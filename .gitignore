@@ -1,2 +1,6 @@
+# cargo
 /target
 **/*.rs.bk
+
+# dependencies
+/node_modules
