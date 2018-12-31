@@ -1,6 +1,8 @@
 # cargo
-/target
-**/*.rs.bk
+/target/
 
 # dependencies
 /node_modules
+
+# testing
+/tmp/
