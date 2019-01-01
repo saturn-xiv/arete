@@ -4,7 +4,7 @@ pub mod http;
 
 use clap::{self, SubCommand};
 
-use super::{env, errors::Result, parser};
+use super::{env, errors::Result, orm, parser};
 
 pub fn launch() -> Result<()> {
     log4rs::init_file("log4rs.yml", Default::default())?;
@@ -25,9 +25,9 @@ pub fn launch() -> Result<()> {
         )
         .subcommand(generate::systemd::command())
         .subcommand(generate::migration::command())
-        // .subcommand(database::migrate::command())
-        // .subcommand(database::rollback::command())
-        // .subcommand(database::status::command())
+        .subcommand(database::migrate::command())
+        .subcommand(database::rollback::command())
+        .subcommand(database::status::command())
         .get_matches();
 
     if let Some(_) = matches.subcommand_matches(generate::config::NAME) {
@@ -45,7 +45,7 @@ pub fn launch() -> Result<()> {
         let name = matches
             .value_of(generate::migration::ARG_SERVICE_NAME)
             .unwrap();
-        generate::migration::run(name.to_string())?;
+        orm::migration::new(name.to_string())?;
         return Ok(());
     }
 
@@ -61,23 +61,25 @@ pub fn launch() -> Result<()> {
         return Ok(());
     }
 
-    //
-    // if let Some(_) = matches.subcommand_matches(database::migrate::COMMAND_NAME) {
-    //     let db = open_database(cfg)?;
-    //     database::migrate::run(&db, &server.migrations())?;
-    //     return Ok(());
-    // }
-    // if let Some(_) = matches.subcommand_matches(database::rollback::COMMAND_NAME) {
-    //     let db = open_database(cfg)?;
-    //     database::rollback::run(&db)?;
-    //     return Ok(());
-    // }
-    // if let Some(_) = matches.subcommand_matches(database::status::COMMAND_NAME) {
-    //     let db = open_database(cfg)?;
-    //     database::status::run(&db)?;
-    //     return Ok(());
-    // }
-    //
+    if let Some(_) = matches.subcommand_matches(database::migrate::COMMAND_NAME) {
+        let db = cfg.postgresql()?;
+        let db = db.get()?;
+        database::migrate::run(&db)?;
+        return Ok(());
+    }
+    if let Some(_) = matches.subcommand_matches(database::rollback::COMMAND_NAME) {
+        let db = cfg.postgresql()?;
+        let db = db.get()?;
+        database::rollback::run(&db)?;
+        return Ok(());
+    }
+    if let Some(_) = matches.subcommand_matches(database::status::COMMAND_NAME) {
+        let db = cfg.postgresql()?;
+        let db = db.get()?;
+        database::status::run(&db)?;
+        return Ok(());
+    }
+
     // server.launch(&cfg)?;
     Ok(())
 }

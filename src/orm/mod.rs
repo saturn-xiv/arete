@@ -1,3 +1,4 @@
+pub mod migration;
 pub mod schema;
 
 pub type Connection = diesel::pg::PgConnection;
