@@ -9,7 +9,8 @@ ENV TERM linux
 RUN apt-get update
 RUN apt-get -y install apt-utils
 RUN apt-get -y upgrade
-RUN apt-get -y install build-essential pkg-config curl git sudo zsh
+RUN apt-get -y install build-essential pkg-config curl git sudo zsh pwgen \
+  libpq-dev
 RUN apt-get -y autoremove
 RUN apt-get -y clean
 
