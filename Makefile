@@ -20,7 +20,7 @@ check:
 	cargo doc
 
 schema:
-	DATABASE_URL="postgres://postgres:@localhost:5432/arete" diesel print-schema > src/schema.rs
+	DATABASE_URL="postgres://postgres:@localhost:5432/arete" diesel print-schema > src/orm/schema.rs
 
 npm:
 	npm install
