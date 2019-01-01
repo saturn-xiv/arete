@@ -1,3 +1,7 @@
+extern crate arete;
+
 fn main() {
-    println!("Hello, world!");
+    if let Err(e) = arete::app::launch() {
+        panic!("{:?}", e);
+    }
 }
