@@ -2,7 +2,41 @@
 
 A web application by Rust and React.
 
-## Usage
+## Development
+
+### Install dependencies
+
+-   For Mac
+
+```bash
+$ brew install git redis postgresql rabbitmq
+$ brew services start redis
+$ brew services start postgresql
+$ brew services start rabbitmq
+```
+
+-   For Ubuntu
+
+```bash
+$ sudo apt-get install git build-essential redis rabbitmq-server postgresql libpq-dev
+```
+
+-   [Install nodejs](doc/NODEJS.md)
+-   [Install rust](doc/RUST.md)
+-   [Create database](doc/POSTGRESQL.md)
+-   [Create RabbitMQ virtual host](doc/RABBITMQ.md)
+
+```bash
+$ git clone https://github.com/saturn-xiv/arete.git
+$ cd arete
+$ make npm
+$ make check
+$ ./target/debug/arete generate:config # please fix config.toml then
+$ cargo run # http://localhost:8080
+$ cd dashboard && npm start # http://localhost:3000/my/
+```
+
+## Deployment
 
 ### Build by docker
 
@@ -13,7 +47,7 @@ $ docker build -t arete .
 $ docker run --rm -it -v `pwd`:/workspace arete
 > make clean
 > make npm
-> make
+> make # dist.tar.xz
 ```
 
 ## Documents
