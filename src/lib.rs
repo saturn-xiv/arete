@@ -68,4 +68,6 @@ pub mod queue;
 pub mod redis;
 pub mod rfc;
 pub mod settings;
+
+#[cfg(target_os = "linux")]
 pub mod sys;
