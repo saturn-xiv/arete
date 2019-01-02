@@ -3,11 +3,17 @@ import * as React from 'react'
 import Footer from './Footer'
 import Header from './Header'
 
-class Widget extends React.Component<any, any> {
+interface IWidgetProps {
+    children: JSX.Element | JSX.Element[];
+}
+
+class Widget extends React.Component<IWidgetProps> {
     public render() {
         return (<div>
             <Header />
-            {this.props.children}
+            <div className="ms-Grid">
+                {this.props.children}
+            </div>
             <Footer />
         </div>)
     }

@@ -1,0 +1,6 @@
+@import '~office-ui-fabric-core/dist/css/fabric.min.css';
+
+body {
+  margin: 0;
+  padding: 0;
+}

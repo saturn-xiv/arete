@@ -10,6 +10,9 @@ const routes: IPage[] = [{
     component: () => import('./users/SignUp'),
     path: '/users/sign-up',
 }, {
+    component: () => import('./Install'),
+    path: '/install',
+}, {
     component: () => import('./Home'),
     path: '/',
 }]
