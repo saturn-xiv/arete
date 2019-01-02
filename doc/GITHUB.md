@@ -19,14 +19,14 @@ cat id_rsa.pub >> authorized_keys
 
 -   Fork
 
-Just click the fork button [lotus](https://github.com/saturn-xiv/lotus)
+Just click the fork button [arete](https://github.com/saturn-xiv/arete)
 
 -   Clone
 
 ```bash
 git clone CHANGE-ME # click the "clone or download" button can see the url
-cd lotus
-git remote add upstream https://github.com/saturn-xiv/lotus.git
+cd arete
+git remote add upstream https://github.com/saturn-xiv/arete.git
 git checkout development # development is your working branch
 ```
 
