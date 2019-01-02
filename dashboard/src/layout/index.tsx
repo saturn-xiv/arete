@@ -11,7 +11,7 @@ class Widget extends React.Component<IWidgetProps> {
     public render() {
         return (<div>
             <Header />
-            <div className="ms-Grid">
+            <div className="ms-Grid" dir="ltr">
                 {this.props.children}
             </div>
             <Footer />

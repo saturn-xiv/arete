@@ -1,23 +1,23 @@
-import { PrimaryButton } from 'office-ui-fabric-react/lib/Button'
 import { TextField } from 'office-ui-fabric-react/lib/TextField'
 import * as React from 'react'
-import { FormattedMessage } from 'react-intl'
+import { InjectedIntlProps, injectIntl, intlShape } from 'react-intl'
 
-class Widget extends React.Component {
+import Form from '../components/Form'
+
+class Widget extends React.Component<InjectedIntlProps> {
+    public static propTypes: React.ValidationMap<any> = {
+        intl: intlShape.isRequired
+    };
+
     public render() {
-        return (<div className="ms-Grid-row">
-            <div className="ms-Grid-col ms-sm10 ms-smPush1 ms-md4 ms-mdPush4">
-                <FormattedMessage id="install.title" tagName="h2" />
-                <TextField label="Nickname" required={true} />
-                <TextField label="Realname" required={true} />
-                <TextField label="Email" required={true} />
-                <TextField label="Password" type="password" required={true} />
-                <TextField label="Password confirmation" type="password" required={true} />
-                <br />
-                <PrimaryButton><FormattedMessage id="buttons.submit" /></PrimaryButton>
-            </div>
-        </div>)
+        return (<Form title={{ id: 'install.title' }}>
+            <TextField label={this.props.intl.formatMessage({ id: 'form.labels.nick-name' })} required={true} />
+            <TextField label="Realname" required={true} />
+            <TextField label="Email" required={true} />
+            <TextField label="Password" type="password" required={true} />
+            <TextField label="Password confirmation" type="password" required={true} />
+        </Form>)
     }
 }
 
-export default Widget
+export default injectIntl(Widget)
