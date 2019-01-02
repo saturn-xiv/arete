@@ -31,6 +31,8 @@ RUN zsh -c "source $HOME/.zshrc \
 # rust
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 RUN echo 'source $HOME/.cargo/env' >> $HOME/.zshrc
+# https://github.com/rust-lang/rust/issues/50504#issuecomment-410550021
+RUN export RUSTFLAGS="-Aproc-macro-derive-resolution-fallback" 
 
 VOLUME /workspace
 WORKDIR /workspace
