@@ -7,3 +7,6 @@
 # testing
 /tmp/
 /config.toml
+
+#building
+/dist*
