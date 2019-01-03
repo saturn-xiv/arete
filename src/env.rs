@@ -103,15 +103,15 @@ impl Config {
 pub struct Http {
     pub port: u16,
     pub theme: String,
-    pub workers: u16,
-    pub keep_alive: Option<u32>,
+    pub workers: usize,
+    pub keep_alive: Option<usize>,
 }
 
 impl Default for Http {
     fn default() -> Self {
         Self {
             port: 8080,
-            workers: 64,
+            workers: 4,
             theme: "bootstrap".to_string(),
             keep_alive: Some(120),
         }

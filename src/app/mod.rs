@@ -80,5 +80,5 @@ pub fn launch() -> Result<()> {
         return Ok(());
     }
 
-    http::run(cfg)
+    http::server::launch(cfg)
 }
