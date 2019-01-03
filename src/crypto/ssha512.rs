@@ -3,7 +3,7 @@
 // doveadm pw -t {SSHA256.hex}4a847fefc4f9ab450f16783c5025d64313942a1ceb2599707cdb65940ba901e513fa442f -p pass
 
 use base64;
-use rust_sodium::crypto::hash::sha512::{hash, DIGESTBYTES};
+use sodiumoxide::crypto::hash::sha512::{hash, DIGESTBYTES};
 
 pub fn sum(plain: &[u8], salt: &[u8]) -> String {
     base64::encode(&[hash(&[plain, salt].concat()).as_ref(), salt].concat())

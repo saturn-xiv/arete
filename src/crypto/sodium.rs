@@ -1,4 +1,4 @@
-use rust_sodium::{
+use sodiumoxide::{
     crypto::{pwhash, secretbox},
     randombytes,
 };

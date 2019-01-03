@@ -8,7 +8,7 @@ use super::{env, errors::Result, orm, parser};
 
 pub fn launch() -> Result<()> {
     log4rs::init_file("log4rs.yml", Default::default())?;
-    if let Err(_) = rust_sodium::init() {
+    if let Err(_) = sodiumoxide::init() {
         return Err("sodium init fail".into());
     }
 
