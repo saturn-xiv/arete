@@ -1,10 +1,3 @@
-#[cfg(feature = "mysql")]
-mod mysql;
-#[cfg(feature = "postgresql")]
-mod postgresql;
-#[cfg(feature = "sqlite")]
-mod sqlite;
-
 use chrono::{NaiveDateTime, Utc};
 use diesel::{insert_into, prelude::*, update};
 use serde::{de::DeserializeOwned, ser::Serialize};

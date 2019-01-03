@@ -141,4 +141,7 @@ impl Http {
     pub fn third(&self) -> PathBuf {
         Path::new("node_modules").to_path_buf()
     }
+    pub fn upload(&self) -> PathBuf {
+        Path::new("tmp").join("upload")
+    }
 }

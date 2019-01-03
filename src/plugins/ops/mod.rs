@@ -1,2 +1,2 @@
-pub mod vpn;
 pub mod email;
+pub mod vpn;
