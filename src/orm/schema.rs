@@ -135,7 +135,7 @@ table! {
     logs (id) {
         id -> Int8,
         user_id -> Int8,
-        ip -> Varchar,
+        ip -> Inet,
         message -> Varchar,
         created_at -> Timestamp,
     }
@@ -236,8 +236,20 @@ table! {
     survey_responses (id) {
         id -> Int8,
         form_id -> Int8,
+        email -> Varchar,
+        username -> Varchar,
         ip -> Inet,
         content -> Json,
+        created_at -> Timestamp,
+    }
+}
+
+table! {
+    survey_subscribers (id) {
+        id -> Int8,
+        form_id -> Int8,
+        email -> Varchar,
+        username -> Varchar,
         created_at -> Timestamp,
     }
 }
@@ -267,9 +279,9 @@ table! {
         logo -> Varchar,
         sign_in_count -> Int8,
         current_sign_in_at -> Nullable<Timestamp>,
-        current_sign_in_ip -> Nullable<Varchar>,
+        current_sign_in_ip -> Nullable<Inet>,
         last_sign_in_at -> Nullable<Timestamp>,
-        last_sign_in_ip -> Nullable<Varchar>,
+        last_sign_in_ip -> Nullable<Inet>,
         confirmed_at -> Nullable<Timestamp>,
         locked_at -> Nullable<Timestamp>,
         deleted_at -> Nullable<Timestamp>,
@@ -323,6 +335,7 @@ allow_tables_to_appear_in_same_query!(
     survey_forms,
     survey_logs,
     survey_responses,
+    survey_subscribers,
     tags,
     users,
     vip_members,

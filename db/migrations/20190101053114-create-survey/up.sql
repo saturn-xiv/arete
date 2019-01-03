@@ -28,11 +28,15 @@ CREATE UNIQUE INDEX idx_survey_fields_form_key ON survey_fields(form_id, key);
 CREATE TABLE survey_responses(
   id BIGSERIAL PRIMARY KEY,
   form_id BIGINT NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  username VARCHAR(32) NOT NULL,
   ip INET NOT NULL,
   content JSON NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-CREATE UNIQUE INDEX idx_survey_responses_ip ON survey_responses(ip);
+CREATE INDEX idx_survey_responses_ip ON survey_responses(ip);
+CREATE INDEX idx_survey_responses_email ON survey_responses(email);
+CREATE INDEX idx_survey_responses_username ON survey_responses(username);
 
 CREATE TABLE survey_logs(
   id BIGSERIAL PRIMARY KEY,
@@ -42,3 +46,13 @@ CREATE TABLE survey_logs(
   message VARCHAR(255) NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE survey_subscribers(
+  id BIGSERIAL PRIMARY KEY,
+  form_id BIGINT NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  username VARCHAR(32) NOT NULL,    
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE UNIQUE INDEX idx_survey_subscribers_email_form ON survey_subscribers(email, form_id);
+CREATE INDEX idx_survey_subscribers_email_username ON survey_subscribers(email, username);
