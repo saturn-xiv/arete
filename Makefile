@@ -10,7 +10,7 @@ build:
 	cd $(dist) && tar cfJ ../$(dist).tar.xz *
 
 clean:
-	rm -rv $(dist)
+	rm -rv $(dist) $(dist).tar.xz
 	cargo clean
 	cd dashboard && rm -rf build
 
