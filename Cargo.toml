@@ -33,7 +33,7 @@ r2d2_redis = "0.8"
 lapin-futures = "0.15"
 nix = "0.12"
 eui48 = "0.4"
-rust_sodium = "0.10"
+sodiumoxide = "0.2"
 hex = "0.3"
 md5 = "0.6"
 git2 = "0.8"
@@ -56,10 +56,6 @@ git = "https://github.com/lettre/lettre.git"
 
 [dependencies.lettre_email]
 git = "https://github.com/lettre/lettre.git"
-
-[dependencies.openssl-sys]
-version = "*"
-features = ["vendored"]
 
 [dependencies.chrono]
 version = "0.4"
