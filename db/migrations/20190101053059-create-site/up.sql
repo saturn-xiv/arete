@@ -43,6 +43,7 @@ CREATE INDEX idx_friend_links_lang ON friend_links(lang);
 
 CREATE TABLE leave_words(
   id BIGSERIAL PRIMARY KEY,
+  ip INET NOT NULL,
   body TEXT NOT NULL,
   media_type VARCHAR(8) NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP  
@@ -72,7 +73,7 @@ CREATE UNIQUE INDEX idx_tags_name ON tags(name);
 
 CREATE TABLE categories(
   id BIGSERIAL PRIMARY KEY,
-  parent_id BIGINT,
+  parent_id BIGINT,    
   name VARCHAR(255) NOT NULL,
   icon VARCHAR(16) NOT NULL,
   color VARCHAR(16) NOT NULL,

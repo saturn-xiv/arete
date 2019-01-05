@@ -100,6 +100,7 @@ table! {
 table! {
     leave_words (id) {
         id -> Int8,
+        ip -> Inet,
         body -> Text,
         media_type -> Varchar,
         created_at -> Timestamp,
