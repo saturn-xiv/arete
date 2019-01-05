@@ -24,4 +24,7 @@ fn new(cfg: Arc<Config>) -> App<nut::State> {
     .resource(r"/assets/{file:.*}", |r| {
         r.get().f(nut::controllers::html::assets)
     })
+    .scope(r"/api", |s| {
+        s.resource(r"/install", |r| r.post().f(nut::controllers::api::install))
+    })
 }
