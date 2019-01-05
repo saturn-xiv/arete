@@ -43,7 +43,7 @@ CREATE INDEX idx_friend_links_lang ON friend_links(lang);
 
 CREATE TABLE leave_words(
   id BIGSERIAL PRIMARY KEY,
-  ip INET NOT NULL,
+  ip VARCHAR(39),
   body TEXT NOT NULL,
   media_type VARCHAR(8) NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP  

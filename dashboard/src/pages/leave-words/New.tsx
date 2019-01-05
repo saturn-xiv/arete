@@ -9,7 +9,7 @@ import Layout from '../../components/NonSignIn'
 import { httpPost } from '../../utils/request'
 
 interface IFormState {
-    content: string,
+    body: string,
     bar?: IMessageBar,
 }
 
@@ -22,7 +22,7 @@ class Widget extends React.Component<InjectedIntlProps, IFormState> {
     constructor(props: InjectedIntlProps) {
         super(props)
         this.state = {
-            content: '',
+            body: '',
         }
         this.handleChange = this.handleChange.bind(this)
         this.handleSubmit = this.handleSubmit.bind(this)
@@ -45,12 +45,13 @@ class Widget extends React.Component<InjectedIntlProps, IFormState> {
 
         const { formatMessage } = this.props.intl
 
-        httpPost('/users/sign-in', this.state).then((rst) => {
+        httpPost('/leave-words/new', this.state).then((rst) => {
             this.setState({
                 bar: {
                     content: formatMessage({ id: 'form.flashes.success' }),
                     type: MessageBarType.success,
-                }
+                },
+                body: '',
             })
         }).catch((err) => this.setState({
             bar: {
@@ -73,10 +74,10 @@ class Widget extends React.Component<InjectedIntlProps, IFormState> {
             </MessageBar>)}
             <form onSubmit={this.handleSubmit}>
                 <TextField
-                    name="content"
-                    value={this.state.content}
+                    name="body"
+                    value={this.state.body}
                     onChange={this.handleChange}
-                    label={formatMessage({ id: 'form.labels.content' })}
+                    label={formatMessage({ id: 'form.labels.body' })}
                     multiline={true}
                     description={formatMessage({ id: 'leave-words.new.help' })}
                     required={true} />

@@ -9,9 +9,10 @@ pub fn launch(cfg: Config) -> Result<()> {
     let sys = actix::System::new(NAME);
 
     let cfg = Arc::new(cfg);
+    let dbp = cfg.postgresql()?;
 
     let src = cfg.clone();
-    HttpServer::new(move || new(src.clone()).finish())
+    HttpServer::new(move || new(src.clone(), dbp.clone()).finish())
         .bind(cfg.http.address())?
         .shutdown_timeout(60)
         .workers(cfg.http.workers)

@@ -5,13 +5,17 @@ use std::fmt;
 use std::str::FromStr;
 use std::sync::Arc;
 
+use actix::prelude::*;
+
 use super::super::{
     env::Config,
     errors::{Error, Result},
+    orm::DbExecutor,
 };
 
 pub struct State {
     pub config: Arc<Config>,
+    pub db: Addr<DbExecutor>,
 }
 
 pub enum MediaType {

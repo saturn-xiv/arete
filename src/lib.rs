@@ -13,6 +13,8 @@ extern crate validator_derive;
 #[macro_use]
 extern crate diesel;
 
+extern crate actix;
+extern crate actix_web;
 extern crate base64;
 extern crate chrono;
 extern crate chrono_tz;
@@ -24,7 +26,6 @@ extern crate futures;
 extern crate git2;
 extern crate hex;
 extern crate hyper;
-extern crate ipnetwork;
 extern crate jsonwebtoken;
 extern crate language_tags;
 extern crate lapin_futures as lapin;

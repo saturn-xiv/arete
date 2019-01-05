@@ -1,8 +1,5 @@
-use std::net::IpAddr;
-
 use chrono::{NaiveDateTime, Utc};
 use diesel::{insert_into, prelude::*};
-use ipnetwork::IpNetwork;
 use serde_json::Value;
 
 use super::super::super::super::{
@@ -16,7 +13,7 @@ pub struct Item {
     pub form_id: i64,
     pub email: String,
     pub username: String,
-    pub ip: IpNetwork,
+    pub ip: Option<String>,
     pub content: Value,
     pub created_at: NaiveDateTime,
 }
@@ -27,7 +24,7 @@ pub trait Dao {
         form: &i64,
         email: &String,
         username: &String,
-        ip: &IpAddr,
+        ip: &Option<&str>,
         content: &Value,
     ) -> Result<i64>;
     fn by_form(&self, id: &i64) -> Result<Vec<Item>>;
@@ -39,15 +36,14 @@ impl Dao for Connection {
         form: &i64,
         email: &String,
         username: &String,
-        ip: &IpAddr,
+        ip: &Option<&str>,
         content: &Value,
     ) -> Result<i64> {
         let now = Utc::now().naive_utc();
-        let ip: IpNetwork = (*ip).into();
         let id = insert_into(survey_responses::dsl::survey_responses)
             .values((
                 survey_responses::dsl::form_id.eq(form),
-                survey_responses::dsl::ip.eq(&ip),
+                survey_responses::dsl::ip.eq(ip),
                 survey_responses::dsl::email.eq(&email),
                 survey_responses::dsl::username.eq(&username),
                 survey_responses::dsl::content.eq(content),

@@ -1,3 +1,4 @@
+pub mod leave_words;
 pub mod users;
 
 use actix_web::{HttpRequest, Json, Result};
