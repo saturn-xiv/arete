@@ -208,7 +208,6 @@ dependencies = [
  "git2 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "hex 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "hyper 0.12.19 (registry+https://github.com/rust-lang/crates.io-index)",
- "ipnetwork 0.12.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "jsonwebtoken 5.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "language-tags 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "lapin-futures 0.15.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1079,9 +1078,6 @@ dependencies = [
 name = "ipnetwork"
 version = "0.12.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-dependencies = [
- "serde 1.0.84 (registry+https://github.com/rust-lang/crates.io-index)",
-]
 
 [[package]]
 name = "itoa"
