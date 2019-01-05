@@ -1,14 +1,17 @@
+import { PrimaryButton } from 'office-ui-fabric-react/lib/Button'
+import { MessageBar, MessageBarType } from 'office-ui-fabric-react/lib/MessageBar'
 import { TextField } from 'office-ui-fabric-react/lib/TextField'
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl, intlShape } from 'react-intl'
+import { FormattedMessage, InjectedIntlProps, injectIntl, intlShape } from 'react-intl'
 
-import { Panel, validateEmail, validatePassword, validateUsername } from '../components/form'
+import { IMessageBar } from '../components'
+import Layout from '../components/NonSignIn'
 import { httpPost } from '../utils/request'
 
 interface IFormState {
     realName: string,
     email: string,
-    errors: string[],
+    bar?: IMessageBar,
     password: string,
     passwordConfirmation: string,
 }
@@ -23,13 +26,13 @@ class Widget extends React.Component<InjectedIntlProps, IFormState> {
         super(props)
         this.state = {
             email: '',
-            errors: [],
             password: '',
             passwordConfirmation: '',
             realName: '',
         }
         this.handleChange = this.handleChange.bind(this)
         this.handleSubmit = this.handleSubmit.bind(this)
+        this.handleDismiss = this.handleDismiss.bind(this)
     }
 
     public handleChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -38,62 +41,83 @@ class Widget extends React.Component<InjectedIntlProps, IFormState> {
         this.setState(change);
     }
 
+
+    public handleDismiss() {
+        this.setState({ bar: undefined })
+    }
+
     public handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        const errors = []
-        if (!validateEmail(this.state.email)) {
-            errors.push(this.props.intl.formatMessage({ id: 'form.validations.email' }))
-        }
-        if (!validateUsername(this.state.realName)) {
-            errors.push(this.props.intl.formatMessage({ id: 'form.validations.username' }))
-        }
-        if (!validatePassword(this.state.password)) {
-            errors.push(this.props.intl.formatMessage({ id: 'form.validations.password' }))
-        }
+
+        const { formatMessage } = this.props.intl
         if (this.state.password !== this.state.passwordConfirmation) {
-            errors.push(this.props.intl.formatMessage({ id: 'form.validations.password-confirmation' }))
+            this.setState({
+                bar: {
+                    content: formatMessage({ id: 'form.validations.password-confirmation' }),
+                    type: MessageBarType.error,
+                }
+            })
+            return
         }
 
+        httpPost('/install', this.state).then((rst) => {
+            this.setState({
+                bar: {
+                    content: formatMessage({ id: 'install.success' }),
+                    type: MessageBarType.success,
+                }
+            })
+        }).catch((err) => this.setState({
+            bar: {
+                content: err,
+                type: MessageBarType.error,
+            }
+        }))
 
-        if (errors.length === 0) {
-            httpPost('/install', this.state).then((rst) => { alert(rst) }).catch((err) => this.setState({ errors: [err] }))
-        } {
-            this.setState({ errors })
-        }
     }
 
     public render() {
-        return (<form onSubmit={this.handleSubmit}>
-            <Panel errors={this.state.errors} title={{ id: 'install.title' }}>
+        const { formatMessage } = this.props.intl
+        return (<Layout>
+            <FormattedMessage id="install.title" tagName="h2" />
+            {this.state.bar && (<MessageBar
+                messageBarType={this.state.bar.type} onDismiss={this.handleDismiss}
+                isMultiline={false}
+                dismissButtonAriaLabel="Close">
+                {this.state.bar.content}
+            </MessageBar>)}
+            <form onSubmit={this.handleSubmit}>
                 <TextField
                     name="realName"
                     value={this.state.realName}
                     onChange={this.handleChange}
-                    label={this.props.intl.formatMessage({ id: 'form.labels.username' })}
+                    label={formatMessage({ id: 'form.labels.username' })}
                     required={true} />
                 <TextField
                     name="email"
                     type="email"
                     value={this.state.email}
                     onChange={this.handleChange}
-                    label={this.props.intl.formatMessage({ id: 'form.labels.email' })}
+                    label={formatMessage({ id: 'form.labels.email' })}
                     required={true} />
                 <TextField
                     name="password"
                     value={this.state.password}
                     onChange={this.handleChange}
-                    label={this.props.intl.formatMessage({ id: 'form.labels.password' })}
+                    label={formatMessage({ id: 'form.labels.password' })}
                     type="password"
                     required={true} />
                 <TextField
                     name="passwordConfirmation"
                     value={this.state.passwordConfirmation}
                     onChange={this.handleChange}
-                    label={this.props.intl.formatMessage({ id: 'form.labels.password-confirmation' })}
+                    label={formatMessage({ id: 'form.labels.password-confirmation' })}
                     type="password"
                     required={true} />
-            </Panel>
-        </form>)
+                <br />
+                <PrimaryButton type="submit" text={formatMessage({ id: 'buttons.submit' })} />
+            </form>
+        </Layout>)
     }
 }
 

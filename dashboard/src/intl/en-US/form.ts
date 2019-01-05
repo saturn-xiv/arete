@@ -1,4 +1,8 @@
 export default {
+    'form.flashes.success': 'Success',
+    'form.helps.nick-name': 'Nick name is your unique ID to sign in, between 2 to 32 charaters.',
+    'form.helps.password': 'Password must at least 6 characters.',
+    'form.labels.content': 'Content',
     'form.labels.email': 'Email',
     'form.labels.nick-name': 'Nick name',
     'form.labels.password': 'Password',

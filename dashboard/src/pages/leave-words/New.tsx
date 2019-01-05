@@ -9,8 +9,7 @@ import Layout from '../../components/NonSignIn'
 import { httpPost } from '../../utils/request'
 
 interface IFormState {
-    login: string,
-    password: string,
+    content: string,
     bar?: IMessageBar,
 }
 
@@ -23,8 +22,7 @@ class Widget extends React.Component<InjectedIntlProps, IFormState> {
     constructor(props: InjectedIntlProps) {
         super(props)
         this.state = {
-            login: '',
-            password: '',
+            content: '',
         }
         this.handleChange = this.handleChange.bind(this)
         this.handleSubmit = this.handleSubmit.bind(this)
@@ -50,7 +48,7 @@ class Widget extends React.Component<InjectedIntlProps, IFormState> {
         httpPost('/users/sign-in', this.state).then((rst) => {
             this.setState({
                 bar: {
-                    content: formatMessage({ id: 'install.success' }),
+                    content: formatMessage({ id: 'form.flashes.success' }),
                     type: MessageBarType.success,
                 }
             })
@@ -66,7 +64,7 @@ class Widget extends React.Component<InjectedIntlProps, IFormState> {
     public render() {
         const { formatMessage } = this.props.intl
         return (<Layout>
-            <FormattedMessage id="users.sign-in.title" tagName="h2" />
+            <FormattedMessage id="leave-words.new.title" tagName="h2" />
             {this.state.bar && (<MessageBar
                 messageBarType={this.state.bar.type} onDismiss={this.handleDismiss}
                 isMultiline={false}
@@ -75,17 +73,12 @@ class Widget extends React.Component<InjectedIntlProps, IFormState> {
             </MessageBar>)}
             <form onSubmit={this.handleSubmit}>
                 <TextField
-                    name="login"
-                    value={this.state.login}
+                    name="content"
+                    value={this.state.content}
                     onChange={this.handleChange}
-                    label={formatMessage({ id: 'form.labels.username' })}
-                    required={true} />
-                <TextField
-                    name="password"
-                    value={this.state.password}
-                    onChange={this.handleChange}
-                    label={formatMessage({ id: 'form.labels.password' })}
-                    type="password"
+                    label={formatMessage({ id: 'form.labels.content' })}
+                    multiline={true}
+                    description={formatMessage({ id: 'leave-words.new.help' })}
                     required={true} />
                 <br />
                 <PrimaryButton type="submit" text={formatMessage({ id: 'buttons.submit' })} />

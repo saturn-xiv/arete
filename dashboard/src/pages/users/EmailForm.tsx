@@ -9,22 +9,24 @@ import Layout from '../../components/NonSignIn'
 import { httpPost } from '../../utils/request'
 
 interface IFormState {
-    login: string,
-    password: string,
+    email: string,
     bar?: IMessageBar,
 }
 
-class Widget extends React.Component<InjectedIntlProps, IFormState> {
+interface IFormProps {
+    action: string,
+}
+
+class Widget extends React.Component<InjectedIntlProps & IFormProps, IFormState> {
 
     public static propTypes: React.ValidationMap<any> = {
         intl: intlShape.isRequired,
     }
 
-    constructor(props: InjectedIntlProps) {
+    constructor(props: InjectedIntlProps & IFormProps) {
         super(props)
         this.state = {
-            login: '',
-            password: '',
+            email: '',
         }
         this.handleChange = this.handleChange.bind(this)
         this.handleSubmit = this.handleSubmit.bind(this)
@@ -45,12 +47,13 @@ class Widget extends React.Component<InjectedIntlProps, IFormState> {
     public handleSubmit(e: React.FormEvent) {
         e.preventDefault();
 
+        const { action } = this.props
         const { formatMessage } = this.props.intl
 
-        httpPost('/users/sign-in', this.state).then((rst) => {
+        httpPost(`/users/${action}`, this.state).then((rst) => {
             this.setState({
                 bar: {
-                    content: formatMessage({ id: 'install.success' }),
+                    content: formatMessage({ id: `users.${action}.success` }),
                     type: MessageBarType.success,
                 }
             })
@@ -66,7 +69,7 @@ class Widget extends React.Component<InjectedIntlProps, IFormState> {
     public render() {
         const { formatMessage } = this.props.intl
         return (<Layout>
-            <FormattedMessage id="users.sign-in.title" tagName="h2" />
+            <FormattedMessage id={`users.${this.props.action}.title`} tagName="h2" />
             {this.state.bar && (<MessageBar
                 messageBarType={this.state.bar.type} onDismiss={this.handleDismiss}
                 isMultiline={false}
@@ -75,17 +78,11 @@ class Widget extends React.Component<InjectedIntlProps, IFormState> {
             </MessageBar>)}
             <form onSubmit={this.handleSubmit}>
                 <TextField
-                    name="login"
-                    value={this.state.login}
+                    name="email"
+                    type="email"
+                    value={this.state.email}
                     onChange={this.handleChange}
-                    label={formatMessage({ id: 'form.labels.username' })}
-                    required={true} />
-                <TextField
-                    name="password"
-                    value={this.state.password}
-                    onChange={this.handleChange}
-                    label={formatMessage({ id: 'form.labels.password' })}
-                    type="password"
+                    label={formatMessage({ id: 'form.labels.email' })}
                     required={true} />
                 <br />
                 <PrimaryButton type="submit" text={formatMessage({ id: 'buttons.submit' })} />
