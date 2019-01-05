@@ -41,7 +41,6 @@ ssh2 = "0.3"
 mime = "0.3"
 actix = "0.7"
 actix-web = "0.7"
-ipnetwork = "0.12"
 mustache = "*"
 lazy_static = "1"
 serde = "1"
@@ -51,6 +50,7 @@ regex = "1"
 clap = "2"
 jsonwebtoken = "5"
 
+# https://github.com/lettre/lettre/issues/312
 [dependencies.lettre]
 git = "https://github.com/lettre/lettre.git"
 
@@ -72,6 +72,11 @@ features=["query_encoding"]
 [dependencies.uuid]
 version = "0.7"
 features = ["v4"]
+
+# https://github.com/diesel-rs/diesel/issues/1942
+[dependencies.ipnetwork]
+version = "0.12"
+features = ["serde"]
 
 [dependencies.diesel]
 version = "1.3"
