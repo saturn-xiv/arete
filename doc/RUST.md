@@ -18,5 +18,6 @@ export RUSTFLAGS="-Aproc-macro-derive-resolution-fallback" # https://github.com/
 -   Install rust
 
 ```bash
-rustup component add rustfmt rls rust-analysis rust-src clippy
+rustup override set nightly
+rustup component add rustfmt rls-preview rust-analysis rust-src clippy
 ```
