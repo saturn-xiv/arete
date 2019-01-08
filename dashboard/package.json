@@ -39,12 +39,12 @@
     "eject": "react-scripts-ts eject"
   },
   "devDependencies": {
-    "@types/jest": "^23.3.11",
+    "@types/jest": "^23.3.12",
     "@types/js-cookie": "^2.2.0",
     "@types/node": "^10.12.18",
     "@types/react": "^16.7.18",
     "@types/react-dom": "^16.0.11",
-    "@types/react-intl": "^2.3.14",
+    "@types/react-intl": "^2.3.15",
     "@types/react-loadable": "^5.4.3",
     "@types/react-redux": "^6.0.12",
     "@types/react-router-dom": "^4.3.1",
