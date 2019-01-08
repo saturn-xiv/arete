@@ -100,7 +100,7 @@ table! {
 table! {
     leave_words (id) {
         id -> Int8,
-        ip -> Nullable<Varchar>,
+        ip -> Inet,
         body -> Text,
         media_type -> Varchar,
         created_at -> Timestamp,
@@ -136,7 +136,7 @@ table! {
     logs (id) {
         id -> Int8,
         user_id -> Int8,
-        ip -> Nullable<Varchar>,
+        ip -> Inet,
         message -> Varchar,
         created_at -> Timestamp,
     }
@@ -227,7 +227,7 @@ table! {
         id -> Int8,
         form_id -> Int8,
         user_id -> Nullable<Int8>,
-        ip -> Nullable<Varchar>,
+        ip -> Inet,
         message -> Varchar,
         created_at -> Timestamp,
     }
@@ -239,7 +239,7 @@ table! {
         form_id -> Int8,
         email -> Varchar,
         username -> Varchar,
-        ip -> Nullable<Varchar>,
+        ip -> Inet,
         content -> Json,
         created_at -> Timestamp,
     }
@@ -280,9 +280,9 @@ table! {
         logo -> Varchar,
         sign_in_count -> Int8,
         current_sign_in_at -> Nullable<Timestamp>,
-        current_sign_in_ip -> Nullable<Varchar>,
+        current_sign_in_ip -> Nullable<Inet>,
         last_sign_in_at -> Nullable<Timestamp>,
-        last_sign_in_ip -> Nullable<Varchar>,
+        last_sign_in_ip -> Nullable<Inet>,
         confirmed_at -> Nullable<Timestamp>,
         locked_at -> Nullable<Timestamp>,
         deleted_at -> Nullable<Timestamp>,
