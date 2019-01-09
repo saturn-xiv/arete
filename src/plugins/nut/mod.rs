@@ -1,3 +1,4 @@
+pub mod catchers;
 pub mod controllers;
 pub mod models;
 pub mod request;

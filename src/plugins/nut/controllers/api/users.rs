@@ -337,7 +337,7 @@ pub fn reset_password(
 }
 
 #[get("/logs")]
-pub fn get_logs(user: CurrentUser, db: Database) -> Result<Json<Vec<Log>>> {
+pub fn logs(user: CurrentUser, db: Database) -> Result<Json<Vec<Log>>> {
     let db = db.deref();
     let items = LogDao::all(db, &user.id, 1 << 10)?;
     Ok(Json(items))
