@@ -36,6 +36,7 @@ lazy_static! {
                 api::admin::leave_words::destory
             ],
         ));
+        items.push(("/api", routes![api::about]));
         items.push((
             "/",
             routes![

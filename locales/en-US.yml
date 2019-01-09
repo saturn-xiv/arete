@@ -27,6 +27,10 @@ form:
     password: Password must at least has 6 characters.
     password-confirmation: Passwords not match.
     username: Username must between 2~32 characters.
+site:
+  copyright: 2018~2019
+  title: Title
+  subhead: Subhead  
 nut:
   home:
     title: Home
