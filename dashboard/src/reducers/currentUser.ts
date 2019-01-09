@@ -2,7 +2,7 @@ import { Reducer } from 'redux'
 
 import { IUserState, UserActionTypes } from '../actions'
 
-const initialState: IUserState = { uid: undefined }
+const initialState: IUserState = {}
 
 export const currentUser: Reducer<IUserState> = (state = initialState, action) => {
   switch (action.type) {

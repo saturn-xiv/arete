@@ -1,4 +1,5 @@
-@import '~office-ui-fabric-core/dist/css/fabric.min.css';
+@import '~antd/dist/antd.css';
+@import '~ant-design-pro/dist/ant-design-pro.css';
 
 body {
   margin: 0;

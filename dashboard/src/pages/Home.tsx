@@ -1,8 +1,9 @@
 import * as React from 'react'
+import { FormattedMessage } from 'react-intl'
 
 class Widget extends React.Component {
     public render() {
-        return (<div>home</div>)
+        return (<div><FormattedMessage id="nut.home.title" /></div>)
     }
 }
 
