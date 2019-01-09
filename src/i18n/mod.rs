@@ -45,8 +45,8 @@ impl I18n {
             &format!("locales.{}.{}", lang, code),
             Duration::from_secs(60 * 60 * 24 * 7),
             || -> Result<Option<String>> {
-                if let Ok(v) = self.db.deref().get(lang, code) {
-                    return Ok(Some(v));
+                if let Ok(it) = self.db.deref().by_lang_and_code(lang, code) {
+                    return Ok(Some(it.message));
                 }
                 Ok(None)
             },

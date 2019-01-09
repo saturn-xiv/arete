@@ -25,20 +25,15 @@ lazy_static! {
                 api::users::sign_out
             ],
         ));
+        items.push(("/api/locales", routes![api::locales::index]));
+        items.push(("/api/leave-words", routes![api::leave_words::create]));
         items.push((
-            "/api/locales",
+            "/api/admin",
             routes![
-                api::locales::index,
-                api::locales::save,
-                api::locales::destory,
-            ],
-        ));
-        items.push((
-            "/api/leave-words",
-            routes![
-                api::leave_words::index,
-                api::leave_words::create,
-                api::leave_words::destory,
+                api::admin::locales::update,
+                api::admin::locales::destory,
+                api::admin::leave_words::index,
+                api::admin::leave_words::destory
             ],
         ));
         items.push((
@@ -47,8 +42,8 @@ lazy_static! {
                 seo::robots::txt,
                 seo::sitemap::xml_gz,
                 seo::rss::atom,
-                html::home,
                 html::ueditor,
+                html::home,
             ],
         ));
         items

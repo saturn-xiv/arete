@@ -28,8 +28,10 @@ pub struct New<'a> {
 pub trait Dao {
     fn languages(&self) -> Result<Vec<String>>;
     fn count(&self, lang: &String) -> Result<i64>;
-    fn all(&self, lang: &String) -> Result<Vec<Item>>;
-    fn get(&self, lang: &String, code: &String) -> Result<String>;
+    fn all(&self) -> Result<Vec<Item>>;
+    fn by_lang(&self, lang: &String) -> Result<Vec<Item>>;
+    fn by_id(&self, id: &i64) -> Result<Item>;
+    fn by_lang_and_code(&self, lang: &String, code: &String) -> Result<Item>;
     fn set(&self, lang: &String, code: &String, message: &String) -> Result<()>;
     fn delete(&self, id: &i64) -> Result<()>;
 }
@@ -49,21 +51,32 @@ impl Dao for Connection {
             .get_result(self)?;
         Ok(cnt)
     }
-
-    fn all(&self, lang: &String) -> Result<Vec<Item>> {
+    fn by_lang(&self, lang: &String) -> Result<Vec<Item>> {
         let items = locales::dsl::locales
             .filter(locales::dsl::lang.eq(lang))
             .order(locales::dsl::code.asc())
             .load::<Item>(self)?;
         Ok(items)
     }
-
-    fn get(&self, lang: &String, code: &String) -> Result<String> {
+    fn all(&self) -> Result<Vec<Item>> {
+        let items = locales::dsl::locales
+            .order(locales::dsl::code.asc())
+            .order(locales::dsl::lang.asc())
+            .load::<Item>(self)?;
+        Ok(items)
+    }
+    fn by_id(&self, id: &i64) -> Result<Item> {
+        let it = locales::dsl::locales
+            .filter(locales::dsl::id.eq(id))
+            .first::<Item>(self)?;
+        Ok(it)
+    }
+    fn by_lang_and_code(&self, lang: &String, code: &String) -> Result<Item> {
         let it = locales::dsl::locales
             .filter(locales::dsl::lang.eq(lang))
             .filter(locales::dsl::code.eq(code))
             .first::<Item>(self)?;
-        Ok(it.message)
+        Ok(it)
     }
     fn set(&self, lang: &String, code: &String, message: &String) -> Result<()> {
         let now = Utc::now().naive_utc();

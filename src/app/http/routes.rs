@@ -12,8 +12,7 @@ pub fn run() -> Result<()> {
             .finalize()?,
     );
     println!("METHOD\tRANK\tURI");
-    for it in app.routes() {
-        println!("{}\t{}\t{}", it.method, it.rank, it.uri);
-    }
+    app.routes()
+        .for_each(|it| println!("{}\t{}\t{}", it.method, it.rank, it.uri));
     Ok(())
 }
