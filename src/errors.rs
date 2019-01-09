@@ -39,6 +39,7 @@ error_chain! {
         LettreSmtp(lettre::smtp::error::Error);
         RocketConfig(rocket::config::ConfigError);
         RocketLaunch(rocket::error::LaunchError);
+        YamlScan(yaml_rust::ScanError);
     }
 }
 

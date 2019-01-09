@@ -44,7 +44,7 @@ impl Default for Config {
             http: Http::default(),
             secrets: base64::encode(&crypto::sodium::Encryptor::random(32)),
             redis: "redis://127.0.0.1:5432/0".to_string(),
-            database: format!("postgres://postgres:@127.0.0.1:5432/{}", NAME),
+            database: format!("postgres://postgres:@127.0.0.1:6379/{}", NAME),
             rabbitmq: RabbitMQConfig::default(),
         }
     }

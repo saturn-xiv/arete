@@ -1,6 +1,7 @@
 pub mod database;
 pub mod generate;
 pub mod http;
+pub mod i18n;
 
 use clap::{self, SubCommand};
 
@@ -23,6 +24,7 @@ pub fn launch() -> Result<()> {
         .subcommand(database::migrate::command())
         .subcommand(database::rollback::command())
         .subcommand(database::status::command())
+        .subcommand(i18n::sync::command())
         .subcommand(SubCommand::with_name(http::routes::NAME).about(http::routes::ABOUT))
         .get_matches();
 
@@ -53,6 +55,7 @@ pub fn launch() -> Result<()> {
 
     info!("load configuration from {}", cfg);
     let cfg: env::Config = parser::from_toml(cfg)?;
+
     if let Some(matches) = matches.subcommand_matches(generate::nginx::COMMAND_NAME) {
         let name = matches.value_of(generate::nginx::ARG_SERVER_NAME).unwrap();
         return generate::nginx::run(
@@ -60,6 +63,11 @@ pub fn launch() -> Result<()> {
             cfg.http.port,
             matches.is_present(generate::nginx::ARG_HTTPS),
         );
+    }
+
+    if let Some(matches) = matches.subcommand_matches(i18n::sync::COMMAND_NAME) {
+        let dir = matches.value_of(i18n::sync::ARG_DIR_NAME).unwrap();
+        return i18n::sync::run(cfg, dir.to_string());
     }
 
     if let Some(_) = matches.subcommand_matches(database::migrate::COMMAND_NAME) {

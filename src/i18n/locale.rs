@@ -1,5 +1,10 @@
+use std::ffi::OsStr;
+use std::fs;
+use std::path::Path;
+
 use chrono::{NaiveDateTime, Utc};
 use diesel::{delete, insert_into, prelude::*, update};
+use yaml_rust::{Yaml, YamlLoader};
 
 use super::super::{
     errors::Result,
@@ -26,6 +31,7 @@ pub struct New<'a> {
 }
 
 pub trait Dao {
+    fn sync<P: AsRef<Path>>(&self, root: P) -> Result<(usize, usize)>;
     fn languages(&self) -> Result<Vec<String>>;
     fn count(&self, lang: &String) -> Result<i64>;
     fn all(&self) -> Result<Vec<Item>>;
@@ -36,7 +42,97 @@ pub trait Dao {
     fn delete(&self, id: &i64) -> Result<()>;
 }
 
+fn loop_yaml(
+    db: &Connection,
+    lang: &str,
+    prefix: Option<String>,
+    node: Yaml,
+) -> Result<(usize, usize)> {
+    let mut finded = 0;
+    let mut inserted = 0;
+    let sep = ".";
+    match node {
+        Yaml::String(v) => {
+            let k = match prefix {
+                Some(p) => p,
+                None => "".to_string(),
+            };
+            // debug!("find {} {} => {}", lang, k, v);
+            finded += 1;
+
+            let cnt: i64 = locales::dsl::locales
+                .count()
+                .filter(locales::dsl::lang.eq(lang))
+                .filter(locales::dsl::code.eq(&k))
+                .get_result(db)?;
+            if cnt == 0 {
+                inserted += 1;
+                insert_into(locales::dsl::locales)
+                    .values(&New {
+                        lang: lang,
+                        code: &k,
+                        message: &v,
+                        updated_at: &Utc::now().naive_utc(),
+                    })
+                    .execute(db)?;
+            }
+        }
+        Yaml::Hash(h) => {
+            for (k, v) in h {
+                match k {
+                    Yaml::String(k) => {
+                        let (i, f) = loop_yaml(
+                            db,
+                            lang,
+                            Some(match prefix {
+                                Some(ref p) => p.clone() + sep + &k,
+                                None => k,
+                            }),
+                            v,
+                        )?;
+                        inserted += i;
+                        finded += f;
+                    }
+                    k => {
+                        error!("bad key {:?}", k);
+                    }
+                }
+            }
+        }
+        k => {
+            error!("bad key {:?}", k);
+        }
+    };
+    Ok((inserted, finded))
+}
+
 impl Dao for Connection {
+    fn sync<P: AsRef<Path>>(&self, root: P) -> Result<(usize, usize)> {
+        let mut finded = 0;
+        let mut inserted = 0;
+        let ext = "yml";
+
+        for it in fs::read_dir(root)? {
+            let it = it?.path();
+            if Some(OsStr::new(ext)) == it.extension() {
+                let buf = fs::read_to_string(&it)?;
+                if let Some(name) = it.file_name() {
+                    if let Some(name) = name.to_str() {
+                        let lang = &name[..(name.len() - ext.len() - 1)];
+                        info!("find locale {}", lang);
+                        for it in YamlLoader::load_from_str(&buf)? {
+                            let (i, f) = loop_yaml(&self, lang, None, it)?;
+                            inserted += i;
+                            finded += f;
+                        }
+                    }
+                }
+            }
+        }
+
+        Ok((inserted, finded))
+    }
+
     fn languages(&self) -> Result<Vec<String>> {
         Ok(locales::dsl::locales
             .select(locales::dsl::lang)

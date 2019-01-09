@@ -20,8 +20,8 @@ use super::{
 use self::locale::Dao;
 
 pub struct I18n {
-    db: DbConnection,
-    cache: RedisConnection,
+    pub db: DbConnection,
+    pub cache: RedisConnection,
 }
 
 impl I18n {

@@ -433,12 +433,12 @@ fn send_email(
     )?;
     let subject = i18n.t(
         locale,
-        &format!("nut.emails.users.{}.subject", act),
+        &format!("nut.mailer.users.{}.subject", act),
         &Some(json!({})),
     );
     let body = i18n.t(
         locale,
-        &format!("nut.emails.users.{}.body", act),
+        &format!("nut.mailer.users.{}.body", act),
         &Some(json!({ "host": host, "expire":expire, "token":token })),
     );
 

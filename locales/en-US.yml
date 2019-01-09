@@ -1,0 +1,70 @@
+languages:
+  en-US: English
+  zh-Hans: 简体中文
+  zh-Hant: 繁體中文
+buttons:
+  submit: Submit
+  reset: Reset
+flashes:
+  success: Success
+form:
+  helpers:
+    nick-name: Nick name is your unique ID to sign in, between 2 to 32 charaters.
+    password: Password must at least 6 characters.
+    password-confirmation: Passwords must match.
+  labels:
+    body: Body
+    content: Content
+    email: Email
+    nick-name: Nick name
+    password: Password
+    password-confirmation: Password confirmation
+    real-name: Real name
+    username: User name
+  validations:
+    email: Bad email address.
+    nick-name: Nick name must between 2~32 characters and without special characters.
+    password: Password must at least has 6 characters.
+    password-confirmation: Passwords not match.
+    username: Username must between 2~32 characters.
+nut:
+  home:
+    title: Home
+  install:
+    success: Init database successed, you can sign in to continue now.
+    title: Init database
+  leave-words:
+    new:
+      helper: Please leave your contact information for us to replay to you.
+      title: Leave a message
+  users:
+    change-password:
+      success: Your password has been changed successfully.
+      title: Change your password
+    confirm:
+      success: You will receive an email with instructions for how to confirm your email address in a few minutes.
+      title: Didn't receive unlock instructions?
+    forgot-password:
+      success: You will receive an email with instructions on how to reset your password in a few minutes.
+      title: Forgot your password?
+    reset-password:
+      title: Reset your password
+    sign-in:
+      login: Nick name/Email
+      title: Sign in
+    sign-up:
+      title: Sign Up
+    unlock:
+      success: You will receive an email with instructions for how to unlock your account in a few minutes.
+      title: Didn't receive confirmation instructions?
+  mailer:
+    users:
+      confirm:
+        subject: Confirmation instructions
+        body: Hello {{name}}!<br />You can confirm your account email through the link below.<br /><a target="_blank" href="{{home}}/my/users/confirm/{{token}}">Confirm my account</a>
+      forgot-password:
+        subject: Reset password instructions
+        body: Hello {{name}}!<br />Someone has requested a link to change your password. You can do this through the link below.If you didn't request this, please ignore this email.Your password won't change until you access the link above and create a new one.<br /><a target="_blank" href="{{home}}/my/users/reset-password/{{token}}">Change my password</a>
+      unlock:
+        subject: Unlock instructions
+        body: Hello {{name}}!<br />Click the link below to unlock your account.<br /><a target="_blank" href="{{home}}/my/users/unlock/{{token}}">Unlock my account</a>

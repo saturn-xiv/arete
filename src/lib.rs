@@ -58,6 +58,7 @@ extern crate url;
 extern crate uuid;
 extern crate validator;
 extern crate xml;
+extern crate yaml_rust;
 
 pub mod app;
 pub mod cache;
