@@ -19,6 +19,7 @@ error-chain = "0.12" # https://github.com/rust-lang-nursery/error-chain/issues/2
 base64 = "0.10"
 rand = "0.6"
 toml = "0.4"
+yaml-rust = "0.4"
 validator = "0.8"
 validator_derive = "0.8"
 serde-xml-rs = "0.2"
