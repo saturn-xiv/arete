@@ -1,13 +1,11 @@
-use std::fmt;
+use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
-use std::str::FromStr;
 
-use base64;
-use r2d2;
+use rocket::config::{Config as RocketConfig, Environment, Limits, LoggingLevel, Value};
 
 use super::{
     crypto::{self, Encryptor},
-    errors::{Error, Result},
+    errors::Result,
     orm::{Connection as DbConnection, Pool as DbPool},
     queue::rabbitmq::Config as RabbitMQConfig,
     redis::Pool as RedisPool,
@@ -29,41 +27,11 @@ pub const AUTHORS: &'static str = env!("CARGO_PKG_AUTHORS");
 pub const BANNER: &'static str = include_str!("banner.txt");
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub enum Environment {
-    TEST,
-    DEVELOPMENT,
-    PRODUCTION,
-}
-
-impl fmt::Display for Environment {
-    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Environment::TEST => fmt.write_str("test"),
-            Environment::DEVELOPMENT => fmt.write_str("development"),
-            Environment::PRODUCTION => fmt.write_str("production"),
-        }
-    }
-}
-
-impl FromStr for Environment {
-    type Err = Error;
-
-    fn from_str(s: &str) -> Result<Self> {
-        match s {
-            "test" => Ok(Environment::TEST),
-            "development" => Ok(Environment::DEVELOPMENT),
-            "production" => Ok(Environment::PRODUCTION),
-            v => Err(format!("unknown environment {}", v).into()),
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Config {
-    pub env: Environment,
+    pub env: String,
     pub secrets: String,
-    pub postgresql: String,
+    pub database: String,
     pub redis: String,
     pub rabbitmq: RabbitMQConfig,
     pub http: Http,
@@ -72,17 +40,70 @@ pub struct Config {
 impl Default for Config {
     fn default() -> Self {
         Self {
-            env: Environment::DEVELOPMENT,
+            env: Environment::Development.to_string(),
             http: Http::default(),
             secrets: base64::encode(&crypto::sodium::Encryptor::random(32)),
             redis: "redis://127.0.0.1:5432/0".to_string(),
-            postgresql: format!("postgres://postgres:@127.0.0.1:5432/{}", NAME),
+            database: format!("postgres://postgres:@127.0.0.1:5432/{}", NAME),
             rabbitmq: RabbitMQConfig::default(),
         }
     }
 }
 
 impl Config {
+    pub fn env(&self) -> Environment {
+        match self.env.parse() {
+            Ok(v) => v,
+            Err(_) => Environment::Development,
+        }
+    }
+
+    pub fn rocket(&self) -> Result<RocketConfig> {
+        let env = self.env();
+        let mut databases = BTreeMap::new();
+        {
+            let mut cfg = BTreeMap::new();
+            cfg.insert("url".to_string(), Value::String(self.database.clone()));
+            databases.insert("postgresql".to_string(), cfg);
+        }
+        {
+            let mut cfg = BTreeMap::new();
+            cfg.insert("url".to_string(), Value::String(self.redis.clone()));
+            databases.insert("redis".to_string(), cfg);
+        }
+
+        let it = RocketConfig::build(env)
+            .address("0.0.0.0")
+            .workers(self.http.workers)
+            .port(self.http.port)
+            .secret_key(&self.secrets[..])
+            .keep_alive(match self.http.keep_alive {
+                Some(v) => v,
+                None => 0,
+            })
+            .limits(
+                Limits::new()
+                    .limit("forms", self.http.limits * (1 << 10 << 10))
+                    .limit("json", self.http.limits * (1 << 10 << 10)),
+            )
+            .extra("databases", databases)
+            .extra(
+                "template_dir",
+                match self.http.templates().to_str() {
+                    Some(v) => v,
+                    None => "templates",
+                },
+            )
+            .log_level(match env {
+                Environment::Production => LoggingLevel::Normal,
+                _ => LoggingLevel::Debug,
+            })
+            .workers(12)
+            .finalize()?;
+
+        Ok(it)
+    }
+
     pub fn secrets(&self) -> Result<Vec<u8>> {
         let buf = base64::decode(&self.secrets)?;
         Ok(buf)
@@ -94,8 +115,8 @@ impl Config {
         Ok(pool)
     }
 
-    pub fn postgresql(&self) -> Result<DbPool> {
-        let manager = diesel::r2d2::ConnectionManager::<DbConnection>::new(&self.postgresql[..]);
+    pub fn database(&self) -> Result<DbPool> {
+        let manager = diesel::r2d2::ConnectionManager::<DbConnection>::new(&self.database[..]);
         Ok(DbPool::new(manager)?)
     }
 }
@@ -105,15 +126,17 @@ impl Config {
 pub struct Http {
     pub port: u16,
     pub theme: String,
-    pub workers: usize,
-    pub keep_alive: Option<usize>,
+    pub workers: u16,
+    pub limits: u64,
+    pub keep_alive: Option<u32>,
 }
 
 impl Default for Http {
     fn default() -> Self {
         Self {
             port: 8080,
-            workers: 4,
+            workers: 1 << 3,
+            limits: 1 << 5,
             theme: "bootstrap".to_string(),
             keep_alive: Some(120),
         }
