@@ -1,5 +1,7 @@
 pub mod controllers;
 pub mod models;
+pub mod request;
+pub mod tasks;
 
 use std::fmt;
 use std::str::FromStr;

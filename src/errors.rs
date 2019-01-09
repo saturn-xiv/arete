@@ -1,3 +1,12 @@
+use std::io::Cursor;
+use std::result::Result as StdResult;
+
+use rocket::{
+    http::{ContentType, Status},
+    response::Responder,
+    Request, Response,
+};
+
 error_chain! {
     foreign_links {
         StdIo(std::io::Error);
@@ -28,5 +37,16 @@ error_chain! {
         Git2(git2::Error);
         MimeFormStr(mime::FromStrError);
         LettreSmtp(lettre::smtp::error::Error);
+    }
+}
+
+impl<'r> Responder<'r> for Error {
+    fn respond_to(self, _: &Request) -> StdResult<Response<'r>, Status> {
+        error!("{:?}", self);
+        Ok(Response::build()
+            .header(ContentType::Plain)
+            .status(Status::InternalServerError)
+            .sized_body(Cursor::new(self.description().to_string()))
+            .finalize())
     }
 }

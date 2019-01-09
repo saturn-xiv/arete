@@ -4,13 +4,17 @@ use std::ops::Deref;
 use std::time::Duration;
 
 use mustache;
+use rocket::{
+    request::{self, FromRequest},
+    Outcome, Request,
+};
 use serde::ser::Serialize;
 
 use super::{
     cache::Cache,
     errors::{Error, Result},
-    orm::PooledConnection as DbConnection,
-    redis::PooledConnection as RedisConnection,
+    orm::{Database, PooledConnection as DbConnection},
+    redis::{PooledConnection as RedisConnection, Redis},
 };
 
 use self::locale::Dao;
@@ -77,5 +81,18 @@ impl I18n {
             return msg;
         }
         format!("{}.{}", lang, code)
+    }
+}
+
+impl<'a, 'r> FromRequest<'a, 'r> for I18n {
+    type Error = ();
+    fn from_request(request: &'a Request<'r>) -> request::Outcome<Self, Self::Error> {
+        let Database(db) = request.guard::<Database>()?;
+        let Redis(cache) = request.guard::<Redis>()?;
+
+        Outcome::Success(I18n {
+            db: db,
+            cache: cache,
+        })
     }
 }

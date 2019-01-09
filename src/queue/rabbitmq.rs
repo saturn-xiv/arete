@@ -21,6 +21,7 @@ use super::super::{env::NAME, errors::Result};
 use super::{Handler, Queue};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct Config {
     pub host: String,
     pub port: u16,

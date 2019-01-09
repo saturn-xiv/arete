@@ -59,6 +59,7 @@ impl FromStr for Environment {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct Config {
     pub env: Environment,
     pub secrets: String,
@@ -100,6 +101,7 @@ impl Config {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct Http {
     pub port: u16,
     pub theme: String,

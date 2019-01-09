@@ -1,3 +1,4 @@
+#![feature(proc_macro_hygiene, decl_macro)]
 #![recursion_limit = "1024"]
 
 #[macro_use]
@@ -12,7 +13,10 @@ extern crate lazy_static;
 extern crate validator_derive;
 #[macro_use]
 extern crate diesel;
-
+#[macro_use]
+extern crate rocket;
+#[macro_use]
+extern crate rocket_contrib;
 
 extern crate base64;
 extern crate chrono;
@@ -25,6 +29,7 @@ extern crate futures;
 extern crate git2;
 extern crate hex;
 extern crate hyper;
+extern crate ipnetwork;
 extern crate jsonwebtoken;
 extern crate language_tags;
 extern crate lapin_futures as lapin;

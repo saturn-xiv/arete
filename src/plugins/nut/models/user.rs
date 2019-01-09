@@ -1,7 +1,9 @@
 use std::fmt;
+use std::net::IpAddr;
 
 use chrono::{NaiveDateTime, Utc};
 use diesel::{insert_into, prelude::*, update};
+use ipnetwork::IpNetwork;
 use md5;
 use uuid::Uuid;
 
@@ -47,9 +49,9 @@ pub struct Item {
     pub logo: String,
     pub sign_in_count: i64,
     pub current_sign_in_at: Option<NaiveDateTime>,
-    pub current_sign_in_ip: Option<String>,
+    pub current_sign_in_ip: Option<IpNetwork>,
     pub last_sign_in_at: Option<NaiveDateTime>,
-    pub last_sign_in_ip: Option<String>,
+    pub last_sign_in_ip: Option<IpNetwork>,
     pub confirmed_at: Option<NaiveDateTime>,
     pub locked_at: Option<NaiveDateTime>,
     pub deleted_at: Option<NaiveDateTime>,
@@ -99,7 +101,7 @@ pub trait Dao {
     fn by_uid(&self, uid: &String) -> Result<Item>;
     fn by_email(&self, email: &String) -> Result<Item>;
     fn by_nick_name(&self, nick_name: &String) -> Result<Item>;
-    fn sign_in(&self, id: &i64, ip: &Option<&str>) -> Result<()>;
+    fn sign_in(&self, id: &i64, ip: &IpAddr) -> Result<()>;
     fn sign_up<T: Encryptor>(
         &self,
         real_name: &String,
@@ -143,7 +145,8 @@ impl Dao for Connection {
         Ok(it)
     }
 
-    fn sign_in(&self, id: &i64, ip: &Option<&str>) -> Result<()> {
+    fn sign_in(&self, id: &i64, ip: &IpAddr) -> Result<()> {
+        let ip: IpNetwork = (*ip).into();
         let now = Utc::now().naive_utc();
         let it = users::dsl::users.filter(users::dsl::id.eq(id));
         let (current_sign_in_at, current_sign_in_ip, sign_in_count) = users::dsl::users
@@ -153,11 +156,11 @@ impl Dao for Connection {
                 users::dsl::sign_in_count,
             ))
             .filter(users::dsl::id.eq(id))
-            .first::<(Option<NaiveDateTime>, Option<String>, i64)>(self)?;
+            .first::<(Option<NaiveDateTime>, Option<IpNetwork>, i64)>(self)?;
         update(it)
             .set((
                 users::dsl::current_sign_in_at.eq(&now),
-                users::dsl::current_sign_in_ip.eq(ip),
+                users::dsl::current_sign_in_ip.eq(&Some(ip)),
                 users::dsl::last_sign_in_at.eq(&current_sign_in_at),
                 users::dsl::last_sign_in_ip.eq(&current_sign_in_ip),
                 users::dsl::sign_in_count.eq(&(sign_in_count + 1)),
