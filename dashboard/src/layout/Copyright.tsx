@@ -12,13 +12,13 @@ interface IProps {
 
 class Widget extends React.Component<IProps> {
   public render() {
-    return (<div>
+    return (<>
       <Icon type="copyright" />
       &nbsp;
             <FormattedMessage id="site.copyright" />
       &nbsp;
             {this.props.site.version}
-    </div>)
+    </>)
   }
 }
 
