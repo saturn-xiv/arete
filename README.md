@@ -4,6 +4,15 @@ A web application by Rust and React.
 
 ## Development
 
+### Editor(atom)
+
+-   ide-rust
+-   ide-typescript
+-   file-icons
+-   atom-beautify
+-   autosave
+-   language-docker
+
 ### Install dependencies
 
 -   For Mac
