@@ -12,6 +12,18 @@ A web application by Rust and React.
 -   atom-beautify
 -   autosave
 -   language-docker
+-   language-babel
+
+[Add to ~/.atom/config.cson](https://flight-manual.atom.io/using-atom/sections/basic-customization/#customizing-language-recognition)
+
+```text
+'*':
+  core:
+    customFileTypes:
+      'source.tsx': [
+        'tsx'
+      ]
+```
 
 ### Install dependencies
 
