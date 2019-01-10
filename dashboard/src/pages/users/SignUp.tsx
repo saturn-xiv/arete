@@ -4,10 +4,10 @@ import * as React from 'react'
 import { FormattedMessage, InjectedIntlProps, injectIntl, intlShape } from 'react-intl'
 import { RouteComponentProps, withRouter } from "react-router"
 
-import { formItemLayout } from '../components/form'
-import Submit from '../components/form/Submit'
-import Layout from '../components/users/SharedLinks'
-import { httpPost } from '../utils/request'
+import { formItemLayout } from '../../components/form'
+import Submit from '../../components/form/Submit'
+import Layout from '../../components/users/SharedLinks'
+import { httpPost } from '../../utils/request'
 
 const FormItem = Form.Item
 
@@ -28,8 +28,8 @@ class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProp
     const { form, history, intl } = this.props
     form.validateFields((err, values) => {
       if (!err) {
-        httpPost("/install", values).then((_) => {
-          message.success(intl.formatMessage({ id: "flashes.success" }))
+        httpPost("/users/sign-up", values).then((_) => {
+          message.success(intl.formatMessage({ id: "nut.users.confirm.success" }))
           history.push("/users/sign-in")
         }).catch(message.error)
       }
@@ -39,7 +39,7 @@ class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProp
     const { formatMessage } = this.props.intl
     const { getFieldDecorator } = this.props.form
 
-    return (<Layout title="nut.install.title">
+    return (<Layout title="nut.users.sign-up.title">
       <Form onSubmit={this.handleSubmit}>
         <FormItem {...formItemLayout} label={<FormattedMessage id="form.labels.email" />}>
           {
@@ -49,6 +49,20 @@ class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProp
                   message: formatMessage({ id: "form.validations.email" }),
                   required: true,
                   type: 'email',
+                }
+              ]
+            })(<Input />)
+          }
+        </FormItem>
+        <FormItem {...formItemLayout} label={<FormattedMessage id="form.labels.nick-name" />}>
+          {
+            getFieldDecorator('nickName', {
+              rules: [
+                {
+                  max: 32,
+                  message: formatMessage({ id: "form.validations.nick-name" }),
+                  min: 2,
+                  required: true,
                 }
               ]
             })(<Input />)

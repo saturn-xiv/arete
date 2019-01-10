@@ -41,9 +41,9 @@ class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProp
 
     return (<Layout title="nut.users.sign-in.title">
       <Form onSubmit={this.handleSubmit}>
-        <FormItem {...formItemLayout} label={<FormattedMessage id="form.labels.username" />}>
+        <FormItem {...formItemLayout} label={<FormattedMessage id="nut.users.sign-in.login" />}>
           {
-            getFieldDecorator('id', {
+            getFieldDecorator('login', {
               rules: [
                 {
                   message: formatMessage({ id: "form.validations.required" }),
