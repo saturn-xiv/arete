@@ -53,6 +53,7 @@ $ cd arete
 $ make npm
 $ make check
 $ ./target/debug/arete generate:config # please fix config.toml then
+$ ./target/debug/arete database:migrate # migrate database
 $ cargo run # http://localhost:8080
 $ cd dashboard && npm start # http://localhost:3000/my/
 ```
