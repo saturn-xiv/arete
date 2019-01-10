@@ -1,15 +1,17 @@
 import HeaderSearch from 'ant-design-pro/lib/HeaderSearch'
 import { Icon, Layout, Menu, message } from 'antd'
+import { ClickParam } from 'antd/lib/menu'
 import * as React from 'react'
-import { FormattedMessage } from 'react-intl'
+import { FormattedMessage, InjectedIntlProps, injectIntl, intlShape } from 'react-intl'
 import { connect } from 'react-redux'
+import { RouteComponentProps, withRouter } from "react-router"
 import { Dispatch } from 'redux'
 
 import { ISiteState, IUserState, refresh as refreshSiteInfo } from '../actions'
+import { set as setLocale } from '../intl'
 import { IApplicationState } from '../reducers'
 import { httpGet } from '../utils/request'
 import Footer from './Footer'
-
 
 const { Header, Sider, Content } = Layout
 
@@ -67,7 +69,7 @@ function headerBar(user: IUserState): INavItem[] {
   } else {
     items.push({
       children: (<Icon type="login" />),
-      key: "sign-in",
+      key: "to-/users/sign-in",
     })
   }
   return items.reverse()
@@ -78,11 +80,48 @@ function siderBar(user: IUserState): IMenu[] {
 }
 
 
-class Widget extends React.Component<IProps, IState> {
-  constructor(props: IProps) {
+class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProps & IProps, IState> {
+  public static propTypes: React.ValidationMap<any> = {
+    intl: intlShape.isRequired,
+  }
+  constructor(props: RouteComponentProps<any> & InjectedIntlProps & IProps) {
     super(props)
     this.state = {
       collapsed: false,
+    }
+  }
+  public handleMenuItem = (e: ClickParam) => {
+    const key = e.key
+
+    const to = 'to-';
+    if (key.startsWith(to)) {
+      this.props.history.push(key.substring(to.length))
+      return
+    }
+
+    const lang = 'lang-';
+    if (key.startsWith(lang)) {
+      setLocale(key.substring(lang.length))
+      window.location.reload()
+      return
+    }
+
+    switch (key) {
+      case 'home':
+        window.open('/', '_blank')
+        return;
+      case 'doc':
+        window.open('https://github.com/saturn-xiv/arete/issues', '_blank')
+        return
+      case 'reload':
+        window.location.reload()
+        return
+      case 'toggle':
+        this.setState({
+          collapsed: !this.state.collapsed
+        })
+        return
+      default:
     }
   }
   public componentDidMount() {
@@ -92,31 +131,38 @@ class Widget extends React.Component<IProps, IState> {
     // TODO check sign-in
   }
   public render() {
-    const sider = siderBar(this.props.user).map((it) => (<Menu.SubMenu
-      key={it.key}
-      title={(<span><Icon type={it.icon} />{it.label}</span>)}>
-      {it.children.map((jt) => (<Menu.Item key={jt.key}>{jt.label}</Menu.Item>))}
-    </Menu.SubMenu>))
-    const header = headerBar(this.props.user).map((it) => (<Menu.Item className="pull-right" key={it.key}>{it.children}</Menu.Item>))
-    const languages = this.props.site.languages.map((it) => (<Menu.Item key={`lang-${it}`}>
-      <FormattedMessage id={`languages.${it}`} />
-    </Menu.Item>))
     return (<Layout>
       <Sider breakpoint="lg" collapsedWidth="0" trigger={null} collapsible={true} collapsed={this.state.collapsed}>
         <div className="sider-logo" />
-        <Menu theme="dark" mode="inline" defaultSelectedKeys={[]}>
-          {sider}
+        <Menu onClick={this.handleMenuItem} theme="dark" mode="inline" defaultSelectedKeys={[]}>
+          {
+            siderBar(this.props.user).map((it) => (<Menu.SubMenu
+              key={it.key}
+              title={(<span><Icon type={it.icon} />{it.label}</span>)}>
+              {it.children.map((jt) => (<Menu.Item key={jt.key}>{jt.label}</Menu.Item>))}
+            </Menu.SubMenu>))
+          }
         </Menu>
       </Sider>
       <Layout>
         <Header className="header-bar">
-          <Menu mode="horizontal">
+          <Menu onClick={this.handleMenuItem} mode="horizontal">
             <Menu.Item key='toggle'>
               <Icon className="trigger" type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'} />
             </Menu.Item>
-            {header}
+            {
+              headerBar(this.props.user).map((it) => (<Menu.Item
+                className="pull-right"
+                key={it.key}>
+                {it.children}
+              </Menu.Item>))
+            }
             <Menu.SubMenu className="pull-right" key="switch-languages" title={<Icon type="global" />}>
-              {languages}
+              {
+                this.props.site.languages.map((it) => (<Menu.Item key={`lang-${it}`}>
+                  <FormattedMessage id={`languages.${it}`} />
+                </Menu.Item>))
+              }
             </Menu.SubMenu>
           </Menu>
         </Header>
@@ -142,4 +188,4 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(Widget)
+)(injectIntl(withRouter(Widget)))

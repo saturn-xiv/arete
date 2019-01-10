@@ -7,9 +7,8 @@ const initialState: IUserState = {}
 export const currentUser: Reducer<IUserState> = (state = initialState, action) => {
   switch (action.type) {
     case UserActionTypes.SIGN_IN:
-      // TODO
-      // tslint:disable-next-line:no-console
-      console.log(action.token);
+      // TODO      
+      window.console.log('aaa');
       return { ...state, uid: 'aaa' };
     case UserActionTypes.SIGN_OUT:
       // TODO

@@ -3,7 +3,7 @@ import { FormattedMessage } from 'react-intl'
 
 class Widget extends React.Component {
   public render() {
-    return (<div><FormattedMessage id="nut.install.title" /> </div>)
+    return (<div><FormattedMessage id="nut.users.sign-in.title" /> </div>)
   }
 }
 
