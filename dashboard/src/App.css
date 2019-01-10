@@ -5,3 +5,19 @@ body {
   margin: 0;
   padding: 0;
 }
+
+.pull-right {
+  float: right;
+}
+
+.root-content {
+  background: #fff;
+  margin: 24px 16px;
+  min-height: 360px;
+  padding: 24px;
+}
+
+.header-bar {
+  background: #fff;
+  padding: 0;
+}

@@ -18,4 +18,3 @@ export const currentUser: Reducer<IUserState> = (state = initialState, action) =
       return state
   }
 }
-

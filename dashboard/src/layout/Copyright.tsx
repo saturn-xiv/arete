@@ -7,30 +7,30 @@ import { ISiteState } from '../actions'
 import { IApplicationState } from '../reducers'
 
 interface IProps {
-    site: ISiteState,
+  site: ISiteState,
 }
 
 class Widget extends React.Component<IProps> {
-    public render() {
-        return (<div>
-            <Icon type="copyright" />
-            &nbsp;
+  public render() {
+    return (<div>
+      <Icon type="copyright" />
+      &nbsp;
             <FormattedMessage id="site.copyright" />
-            &nbsp;
+      &nbsp;
             {this.props.site.version}
-        </div>)
-    }
+    </div>)
+  }
 }
 
 
 const mapStateToProps = ({ site }: IApplicationState) => ({
-    site,
+  site,
 })
 
 
 const mapDispatchToProps = () => ({})
 
 export default connect(
-    mapStateToProps,
-    mapDispatchToProps
+  mapStateToProps,
+  mapDispatchToProps
 )(Widget)
