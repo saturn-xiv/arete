@@ -185,7 +185,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
   refresh: (info: ISiteState) => dispatch(refreshSiteInfo(info))
 })
 
-export default connect(
+export default withRouter(connect(
   mapStateToProps,
   mapDispatchToProps
-)(injectIntl(withRouter(Widget)))
+)(injectIntl(Widget)))

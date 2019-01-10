@@ -78,8 +78,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
   signIn: (token: string) => dispatch(usersSignIn(token))
 })
 
-export default connect(
+export default withRouter(connect(
   mapStateToProps,
   mapDispatchToProps
-)(injectIntl(withRouter(Form.create()(Widget))))
-// export default withRouter(connect(() => ({}), {userSignIn})(Form.create()(injectIntl(Widget))))
+)(injectIntl(Form.create()(Widget))))

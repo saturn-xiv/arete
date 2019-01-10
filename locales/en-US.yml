@@ -22,6 +22,7 @@ form:
     real-name:             Real name
     username:              User name
   validations:
+    required:              Field is required
     email:                 Bad email address.
     nick-name:             Nick name must between 2~32 characters and without special characters.
     password:              Password must at least has 6 characters.
