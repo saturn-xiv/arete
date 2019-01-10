@@ -14,7 +14,7 @@ class Widget extends React.Component {
         <FormattedMessage id="buttons.submit" />
       </Button>
       {children}
-    </FormItem>);
+    </FormItem>)
   }
 }
 

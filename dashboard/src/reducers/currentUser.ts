@@ -7,9 +7,9 @@ const initialState: IUserState = {}
 export const currentUser: Reducer<IUserState> = (state = initialState, action) => {
   switch (action.type) {
     case UserActionTypes.SIGN_IN:
-      // TODO      
-      window.console.log('aaa');
-      return { ...state, uid: 'aaa' };
+      // TODO
+      window.console.log(action.payload)
+      return { ...state, uid: 'aaa' }
     case UserActionTypes.SIGN_OUT:
       // TODO
       return {}

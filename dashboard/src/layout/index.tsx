@@ -93,13 +93,13 @@ class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProp
   public handleMenuItem = (e: ClickParam) => {
     const key = e.key
 
-    const to = 'to-';
+    const to = 'to-'
     if (key.startsWith(to)) {
       this.props.history.push(key.substring(to.length))
       return
     }
 
-    const lang = 'lang-';
+    const lang = 'lang-'
     if (key.startsWith(lang)) {
       setLocale(key.substring(lang.length))
       window.location.reload()
@@ -109,7 +109,7 @@ class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProp
     switch (key) {
       case 'home':
         window.open('/', '_blank')
-        return;
+        return
       case 'doc':
         window.open('https://github.com/saturn-xiv/arete/issues', '_blank')
         return
