@@ -64,7 +64,7 @@ pub struct SignIn {
     pub password: String,
 }
 
-#[post("/sign-in", format = "json", data = "<form>")]
+#[post("/users/sign-in", format = "json", data = "<form>")]
 pub fn sign_in(
     db: Database,
     jwt: State<Arc<Jwt>>,
@@ -116,7 +116,7 @@ pub struct SignUp {
     pub password: String,
 }
 
-#[post("/sign-up", format = "json", data = "<form>")]
+#[post("/users/sign-up", format = "json", data = "<form>")]
 pub fn sign_up(
     form: Json<SignUp>,
     queue: State<Arc<RabbitMQ>>,
@@ -168,7 +168,7 @@ pub struct Email {
     pub email: String,
 }
 
-#[post("/confirm", format = "json", data = "<form>")]
+#[post("/users/confirm", format = "json", data = "<form>")]
 pub fn confirm(
     form: Json<Email>,
     host: Host,
@@ -200,30 +200,7 @@ pub fn confirm(
     Ok(json!({}))
 }
 
-#[put("/confirm/<token>")]
-pub fn confirm_token(
-    token: String,
-    remote: SocketAddr,
-    db: Database,
-    jwt: State<Arc<Jwt>>,
-) -> Result<JsonValue> {
-    let token = jwt.parse::<Token>(&token)?.claims;
-    if token.act != Action::Confirm {
-        return Err("bad action".into());
-    }
-
-    let db = db.deref();
-    let ip = remote.ip();
-    let it = UserDao::by_uid(db, &token.uid)?;
-    if let Some(_) = it.confirmed_at {
-        return Err("User already confirmed".into());
-    }
-    UserDao::confirm(db, &it.id)?;
-    LogDao::add(db, &it.id, &ip, "Confirmed")?;
-    Ok(json!({}))
-}
-
-#[post("/unlock", format = "json", data = "<form>")]
+#[post("/users/unlock", format = "json", data = "<form>")]
 pub fn unlock(
     form: Json<Email>,
     host: Host,
@@ -254,30 +231,7 @@ pub fn unlock(
     Ok(json!({}))
 }
 
-#[put("/unlock/<token>")]
-pub fn unlock_token(
-    token: String,
-    remote: SocketAddr,
-    db: Database,
-    jwt: State<Arc<Jwt>>,
-) -> Result<JsonValue> {
-    let token = jwt.parse::<Token>(&token)?.claims;
-    if token.act != Action::Unlock {
-        return Err("bad action".into());
-    }
-
-    let db = db.deref();
-    let ip = remote.ip();
-    let it = UserDao::by_uid(db, &token.uid)?;
-    if None == it.locked_at {
-        return Err("User already isn't locked".into());
-    }
-    UserDao::unlock(db, &it.id)?;
-    LogDao::add(db, &it.id, &ip, "Unlock")?;
-    Ok(json!({}))
-}
-
-#[post("/forgot-password", format = "json", data = "<form>")]
+#[post("/users/forgot-password", format = "json", data = "<form>")]
 pub fn forgot_password(
     form: Json<Email>,
     queue: State<Arc<RabbitMQ>>,
@@ -314,7 +268,7 @@ pub struct ResetPassword {
     pub password: String,
 }
 
-#[post("/reset-password", format = "json", data = "<form>")]
+#[post("/users/reset-password", format = "json", data = "<form>")]
 pub fn reset_password(
     form: Json<ResetPassword>,
     remote: SocketAddr,
@@ -336,14 +290,14 @@ pub fn reset_password(
     Ok(json!({}))
 }
 
-#[get("/logs")]
+#[get("/users/logs")]
 pub fn logs(user: CurrentUser, db: Database) -> Result<Json<Vec<Log>>> {
     let db = db.deref();
     let items = LogDao::all(db, &user.id, 1 << 10)?;
     Ok(Json(items))
 }
 
-#[get("/profile")]
+#[get("/users/profile")]
 pub fn get_profile(user: CurrentUser, db: Database) -> Result<JsonValue> {
     let db = db.deref();
     let it = UserDao::by_id(db, &user.id)?;
@@ -361,7 +315,7 @@ pub struct Profile {
     pub logo: String,
 }
 
-#[post("/profile", format = "json", data = "<form>")]
+#[post("/users/profile", format = "json", data = "<form>")]
 pub fn post_profile(user: CurrentUser, form: Json<Profile>, db: Database) -> Result<Json<()>> {
     let db = db.deref();
     let now = Utc::now().naive_utc();
@@ -386,7 +340,7 @@ pub struct ChangePassword {
     pub new_password: String,
 }
 
-#[post("/change-password", format = "json", data = "<form>")]
+#[post("/users/change-password", format = "json", data = "<form>")]
 pub fn change_password(
     db: Database,
     form: Json<ChangePassword>,
@@ -403,7 +357,7 @@ pub fn change_password(
     Ok(Json(()))
 }
 
-#[delete("/sign-out")]
+#[delete("/users/sign-out")]
 pub fn sign_out(db: Database, user: CurrentUser, remote: SocketAddr) -> Result<Json<()>> {
     let db = db.deref();
     let ip = remote.ip();

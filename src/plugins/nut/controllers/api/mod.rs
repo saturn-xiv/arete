@@ -1,6 +1,7 @@
 pub mod admin;
 pub mod leave_words;
 pub mod locales;
+pub mod ueditor;
 pub mod users;
 
 use std::ops::Deref;

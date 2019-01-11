@@ -1,14 +1,11 @@
+use std::net::SocketAddr;
 use std::ops::Deref;
 
-use diesel::{insert_into, prelude::*};
 use rocket_contrib::json::Json;
 use validator::Validate;
 
-use super::super::super::super::super::{
-    errors::Result,
-    orm::{schema::leave_words, Database},
-};
-use super::super::super::MediaType;
+use super::super::super::super::super::{errors::Result, orm::Database};
+use super::super::super::{models::leave_word::Dao as LeaveWordDao, MediaType};
 
 #[derive(Debug, Validate, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -20,15 +17,10 @@ pub struct New {
 }
 
 #[post("/leave-words", format = "json", data = "<form>")]
-pub fn create(form: Json<New>, db: Database) -> Result<Json<()>> {
+pub fn create(form: Json<New>, remote: SocketAddr, db: Database) -> Result<Json<()>> {
     form.validate()?;
     let db = db.deref();
-    form.media_type.parse::<MediaType>()?;
-    insert_into(leave_words::dsl::leave_words)
-        .values((
-            leave_words::dsl::body.eq(&form.body),
-            leave_words::dsl::media_type.eq(&form.media_type),
-        ))
-        .execute(db)?;
+    let ip = remote.ip();
+    LeaveWordDao::add(db, &ip, &form.body, &form.media_type.parse::<MediaType>()?)?;
     Ok(Json(()))
 }

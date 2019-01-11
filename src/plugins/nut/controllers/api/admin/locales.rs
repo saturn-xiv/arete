@@ -21,21 +21,21 @@ pub struct Form {
     pub message: String,
 }
 
-#[get("/locales")]
+#[get("/admin/locales")]
 pub fn index(_user: Administrator, db: Database) -> Result<Json<Vec<Locale>>> {
     let db = db.deref();
     let it = LocaleDao::all(db)?;
     Ok(Json(it))
 }
 
-#[get("/locales/<id>")]
+#[get("/admin/locales/<id>")]
 pub fn show(_user: Administrator, id: i64, db: Database) -> Result<Json<Locale>> {
     let db = db.deref();
     let it = LocaleDao::by_id(db, &id)?;
     Ok(Json(it))
 }
 
-#[post("/locales", format = "json", data = "<form>")]
+#[post("/admin/locales", format = "json", data = "<form>")]
 pub fn update(_user: Administrator, form: Json<Form>, db: Database) -> Result<Json<()>> {
     form.validate()?;
     let db = db.deref();
@@ -43,7 +43,7 @@ pub fn update(_user: Administrator, form: Json<Form>, db: Database) -> Result<Js
     Ok(Json(()))
 }
 
-#[delete("/locales/<id>")]
+#[delete("/admin/locales/<id>")]
 pub fn destory(_user: Administrator, id: i64, db: Database) -> Result<Json<()>> {
     let db = db.deref();
     LocaleDao::delete(db, &id)?;
