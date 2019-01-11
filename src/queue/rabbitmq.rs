@@ -5,8 +5,8 @@ use failure::Error as FailureError;
 use futures::{future::Future, Stream};
 use lapin::{
     channel::{
-        BasicConsumeOptions, BasicGetOptions, BasicProperties, BasicPublishOptions,
-        ConfirmSelectOptions, QueueDeclareOptions,
+        BasicConsumeOptions, BasicProperties, BasicPublishOptions, ConfirmSelectOptions,
+        QueueDeclareOptions,
     },
     client::ConnectionOptions,
     message::Delivery,
@@ -66,7 +66,6 @@ impl RabbitMQ {
                 username: username,
                 password: password,
                 vhost: vhost,
-                frame_max: std::u16::MAX as u32,
                 ..Default::default()
             },
         })
@@ -84,45 +83,44 @@ impl Queue for RabbitMQ {
                 lapin::client::Client::connect(stream, options).map_err(FailureError::from)
             })
             .and_then(move |(client, _)| {
-                // tokio::spawn(heartbeat.map_err(|e| error!("heartbeat error: {}", e)));
-
                 client
                     .create_confirm_channel(ConfirmSelectOptions::default())
-                    .and_then(move |channel| {
-                        let id = channel.id;
-                        info!("created channel with id: {}", id);
+                    .map_err(FailureError::from)
+            })
+            .and_then(move |channel| {
+                let id = channel.id;
+                info!("created channel with id: {}", id);
 
+                channel
+                    .queue_declare(
+                        &queue.clone(),
+                        QueueDeclareOptions::default(),
+                        FieldTable::new(),
+                    )
+                    .and_then(move |_| {
+                        info!("channel {} declared queue {}", id, queue);
                         channel
-                            .queue_declare(
-                                &queue.clone(),
-                                QueueDeclareOptions::default(),
-                                FieldTable::new(),
+                            .basic_publish(
+                                "",
+                                &queue,
+                                payload,
+                                BasicPublishOptions::default(),
+                                BasicProperties::default()
+                                    .with_message_id(mid)
+                                    .with_content_type(APPLICATION_JSON.to_string())
+                                    .with_timestamp(
+                                        SystemTime::now()
+                                            .duration_since(UNIX_EPOCH)
+                                            .expect("get timestamp")
+                                            .as_secs(),
+                                    ),
                             )
+                            .map(|confirmation| {
+                                info!("publish got confirmation: {:?}", confirmation)
+                            })
                             .and_then(move |_| {
-                                info!("channel {} declared queue {}", id, queue);
-                                channel
-                                    .basic_publish(
-                                        "",
-                                        &queue,
-                                        payload,
-                                        BasicPublishOptions::default(),
-                                        BasicProperties::default()
-                                            .with_message_id(mid)
-                                            .with_content_type(APPLICATION_JSON.to_string())
-                                            .with_timestamp(
-                                                SystemTime::now()
-                                                    .duration_since(UNIX_EPOCH)
-                                                    .expect("get timestamp")
-                                                    .as_secs(),
-                                            ),
-                                    )
-                                    .map(|confirmation| {
-                                        info!("publish got confirmation: {:?}", confirmation)
-                                    })
-                                    .and_then(move |_| {
-                                        info!("close channel");
-                                        channel.close_ok()
-                                    })
+                                info!("close channel");
+                                channel.close_ok()
                             })
                     })
                     .map_err(FailureError::from)
@@ -149,53 +147,36 @@ impl Queue for RabbitMQ {
             })
             .and_then(move |(client, heartbeat)| {
                 tokio::spawn(heartbeat.map_err(|e| error!("heartbeat error: {}", e)));
-
-                client
-                    .create_channel()
-                    .and_then(move |channel| {
-                        let id = channel.id;
-                        info!("created channel with id: {}", id);
-
-                        let c = channel.clone();
-                        channel
-                            .queue_declare(
-                                &queue_name.clone(),
-                                QueueDeclareOptions::default(),
-                                FieldTable::new(),
-                            )
-                            .and_then(move |queue| {
-                                info!("channel {} declared queue {:?}", id, queue);
-
-                                let ch = channel.clone();
-                                channel
-                                    .basic_get(&queue_name, BasicGetOptions::default())
-                                    .and_then(move |message| {
-                                        info!("got message: {:?}", message);
-                                        info!(
-                                            "decoded message: {:?}",
-                                            std::str::from_utf8(&message.delivery.data).unwrap()
-                                        );
-                                        channel.basic_ack(message.delivery.delivery_tag, false)
-                                    })
-                                    .and_then(move |_| {
-                                        ch.basic_consume(
-                                            &queue,
-                                            &consumer_name,
-                                            BasicConsumeOptions::default(),
-                                            FieldTable::new(),
-                                        )
-                                    })
-                            })
-                            .and_then(|stream| {
-                                info!("got consumer stream");
-                                stream.for_each(move |message| {
-                                    let tag = message.delivery_tag;
-                                    if let Err(e) = handle_message(message, &handler) {
-                                        error!("failed to handle message: {:?}", e);
-                                    }
-                                    c.basic_ack(tag, false)
-                                })
-                            })
+                client.create_channel().map_err(FailureError::from)
+            })
+            .and_then(move |channel| {
+                let id = channel.id;
+                info!("created channel with id: {}", id);
+                let c = channel.clone();
+                channel
+                    .queue_declare(
+                        &queue_name.clone(),
+                        QueueDeclareOptions::default(),
+                        FieldTable::new(),
+                    )
+                    .and_then(move |queue| {
+                        info!("channel {} declared queue {:?}", id, queue);
+                        channel.basic_consume(
+                            &queue,
+                            &consumer_name,
+                            BasicConsumeOptions::default(),
+                            FieldTable::new(),
+                        )
+                    })
+                    .and_then(|stream| {
+                        info!("got consumer stream");
+                        stream.for_each(move |message| {
+                            let tag = message.delivery_tag;
+                            if let Err(e) = handle_message(message, &handler) {
+                                error!("failed to handle message: {:?}", e);
+                            }
+                            c.basic_ack(tag, false)
+                        })
                     })
                     .map_err(FailureError::from)
             });
