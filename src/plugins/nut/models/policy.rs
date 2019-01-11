@@ -1,7 +1,8 @@
 use std::fmt;
+use std::ops::Add;
 use std::str::FromStr;
 
-use chrono::{NaiveDate, NaiveDateTime, Utc};
+use chrono::{Duration, NaiveDate, NaiveDateTime, Utc};
 use diesel::{delete, insert_into, prelude::*, update};
 
 use super::super::super::super::{
@@ -25,6 +26,11 @@ impl Item {
     pub fn enable(&self) -> bool {
         let today = Utc::now().naive_utc().date();
         today.ge(&self.nbf) && today.le(&self.exp)
+    }
+    pub fn weeks(d: i64) -> (NaiveDate, NaiveDate) {
+        let nbf = Utc::now().naive_utc();
+        let exp = nbf.add(Duration::weeks(d));
+        (nbf.date(), exp.date())
     }
 }
 

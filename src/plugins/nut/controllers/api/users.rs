@@ -12,7 +12,7 @@ use validator::Validate;
 
 use super::super::super::super::super::{
     crypto::sodium::Encryptor as Sodium,
-    errors::Result,
+    errors::{Error, Result},
     i18n::I18n,
     jwt::Jwt,
     orm::{schema::users, Database},
@@ -140,20 +140,24 @@ pub fn sign_up(
     if let Ok(_) = UserDao::by_nick_name(db, &form.nick_name) {
         return Err(format!("Nick name {} already exist", form.nick_name).into());
     }
-    UserDao::sign_up::<Sodium>(
-        db,
-        &form.real_name,
-        &form.nick_name,
-        &form.email,
-        &form.password,
-    )?;
-    let it = UserDao::by_email(db, &form.email)?;
-    LogDao::add(db, &it.id, &ip, "Sign up")?;
+
+    let user = db.transaction::<_, Error, _>(move || {
+        UserDao::sign_up::<Sodium>(
+            db,
+            &form.real_name,
+            &form.nick_name,
+            &form.email,
+            &form.password,
+        )?;
+        let it = UserDao::by_email(db, &form.email)?;
+        LogDao::add(db, &it.id, &ip, "Sign up")?;
+        Ok(it)
+    })?;
     send_email(
         &i18n,
         jwt,
         queue,
-        &it,
+        &user,
         &Action::Confirm,
         &locale,
         &host.hostname,
@@ -385,15 +389,16 @@ fn send_email(
             exp: exp,
         },
     )?;
+
     let subject = i18n.t(
         locale,
         &format!("nut.mailer.users.{}.subject", act),
-        &Some(json!({})),
+        &None::<String>,
     );
     let body = i18n.t(
         locale,
         &format!("nut.mailer.users.{}.body", act),
-        &Some(json!({ "host": host, "expire":expire, "token":token })),
+        &Some(json!({ "name": user.real_name, "home": host, "expire":expire, "token":token })),
     );
 
     queue.publish(

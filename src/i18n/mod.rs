@@ -59,25 +59,27 @@ impl I18n {
         code: &String,
         args: &Option<S>,
     ) -> Result<Option<String>> {
-        if let Some(msg) = self.get(lang, code)? {
-            let tpl = mustache::compile_str(&msg)?;
-            return Ok(Some(tpl.render_to_string(args)?));
+        match self.get(lang, code)? {
+            Some(msg) => match args {
+                Some(args) => Ok(Some(mustache::compile_str(&msg)?.render_to_string(args)?)),
+                None => Ok(Some(msg)),
+            },
+            None => Ok(None),
         }
-        Ok(None)
     }
 
     pub fn e<S: Serialize>(&self, lang: &String, code: &String, args: &Option<S>) -> Error {
-        self.t(lang, code, args).into()
+        match self.tr(lang, code, args) {
+            Ok(msg) => match msg {
+                Some(msg) => msg.into(),
+                None => format!("{}.{}", lang, code).into(),
+            },
+            Err(e) => e,
+        }
     }
 
     pub fn t<S: Serialize>(&self, lang: &String, code: &String, args: &Option<S>) -> String {
-        if let Some(msg) = match self.tr(lang, code, args) {
-            Ok(v) => v,
-            Err(e) => {
-                error!("{:?}", e);
-                None
-            }
-        } {
+        if let Ok(Some(msg)) = self.tr(lang, code, args) {
             return msg;
         }
         format!("{}.{}", lang, code)

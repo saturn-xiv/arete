@@ -22,6 +22,7 @@ lazy_static! {
                 api::users::change_password,
                 api::users::sign_out,
                 api::about,
+                api::install,
                 api::locales::index,
                 api::leave_words::create,
                 api::ueditor::post,

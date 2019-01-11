@@ -16,22 +16,19 @@ impl super::Cache for Connection {
     {
         let key = format!("cache://{}", serde_json::to_string(key)?);
         let db = self.deref();
-        match cmd("get").arg(&key).query::<Vec<u8>>(db) {
-            Ok(buf) => {
-                let val = serde_json::from_slice(buf.as_slice())?;
-                Ok(val)
-            }
-            Err(_) => {
-                error!("can't get from cache {:?}", key);
-                let val = fun()?;
-                let _: String = cmd("set")
-                    .arg(&key)
-                    .arg(serde_json::to_vec(&val)?.as_slice())
-                    .arg("ex")
-                    .arg(ttl.as_secs())
-                    .query(db)?;
-                Ok(val)
+        if let Ok(buf) = cmd("get").arg(&key).query::<Vec<u8>>(db) {
+            if let Ok(val) = serde_json::from_slice(buf.as_slice()) {
+                return Ok(val);
             }
         }
+        warn!("can't get from cache {:?}", key);
+        let val = fun()?;
+        let _: String = cmd("set")
+            .arg(&key)
+            .arg(serde_json::to_vec(&val)?.as_slice())
+            .arg("ex")
+            .arg(ttl.as_secs())
+            .query(db)?;
+        Ok(val)
     }
 }

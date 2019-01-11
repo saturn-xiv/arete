@@ -39,16 +39,13 @@ class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProp
       <Form onSubmit={this.handleSubmit}>
         <FormItem {...formItemLayout} label={<FormattedMessage id="form.labels.email" />}>
           {
-            getFieldDecorator('id', {
+            getFieldDecorator('email', {
               rules: [
                 {
                   message: formatMessage({ id: "form.validations.email" }),
+                  required: true,
                   type: 'email',
                 },
-                {
-                  message: formatMessage({ id: "form.validations.required" }),
-                  required: true,
-                }
               ]
             })(<Input />)
           }

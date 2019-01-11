@@ -1,8 +1,13 @@
 use std::ops::Deref;
 
 use clap::{App, SubCommand};
+use diesel::Connection as DieselConnection;
 
-use super::super::super::{env::Config, errors::Result, i18n::locale::Dao as LocaleDao};
+use super::super::super::{
+    env::Config,
+    errors::{Error, Result},
+    i18n::locale::Dao as LocaleDao,
+};
 
 pub const COMMAND_NAME: &'static str = "i18n:sync";
 pub const COMMAND_ABOUT: &'static str = "Sync locales from directory";
@@ -25,7 +30,7 @@ pub fn command<'a, 'b>() -> App<'a, 'b> {
 pub fn run(cfg: Config, dir: String) -> Result<()> {
     let db = cfg.database()?;
     let db = db.get()?;
-    let (inserted, finded) = LocaleDao::sync(db.deref(), &dir)?;
+    let (inserted, finded) = db.transaction::<_, Error, _>(|| LocaleDao::sync(db.deref(), &dir))?;
     info!("find {} recored, insert {}", finded, inserted);
     Ok(())
 }
