@@ -19,7 +19,7 @@ class Widget extends React.Component<InjectedIntlProps & FormComponentProps> {
     const { form, intl } = this.props
     form.validateFields((err, values) => {
       if (!err) {
-        httpPost("/leave-words/new", Object.assign({}, values, { mediaType: MediaType.TEXT })).then((_) => {
+        httpPost("/leave-words", Object.assign({}, values, { mediaType: MediaType.TEXT })).then((_) => {
           message.success(intl.formatMessage({ id: "flashes.success" }))
           form.setFieldsValue({ body: '' })
         }).catch(message.error)
@@ -30,7 +30,7 @@ class Widget extends React.Component<InjectedIntlProps & FormComponentProps> {
     const { formatMessage } = this.props.intl
     const { getFieldDecorator } = this.props.form
 
-    return (<Layout title="nut.users.sign-up.title">
+    return (<Layout title="nut.leave-words.new.title">
       <Form onSubmit={this.handleSubmit}>
         <FormItem {...formItemLayout} label={<FormattedMessage id="form.labels.body" />}>
           {

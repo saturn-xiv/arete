@@ -29,7 +29,7 @@ class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProp
     form.validateFields((err, values) => {
       if (!err) {
         httpPost("/users/reset-password", Object.assign({}, values, { token: match.params.token })).then((_) => {
-          message.success(intl.formatMessage({ id: "nut.users.reset-password.success" }))
+          message.success(intl.formatMessage({ id: "nut.users.change-password.success" }))
           history.push("/users/sign-in")
         }).catch(message.error)
       }

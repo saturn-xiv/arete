@@ -3,6 +3,7 @@ import * as React from 'react'
 import { FormattedMessage } from 'react-intl'
 
 import { ILabel } from '..'
+import Head from '../Head'
 
 interface IProps {
   title: ILabel,
@@ -16,6 +17,7 @@ class Widget extends React.Component<IProps> {
       </Col>
       <Col sm={{ span: 24 }} md={{ offset: 1, span: 12 }}>
         {this.props.children}
+        <Head title={this.props.title} />
       </Col >
     </Row >)
   }
