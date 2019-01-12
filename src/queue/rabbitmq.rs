@@ -189,9 +189,10 @@ impl Queue for RabbitMQ {
 }
 
 pub fn handle_message(msg: Delivery, hnd: &Box<Handler>) -> Result<()> {
-    debug!("got message: {:?}", msg);
+    let props = msg.properties;
+    debug!("got message: {:?}", props);
 
-    let ct: Result<()> = match msg.properties.content_type() {
+    let ct: Result<()> = match props.content_type() {
         Some(v) => {
             if v.parse::<Mime>()? == APPLICATION_JSON {
                 Ok(())
@@ -203,7 +204,7 @@ pub fn handle_message(msg: Delivery, hnd: &Box<Handler>) -> Result<()> {
     };
     ct?;
 
-    let id: Result<String> = match msg.properties.message_id() {
+    let id: Result<String> = match props.message_id() {
         Some(v) => Ok(v.to_string()),
         None => Err("empty message id".into()),
     };

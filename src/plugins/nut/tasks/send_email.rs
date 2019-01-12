@@ -1,3 +1,4 @@
+use std::fmt;
 use std::ops::Deref;
 use std::sync::Arc;
 use std::time::Duration;
@@ -33,6 +34,16 @@ pub struct Task {
     pub body: String,
 }
 
+impl fmt::Display for Task {
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            fmt,
+            "{}<{}>\n{}\n{}",
+            self.name, self.email, self.subject, self.body
+        )
+    }
+}
+
 pub struct Job(Task, Config);
 
 impl Into<Result<Email>> for Job {
@@ -46,7 +57,7 @@ impl Into<Result<Email>> for Job {
             .build()
         {
             Ok(v) => Ok(v),
-            Err(e) => Err(format!("{:?}", e).into()),
+            Err(e) => Err(format!("send eail fail: {:?}", e).into()),
         }
     }
 }
@@ -62,7 +73,7 @@ impl Printer {
 impl Handler for Printer {
     fn handle(&self, _id: String, payload: Vec<u8>) -> Result<()> {
         let task: Task = serde_json::from_slice(&payload)?;
-        info!("send email: {:?}", task);
+        info!("send email {}", task);
         Ok(())
     }
 }

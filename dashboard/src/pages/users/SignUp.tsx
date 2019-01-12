@@ -7,6 +7,7 @@ import { RouteComponentProps, withRouter } from "react-router"
 import { formItemLayout } from '../../components/form'
 import Submit from '../../components/form/Submit'
 import Layout from '../../components/users/SharedLinks'
+import { HOME } from '../../utils'
 import { httpPost } from '../../utils/request'
 
 const FormItem = Form.Item
@@ -28,10 +29,13 @@ class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProp
     const { form, history, intl } = this.props
     form.validateFields((err, values) => {
       if (!err) {
-        httpPost("/users/sign-up", values).then((_) => {
-          message.success(intl.formatMessage({ id: "nut.users.confirm.success" }))
-          history.push("/users/sign-in")
-        }).catch(message.error)
+        httpPost(
+          "/users/sign-up",
+          Object.assign({}, values, { home: HOME }))
+          .then((_) => {
+            message.success(intl.formatMessage({ id: "nut.users.confirm.success" }))
+            history.push("/users/sign-in")
+          }).catch(message.error)
       }
     })
   }

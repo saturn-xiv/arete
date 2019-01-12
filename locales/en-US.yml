@@ -66,10 +66,10 @@ nut:
     users:
       confirm:
         subject:           Confirmation instructions
-        body:              Hello {{name}}!<br />You can confirm your account email through the link below.<br /><a target="_blank" href="{{home}}/my/users/confirm/{{token}}">Confirm my account</a>
-      forgot-password:
+        body:              Hello {{name}}!<br />You can confirm your account email through the link below.<br /><a target="_blank" href="{{home}}/users/confirm/{{token}}">Confirm my account</a>
+      reset-password:
         subject:           Reset password instructions
         body:              Hello {{name}}!<br />Someone has requested a link to change your password. You can do this through the link below.If you didn't request this, please ignore this email.Your password won't change until you access the link above and create a new one.<br /><a target="_blank" href="{{home}}/my/users/reset-password/{{token}}">Change my password</a>
       unlock:
         subject:           Unlock instructions
-        body:              Hello {{name}}!<br />Click the link below to unlock your account.<br /><a target="_blank" href="{{home}}/my/users/unlock/{{token}}">Unlock my account</a>
+        body:              Hello {{name}}!<br />Click the link below to unlock your account.<br /><a target="_blank" href="{{home}}/users/unlock/{{token}}">Unlock my account</a>

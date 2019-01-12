@@ -4,7 +4,7 @@ use std::sync::Arc;
 use hyper::header::Header as HyperHeader;
 use rocket::{
     http::{
-        hyper::header::{AcceptLanguage, Authorization, Bearer, Host as HyperHost},
+        hyper::header::{AcceptLanguage, Authorization, Bearer},
         Cookies, Status,
     },
     request::{self, FromRequest},
@@ -19,34 +19,6 @@ use super::{
         user::Dao as UserDao,
     },
 };
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Host {
-    pub hostname: String,
-    pub port: Option<u16>,
-}
-
-impl From<HyperHost> for Host {
-    fn from(v: HyperHost) -> Self {
-        Self {
-            hostname: v.hostname,
-            port: v.port,
-        }
-    }
-}
-
-impl<'a, 'r> FromRequest<'a, 'r> for Host {
-    type Error = ();
-
-    fn from_request(req: &'a Request<'r>) -> request::Outcome<Self, Self::Error> {
-        if let Some(host) = req.headers().get_one(HyperHost::header_name()) {
-            if let Ok(host) = host.parse::<HyperHost>() {
-                return Outcome::Success(host.into());
-            }
-        }
-        Outcome::Failure((Status::BadRequest, ()))
-    }
-}
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Token(pub String);

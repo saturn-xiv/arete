@@ -23,7 +23,7 @@ use super::super::super::{
         log::{Dao as LogDao, Item as Log},
         user::{Dao as UserDao, Item as User},
     },
-    request::{CurrentUser, Host, Locale},
+    request::{CurrentUser, Locale},
     tasks::send_email,
 };
 
@@ -114,6 +114,8 @@ pub struct SignUp {
     pub email: String,
     #[validate(length(min = "6", max = "32"))]
     pub password: String,
+    #[validate(length(min = "1"))]
+    pub home: String,
 }
 
 #[post("/users/sign-up", format = "json", data = "<form>")]
@@ -123,7 +125,6 @@ pub fn sign_up(
     db: Database,
     jwt: State<Arc<Jwt>>,
     remote: SocketAddr,
-    host: Host,
     locale: Locale,
     i18n: I18n,
 ) -> Result<JsonValue> {
@@ -141,6 +142,7 @@ pub fn sign_up(
         return Err(format!("Nick name {} already exist", form.nick_name).into());
     }
 
+    let home = form.home.clone();
     let user = db.transaction::<_, Error, _>(move || {
         UserDao::sign_up::<Sodium>(
             db,
@@ -153,15 +155,7 @@ pub fn sign_up(
         LogDao::add(db, &it.id, &ip, "Sign up")?;
         Ok(it)
     })?;
-    send_email(
-        &i18n,
-        jwt,
-        queue,
-        &user,
-        &Action::Confirm,
-        &locale,
-        &host.hostname,
-    )?;
+    send_email(&i18n, jwt, queue, &user, &Action::Confirm, &locale, &home)?;
     Ok(json!({}))
 }
 
@@ -170,12 +164,13 @@ pub fn sign_up(
 pub struct Email {
     #[validate(email)]
     pub email: String,
+    #[validate(length(min = "1"))]
+    pub home: String,
 }
 
 #[post("/users/confirm", format = "json", data = "<form>")]
 pub fn confirm(
     form: Json<Email>,
-    host: Host,
     locale: Locale,
     queue: State<Arc<RabbitMQ>>,
     db: Database,
@@ -199,7 +194,7 @@ pub fn confirm(
         &it,
         &Action::Confirm,
         &locale,
-        &host.hostname,
+        &form.home,
     )?;
     Ok(json!({}))
 }
@@ -207,7 +202,6 @@ pub fn confirm(
 #[post("/users/unlock", format = "json", data = "<form>")]
 pub fn unlock(
     form: Json<Email>,
-    host: Host,
     locale: Locale,
     queue: State<Arc<RabbitMQ>>,
     i18n: I18n,
@@ -223,15 +217,7 @@ pub fn unlock(
     if None == it.locked_at {
         return Err("User isn't locked".into());
     }
-    send_email(
-        &i18n,
-        jwt,
-        queue,
-        &it,
-        &Action::Unlock,
-        &locale,
-        &host.hostname,
-    )?;
+    send_email(&i18n, jwt, queue, &it, &Action::Unlock, &locale, &form.home)?;
     Ok(json!({}))
 }
 
@@ -239,7 +225,6 @@ pub fn unlock(
 pub fn forgot_password(
     form: Json<Email>,
     queue: State<Arc<RabbitMQ>>,
-    host: Host,
     locale: Locale,
     db: Database,
     i18n: I18n,
@@ -250,7 +235,7 @@ pub fn forgot_password(
     let queue = queue.deref();
     let jwt = jwt.deref();
     let Locale(locale) = locale;
-    let it = UserDao::by_uid(db, &form.email)?;
+    let it = UserDao::by_email(db, &form.email)?;
     send_email(
         &i18n,
         jwt,
@@ -258,7 +243,7 @@ pub fn forgot_password(
         &it,
         &Action::ResetPassword,
         &locale,
-        &host.hostname,
+        &form.home,
     )?;
     Ok(json!({}))
 }
@@ -376,7 +361,7 @@ fn send_email(
     user: &User,
     act: &Action,
     locale: &String,
-    host: &String,
+    home: &String,
 ) -> Result<()> {
     let expire = 1;
     let (nbf, exp) = Jwt::timestamps(Duration::hours(expire));
@@ -390,16 +375,10 @@ fn send_email(
         },
     )?;
 
-    let subject = i18n.t(
-        locale,
-        &format!("nut.mailer.users.{}.subject", act),
-        &None::<String>,
-    );
-    let body = i18n.t(
-        locale,
-        &format!("nut.mailer.users.{}.body", act),
-        &Some(json!({ "name": user.real_name, "home": host, "expire":expire, "token":token })),
-    );
+    let args =
+        Some(json!({ "name": user.real_name, "home": home, "expire":expire, "token":token }));
+    let subject = i18n.t(locale, &format!("nut.mailer.users.{}.subject", act), &args);
+    let body = i18n.t(locale, &format!("nut.mailer.users.{}.body", act), &args);
 
     queue.publish(
         send_email::NAME.to_string(),
