@@ -6,7 +6,8 @@ buttons:
   submit:                  Submit
   reset:                   Reset
 flashes:
-  success:                 Success
+  success:                 Success.
+  bad-action:              Bad action.
 form:
   helpers:
     nick-name:             Nick name is your unique ID to sign in, between 2 to 32 charaters.
@@ -73,3 +74,25 @@ nut:
       unlock:
         subject:           Unlock instructions
         body:              Hello {{name}}!<br />Click the link below to unlock your account.<br /><a target="_blank" href="{{home}}/users/unlock/{{token}}">Unlock my account</a>
+  errors:
+    user:
+      is-not-lock:         User isn't locked.
+      is-not-exist:        User {{login}} isn't exist.
+      already-confirm:     User is already confirm.
+      already-unlock:      User is already unlock.
+      already-exist:
+        email:             Email {{email}} already exists.
+        nick-name:         Nick name {{name}} already exists.
+    database-is-not-empty: Database isn't empty.
+  logs:
+    user:
+      unlock:              Unlock.
+      confirm:             Confirm.
+      sign-in:
+        failed:            Sign in failed.
+        success:           Sign in success.
+      sign-up:             Sign Up.
+      change-password:     Change password.
+      reset-password:      Reset password.
+      sign-out:            Sign out.
+    init-database:         Init database, apply as administrator.

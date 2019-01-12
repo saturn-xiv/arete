@@ -4,7 +4,6 @@ pub mod locales;
 pub mod ueditor;
 pub mod users;
 
-use std::net::SocketAddr;
 use std::ops::Deref;
 
 use diesel::Connection as DieselConnection;
@@ -15,11 +14,10 @@ use super::super::super::super::{
     crypto::sodium::Encryptor as Sodium,
     env,
     errors::{Error, Result},
-    i18n::locale::Dao as LocaleDao,
+    i18n::{locale::Dao as LocaleDao, I18n},
     orm::Database,
 };
 use super::super::models::{
-    log::Dao as LogDao,
     policy::{Dao as PolicyDao, Item as Policy, Role},
     user::Dao as UserDao,
 };
@@ -46,14 +44,13 @@ pub struct Install {
 }
 
 #[post("/install", format = "json", data = "<form>")]
-pub fn install(form: Json<Install>, db: Database, remote: SocketAddr) -> Result<JsonValue> {
+pub fn install(form: Json<Install>, i18n: I18n, db: Database) -> Result<JsonValue> {
     form.validate()?;
     let db = db.deref();
-    let ip = remote.ip();
 
-    db.transaction::<_, Error, _>(|| {
+    let user = db.transaction::<_, Error, _>(|| {
         if UserDao::count(db)? > 0 {
-            return Err("Database isn't empty".into());
+            return Err(i18n.e("nut.errors.database-is-not-empty", &None::<String>));
         }
         UserDao::sign_up::<Sodium>(
             db,
@@ -68,9 +65,10 @@ pub fn install(form: Json<Install>, db: Database, remote: SocketAddr) -> Result<
         PolicyDao::apply(db, &it.id, &Role::Root, &None::<String>, &nbf, &exp)?;
         PolicyDao::apply(db, &it.id, &Role::Admin, &None::<String>, &nbf, &exp)?;
 
-        LogDao::add(db, &it.id, &ip, "Init database, apply as administrator")?;
-        Ok(())
+        Ok(it.id)
     })?;
+
+    i18n.l(&user, "nut.logs.init-database", &None::<String>)?;
 
     Ok(json!({}))
 }

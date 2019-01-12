@@ -23,7 +23,7 @@ use super::super::super::{
         log::{Dao as LogDao, Item as Log},
         user::{Dao as UserDao, Item as User},
     },
-    request::{CurrentUser, Locale},
+    request::CurrentUser,
     tasks::send_email,
 };
 
@@ -59,7 +59,7 @@ impl fmt::Display for Action {
 #[serde(rename_all = "camelCase")]
 pub struct SignIn {
     #[validate(length(min = "1"))]
-    pub id: String,
+    pub login: String,
     #[validate(length(min = "1"))]
     pub password: String,
 }
@@ -68,28 +68,33 @@ pub struct SignIn {
 pub fn sign_in(
     db: Database,
     jwt: State<Arc<Jwt>>,
+    i18n: I18n,
     remote: SocketAddr,
     form: Json<SignIn>,
 ) -> Result<JsonValue> {
     form.validate()?;
     let ip = remote.ip();
     let db = db.deref();
-    let user: Result<User> = match UserDao::by_email(db, &form.id) {
+
+    let user: Result<User> = match UserDao::by_email(db, &form.login) {
         Ok(v) => Ok(v),
-        Err(_) => match UserDao::by_nick_name(db, &form.id) {
+        Err(_) => match UserDao::by_nick_name(db, &form.login) {
             Ok(v) => Ok(v),
-            Err(_) => Err(format!("User {} not exist", form.id).into()),
+            Err(_) => Err(i18n.e(
+                "nut.errors.user.is-not-exist",
+                &Some(json!({"login": form.login})),
+            )),
         },
     };
     let user = user?;
 
     if let Err(e) = user.auth::<Sodium>(&form.password) {
-        LogDao::add(db, &user.id, &ip, "Sign in failed")?;
+        i18n.l(&user.id, "nut.logs.user.sign-in.failed", &None::<String>)?;
         return Err(e);
     }
     user.available()?;
     UserDao::sign_in(db, &user.id, &ip)?;
-    LogDao::add(db, &user.id, &ip, "Sign in success")?;
+    i18n.l(&user.id, "nut.logs.user.sign-in.success", &None::<String>)?;
     let (nbf, exp) = Jwt::timestamps(Duration::weeks(1));
     let token = jwt.sum(
         None,
@@ -124,22 +129,24 @@ pub fn sign_up(
     queue: State<Arc<RabbitMQ>>,
     db: Database,
     jwt: State<Arc<Jwt>>,
-    remote: SocketAddr,
-    locale: Locale,
     i18n: I18n,
 ) -> Result<JsonValue> {
     form.validate()?;
     let db = db.deref();
     let queue = queue.deref();
-    let ip = remote.ip();
-    let Locale(locale) = locale;
     let jwt = jwt.deref();
 
     if let Ok(_) = UserDao::by_email(db, &form.email) {
-        return Err(format!("Email {} already exist", form.email).into());
+        return Err(i18n.e(
+            "nut.errors.already-exist.email",
+            &Some(json!({"email":form.email})),
+        ));
     }
     if let Ok(_) = UserDao::by_nick_name(db, &form.nick_name) {
-        return Err(format!("Nick name {} already exist", form.nick_name).into());
+        return Err(i18n.e(
+            "nut.errors.already-exist.nick-name",
+            &Some(json!({"name":&form.nick_name})),
+        ));
     }
 
     let home = form.home.clone();
@@ -152,10 +159,10 @@ pub fn sign_up(
             &form.password,
         )?;
         let it = UserDao::by_email(db, &form.email)?;
-        LogDao::add(db, &it.id, &ip, "Sign up")?;
         Ok(it)
     })?;
-    send_email(&i18n, jwt, queue, &user, &Action::Confirm, &locale, &home)?;
+    i18n.l(&user.id, "nut.logs.user.sign-up", &None::<String>)?;
+    send_email(&i18n, jwt, queue, &user, &Action::Confirm, &home)?;
     Ok(json!({}))
 }
 
@@ -171,7 +178,6 @@ pub struct Email {
 #[post("/users/confirm", format = "json", data = "<form>")]
 pub fn confirm(
     form: Json<Email>,
-    locale: Locale,
     queue: State<Arc<RabbitMQ>>,
     db: Database,
     jwt: State<Arc<Jwt>>,
@@ -182,27 +188,17 @@ pub fn confirm(
     let queue = queue.deref();
     let jwt = jwt.deref();
 
-    let Locale(locale) = locale;
     let it = UserDao::by_email(db, &form.email)?;
     if let Some(_) = it.confirmed_at {
-        return Err("User already confirmed".into());
+        return Err(i18n.e("nut.errors.user.already-confirm", &None::<String>));
     }
-    send_email(
-        &i18n,
-        jwt,
-        queue,
-        &it,
-        &Action::Confirm,
-        &locale,
-        &form.home,
-    )?;
+    send_email(&i18n, jwt, queue, &it, &Action::Confirm, &form.home)?;
     Ok(json!({}))
 }
 
 #[post("/users/unlock", format = "json", data = "<form>")]
 pub fn unlock(
     form: Json<Email>,
-    locale: Locale,
     queue: State<Arc<RabbitMQ>>,
     i18n: I18n,
     db: Database,
@@ -212,12 +208,12 @@ pub fn unlock(
     let db = db.deref();
     let queue = queue.deref();
     let jwt = jwt.deref();
-    let Locale(locale) = locale;
+
     let it = UserDao::by_email(db, &form.email)?;
     if None == it.locked_at {
-        return Err("User isn't locked".into());
+        return Err(i18n.e("nut.errors.user.is-not-lock", &None::<String>));
     }
-    send_email(&i18n, jwt, queue, &it, &Action::Unlock, &locale, &form.home)?;
+    send_email(&i18n, jwt, queue, &it, &Action::Unlock, &form.home)?;
     Ok(json!({}))
 }
 
@@ -225,7 +221,6 @@ pub fn unlock(
 pub fn forgot_password(
     form: Json<Email>,
     queue: State<Arc<RabbitMQ>>,
-    locale: Locale,
     db: Database,
     i18n: I18n,
     jwt: State<Arc<Jwt>>,
@@ -234,17 +229,9 @@ pub fn forgot_password(
     let db = db.deref();
     let queue = queue.deref();
     let jwt = jwt.deref();
-    let Locale(locale) = locale;
+
     let it = UserDao::by_email(db, &form.email)?;
-    send_email(
-        &i18n,
-        jwt,
-        queue,
-        &it,
-        &Action::ResetPassword,
-        &locale,
-        &form.home,
-    )?;
+    send_email(&i18n, jwt, queue, &it, &Action::ResetPassword, &form.home)?;
     Ok(json!({}))
 }
 
@@ -260,22 +247,21 @@ pub struct ResetPassword {
 #[post("/users/reset-password", format = "json", data = "<form>")]
 pub fn reset_password(
     form: Json<ResetPassword>,
-    remote: SocketAddr,
     db: Database,
     jwt: State<Arc<Jwt>>,
+    i18n: I18n,
 ) -> Result<JsonValue> {
     form.validate()?;
     let token = jwt.parse::<Token>(&form.token)?.claims;
     if token.act != Action::ResetPassword {
-        return Err("bad action".into());
+        return Err(i18n.e("flashes.bad-action", &None::<String>));
     }
 
     let db = db.deref();
-    let ip = remote.ip();
     let it = UserDao::by_uid(db, &token.uid)?;
 
     UserDao::password::<Sodium>(db, &it.id, &form.password)?;
-    LogDao::add(db, &it.id, &ip, "Reset password")?;
+    i18n.l(&it.id, "nut.logs.user.reset-password", &None::<String>)?;
     Ok(json!({}))
 }
 
@@ -334,23 +320,20 @@ pub fn change_password(
     db: Database,
     form: Json<ChangePassword>,
     user: CurrentUser,
-    remote: SocketAddr,
+    i18n: I18n,
 ) -> Result<Json<()>> {
     form.validate()?;
     let db = db.deref();
-    let ip = remote.ip();
     let user = UserDao::by_id(db, &user.id)?;
     user.auth::<Sodium>(&form.current_password)?;
     UserDao::password::<Sodium>(db, &user.id, &form.new_password)?;
-    LogDao::add(db, &user.id, &ip, "Change password")?;
+    i18n.l(&user.id, "nut.logs.user.change-password", &None::<String>)?;
     Ok(Json(()))
 }
 
 #[delete("/users/sign-out")]
-pub fn sign_out(db: Database, user: CurrentUser, remote: SocketAddr) -> Result<Json<()>> {
-    let db = db.deref();
-    let ip = remote.ip();
-    LogDao::add(db, &user.id, &ip, "Sign out")?;
+pub fn sign_out(user: CurrentUser, i18n: I18n) -> Result<Json<()>> {
+    i18n.l(&user.id, "nut.logs.user.sign-out", &None::<String>)?;
     Ok(Json(()))
 }
 
@@ -360,7 +343,6 @@ fn send_email(
     queue: &RabbitMQ,
     user: &User,
     act: &Action,
-    locale: &String,
     home: &String,
 ) -> Result<()> {
     let expire = 1;
@@ -377,8 +359,8 @@ fn send_email(
 
     let args =
         Some(json!({ "name": user.real_name, "home": home, "expire":expire, "token":token }));
-    let subject = i18n.t(locale, &format!("nut.mailer.users.{}.subject", act), &args);
-    let body = i18n.t(locale, &format!("nut.mailer.users.{}.body", act), &args);
+    let subject = i18n.t(format!("nut.mailer.users.{}.subject", act), &args);
+    let body = i18n.t(format!("nut.mailer.users.{}.body", act), &args);
 
     queue.publish(
         send_email::NAME.to_string(),

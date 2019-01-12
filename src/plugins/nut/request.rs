@@ -1,3 +1,4 @@
+use std::net::SocketAddr;
 use std::ops::Deref;
 use std::sync::Arc;
 
@@ -11,7 +12,7 @@ use rocket::{
     Outcome, Request, State,
 };
 
-use super::super::super::{i18n::I18n, jwt::Jwt, orm::Database};
+use super::super::super::{i18n::I18n, jwt::Jwt, orm::Database, redis::Redis};
 use super::{
     controllers,
     models::{
@@ -163,5 +164,22 @@ impl<'a, 'r> FromRequest<'a, 'r> for Administrator {
         }
 
         Outcome::Failure((Status::Forbidden, ()))
+    }
+}
+
+impl<'a, 'r> FromRequest<'a, 'r> for I18n {
+    type Error = ();
+    fn from_request(request: &'a Request<'r>) -> request::Outcome<Self, Self::Error> {
+        let Database(db) = request.guard::<Database>()?;
+        let Redis(cache) = request.guard::<Redis>()?;
+        let Locale(locale) = request.guard::<Locale>()?;
+        let remote = request.guard::<SocketAddr>().unwrap();
+
+        Outcome::Success(I18n {
+            db: db,
+            cache: cache,
+            locale: locale,
+            ip: remote.ip(),
+        })
     }
 }

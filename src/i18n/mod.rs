@@ -1,20 +1,17 @@
 pub mod locale;
 
+use std::net::IpAddr;
 use std::ops::Deref;
 use std::time::Duration;
 
 use mustache;
-use rocket::{
-    request::{self, FromRequest},
-    Outcome, Request,
-};
 use serde::ser::Serialize;
 
 use super::{
     cache::Cache,
     errors::{Error, Result},
-    orm::{Database, PooledConnection as DbConnection},
-    redis::{PooledConnection as RedisConnection, Redis},
+    orm::PooledConnection as DbConnection,
+    redis::PooledConnection as RedisConnection,
 };
 
 use self::locale::Dao;
@@ -22,6 +19,8 @@ use self::locale::Dao;
 pub struct I18n {
     pub db: DbConnection,
     pub cache: RedisConnection,
+    pub locale: String,
+    pub ip: IpAddr,
 }
 
 impl I18n {
@@ -53,13 +52,8 @@ impl I18n {
         )
     }
 
-    pub fn tr<S: Serialize>(
-        &self,
-        lang: &String,
-        code: &String,
-        args: &Option<S>,
-    ) -> Result<Option<String>> {
-        match self.get(lang, code)? {
+    pub fn tr<S: Serialize>(&self, code: &String, args: &Option<S>) -> Result<Option<String>> {
+        match self.get(&self.locale, &code)? {
             Some(msg) => match args {
                 Some(args) => Ok(Some(mustache::compile_str(&msg)?.render_to_string(args)?)),
                 None => Ok(Some(msg)),
@@ -68,33 +62,22 @@ impl I18n {
         }
     }
 
-    pub fn e<S: Serialize>(&self, lang: &String, code: &String, args: &Option<S>) -> Error {
-        match self.tr(lang, code, args) {
+    pub fn e<C: Into<String>, S: Serialize>(&self, code: C, args: &Option<S>) -> Error {
+        let code = code.into();
+        match self.tr(&code, args) {
             Ok(msg) => match msg {
                 Some(msg) => msg.into(),
-                None => format!("{}.{}", lang, code).into(),
+                None => format!("{}.{}", self.locale, code).into(),
             },
             Err(e) => e,
         }
     }
 
-    pub fn t<S: Serialize>(&self, lang: &String, code: &String, args: &Option<S>) -> String {
-        if let Ok(Some(msg)) = self.tr(lang, code, args) {
+    pub fn t<C: Into<String>, S: Serialize>(&self, code: C, args: &Option<S>) -> String {
+        let code = code.into();
+        if let Ok(Some(msg)) = self.tr(&code, args) {
             return msg;
         }
-        format!("{}.{}", lang, code)
-    }
-}
-
-impl<'a, 'r> FromRequest<'a, 'r> for I18n {
-    type Error = ();
-    fn from_request(request: &'a Request<'r>) -> request::Outcome<Self, Self::Error> {
-        let Database(db) = request.guard::<Database>()?;
-        let Redis(cache) = request.guard::<Redis>()?;
-
-        Outcome::Success(I18n {
-            db: db,
-            cache: cache,
-        })
+        format!("{}.{}", self.locale, code)
     }
 }
