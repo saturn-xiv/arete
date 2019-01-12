@@ -2,12 +2,30 @@ import Exception from 'ant-design-pro/lib/Exception'
 import * as React from 'react'
 import { connect } from 'react-redux'
 
-
 import { IUserState } from '../actions'
 import { IApplicationState } from '../reducers'
 
-export const ADMIN = 'admin'
-export const ROOT = 'root'
+export const enum RoleTypes {
+  ROOT = 'root',
+  ADMIN = 'admin',
+}
+
+export const havePermission = (user: IUserState, authority?: string): boolean => {
+  if (user.uid) {
+    if (authority) {
+      if (user.roles.indexOf(RoleTypes.ROOT) >= 0) {
+        return true
+      }
+      if (authority !== RoleTypes.ROOT && user.roles.indexOf(RoleTypes.ADMIN) >= 0) {
+        return true
+      }
+      return user.roles.indexOf(authority) >= 0
+    } else {
+      return true
+    }
+  }
+  return false
+}
 
 interface IProps {
   user: IUserState,
@@ -16,28 +34,12 @@ interface IProps {
 }
 
 class Widget extends React.Component<IProps> {
-
   public render() {
-    return this.havePermission() ? this.props.children : (<Exception type="403" />)
+    const { user, authority } = this.props
+    return havePermission(user, authority) ? this.props.children : (<Exception type="403" />)
   }
 
-  private havePermission(): boolean {
-    const { user, authority } = this.props
-    if (user.uid) {
-      if (authority) {
-        if (user.roles.indexOf(ROOT) >= 0) {
-          return true
-        }
-        if (authority !== ROOT && user.roles.indexOf(ADMIN) >= 0) {
-          return true
-        }
-        return user.roles.indexOf(authority) >= 0
-      } else {
-        return true
-      }
-    }
-    return false
-  }
+
 
 }
 

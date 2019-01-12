@@ -8,6 +8,7 @@ import { RouteComponentProps, withRouter } from "react-router"
 import { Dispatch } from 'redux'
 
 import { ISiteState, IUserState, siteRefresh, userSignIn, userSignOut } from '../actions'
+import { havePermission, RoleTypes } from '../components/authorized'
 import { set as setLocale } from '../intl'
 import { IApplicationState } from '../reducers'
 import { httpDelete, httpGet } from '../utils/request'
@@ -79,19 +80,23 @@ function headerBar(user: IUserState): IMenuItem[] {
 }
 
 function siderBar(user: IUserState): IMenu[] {
-  const items = []
-  if (user.uid) {
-    items.push({
-      children: [
-        { children: (<FormattedMessage id="nut.users.logs.title" />), key: "to-/users/logs" },
-        { children: (<FormattedMessage id="nut.users.change-password.title" />), key: "to-/users/change-password" },
-        { children: (<FormattedMessage id="nut.users.profile.title" />), key: "to-/users/profile" },
-      ],
-      icon: 'user',
-      key: 'personal',
-      label: (<FormattedMessage id="nut.dashboard.personal.title" />),
-    })
+  const items: IMenu[] = []
+  if (!user.uid) {
+    return items
+  }
 
+  items.push({
+    children: [
+      { children: (<FormattedMessage id="nut.users.logs.title" />), key: "to-/users/logs" },
+      { children: (<FormattedMessage id="nut.users.change-password.title" />), key: "to-/users/change-password" },
+      { children: (<FormattedMessage id="nut.users.profile.title" />), key: "to-/users/profile" },
+    ],
+    icon: 'user',
+    key: 'personal',
+    label: (<FormattedMessage id="nut.dashboard.personal.title" />),
+  })
+
+  if (havePermission(user, RoleTypes.ADMIN)) {
     items.push({
       children: [
         { children: (<FormattedMessage id="nut.admin.site.status.title" />), key: "to-/admin/site/status" },
@@ -113,75 +118,115 @@ function siderBar(user: IUserState): IMenu[] {
       key: 'site',
       label: (<FormattedMessage id="nut.dashboard.site.title" />),
     })
+  }
 
+  if (process.env.REACT_APP_FEATURE_ALBUM) {
     items.push({
       children: [],
       icon: 'picture',
       key: 'album',
       label: (<FormattedMessage id="album.dashboard.title" />),
     })
+  }
+
+  if (process.env.REACT_APP_FEATURE_FORUM) {
     items.push({
       children: [],
       icon: 'snippets',
       key: 'forum',
       label: (<FormattedMessage id="forum.dashboard.title" />),
     })
+  }
+
+  if (process.env.REACT_APP_FEATURE_SURVEY) {
     items.push({
       children: [],
       icon: 'form',
       key: 'survey',
       label: (<FormattedMessage id="survey.dashboard.title" />),
     })
-    items.push({
-      children: [],
-      icon: 'idcard',
-      key: 'vip',
-      label: (<FormattedMessage id="vip.dashboard.title" />),
-    })
+  }
+
+  if (process.env.REACT_APP_FEATURE_CBETA) {
     items.push({
       children: [],
       icon: 'read',
       key: 'cbeta',
       label: (<FormattedMessage id="cbeta.dashboard.title" />),
     })
+  }
+
+  if (process.env.REACT_APP_FEATURE_SCHEDULE) {
     items.push({
       children: [],
       icon: 'schedule',
       key: 'schedule',
       label: (<FormattedMessage id="schedule.dashboard.title" />),
     })
+  }
+  if (process.env.REACT_APP_FEATURE_SHOPPING) {
     items.push({
       children: [],
       icon: 'shopping-cart',
       key: 'shopping',
       label: (<FormattedMessage id="shopping.dashboard.title" />),
     })
+  }
+
+  if (process.env.REACT_APP_FEATURE_CALENDAR) {
     items.push({
       children: [],
       icon: 'calendar',
       key: 'calendar',
       label: (<FormattedMessage id="calendar.dashboard.title" />),
     })
-    items.push({
-      children: [],
-      icon: 'money-collect',
-      key: 'donate',
-      label: (<FormattedMessage id="donate.dashboard.title" />),
-    })
-    items.push({
-      children: [],
-      icon: 'cloud',
-      key: 'ops.vpn',
-      label: (<FormattedMessage id="ops.vpn.dashboard.title" />),
-    })
-    items.push({
-      children: [],
-      icon: 'mail',
-      key: 'ops.email',
-      label: (<FormattedMessage id="ops.email.dashboard.title" />),
-    })
+  }
+
+  if (havePermission(user, RoleTypes.ADMIN)) {
+
+    if (process.env.REACT_APP_FEATURE_DONATE) {
+      items.push({
+        children: [],
+        icon: 'money-collect',
+        key: 'donate',
+        label: (<FormattedMessage id="donate.dashboard.title" />),
+      })
+    }
+
+    if (process.env.REACT_APP_FEATURE_OPS_VPN) {
+      items.push({
+        children: [],
+        icon: 'cloud',
+        key: 'ops.vpn',
+        label: (<FormattedMessage id="ops.vpn.dashboard.title" />),
+      })
+    }
+
+    if (process.env.REACT_APP_FEATURE_OPS_EMAIL) {
+      items.push({
+        children: [],
+        icon: 'mail',
+        key: 'ops.email',
+        label: (<FormattedMessage id="ops.email.dashboard.title" />),
+      })
+    }
+
+    if (process.env.REACT_APP_FEATURE_SURVEY
+      || process.env.REACT_APP_CALENDAR
+      || process.env.REACT_APP_FEATURE_SCHEDULE
+      || process.env.REACT_APP_FEATURE_DONATE
+      || process.env.REACT_APP_FEATURE_SHOPPING
+    ) {
+      items.push({
+        children: [],
+        icon: 'idcard',
+        key: 'vip',
+        label: (<FormattedMessage id="vip.dashboard.title" />),
+      })
+    }
 
   }
+
   return items
 }
 
@@ -237,6 +282,7 @@ class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProp
             httpDelete('/users/sign-out')
               .then(() => message.success(intl.formatMessage({ id: 'flashes.success' })))
               .catch(message.error)
+            history.push('/users/sign-in')
             signOut()
           }
         });

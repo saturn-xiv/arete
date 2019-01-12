@@ -20,10 +20,10 @@ export const currentUser: Reducer<IUserState> = (state = initialState, action) =
         window.console.error(e)
       }
       removeToken()
-      return { roles: [] }
+      return initialState
     case UserActionTypes.SIGN_OUT:
       removeToken()
-      return { roles: [] }
+      return initialState
     default:
       return state
   }
