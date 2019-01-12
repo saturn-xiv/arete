@@ -22,6 +22,11 @@ form:
     password-confirmation: Password confirmation
     real-name:             Real name
     username:              User name
+    id:                    ID
+    ip:                    IP
+    message:               Message
+    created-at:            Created at
+    updated-at:            Updated at
   validations:
     required:              Field is required
     email:                 Bad email address.
@@ -58,7 +63,7 @@ nut:
   users:
     change-password:
       success:             Your password has been changed successfully.
-      title:               Change your password
+      title:               Change password
     confirm:
       success:             You will receive an email with instructions for how to confirm your email address in a few minutes.
       title:               Didn't receive confirmation instructions?

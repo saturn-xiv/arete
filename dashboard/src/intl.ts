@@ -8,6 +8,8 @@ import { addLocaleData } from 'react-intl'
 import * as dataEn from 'react-intl/locale-data/en'
 import * as dataZh from 'react-intl/locale-data/zh'
 
+import { detect as detectMoment } from './components/moment'
+
 const KEY = "locale"
 
 export interface ILocale {
@@ -31,12 +33,13 @@ export const get = () => {
     ...dataZh
   ])
   const locale = Cookies.get(KEY) || localStorage.getItem(KEY) || 'en-US'
+  const moment = detectMoment(locale)
   switch (locale) {
     case 'zh-Hans':
-      return { moment: 'zh-cn', locale, antd: antdZhHans }
+      return { moment, locale, antd: antdZhHans }
     case 'zh-Hant':
-      return { moment: 'zh-tw', locale, antd: antdZhHant }
+      return { moment, locale, antd: antdZhHant }
     default:
-      return { moment: 'en', locale: 'en-US', antd: antdEnUS }
+      return { moment, locale: 'en-US', antd: antdEnUS }
   }
 }

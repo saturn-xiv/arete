@@ -7,6 +7,7 @@ import Head from '../Head'
 
 interface IProps {
   title: ILabel,
+  children: React.ReactNode,
 }
 
 class Widget extends React.Component<IProps> {
