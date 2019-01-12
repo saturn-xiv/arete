@@ -21,6 +21,7 @@ use super::super::super::super::super::{
 use super::super::super::{
     models::{
         log::{Dao as LogDao, Item as Log},
+        policy::Dao as PolicyDao,
         user::{Dao as UserDao, Item as User},
     },
     request::CurrentUser,
@@ -34,6 +35,7 @@ pub struct Token {
     pub act: Action,
     pub nbf: i64,
     pub exp: i64,
+    pub roles: Vec<String>,
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
@@ -103,6 +105,11 @@ pub fn sign_in(
             act: Action::SignIn,
             nbf: nbf,
             exp: exp,
+            roles: PolicyDao::all(db, &user.id)?
+                .iter()
+                .filter(|(_, it)| *it == None)
+                .map(|(it, _)| it.to_string())
+                .collect(),
         },
     )?;
     Ok(json!({ "token": token }))
@@ -354,6 +361,7 @@ fn send_email(
             act: act.clone(),
             nbf: nbf,
             exp: exp,
+            roles: Vec::new(),
         },
     )?;
 

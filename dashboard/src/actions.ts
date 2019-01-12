@@ -11,6 +11,7 @@ export const enum SiteActionTypes {
 
 export interface IUserState {
   readonly uid?: string,
+  readonly roles: string[],
 }
 
 export interface ISiteState {

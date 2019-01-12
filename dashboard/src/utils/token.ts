@@ -5,6 +5,7 @@ export interface IToken {
   act: string,
   exp: number,
   nbf: number,
+  roles: string[],
 }
 
 export const get = () => {

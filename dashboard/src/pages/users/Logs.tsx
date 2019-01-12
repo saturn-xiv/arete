@@ -1,9 +1,13 @@
 import * as React from 'react'
 import { FormattedMessage } from 'react-intl'
 
+import { Authorized } from '../../components/authorized'
+
 class Widget extends React.Component {
   public render() {
-    return (<div><FormattedMessage id="nut.users.logs.title" /> </div>)
+    return (<Authorized>
+      <FormattedMessage id="nut.users.logs.title" />
+    </Authorized>)
   }
 }
 
