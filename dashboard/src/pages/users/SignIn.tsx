@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from "react-router"
 import { Dispatch } from 'redux'
 
-import { signIn as usersSignIn } from '../../actions'
+import { userSignIn } from '../../actions'
 import { formItemLayout } from '../../components/form'
 import Submit from '../../components/form/Submit'
 import Layout from '../../components/users/SharedLinks'
@@ -14,7 +14,7 @@ import { IApplicationState } from '../../reducers'
 import { httpPost } from '../../utils/request'
 
 interface IProps {
-  signIn: typeof usersSignIn,
+  signIn: typeof userSignIn,
 }
 
 const FormItem = Form.Item
@@ -75,7 +75,7 @@ const mapStateToProps = ({ }: IApplicationState) => ({
 })
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-  signIn: (token: string) => dispatch(usersSignIn(token))
+  signIn: (token: string) => dispatch(userSignIn(token))
 })
 
 export default withRouter(connect(

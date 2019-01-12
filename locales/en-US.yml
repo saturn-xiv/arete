@@ -63,6 +63,8 @@ nut:
     unlock:
       success:             You will receive an email with instructions for how to unlock your account in a few minutes.
       title:               Didn't receive unlock instructions?
+    sign-out:
+      sure:                Are you sure to sign out?
   mailer:
     users:
       confirm:

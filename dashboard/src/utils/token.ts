@@ -1,5 +1,12 @@
 const KEY = 'token'
 
+export interface IToken {
+  uid: string,
+  act: string,
+  exp: number,
+  nbf: number,
+}
+
 export const get = () => {
   return sessionStorage.getItem(KEY)
 }
