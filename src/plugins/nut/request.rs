@@ -1,18 +1,17 @@
-use std::net::SocketAddr;
 use std::ops::Deref;
 use std::sync::Arc;
 
 use hyper::header::Header as HyperHeader;
 use rocket::{
     http::{
-        hyper::header::{AcceptLanguage, Authorization, Bearer},
-        Cookies, Status,
+        hyper::header::{Authorization, Bearer},
+        Status,
     },
     request::{self, FromRequest},
     Outcome, Request, State,
 };
 
-use super::super::super::{i18n::I18n, jwt::Jwt, orm::Database, redis::Redis};
+use super::super::super::{jwt::Jwt, orm::Database};
 use super::{
     controllers,
     models::{
@@ -38,61 +37,6 @@ impl<'a, 'r> FromRequest<'a, 'r> for Token {
             }
         }
         Outcome::Failure((Status::NonAuthoritativeInformation, ()))
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Locale(pub String);
-
-impl Locale {
-    fn parse(req: &Request) -> Option<String> {
-        let key = "locale";
-        // 1. Check URL arguments.
-        // 2. Get language information from cookies.
-        if let Outcome::Success(cookies) = req.guard::<Cookies>() {
-            if let Some(it) = cookies.get(key) {
-                return Some(it.value().to_string());
-            }
-        }
-        // 3. Get language information from 'Accept-Language'.
-        // https://www.w3.org/International/questions/qa-accept-lang-locales
-        // https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.4
-
-        if let Ok(AcceptLanguage(al)) = AcceptLanguage::parse_header(
-            &req.headers()
-                .get(AcceptLanguage::header_name())
-                .map(|x| x.as_bytes().to_vec())
-                .collect::<Vec<Vec<u8>>>(),
-        ) {
-            for it in al {
-                if let Some(lng) = it.item.language {
-                    return Some(lng);
-                }
-            }
-        }
-        None
-    }
-    fn detect(req: &Request) -> Option<String> {
-        if let Some(lang) = Self::parse(req) {
-            if let Outcome::Success(i18n) = req.guard::<I18n>() {
-                if i18n.exist(&lang) {
-                    return Some(lang);
-                }
-            }
-        }
-        None
-    }
-}
-
-impl<'a, 'r> FromRequest<'a, 'r> for Locale {
-    type Error = ();
-
-    fn from_request(req: &'a Request<'r>) -> request::Outcome<Self, Self::Error> {
-        let lang = match Self::detect(req) {
-            Some(v) => v,
-            None => "en-US".to_string(),
-        };
-        Outcome::Success(Locale(lang))
     }
 }
 
@@ -164,22 +108,5 @@ impl<'a, 'r> FromRequest<'a, 'r> for Administrator {
         }
 
         Outcome::Failure((Status::Forbidden, ()))
-    }
-}
-
-impl<'a, 'r> FromRequest<'a, 'r> for I18n {
-    type Error = ();
-    fn from_request(request: &'a Request<'r>) -> request::Outcome<Self, Self::Error> {
-        let Database(db) = request.guard::<Database>()?;
-        let Redis(cache) = request.guard::<Redis>()?;
-        let Locale(locale) = request.guard::<Locale>()?;
-        let remote = request.guard::<SocketAddr>().unwrap();
-
-        Outcome::Success(I18n {
-            db: db,
-            cache: cache,
-            locale: locale,
-            ip: remote.ip(),
-        })
     }
 }
