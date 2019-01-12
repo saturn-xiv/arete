@@ -33,9 +33,21 @@ site:
   copyright:               2018~2019
   title:                   Title
   subhead:                 Subhead
+layout:
+  header:
+    reload:                Refresh
+    home:                  Home
+    dashboard:             Dashboard
+    doc:                   Document
+    search:                Search
 nut:
   home:
     title:                 Home
+  dashboard:
+    personal:
+      title:               Personal
+    site:
+      title:               Site
   install:
     success:               Init database successed, you can sign in to continue now.
     title:                 Init database
@@ -64,7 +76,51 @@ nut:
       success:             You will receive an email with instructions for how to unlock your account in a few minutes.
       title:               Didn't receive unlock instructions?
     sign-out:
+      title:               Sign out
       sure:                Are you sure to sign out?
+    logs:
+      title:               Logs
+    profile:
+      title:               Edit profile
+  admin:
+    site:
+      status:
+        title:             Site status
+      info:
+        title:             Site info
+      author:
+        title:             Site author
+      seo:
+        title:             SEO
+      smtp:
+        title:             SMTP
+    users:
+      index:
+        title:             Users
+    leave-words:
+      index:
+        title:             Leave words
+    links:
+      index:
+        title:             Nav-Bar links
+    cards:
+      index:
+        title:             Card panels
+    locales:
+      index:
+        title:             Internationalization
+    votes:
+      index:
+        title:             Votes
+    tags:
+      index:
+        title:             Tags
+    categories:
+      index:
+        title:             Categories
+    friend-links:
+      index:
+        title:             Friend links
   mailer:
     users:
       confirm:
@@ -98,3 +154,37 @@ nut:
       reset-password:      Reset password.
       sign-out:            Sign out.
     init-database:         Init database, apply as administrator.
+album:
+  dashboard:
+    title:                 Album
+forum:
+  dashboard:
+    title:                 Forum
+cbeta:
+  dashboard:
+    title:                 CBETA
+survey:
+  dashboard:
+    title:                 Survey
+schedule:
+  dashboard:
+    title:                 Schedule
+shopping:
+  dashboard:
+    title:                 Shopping
+vip:
+  dashboard:
+    title:                 VIP
+calendar:
+  dashboard:
+    title:                 Calendar
+donate:
+  dashboard:
+    title:                 Donate
+ops:
+  email:
+    dashboard:
+      title:               Email
+  vpn:
+    dashboard:
+      title:               Vpn

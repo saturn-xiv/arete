@@ -25,8 +25,8 @@ class Widget extends React.Component<IProps> {
         dataSource={[
           { icon: 'login', label: 'nut.users.sign-in.title', to: '/users/sign-in' },
           { icon: 'user-add', label: 'nut.users.sign-up.title', to: '/users/sign-up' },
-          { icon: 'safety', label: 'nut.users.forgot-password.title', to: '/users/forgot-password' },
-          { icon: 'check', label: 'nut.users.confirm.title', to: '/users/confirm' },
+          { icon: 'key', label: 'nut.users.forgot-password.title', to: '/users/forgot-password' },
+          { icon: 'safety', label: 'nut.users.confirm.title', to: '/users/confirm' },
           { icon: 'unlock', label: 'nut.users.unlock.title', to: '/users/unlock' },
           { icon: 'message', label: 'nut.leave-words.new.title', to: '/leave-words/new' },
         ]}

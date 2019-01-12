@@ -1,5 +1,5 @@
 import HeaderSearch from 'ant-design-pro/lib/HeaderSearch'
-import { Icon, Layout, Menu, message, Modal } from 'antd'
+import { Icon, Layout, Menu, message, Modal, Tooltip } from 'antd'
 import { ClickParam } from 'antd/lib/menu'
 import * as React from 'react'
 import { FormattedMessage, InjectedIntlProps, injectIntl, intlShape } from 'react-intl'
@@ -35,47 +35,43 @@ interface IMenu {
   icon: string,
   children: IMenuItem[],
 }
+
 interface IMenuItem {
   key: string,
-  label: React.ReactNode,
-}
-
-interface INavItem {
   children: React.ReactNode,
-  key: string,
 }
 
-function headerBar(user: IUserState): INavItem[] {
+function headerBar(user: IUserState): IMenuItem[] {
   const items = [{
     children: (<Icon type="home" />),
     key: 'home',
   }]
   if (user.uid) {
     items.push({
-      children: (<Icon type="dashboard" />),
-      key: "dashboard",
+      children: (<Tooltip title={<FormattedMessage id="layout.header.dashboard" />}><Icon type="dashboard" /></Tooltip>),
+      key: "to-/users/logs",
     })
   }
   items.push({
-    children: (<HeaderSearch />),
+    children: (<Tooltip title={<FormattedMessage id="layout.header.search" />}><HeaderSearch /></Tooltip>),
     key: "search",
   })
   items.push({
-    children: (<Icon type="reload" />),
+    children: (<Tooltip title={<FormattedMessage id="layout.header.reload" />}><Icon type="reload" /></Tooltip>),
     key: "reload",
   })
   items.push({
-    children: (<Icon type="question-circle-o" />),
+    children: (<Tooltip title={<FormattedMessage id="layout.header.doc" />}><Icon type="question-circle-o" /></Tooltip>),
     key: "doc",
   })
   if (user.uid) {
     items.push({
-      children: (<Icon type="logout" />),
+      children: (<Tooltip title={<FormattedMessage id="nut.users.sign-out.title" />}><Icon type="logout" /></Tooltip>),
       key: "sign-out",
     })
   } else {
     items.push({
-      children: (<Icon type="login" />),
+      children: (<Tooltip title={<FormattedMessage id="nut.users.sign-in.title" />}><Icon type="login" /></Tooltip>),
       key: "to-/users/sign-in",
     })
   }
@@ -83,7 +79,110 @@ function headerBar(user: IUserState): INavItem[] {
 }
 
 function siderBar(user: IUserState): IMenu[] {
-  return []
+  const items = []
+  if (user.uid) {
+    items.push({
+      children: [
+        { children: (<FormattedMessage id="nut.users.logs.title" />), key: "to-/users/logs" },
+        { children: (<FormattedMessage id="nut.users.change-password.title" />), key: "to-/users/change-password" },
+        { children: (<FormattedMessage id="nut.users.profile.title" />), key: "to-/users/profile" },
+      ],
+      icon: 'user',
+      key: 'personal',
+      label: (<FormattedMessage id="nut.dashboard.personal.title" />),
+    })
+
+    items.push({
+      children: [
+        { children: (<FormattedMessage id="nut.admin.site.status.title" />), key: "to-/admin/site/status" },
+        { children: (<FormattedMessage id="nut.admin.site.info.title" />), key: "to-/admin/site/info" },
+        { children: (<FormattedMessage id="nut.admin.site.author.title" />), key: "to-/admin/site/author" },
+        { children: (<FormattedMessage id="nut.admin.site.seo.title" />), key: "to-/admin/site/seo" },
+        { children: (<FormattedMessage id="nut.admin.site.smtp.title" />), key: "to-/admin/site/smtp" },
+        { children: (<FormattedMessage id="nut.admin.locales.index.title" />), key: "to-/admin/locales" },
+        { children: (<FormattedMessage id="nut.admin.tags.index.title" />), key: "to-/admin/tags" },
+        { children: (<FormattedMessage id="nut.admin.categories.index.title" />), key: "to-/admin/categories" },
+        { children: (<FormattedMessage id="nut.admin.links.index.title" />), key: "to-/admin/links" },
+        { children: (<FormattedMessage id="nut.admin.cards.index.title" />), key: "to-/admin/cards" },
+        { children: (<FormattedMessage id="nut.admin.leave-words.index.title" />), key: "to-/admin/leave-words" },
+        { children: (<FormattedMessage id="nut.admin.friend-links.index.title" />), key: "to-/admin/friend-links" },
+        { children: (<FormattedMessage id="nut.admin.users.index.title" />), key: "to-/admin/users" },
+        { children: (<FormattedMessage id="nut.admin.votes.index.title" />), key: "to-/admin/votes" },
+      ],
+      icon: 'setting',
+      key: 'site',
+      label: (<FormattedMessage id="nut.dashboard.site.title" />),
+    })
+
+    items.push({
+      children: [],
+      icon: 'picture',
+      key: 'album',
+      label: (<FormattedMessage id="album.dashboard.title" />),
+    })
+    items.push({
+      children: [],
+      icon: 'snippets',
+      key: 'forum',
+      label: (<FormattedMessage id="forum.dashboard.title" />),
+    })
+    items.push({
+      children: [],
+      icon: 'form',
+      key: 'survey',
+      label: (<FormattedMessage id="survey.dashboard.title" />),
+    })
+    items.push({
+      children: [],
+      icon: 'idcard',
+      key: 'vip',
+      label: (<FormattedMessage id="vip.dashboard.title" />),
+    })
+    items.push({
+      children: [],
+      icon: 'read',
+      key: 'cbeta',
+      label: (<FormattedMessage id="cbeta.dashboard.title" />),
+    })
+    items.push({
+      children: [],
+      icon: 'schedule',
+      key: 'schedule',
+      label: (<FormattedMessage id="schedule.dashboard.title" />),
+    })
+    items.push({
+      children: [],
+      icon: 'shopping-cart',
+      key: 'shopping',
+      label: (<FormattedMessage id="shopping.dashboard.title" />),
+    })
+    items.push({
+      children: [],
+      icon: 'calendar',
+      key: 'calendar',
+      label: (<FormattedMessage id="calendar.dashboard.title" />),
+    })
+    items.push({
+      children: [],
+      icon: 'money-collect',
+      key: 'donate',
+      label: (<FormattedMessage id="donate.dashboard.title" />),
+    })
+    items.push({
+      children: [],
+      icon: 'cloud',
+      key: 'ops.vpn',
+      label: (<FormattedMessage id="ops.vpn.dashboard.title" />),
+    })
+    items.push({
+      children: [],
+      icon: 'mail',
+      key: 'ops.email',
+      label: (<FormattedMessage id="ops.email.dashboard.title" />),
+    })
+
+  }
+  return items
 }
 
 
@@ -117,9 +216,6 @@ class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProp
     switch (key) {
       case 'home':
         window.open('/', '_blank')
-        return
-      case 'dashboard':
-        history.push('/')
         return
       case 'doc':
         window.open('https://github.com/saturn-xiv/arete/issues', '_blank')
@@ -168,7 +264,7 @@ class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProp
             siderBar(this.props.user).map((it) => (<Menu.SubMenu
               key={it.key}
               title={(<span><Icon type={it.icon} />{it.label}</span>)}>
-              {it.children.map((jt) => (<Menu.Item key={jt.key}>{jt.label}</Menu.Item>))}
+              {it.children.map((jt) => (<Menu.Item key={jt.key}>{jt.children}</Menu.Item>))}
             </Menu.SubMenu>))
           }
         </Menu>

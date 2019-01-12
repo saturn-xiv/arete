@@ -25,6 +25,12 @@ const routes: IPage[] = [{
   component: () => import('./users/Logs'),
   path: '/users/logs',
 }, {
+  component: () => import('./users/ChangePassword'),
+  path: '/users/change-password',
+}, {
+  component: () => import('./users/Profile'),
+  path: '/users/profile',
+}, {
   component: () => import('./leave-words/New'),
   path: '/leave-words/new',
 }, {
