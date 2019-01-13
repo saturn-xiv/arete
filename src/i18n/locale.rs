@@ -156,8 +156,7 @@ impl Dao for Connection {
     }
     fn all(&self) -> Result<Vec<Item>> {
         let items = locales::dsl::locales
-            .order(locales::dsl::code.asc())
-            .order(locales::dsl::lang.asc())
+            .order(locales::dsl::updated_at.desc())
             .load::<Item>(self)?;
         Ok(items)
     }

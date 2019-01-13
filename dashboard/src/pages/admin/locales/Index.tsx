@@ -2,9 +2,7 @@ import { message } from 'antd'
 import * as React from 'react'
 import { FormattedMessage, InjectedIntlProps, injectIntl, intlShape } from 'react-intl'
 
-import { MediaType } from '../../../components'
 import { Authorized, RoleTypes } from '../../../components/authorized'
-import Content from '../../../components/Content'
 import Timestamp from '../../../components/moment/Timestamp'
 import ActionCell from '../../../components/table/action/Cell'
 import ActionColumn from '../../../components/table/action/Column'
@@ -13,10 +11,10 @@ import { httpDelete, httpGet } from '../../../utils/request'
 
 interface IItem {
   id: number,
-  ip: string
-  body: string,
-  mediaType: MediaType,
-  createdAt: Date,
+  lang: string,
+  code: string
+  message: string,
+  updatedAt: Date,
 }
 
 interface IState {
@@ -35,50 +33,47 @@ class Widget extends React.Component<InjectedIntlProps, IState> {
   }
   public handleRemove = (id: number) => {
     const { formatMessage } = this.props.intl
-    httpDelete(`/admin/leave-words/${id}`).then(() => {
+    httpDelete(`/admin/locales/${id}`).then(() => {
       message.success(formatMessage({ id: 'flashes.success' }))
       const items = this.state.items.filter((it) => it.id !== id)
       this.setState({ items })
     }).catch(message.error)
   }
   public componentDidMount() {
-    httpGet(`/admin/leave-words`).then((rst) => {
+    httpGet(`/admin/locales`).then((rst) => {
       this.setState({ items: rst })
     }).catch(message.error)
   }
   public render() {
     const columns = [{
-      dataIndex: 'id',
-      key: 'id',
-      title: (<FormattedMessage id="form.labels.id" />),
-      width: 80,
-    }, {
-      dataIndex: 'createdAt',
-      key: 'createdAt',
-      render: (v: Date) => (<Timestamp date={v} />),
-      title: (<FormattedMessage id="form.labels.created-at" />),
-      width: 280,
-    }, {
-      dataIndex: 'ip',
-      key: 'ip',
-      title: (<FormattedMessage id="form.labels.ip" />),
+      dataIndex: 'lang',
+      key: 'lang',
+      render: (v: string) => (<FormattedMessage id={`languages.${v}`} />),
+      title: (<FormattedMessage id="nut.models.locale.lang" />),
       width: 120,
     }, {
-      key: 'body',
-      render: (it: IItem) => (<Content mediaType={it.mediaType} body={it.body} />),
-      title: (<FormattedMessage id="form.labels.body" />),
+      dataIndex: 'code',
+      key: 'code',
+      title: (<FormattedMessage id="nut.models.locale.code" />),
+    }, {
+      dataIndex: 'updatedAt',
+      key: 'updatedAt',
+      render: (v: Date) => (<Timestamp date={v} />),
+      title: (<FormattedMessage id="form.labels.updated-at" />),
+      width: 280,
     }, {
       key: 'action',
-      render: (it: IItem) => (<ActionCell confirmRemove={{ id: 'nut.admin.leave-words.index.confirm', values: { id: it.id } }} onRemove={() => this.handleRemove(it.id)} />),
-      title: (<ActionColumn />),
-      width: 50,
+      render: (it: IItem) => (<ActionCell toEdit={`/admin/locales/${it.id}/edit`} confirmRemove={{ id: 'nut.admin.locales.index.confirm', values: { code: it.code, lang: it.lang } }} onRemove={() => this.handleRemove(it.id)} />),
+      title: (<ActionColumn to="/admin/locales/new" />),
+      width: 120,
     }]
     return (<Authorized authority={RoleTypes.ADMIN}>
       <Layout
         rowKey="id"
         columns={columns}
         data={this.state.items}
-        title={{ id: 'nut.admin.leave-words.index.title' }} />
+        expandedRowRender={(it: IItem) => (<>{it.message}</>)}
+        title={{ id: 'nut.admin.locales.index.title' }} />
     </Authorized>)
   }
 }

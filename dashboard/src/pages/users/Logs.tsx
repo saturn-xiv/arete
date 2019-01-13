@@ -4,7 +4,7 @@ import { FormattedMessage } from 'react-intl'
 
 import { Authorized } from '../../components/authorized'
 import Timestamp from '../../components/moment/Timestamp'
-import Table from '../../components/Table'
+import Layout from '../../components/table/Layout'
 import { httpGet } from '../../utils/request'
 
 interface IItem {
@@ -48,7 +48,7 @@ class Widget extends React.Component<any, IState> {
       title: (<FormattedMessage id="form.labels.message" />),
     }]
     return (<Authorized>
-      <Table rowKey="id" columns={columns} data={this.state.items} title={{ id: 'nut.users.logs.title' }} />
+      <Layout rowKey="id" columns={columns} data={this.state.items} title={{ id: 'nut.users.logs.title' }} />
     </Authorized>)
   }
 }

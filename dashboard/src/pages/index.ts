@@ -40,6 +40,9 @@ const routes: IPage[] = [{
   component: () => import('./admin/leave-words/Index'),
   path: '/admin/leave-words',
 }, {
+  component: () => import('./admin/locales/Index'),
+  path: '/admin/locales',
+}, {
   component: () => import('./Home'),
   path: '/',
 }]

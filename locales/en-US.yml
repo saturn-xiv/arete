@@ -129,6 +129,7 @@ nut:
     locales:
       index:
         title:             Internationalization
+        confirm:           Are you sure to remove locale {code} in {lang}?
     votes:
       index:
         title:             Votes
@@ -141,6 +142,11 @@ nut:
     friend-links:
       index:
         title:             Friend links
+  models:
+    locale:
+      code:                Code
+      lang:                Lang
+      message:             Message
   mailer:
     users:
       confirm:
