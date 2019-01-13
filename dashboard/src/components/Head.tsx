@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Helmet } from "react-helmet"
 import { InjectedIntlProps, injectIntl, intlShape } from 'react-intl'
 
-import { ILabel } from '../components'
+import { ILabel } from '.'
 
 interface IProps {
   title: ILabel,

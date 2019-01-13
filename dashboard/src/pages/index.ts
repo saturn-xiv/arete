@@ -37,6 +37,9 @@ const routes: IPage[] = [{
   component: () => import('./Install'),
   path: '/install',
 }, {
+  component: () => import('./admin/leave-words/Index'),
+  path: '/admin/leave-words',
+}, {
   component: () => import('./Home'),
   path: '/',
 }]

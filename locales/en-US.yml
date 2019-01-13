@@ -5,6 +5,17 @@ languages:
 buttons:
   submit:                  Submit
   reset:                   Reset
+  delete:                  Delete
+  remove:                  Remove
+  action:                  Action
+  ecit:                    Edit
+  save:                    Save
+  update:                  Update
+  test:                    Test
+  upgrade:                 Upgrade
+  send:                    Send
+  upload:                  Upload
+  show:                    Show
 flashes:
   success:                 Success.
   bad-action:              Bad action.
@@ -26,7 +37,7 @@ form:
     username:              User name
     id:                    ID
     ip:                    IP
-    logo:                  Logo    
+    logo:                  Logo
     message:               Message
     created-at:            Created at
     updated-at:            Updated at
@@ -108,6 +119,7 @@ nut:
     leave-words:
       index:
         title:             Leave words
+        confirm:           Are you sure to remove leave word [{id}]?
     links:
       index:
         title:             Nav-Bar links
