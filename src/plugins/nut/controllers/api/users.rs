@@ -280,21 +280,34 @@ pub fn logs(user: CurrentUser, db: Database) -> Result<Json<Vec<Log>>> {
 }
 
 #[get("/users/profile")]
-pub fn get_profile(user: CurrentUser, db: Database) -> Result<JsonValue> {
+pub fn get_profile(user: CurrentUser, db: Database) -> Result<Json<Profile>> {
     let db = db.deref();
     let it = UserDao::by_id(db, &user.id)?;
-    Ok(
-        json!({"email":it.email, "nick_name":it.nick_name, "real_name":it.real_name, "logo":it.logo}),
-    )
+    Ok(Json(it.into()))
 }
 
-#[derive(Debug, Validate, Deserialize)]
+#[derive(Debug, Validate, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Profile {
-    #[validate(length(min = "1"))]
+    #[validate(email, length(min = "2", max = "64"))]
+    pub email: String,
+    #[validate(length(min = "2", max = "32"))]
+    pub nick_name: String,
+    #[validate(length(min = "2", max = "32"))]
     pub real_name: String,
     #[validate(length(min = "1"))]
     pub logo: String,
+}
+
+impl From<User> for Profile {
+    fn from(it: User) -> Self {
+        Self {
+            real_name: it.real_name,
+            nick_name: it.nick_name,
+            logo: it.logo,
+            email: it.email,
+        }
+    }
 }
 
 #[post("/users/profile", format = "json", data = "<form>")]

@@ -20,10 +20,13 @@ form:
     nick-name:             Nick name
     password:              Password
     password-confirmation: Password confirmation
+    current-password:      Current password
+    new-password:          New password
     real-name:             Real name
     username:              User name
     id:                    ID
     ip:                    IP
+    logo:                  Logo    
     message:               Message
     created-at:            Created at
     updated-at:            Updated at
@@ -31,7 +34,7 @@ form:
     required:              Field is required
     email:                 Bad email address.
     nick-name:             Nick name must between 2~32 characters and without special characters.
-    password:              Password must at between 2~32 characters.
+    password:              Password must at between 6~32 characters.
     password-confirmation: Passwords not match.
     username:              Username must between 2~32 characters.
 site:
