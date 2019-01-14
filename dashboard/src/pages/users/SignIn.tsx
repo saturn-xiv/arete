@@ -9,9 +9,9 @@ import { Dispatch } from 'redux'
 import { userSignIn } from '../../actions'
 import { formItemLayout } from '../../components/form'
 import Submit from '../../components/form/Submit'
-import Layout from '../../components/users/SharedLinks'
 import { IApplicationState } from '../../reducers'
 import { httpPost } from '../../utils/request'
+import Layout from './SharedLinks'
 
 interface IProps {
   signIn: typeof userSignIn,

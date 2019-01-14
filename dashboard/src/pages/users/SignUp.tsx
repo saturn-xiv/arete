@@ -2,13 +2,13 @@ import { Form, Input, message } from 'antd'
 import { FormComponentProps } from 'antd/lib/form/Form'
 import * as React from 'react'
 import { FormattedMessage, InjectedIntlProps, injectIntl, intlShape } from 'react-intl'
-import { RouteComponentProps, withRouter } from "react-router"
+import { RouteComponentProps, withRouter } from 'react-router'
 
 import { formItemLayout } from '../../components/form'
 import Submit from '../../components/form/Submit'
-import Layout from '../../components/users/SharedLinks'
 import { HOME } from '../../utils'
 import { httpPost } from '../../utils/request'
+import Layout from './SharedLinks'
 
 const FormItem = Form.Item
 

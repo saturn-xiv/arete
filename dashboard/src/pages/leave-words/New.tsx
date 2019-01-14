@@ -6,8 +6,8 @@ import { FormattedMessage, InjectedIntlProps, injectIntl, intlShape } from 'reac
 import { MediaType } from '../../components'
 import { formItemLayout } from '../../components/form'
 import Submit from '../../components/form/Submit'
-import Layout from '../../components/users/SharedLinks'
 import { httpPost } from '../../utils/request'
+import Layout from '../users/SharedLinks'
 
 const FormItem = Form.Item
 

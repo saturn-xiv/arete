@@ -6,8 +6,8 @@ import { RouteComponentProps, withRouter } from 'react-router'
 
 import { formItemLayout } from '../../components/form'
 import Submit from '../../components/form/Submit'
-import Layout from '../../components/users/SharedLinks'
 import { httpPost } from '../../utils/request'
+import Layout from './SharedLinks'
 
 const FormItem = Form.Item
 

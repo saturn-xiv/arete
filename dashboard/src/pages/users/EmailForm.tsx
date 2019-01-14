@@ -5,10 +5,10 @@ import { FormattedMessage, InjectedIntlProps, injectIntl, intlShape } from 'reac
 import { RouteComponentProps, withRouter } from 'react-router'
 
 import { formItemLayout } from '../../components/form'
+import Submit from '../../components/form/Submit'
 import { HOME } from '../../utils'
 import { httpPost } from '../../utils/request'
-import Submit from '../form/Submit'
-import Layout from '../users/SharedLinks'
+import Layout from './SharedLinks'
 
 interface IProps {
   action: string,

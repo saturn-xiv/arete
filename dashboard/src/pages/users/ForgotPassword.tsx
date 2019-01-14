@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import EmailForm from '../../components/users/EmailForm'
+import EmailForm from './EmailForm'
 
 class Widget extends React.Component {
   public render() {

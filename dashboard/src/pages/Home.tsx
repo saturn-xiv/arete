@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { RouteComponentProps, withRouter } from "react-router"
+import { RouteComponentProps, withRouter } from 'react-router'
 
 import { get as getToken } from '../utils/token'
 

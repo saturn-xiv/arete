@@ -1,9 +1,9 @@
 import { Icon, List } from 'antd'
 import * as React from 'react'
 import { FormattedMessage } from 'react-intl'
-import { Link } from "react-router-dom"
+import { Link } from 'react-router-dom'
 
-import Layout from '../form/Layout'
+import Layout from '../../components/form/Layout'
 
 interface IProps {
   title: string,

@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 
 import { IUserState } from '../actions'
 import { IApplicationState } from '../reducers'
+import Head from './Head'
 
 export const enum RoleTypes {
   ROOT = 'root',
@@ -36,11 +37,8 @@ interface IProps {
 class Widget extends React.Component<IProps> {
   public render() {
     const { user, authority } = this.props
-    return havePermission(user, authority) ? this.props.children : (<Exception type="403" />)
+    return havePermission(user, authority) ? this.props.children : (<><Exception type="403" /><Head title={{ id: "flashes.forbidden" }} /></>)
   }
-
-
-
 }
 
 const mapStateToProps = ({ user }: IApplicationState) => ({ user })
