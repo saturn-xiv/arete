@@ -3,7 +3,7 @@ import { FormComponentProps } from 'antd/lib/form/Form'
 import * as React from 'react'
 import { FormattedMessage, InjectedIntlProps, injectIntl, intlShape } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps, withRouter } from "react-router"
+import { RouteComponentProps, withRouter } from 'react-router'
 import { Dispatch } from 'redux'
 
 import { userSignIn } from '../../actions'

@@ -36,10 +36,18 @@ pub fn show(_user: Administrator, id: i64, db: Database) -> Result<Json<Locale>>
 }
 
 #[post("/admin/locales", format = "json", data = "<form>")]
-pub fn update(_user: Administrator, form: Json<Form>, db: Database) -> Result<Json<()>> {
+pub fn create(_user: Administrator, form: Json<Form>, db: Database) -> Result<Json<()>> {
     form.validate()?;
     let db = db.deref();
-    LocaleDao::set(db, &form.lang, &form.code, &form.message)?;
+    LocaleDao::create(db, &form.lang, &form.code, &form.message)?;
+    Ok(Json(()))
+}
+
+#[post("/admin/locales/<id>", format = "json", data = "<form>")]
+pub fn update(_user: Administrator, id: i64, form: Json<Form>, db: Database) -> Result<Json<()>> {
+    form.validate()?;
+    let db = db.deref();
+    LocaleDao::update(db, &id, &form.lang, &form.code, &form.message)?;
     Ok(Json(()))
 }
 

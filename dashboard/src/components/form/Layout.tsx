@@ -12,13 +12,15 @@ interface IProps {
 
 class Widget extends React.Component<IProps> {
   public render() {
+    const { children, title } = this.props
+
     return (<Row>
       <Col sm={{ span: 24 }} md={{ offset: 3, span: 12 }}>
-        <FormattedMessage tagName="h1" id={this.props.title.id} values={this.props.title.values} />
+        <FormattedMessage tagName="h1" {...title} />
       </Col>
       <Col sm={{ span: 24 }} md={{ offset: 1, span: 12 }}>
-        {this.props.children}
-        <Head title={this.props.title} />
+        {children}
+        <Head title={title} />
       </Col >
     </Row >)
   }

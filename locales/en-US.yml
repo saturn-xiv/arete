@@ -130,6 +130,10 @@ nut:
       index:
         title:             Internationalization
         confirm:           Are you sure to remove locale {code} in {lang}?
+      new:
+        title:             Add a new locale
+      edit:
+        title:             Edit locale {code} in {lang}
     votes:
       index:
         title:             Votes

@@ -38,8 +38,9 @@ pub trait Dao {
     fn by_lang(&self, lang: &String) -> Result<Vec<Item>>;
     fn by_id(&self, id: &i64) -> Result<Item>;
     fn by_lang_and_code(&self, lang: &String, code: &String) -> Result<Item>;
-    fn set(&self, lang: &String, code: &String, message: &String) -> Result<()>;
     fn delete(&self, id: &i64) -> Result<()>;
+    fn create(&self, lang: &String, code: &String, message: &String) -> Result<()>;
+    fn update(&self, id: &i64, lang: &String, code: &String, message: &String) -> Result<()>;
 }
 
 fn loop_yaml(
@@ -173,33 +174,29 @@ impl Dao for Connection {
             .first::<Item>(self)?;
         Ok(it)
     }
-    fn set(&self, lang: &String, code: &String, message: &String) -> Result<()> {
+    fn update(&self, id: &i64, lang: &String, code: &String, message: &String) -> Result<()> {
         let now = Utc::now().naive_utc();
-        match locales::dsl::locales
-            .filter(locales::dsl::lang.eq(lang))
-            .filter(locales::dsl::code.eq(code))
-            .first::<Item>(self)
-        {
-            Ok(it) => {
-                let it = locales::dsl::locales.filter(locales::dsl::id.eq(&it.id));
-                update(it)
-                    .set((
-                        locales::dsl::message.eq(message),
-                        locales::dsl::updated_at.eq(&now),
-                    ))
-                    .execute(self)?;
-            }
-            Err(_) => {
-                insert_into(locales::dsl::locales)
-                    .values(&New {
-                        lang: lang,
-                        code: code,
-                        message: message,
-                        updated_at: &now,
-                    })
-                    .execute(self)?;
-            }
-        }
+        let it = locales::dsl::locales.filter(locales::dsl::id.eq(id));
+        update(it)
+            .set((
+                locales::dsl::lang.eq(lang),
+                locales::dsl::code.eq(code),
+                locales::dsl::message.eq(message),
+                locales::dsl::updated_at.eq(&now),
+            ))
+            .execute(self)?;
+        Ok(())
+    }
+    fn create(&self, lang: &String, code: &String, message: &String) -> Result<()> {
+        let now = Utc::now().naive_utc();
+        insert_into(locales::dsl::locales)
+            .values(&New {
+                lang: lang,
+                code: code,
+                message: message,
+                updated_at: &now,
+            })
+            .execute(self)?;
         Ok(())
     }
     fn delete(&self, id: &i64) -> Result<()> {

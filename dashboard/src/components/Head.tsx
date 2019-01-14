@@ -14,8 +14,9 @@ class Widget extends React.Component<InjectedIntlProps & IProps> {
   }
   public render() {
     const { formatMessage } = this.props.intl
+    const title = this.props.title
     return (<Helmet>
-      <title>{formatMessage(this.props.title)} | {formatMessage({ id: 'site.subhead' })} | {formatMessage({ id: 'site.title' })}</title>
+      <title>{formatMessage({ id: title.id }, title.values)} | {formatMessage({ id: 'site.subhead' })} | {formatMessage({ id: 'site.title' })}</title>
     </Helmet>)
   }
 }

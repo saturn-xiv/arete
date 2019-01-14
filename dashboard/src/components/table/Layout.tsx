@@ -19,7 +19,7 @@ class Widget<T> extends React.Component<IProps<T>> {
     return (<Row>
       <Col sm={{ span: 24 }} md={{ offset: 1, span: 22 }}>
         <Table
-          title={() => (<FormattedMessage id={this.props.title.id} values={this.props.title.values} />)}
+          title={() => (<FormattedMessage {...this.props.title} />)}
           bordered={true}
           columns={this.props.columns}
           rowKey={this.props.rowKey}

@@ -27,6 +27,8 @@ lazy_static! {
                 api::leave_words::create,
                 api::ueditor::post,
                 api::admin::locales::index,
+                api::admin::locales::create,
+                api::admin::locales::show,
                 api::admin::locales::update,
                 api::admin::locales::destory,
                 api::admin::leave_words::index,

@@ -9,7 +9,7 @@ import ActionColumn from '../../../components/table/action/Column'
 import Layout from '../../../components/table/Layout'
 import { httpDelete, httpGet } from '../../../utils/request'
 
-interface IItem {
+export interface IItem {
   id: number,
   lang: string,
   code: string
