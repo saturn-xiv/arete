@@ -6,7 +6,7 @@
   "proxy": "http://localhost:8080",
   "dependencies": {
     "ant-design-pro": "^2.1.1",
-    "antd": "^3.12.2",
+    "antd": "^3.12.3",
     "emoji-mart": "^2.9.2",
     "gg-editor": "^2.0.0",
     "google-map-react": "^1.1.2",
