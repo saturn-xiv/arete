@@ -49,6 +49,9 @@ const routes: IPage[] = [{
   component: () => import('./admin/locales/Form'),
   path: '/admin/locales/:id/edit',
 }, {
+  component: () => import('./admin/site/Status'),
+  path: '/admin/site/status',
+}, {
   component: () => import('./Home'),
   path: '/',
 }]

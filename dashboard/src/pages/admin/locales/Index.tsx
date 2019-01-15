@@ -12,7 +12,7 @@ import { httpDelete, httpGet } from '../../../utils/request'
 export interface IItem {
   id: number,
   lang: string,
-  code: string
+  code: string,
   message: string,
   updatedAt: Date,
 }

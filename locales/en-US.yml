@@ -37,6 +37,7 @@ form:
     new-password:          New password
     real-name:             Real name
     username:              User name
+    name:                  Name
     id:                    ID
     ip:                    IP
     logo:                  Logo
@@ -107,6 +108,10 @@ nut:
     site:
       status:
         title:             Site status
+        postgresql:        PostgreSql
+        redis:             Redis
+        os:                OS
+        network:           Network
       info:
         title:             Site info
       author:

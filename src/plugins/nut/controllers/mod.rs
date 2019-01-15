@@ -33,6 +33,7 @@ lazy_static! {
                 api::admin::locales::destory,
                 api::admin::leave_words::index,
                 api::admin::leave_words::destory,
+                api::admin::site::status::get,
             ],
         ));
 
