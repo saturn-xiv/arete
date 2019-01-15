@@ -77,6 +77,7 @@ $ docker run --rm -it -v `pwd`:/workspace arete
 
 -   [Ant Design](https://ant.design/docs/react/introduce)
 -   [Ant Design Pro](https://pro.ant.design/components/AvatarList)
+-   [Font Awesome](https://fontawesome.com/how-to-use/on-the-web/setup/hosting-font-awesome-yourself)
 -   [Diesel: A safe, extensible ORM and Query Builder for Rust](https://github.com/diesel-rs/diesel)
 -   [Rocket: A web framework for Rust](https://rocket.rs/)
 -   [favicon.ico](http://icoconvert.com/)
