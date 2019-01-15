@@ -1,4 +1,4 @@
-import { Icon } from 'antd'
+import { BackTop, Icon } from 'antd'
 import * as React from 'react'
 import { FormattedMessage } from 'react-intl'
 import { connect } from 'react-redux'
@@ -18,6 +18,7 @@ class Widget extends React.Component<IProps> {
             <FormattedMessage id="site.copyright" />
       &nbsp;
             {this.props.site.version}
+      <BackTop />
     </>)
   }
 }

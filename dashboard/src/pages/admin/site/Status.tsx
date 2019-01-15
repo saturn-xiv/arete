@@ -1,10 +1,10 @@
-import { Col, Collapse, List, message, Row, Table } from 'antd'
+import { Button, Col, Collapse, List, message, Popconfirm, Row, Table } from 'antd'
 import * as React from 'react'
 import { FormattedMessage, InjectedIntlProps, injectIntl, intlShape } from 'react-intl'
 
 import { Authorized, RoleTypes } from '../../../components/authorized'
 import Head from '../../../components/Head'
-import { httpGet } from '../../../utils/request'
+import { httpDelete, httpGet, httpPost } from '../../../utils/request'
 
 const Panel = Collapse.Panel
 
@@ -47,6 +47,19 @@ class Widget extends React.Component<InjectedIntlProps, IState> {
     }
   }
 
+  public handleClearCache = () => {
+    httpDelete(`/admin/site/clear-cache`).then((rst) => {
+      message.success(rst)
+    }).catch(message.error)
+  }
+
+  public handleSendTestEmail = () => {
+    const { formatMessage } = this.props.intl
+    httpPost(`/admin/site/send-test-email`, {}).then((_) => {
+      message.success(formatMessage({ id: 'nut.admin.site.status.manage.send-test-email.success' }))
+    }).catch(message.error)
+  }
+
   public componentDidMount() {
     httpGet(`/admin/site/status`).then((rst) => {
       this.setState(rst)
@@ -64,7 +77,7 @@ class Widget extends React.Component<InjectedIntlProps, IState> {
                 size="small"
                 bordered={true}
                 dataSource={Object.keys(os).map((k: string) => `${k}: ${os[k]}`)}
-                renderItem={(it: string[]) => (<List.Item>{it}</List.Item>)}
+                renderItem={(it: string) => (<List.Item>{it}</List.Item>)}
               />
             </Panel>
             <Panel key="network" header={(<FormattedMessage id="nut.admin.site.status.network" />)}>
@@ -123,6 +136,20 @@ class Widget extends React.Component<InjectedIntlProps, IState> {
                 dataSource={redis.split("\n").filter((it) => it.trim().length > 0)}
                 renderItem={(it: string) => (<List.Item>{it}</List.Item>)}
               />
+            </Panel>
+            <Panel key="manage" header={(<FormattedMessage id="nut.admin.site.status.manage.title" />)}>
+              <Button.Group size="small">
+                <Popconfirm onConfirm={this.handleClearCache} title={<FormattedMessage id="nut.admin.site.status.manage.clear-cache.confirm" />}>
+                  <Button type="danger" icon="delete">
+                    <FormattedMessage id="nut.admin.site.status.manage.clear-cache.label" />
+                  </Button>
+                </Popconfirm>
+                <Popconfirm onConfirm={this.handleSendTestEmail} title={<FormattedMessage id="nut.admin.site.status.manage.send-test-email.confirm" />}>
+                  <Button type="dashed" icon="mail">
+                    <FormattedMessage id="nut.admin.site.status.manage.send-test-email.label" />
+                  </Button>
+                </Popconfirm>
+              </Button.Group>
             </Panel>
           </Collapse>
         </Col>

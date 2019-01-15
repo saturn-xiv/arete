@@ -33,7 +33,17 @@ lazy_static! {
                 api::admin::locales::destory,
                 api::admin::leave_words::index,
                 api::admin::leave_words::destory,
+                api::admin::site::clear_cache,
+                api::admin::site::send_test_email,
                 api::admin::site::status::get,
+                api::admin::site::info::get,
+                api::admin::site::info::post,
+                api::admin::site::author::get,
+                api::admin::site::author::post,
+                api::admin::site::seo::get,
+                api::admin::site::seo::post,
+                api::admin::site::smtp::get,
+                api::admin::site::smtp::post,
             ],
         ));
 

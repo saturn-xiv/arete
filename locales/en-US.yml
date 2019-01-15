@@ -44,6 +44,8 @@ form:
     message:               Message
     created-at:            Created at
     updated-at:            Updated at
+    host:                  Host
+    port:                  Port
   validations:
     required:              Field is required
     email:                 Bad email address.
@@ -55,6 +57,8 @@ site:
   copyright:               2018~2019
   title:                   Title
   subhead:                 Subhead
+  description:             Description
+  keywords:                Keywords
 layout:
   header:
     reload:                Refresh
@@ -112,12 +116,25 @@ nut:
         redis:             Redis
         os:                OS
         network:           Network
+        manage:
+          title:           Manage
+          clear-cache:
+            label:         Clear cache
+            confirm:       Are you sure to clear cache?
+          send-test-email:
+            label:         Send test email
+            confirm:       Are you sure to send test email?
+            success:       You will receive a test email in a few miniutes.
       info:
         title:             Site info
       author:
         title:             Site author
       seo:
         title:             SEO
+        google:
+          site-verify-id:  Google site verify id
+        baidu:
+          site-verify-id:  Baidu site verify id
       smtp:
         title:             SMTP
     users:
@@ -158,6 +175,12 @@ nut:
       code:                Code
       lang:                Lang
       message:             Message
+    site:
+      title:               Title
+      subhead:             Subhead
+      keywords:            Keywords
+      description:         Description
+      copyright:           Copyright
   mailer:
     users:
       confirm:

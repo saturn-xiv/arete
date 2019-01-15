@@ -52,6 +52,18 @@ const routes: IPage[] = [{
   component: () => import('./admin/site/Status'),
   path: '/admin/site/status',
 }, {
+  component: () => import('./admin/site/Info'),
+  path: '/admin/site/info',
+}, {
+  component: () => import('./admin/site/Author'),
+  path: '/admin/site/author',
+}, {
+  component: () => import('./admin/site/Seo'),
+  path: '/admin/site/seo',
+}, {
+  component: () => import('./admin/site/Smtp'),
+  path: '/admin/site/smtp',
+}, {
   component: () => import('./Home'),
   path: '/',
 }]

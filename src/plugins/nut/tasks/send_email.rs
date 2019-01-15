@@ -11,6 +11,7 @@ use super::super::super::super::{
     crypto::sodium::Encryptor as Sodium, errors::Result, orm::Pool as DbPool, queue::Handler,
     settings::Dao as SettingsDao,
 };
+use super::super::controllers::api::admin::site::smtp::Form as Config;
 
 #[cfg(debug_assertions)]
 pub type Consumer = Printer;
@@ -18,13 +19,6 @@ pub type Consumer = Printer;
 pub type Consumer = SendEmail;
 
 pub const NAME: &'static str = "send-email";
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Config {
-    host: String,
-    email: String,
-    password: String,
-}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Task {

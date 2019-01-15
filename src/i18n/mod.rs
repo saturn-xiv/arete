@@ -48,7 +48,7 @@ impl I18n {
         false
     }
 
-    fn get(&self, lang: &String, code: &String) -> Result<Option<String>> {
+    pub fn get(&self, lang: &String, code: &String) -> Result<Option<String>> {
         self.cache.get(
             &format!("locales.{}.{}", lang, code),
             Duration::from_secs(TTL),
