@@ -46,7 +46,7 @@ CREATE TABLE leave_words(
   ip INET NOT NULL,
   body TEXT NOT NULL,
   media_type VARCHAR(8) NOT NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP  
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE votes(
@@ -65,20 +65,36 @@ CREATE TABLE tags(
   name VARCHAR(255) NOT NULL,
   icon VARCHAR(16) NOT NULL,
   color VARCHAR(16) NOT NULL,
-  font VARCHAR(16) NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL
 );
 CREATE UNIQUE INDEX idx_tags_name ON tags(name);
 
+CREATE TABLE tag_resources(
+  id BIGSERIAL PRIMARY KEY,
+  tag_id BIGINT NOT NULL,
+  resource_type VARCHAR(255) NOT NULL,
+  resource_id BIGINT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE UNIQUE INDEX idx_tag_resources ON tag_resources(tag_id, resource_type, resource_id);
+
 CREATE TABLE categories(
   id BIGSERIAL PRIMARY KEY,
-  parent_id BIGINT,    
+  parent_id BIGINT,
   name VARCHAR(255) NOT NULL,
   icon VARCHAR(16) NOT NULL,
   color VARCHAR(16) NOT NULL,
-  font VARCHAR(16) NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL
 );
 CREATE INDEX idx_categories_name ON categories(name);
+
+CREATE TABLE category_resources(
+  id BIGSERIAL PRIMARY KEY,
+  category_id BIGINT NOT NULL,
+  resource_type VARCHAR(255) NOT NULL,
+  resource_id BIGINT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE UNIQUE INDEX idx_category_resources ON category_resources(category_id, resource_type, resource_id);

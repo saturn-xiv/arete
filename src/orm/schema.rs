@@ -35,9 +35,18 @@ table! {
         name -> Varchar,
         icon -> Varchar,
         color -> Varchar,
-        font -> Varchar,
         created_at -> Timestamp,
         updated_at -> Timestamp,
+    }
+}
+
+table! {
+    category_resources (id) {
+        id -> Int8,
+        category_id -> Int8,
+        resource_type -> Varchar,
+        resource_id -> Int8,
+        created_at -> Timestamp,
     }
 }
 
@@ -256,12 +265,21 @@ table! {
 }
 
 table! {
+    tag_resources (id) {
+        id -> Int8,
+        tag_id -> Int8,
+        resource_type -> Varchar,
+        resource_id -> Int8,
+        created_at -> Timestamp,
+    }
+}
+
+table! {
     tags (id) {
         id -> Int8,
         name -> Varchar,
         icon -> Varchar,
         color -> Varchar,
-        font -> Varchar,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -319,6 +337,7 @@ allow_tables_to_appear_in_same_query!(
     attachments,
     cards,
     categories,
+    category_resources,
     forum_posts,
     forum_topics,
     forum_topics_categories,
@@ -337,6 +356,7 @@ allow_tables_to_appear_in_same_query!(
     survey_logs,
     survey_responses,
     survey_subscribers,
+    tag_resources,
     tags,
     users,
     vip_members,
