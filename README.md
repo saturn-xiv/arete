@@ -50,6 +50,7 @@ $ sudo apt-get install git build-essential redis rabbitmq-server postgresql libp
 ```bash
 $ git clone https://github.com/saturn-xiv/arete.git
 $ cd arete
+$ cargo install diesel_cli --no-default-features --features postgres
 $ make npm
 $ make check
 $ ./target/debug/arete generate:config # please fix config.toml then
@@ -95,3 +96,6 @@ $ docker run --rm -it -v `pwd`:/workspace arete
 -   [UTF-8 Miscellaneous Symbols](https://www.w3schools.com/charsets/ref_utf_misc_symbols.asp)
 -   [msmtp](https://wiki.archlinux.org/index.php/msmtp)
 -   [For gmail smtp](http://stackoverflow.com/questions/20337040/gmail-smtp-debug-error-please-log-in-via-your-web-browser)
+-   [W3C Feed Validation Service](https://validator.w3.org/feed/)
+-   [XML Sitemap Validator](https://www.xml-sitemaps.com/validate-xml-sitemap.html)
+-   [robots.txt Tester](https://support.google.com/webmasters/answer/6062598?hl=en)
