@@ -17,7 +17,10 @@ use serde::ser::Serialize;
 use serde_json;
 use tokio::{net::TcpStream, runtime::Runtime};
 
-use super::super::{env::NAME, errors::Result};
+use super::super::{
+    env::NAME,
+    errors::{Error, Result},
+};
 use super::{Handler, Queue};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -126,9 +129,7 @@ impl Queue for RabbitMQ {
                     .map_err(FailureError::from)
             });
 
-        if let Err(e) = Runtime::new()?.block_on_all(rt) {
-            return Err(format!("failed on publish message {}", e).into());
-        }
+        Runtime::new()?.block_on_all(rt)?;
         Ok(())
     }
 
@@ -181,10 +182,8 @@ impl Queue for RabbitMQ {
                     .map_err(FailureError::from)
             });
 
-        match Runtime::new()?.block_on_all(rt) {
-            Ok(_) => Ok(()),
-            Err(e) => Err(format!("failed on consume message: {:?}", e).into()),
-        }
+        Runtime::new()?.block_on_all(rt)?;
+        Ok(())
     }
 }
 
@@ -197,16 +196,16 @@ pub fn handle_message(msg: Delivery, hnd: &Box<Handler>) -> Result<()> {
             if v.parse::<Mime>()? == APPLICATION_JSON {
                 Ok(())
             } else {
-                Err(format!("bad message content type {}", v).into())
+                Err(Error::RabbitMQBadContentType(v.clone()).into())
             }
         }
-        None => Err("empty message id".into()),
+        None => Err(Error::RabbitMQEmptyContentType.into()),
     };
     ct?;
 
     let id: Result<String> = match props.message_id() {
         Some(v) => Ok(v.to_string()),
-        None => Err("empty message id".into()),
+        None => Err(Error::RabbitMQEmptyMessageId.into()),
     };
     let id = id?;
     info!("consume message {}", id);

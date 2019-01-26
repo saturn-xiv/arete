@@ -9,10 +9,11 @@ use rocket::State;
 use rocket_contrib::json::{Json, JsonValue};
 use uuid::Uuid;
 use validator::Validate;
+use failure::Error;
 
 use super::super::super::super::super::{
     crypto::sodium::Encryptor as Sodium,
-    errors::{Error, Result},
+    errors::Result,
     i18n::I18n,
     jwt::Jwt,
     orm::{schema::users, Database},

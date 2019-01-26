@@ -5,6 +5,7 @@ use std::net::SocketAddr;
 use std::ops::Deref;
 use std::time::Duration;
 
+use failure::Error;
 use hyper::header::Header as HyperHeader;
 use mustache;
 use rocket::{
@@ -16,7 +17,7 @@ use serde::ser::Serialize;
 
 use super::{
     cache::Cache,
-    errors::{Error, Result},
+    errors::Result,
     orm::{Database, PooledConnection as DbConnection},
     redis::{PooledConnection as RedisConnection, Redis},
 };
@@ -75,8 +76,8 @@ impl I18n {
         let code = code.into();
         match self.tr(&code, args) {
             Ok(msg) => match msg {
-                Some(msg) => msg.into(),
-                None => format!("{}.{}", self.locale, code).into(),
+                Some(msg) => format_err!("{}", msg),
+                None => format_err!("{}.{}", self.locale, code),
             },
             Err(e) => e,
         }

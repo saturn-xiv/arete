@@ -1,10 +1,7 @@
 #![feature(proc_macro_hygiene, decl_macro)]
-#![recursion_limit = "1024"]
 
 #[macro_use]
 extern crate serde_derive;
-#[macro_use]
-extern crate error_chain;
 #[macro_use]
 extern crate log;
 #[macro_use]
@@ -17,6 +14,8 @@ extern crate diesel;
 extern crate rocket;
 #[macro_use]
 extern crate rocket_contrib;
+#[macro_use]
+extern crate failure;
 
 extern crate base64;
 extern crate chrono;
@@ -24,7 +23,6 @@ extern crate chrono_tz;
 extern crate clap;
 extern crate encoding_rs;
 extern crate eui48;
-extern crate failure;
 extern crate futures;
 extern crate git2;
 extern crate hex;
@@ -60,12 +58,11 @@ extern crate validator;
 extern crate xml;
 extern crate yaml_rust;
 
-pub mod errors; //  https://github.com/rust-lang-nursery/error-chain/issues/254
-
 pub mod app;
 pub mod cache;
 pub mod crypto;
 pub mod env;
+pub mod errors;
 pub mod i18n;
 pub mod jwt;
 pub mod oauth;

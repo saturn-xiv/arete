@@ -7,13 +7,14 @@ pub mod users;
 use std::ops::Deref;
 
 use diesel::Connection as DieselConnection;
+use failure::Error;
 use rocket_contrib::json::{Json, JsonValue};
 use validator::Validate;
 
 use super::super::super::super::{
     crypto::sodium::Encryptor as Sodium,
     env,
-    errors::{Error, Result},
+    errors::Result,
     i18n::{locale::Dao as LocaleDao, I18n},
     orm::Database,
 };

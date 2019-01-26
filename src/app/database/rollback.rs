@@ -1,8 +1,9 @@
 use clap::{App, SubCommand};
 use diesel::Connection as DieselConnection;
+use failure::Error;
 
 use super::super::super::{
-    errors::{Error, Result},
+    errors::Result,
     orm::{migration::Migration, Connection},
 };
 

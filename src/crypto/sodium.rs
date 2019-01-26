@@ -3,7 +3,7 @@ use sodiumoxide::{
     randombytes,
 };
 
-use super::super::errors::Result;
+use super::super::errors::{Error, Result};
 
 pub struct Encryptor {
     key: secretbox::Key,
@@ -13,7 +13,7 @@ impl Encryptor {
     pub fn new(key: &[u8]) -> Result<Self> {
         match secretbox::Key::from_slice(key) {
             Some(key) => Ok(Self { key: key }),
-            None => Err("bad key length, must be 32".into()),
+            None => Err(Error::SodiumBadKey.into()),
         }
     }
 }
@@ -29,7 +29,7 @@ impl super::Encryptor for Encryptor {
             pwhash::MEMLIMIT_INTERACTIVE,
         ) {
             Ok(cip) => Ok(cip[..].to_vec()),
-            Err(_) => Err("build password failed".into()),
+            Err(_) => Err(Error::SodiumHash.into()),
         }
     }
 
@@ -49,9 +49,9 @@ impl super::Encryptor for Encryptor {
         match secretbox::Nonce::from_slice(nonce) {
             Some(nonce) => match secretbox::open(cipher, &nonce, &self.key) {
                 Ok(buf) => Ok(buf),
-                Err(_) => Err("decrypt data failed".into()),
+                Err(_) => Err(Error::SodiumDecrypt.into()),
             },
-            None => Err("bad nonce".into()),
+            None => Err(Error::SodiumBadNonce.into()),
         }
     }
 }

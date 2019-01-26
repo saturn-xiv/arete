@@ -7,6 +7,8 @@ pub mod tasks;
 use std::fmt;
 use std::str::FromStr;
 
+use failure::Error as FailureError;
+
 use super::super::errors::{Error, Result};
 
 pub enum MediaType {
@@ -26,14 +28,14 @@ impl fmt::Display for MediaType {
 }
 
 impl FromStr for MediaType {
-    type Err = Error;
+    type Err = FailureError;
 
     fn from_str(s: &str) -> Result<Self> {
         match s {
             "text" => Ok(MediaType::TEXT),
             "markdown" => Ok(MediaType::MARKDOWN),
             "html" => Ok(MediaType::HTML),
-            t => Err(format!("unknown media type {}", t).into()),
+            t => Err(Error::BadMediaType(t.to_string()).into()),
         }
     }
 }

@@ -4,9 +4,10 @@ use std::str::FromStr;
 
 use chrono::{Duration, NaiveDate, NaiveDateTime, Utc};
 use diesel::{delete, insert_into, prelude::*, update};
+use failure::Error;
 
 use super::super::super::super::{
-    errors::{Error, Result},
+    errors::Result,
     orm::{schema::policies, Connection},
 };
 

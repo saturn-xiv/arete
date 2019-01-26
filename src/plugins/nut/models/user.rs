@@ -9,7 +9,7 @@ use uuid::Uuid;
 
 use super::super::super::super::{
     crypto::Encryptor,
-    errors::Result,
+    errors::{Error, Result},
     orm::{schema::users, Connection},
 };
 
@@ -62,13 +62,13 @@ pub struct Item {
 impl Item {
     pub fn available(&self) -> Result<()> {
         if let Some(_) = self.deleted_at {
-            return Err("your account is deleted".into());
+            return Err(Error::UserIsDeleted.into());
         }
         if let Some(_) = self.locked_at {
-            return Err("your account is locked".into());
+            return Err(Error::UserIsLocked.into());
         }
         if None == self.confirmed_at {
-            return Err("your account isn't confirmed".into());
+            return Err(Error::UserIsNotConfirmed.into());
         }
         Ok(())
     }
@@ -78,7 +78,7 @@ impl Item {
                 return Ok(());
             }
         }
-        return Err("Bad password".into());
+        return Err(Error::UserBadPassword.into());
     }
 }
 

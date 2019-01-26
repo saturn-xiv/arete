@@ -43,16 +43,13 @@ pub struct Job(Task, Config);
 impl Into<Result<Email>> for Job {
     fn into(self) -> Result<Email> {
         let Job(t, c) = self;
-        match EmailBuilder::new()
+        let v = EmailBuilder::new()
             .to((t.email, t.name))
             .from(c.email)
             .subject(t.subject)
             .text(t.body)
-            .build()
-        {
-            Ok(v) => Ok(v),
-            Err(e) => Err(format!("send eail fail: {:?}", e).into()),
-        }
+            .build()?;
+        Ok(v)
     }
 }
 

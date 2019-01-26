@@ -28,14 +28,14 @@ impl fmt::Display for Gender {
 }
 
 impl FromStr for Gender {
-    type Err = Error;
+    type Err = failure::Error;
 
     fn from_str(s: &str) -> Result<Self> {
         match s {
             "male" => Ok(Gender::Male),
             "female" => Ok(Gender::Female),
             "others" => Ok(Gender::Others),
-            v => Err(format!("unknown gender {}", v).into()),
+            v => Err(Error::BadGender(v.to_string()).into()),
         }
     }
 }
