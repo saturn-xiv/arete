@@ -44,6 +44,11 @@ lazy_static! {
                 api::admin::site::seo::post,
                 api::admin::site::smtp::get,
                 api::admin::site::smtp::post,
+                api::admin::tags::index,
+                api::admin::tags::create,
+                api::admin::tags::show,
+                api::admin::tags::update,
+                api::admin::tags::destory,
             ],
         ));
 

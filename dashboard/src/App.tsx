@@ -6,7 +6,6 @@ import * as Loadable from 'react-loadable'
 import { Provider, ProviderProps } from 'react-redux'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 
-
 import './App.css'
 import { ILocale } from './intl'
 import Layout from './layout'

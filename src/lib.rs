@@ -60,11 +60,12 @@ extern crate validator;
 extern crate xml;
 extern crate yaml_rust;
 
+pub mod errors; //  https://github.com/rust-lang-nursery/error-chain/issues/254
+
 pub mod app;
 pub mod cache;
 pub mod crypto;
 pub mod env;
-pub mod errors;
 pub mod i18n;
 pub mod jwt;
 pub mod oauth;

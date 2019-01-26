@@ -1,10 +1,8 @@
 use std::net::IpAddr;
-use std::result::Result as StdResult;
 
 use chrono::NaiveDateTime;
 use diesel::{delete, insert_into, prelude::*};
 use ipnetwork::IpNetwork;
-use serde::ser::{Serialize, SerializeStruct, Serializer};
 
 use super::super::super::super::{
     errors::Result,
@@ -12,29 +10,13 @@ use super::super::super::super::{
 };
 use super::super::MediaType;
 
-#[derive(Queryable)]
+#[derive(Queryable, Serialize)]
 pub struct Item {
     pub id: i64,
     pub ip: IpNetwork,
     pub body: String,
     pub media_type: String,
     pub created_at: NaiveDateTime,
-}
-
-// FIXME
-impl Serialize for Item {
-    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        let mut state = serializer.serialize_struct("leaveWord", 5)?;
-        state.serialize_field("id", &self.id)?;
-        state.serialize_field("ip", &self.ip.to_string())?;
-        state.serialize_field("body", &self.body)?;
-        state.serialize_field("mediaType", &self.media_type)?;
-        state.serialize_field("createdAt", &self.created_at)?;
-        state.end()
-    }
 }
 
 pub trait Dao {

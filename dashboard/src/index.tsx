@@ -1,3 +1,5 @@
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faIgloo } from '@fortawesome/free-solid-svg-icons'
 import { message } from 'antd'
 import * as moment from 'moment'
 import * as React from 'react'
@@ -9,6 +11,8 @@ import { get as getLocale } from './intl'
 import { rootReducers } from './reducers'
 import registerServiceWorker from './registerServiceWorker'
 import { httpGet } from './utils/request'
+
+library.add(faIgloo)
 
 const lang = getLocale()
 moment.locale(lang.moment)
