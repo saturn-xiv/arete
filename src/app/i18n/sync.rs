@@ -11,22 +11,23 @@ pub const COMMAND_ABOUT: &'static str = "Sync locales from directory";
 pub const ARG_DIR_NAME: &'static str = "dir";
 
 pub fn command<'a, 'b>() -> App<'a, 'b> {
-        SubCommand::with_name(COMMAND_NAME)
-                .about(COMMAND_ABOUT)
-                .arg(clap::Arg::with_name(ARG_DIR_NAME)
-                        .required(true)
-                        .short("d")
-                        .long("dir")
-                        .value_name("LOCALES_DIR")
-                        .help("Directory name")
-                        .takes_value(true))
+    SubCommand::with_name(COMMAND_NAME)
+        .about(COMMAND_ABOUT)
+        .arg(
+            clap::Arg::with_name(ARG_DIR_NAME)
+                .required(true)
+                .short("d")
+                .long("dir")
+                .value_name("LOCALES_DIR")
+                .help("Directory name")
+                .takes_value(true),
+        )
 }
 
 pub fn run(cfg: Config, dir: String) -> Result<()> {
-        let db = cfg.database()?;
-        let db = db.get()?;
-        let (inserted, finded) =
-                db.transaction::<_, Error, _>(|| LocaleDao::sync(db.deref(), &dir))?;
-        info!("find {} recored, insert {}", finded, inserted);
-        Ok(())
+    let db = cfg.database()?;
+    let db = db.get()?;
+    let (inserted, finded) = db.transaction::<_, Error, _>(|| LocaleDao::sync(db.deref(), &dir))?;
+    info!("find {} recored, insert {}", finded, inserted);
+    Ok(())
 }

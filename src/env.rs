@@ -144,7 +144,7 @@ impl Default for Http {
 }
 
 impl Http {
-    const THEMES: &'static str = "themes";
+    pub const THEMES: &'static str = "themes";
 
     pub fn address(&self) -> String {
         format!("0.0.0.0:{}", self.port)

@@ -2,6 +2,8 @@ use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
 
+use rocket_contrib::{serve::StaticFiles, templates::Template};
+
 use super::super::super::{
     crypto::sodium::Encryptor as Sodium,
     env::{self, Config},
@@ -36,11 +38,17 @@ pub fn launch(cfg: Config) -> Result<()> {
         });
     }
     let app = super::rocket(cfg.rocket()?)
+        .mount("/3rd", StaticFiles::from(cfg.http.third()))
+        .mount("/assets", StaticFiles::from(cfg.http.assets()))
+        .mount("/upload", StaticFiles::from(cfg.http.upload()))
+        .mount("/global", StaticFiles::from(cfg.http.global()))
         .manage(jwt.clone())
         .manage(enc.clone())
         .manage(queue.clone())
         .attach(Database::fairing())
-        .attach(Redis::fairing());;
+        .attach(Redis::fairing())
+        .attach(Template::fairing());
+
     let err = app.launch();
     Err(err.into())
 }

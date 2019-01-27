@@ -5,11 +5,11 @@ use std::sync::Arc;
 
 use chrono::{Duration, Utc};
 use diesel::{prelude::*, update};
+use failure::Error;
 use rocket::State;
 use rocket_contrib::json::{Json, JsonValue};
 use uuid::Uuid;
 use validator::Validate;
-use failure::Error;
 
 use super::super::super::super::super::{
     crypto::sodium::Encryptor as Sodium,

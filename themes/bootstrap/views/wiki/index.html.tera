@@ -1,0 +1,3 @@
+{% for it in pages %}
+  <a href="/wiki/{{it.0 | safe}}">{{it.1}}</a>
+{% endfor %}
