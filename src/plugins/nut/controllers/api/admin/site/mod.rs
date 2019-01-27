@@ -13,7 +13,7 @@ use rocket_contrib::json::Json;
 use uuid::Uuid;
 
 use super::super::super::super::super::super::{
-    errors::Result,
+    errors::JsonResult,
     orm::Database,
     queue::{rabbitmq::RabbitMQ, Queue},
     redis::Redis,
@@ -23,7 +23,7 @@ use super::super::super::super::{
 };
 
 #[delete("/admin/site/clear-cache")]
-pub fn clear_cache(_user: Administrator, redis: Redis) -> Result<Json<String>> {
+pub fn clear_cache(_user: Administrator, redis: Redis) -> JsonResult<String> {
     let rst = cmd("flushdb").query::<String>(redis.deref())?;
     Ok(Json(rst))
 }
@@ -33,7 +33,7 @@ pub fn send_test_email(
     user: Administrator,
     db: Database,
     queue: State<Arc<RabbitMQ>>,
-) -> Result<Json<()>> {
+) -> JsonResult<()> {
     let db = db.deref();
     let user = UserDao::by_id(db, &user.id)?;
     queue.publish(

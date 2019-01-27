@@ -4,7 +4,7 @@ use rocket_contrib::json::Json;
 use validator::Validate;
 
 use super::super::super::super::super::super::super::{
-    errors::Result, i18n::locale::Dao as LocaleDao, orm::Database,
+    errors::JsonResult, i18n::locale::Dao as LocaleDao, orm::Database,
 };
 use super::super::super::super::super::request::Administrator;
 
@@ -26,7 +26,7 @@ pub struct Form {
 const KEY: &'static str = "site.";
 
 #[get("/admin/site/info/<lang>")]
-pub fn get(_user: Administrator, lang: String, db: Database) -> Result<Json<Form>> {
+pub fn get(_user: Administrator, lang: String, db: Database) -> JsonResult<Form> {
     let db = db.deref();
 
     let it = Form {
@@ -41,12 +41,7 @@ pub fn get(_user: Administrator, lang: String, db: Database) -> Result<Json<Form
 }
 
 #[post("/admin/site/info/<lang>", format = "json", data = "<form>")]
-pub fn post(
-    _user: Administrator,
-    lang: String,
-    db: Database,
-    form: Json<Form>,
-) -> Result<Json<()>> {
+pub fn post(_user: Administrator, lang: String, db: Database, form: Json<Form>) -> JsonResult<()> {
     form.validate()?;
     let db = db.deref();
     let form = form.deref();

@@ -8,13 +8,13 @@ use std::ops::Deref;
 
 use diesel::Connection as DieselConnection;
 use failure::Error;
-use rocket_contrib::json::{Json, JsonValue};
+use rocket_contrib::json::Json;
 use validator::Validate;
 
 use super::super::super::super::{
     crypto::sodium::Encryptor as Sodium,
     env,
-    errors::Result,
+    errors::JsonValueResult,
     i18n::{locale::Dao as LocaleDao, I18n},
     orm::Database,
 };
@@ -24,7 +24,7 @@ use super::super::models::{
 };
 
 #[get("/about")]
-pub fn about(db: Database) -> Result<JsonValue> {
+pub fn about(db: Database) -> JsonValueResult {
     let db = db.deref();
     let languages = LocaleDao::languages(db)?;
     Ok(json!({
@@ -45,7 +45,7 @@ pub struct Install {
 }
 
 #[post("/install", format = "json", data = "<form>")]
-pub fn install(form: Json<Install>, i18n: I18n, db: Database) -> Result<JsonValue> {
+pub fn install(form: Json<Install>, i18n: I18n, db: Database) -> JsonValueResult {
     form.validate()?;
     let db = db.deref();
 

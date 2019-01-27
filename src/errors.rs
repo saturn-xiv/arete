@@ -7,8 +7,16 @@ use rocket::{
     response::Responder,
     Request, Response,
 };
+use rocket_contrib::{
+    json::{Json, JsonValue},
+    templates::Template,
+};
 
 pub type Result<T> = StdResult<T, FailureError>;
+
+pub type TemplateResult = StdResult<Template, HttpError>;
+pub type JsonValueResult = StdResult<JsonValue, HttpError>;
+pub type JsonResult<T> = StdResult<Json<T>, HttpError>;
 
 #[derive(Fail, Debug)]
 pub enum Error {
@@ -64,13 +72,23 @@ pub enum Error {
     RabbitMQBadContentType(String),
 }
 
-impl<'r> Responder<'r> for Error {
+#[derive(Debug)]
+pub struct HttpError(pub FailureError);
+
+impl<T: Into<FailureError>> From<T> for HttpError {
+    fn from(t: T) -> Self {
+        Self(t.into())
+    }
+}
+
+impl<'r> Responder<'r> for HttpError {
     fn respond_to(self, _: &Request) -> StdResult<Response<'r>, Status> {
-        error!("{:?}", self);
+        let err = self.0;
+        error!("{}", err);
         Ok(Response::build()
             .header(ContentType::Plain)
             .status(Status::InternalServerError)
-            .sized_body(Cursor::new(format!("{:?}", self)))
+            .sized_body(Cursor::new(format!("{}", err)))
             .finalize())
     }
 }

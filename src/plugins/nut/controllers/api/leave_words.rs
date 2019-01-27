@@ -4,7 +4,7 @@ use std::ops::Deref;
 use rocket_contrib::json::Json;
 use validator::Validate;
 
-use super::super::super::super::super::{errors::Result, orm::Database};
+use super::super::super::super::super::{errors::JsonResult, orm::Database};
 use super::super::super::{models::leave_word::Dao as LeaveWordDao, MediaType};
 
 #[derive(Debug, Validate, Deserialize)]
@@ -17,7 +17,7 @@ pub struct New {
 }
 
 #[post("/leave-words", format = "json", data = "<form>")]
-pub fn create(form: Json<New>, remote: SocketAddr, db: Database) -> Result<Json<()>> {
+pub fn create(form: Json<New>, remote: SocketAddr, db: Database) -> JsonResult<()> {
     form.validate()?;
     let db = db.deref();
     let ip = remote.ip();

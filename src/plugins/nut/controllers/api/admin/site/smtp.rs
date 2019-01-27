@@ -6,7 +6,8 @@ use rocket_contrib::json::Json;
 use validator::Validate;
 
 use super::super::super::super::super::super::super::{
-    crypto::sodium::Encryptor as Sodium, errors::Result, orm::Database, settings::Dao as SettingDao,
+    crypto::sodium::Encryptor as Sodium, errors::JsonResult, orm::Database,
+    settings::Dao as SettingDao,
 };
 use super::super::super::super::super::request::Administrator;
 
@@ -34,7 +35,7 @@ impl Default for Form {
 const KEY: &'static str = "site.smtp";
 
 #[get("/admin/site/smtp")]
-pub fn get(_user: Administrator, db: Database, enc: State<Arc<Sodium>>) -> Result<Json<Form>> {
+pub fn get(_user: Administrator, db: Database, enc: State<Arc<Sodium>>) -> JsonResult<Form> {
     let db = db.deref();
     let enc = enc.deref().deref();
 
@@ -52,7 +53,7 @@ pub fn post(
     db: Database,
     enc: State<Arc<Sodium>>,
     form: Json<Form>,
-) -> Result<Json<()>> {
+) -> JsonResult<()> {
     form.validate()?;
     let db = db.deref();
     let enc = enc.deref().deref();

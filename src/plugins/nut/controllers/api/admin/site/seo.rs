@@ -5,7 +5,8 @@ use rocket::State;
 use rocket_contrib::json::Json;
 
 use super::super::super::super::super::super::super::{
-    crypto::sodium::Encryptor as Sodium, errors::Result, orm::Database, settings::Dao as SettingDao,
+    crypto::sodium::Encryptor as Sodium, errors::JsonResult, orm::Database,
+    settings::Dao as SettingDao,
 };
 use super::super::super::super::super::request::Administrator;
 
@@ -39,7 +40,7 @@ impl Default for Form {
 const KEY: &'static str = "site.seo";
 
 #[get("/admin/site/seo")]
-pub fn get(_user: Administrator, db: Database, enc: State<Arc<Sodium>>) -> Result<Json<Form>> {
+pub fn get(_user: Administrator, db: Database, enc: State<Arc<Sodium>>) -> JsonResult<Form> {
     let db = db.deref();
     let enc = enc.deref().deref();
 
@@ -56,7 +57,7 @@ pub fn post(
     db: Database,
     enc: State<Arc<Sodium>>,
     form: Json<Form>,
-) -> Result<Json<()>> {
+) -> JsonResult<()> {
     let db = db.deref();
     let enc = enc.deref().deref();
     let form = form.deref();

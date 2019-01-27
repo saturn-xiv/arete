@@ -12,7 +12,7 @@ use r2d2_redis::redis::cmd;
 use rocket_contrib::json::Json;
 
 use super::super::super::super::super::super::super::{
-    errors::Result,
+    errors::{JsonResult, Result},
     orm::{Connection, Database},
     redis::Redis,
     sys,
@@ -140,7 +140,7 @@ impl PostgreSql {
 }
 
 #[get("/admin/site/status")]
-pub fn get(_user: Administrator, redis: Redis, db: Database) -> Result<Json<Status>> {
+pub fn get(_user: Administrator, redis: Redis, db: Database) -> JsonResult<Status> {
     Ok(Json(Status {
         os: Os::new()?,
         network: Network::new()?,

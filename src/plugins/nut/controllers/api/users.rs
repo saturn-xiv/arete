@@ -7,13 +7,13 @@ use chrono::{Duration, Utc};
 use diesel::{prelude::*, update};
 use failure::Error;
 use rocket::State;
-use rocket_contrib::json::{Json, JsonValue};
+use rocket_contrib::json::Json;
 use uuid::Uuid;
 use validator::Validate;
 
 use super::super::super::super::super::{
     crypto::sodium::Encryptor as Sodium,
-    errors::Result,
+    errors::{JsonResult, JsonValueResult, Result},
     i18n::I18n,
     jwt::Jwt,
     orm::{schema::users, Database},
@@ -74,7 +74,7 @@ pub fn sign_in(
     i18n: I18n,
     remote: SocketAddr,
     form: Json<SignIn>,
-) -> Result<JsonValue> {
+) -> JsonValueResult {
     form.validate()?;
     let ip = remote.ip();
     let db = db.deref();
@@ -83,17 +83,19 @@ pub fn sign_in(
         Ok(v) => Ok(v),
         Err(_) => match UserDao::by_nick_name(db, &form.login) {
             Ok(v) => Ok(v),
-            Err(_) => Err(i18n.e(
-                "nut.errors.user.is-not-exist",
-                &Some(json!({"login": form.login})),
-            )),
+            Err(_) => Err(i18n
+                .e(
+                    "nut.errors.user.is-not-exist",
+                    &Some(json!({"login": form.login})),
+                )
+                .into()),
         },
     };
     let user = user?;
 
     if let Err(e) = user.auth::<Sodium>(&form.password) {
         i18n.l(&user.id, "nut.logs.user.sign-in.failed", &None::<String>)?;
-        return Err(e);
+        return Err(e.into());
     }
     user.available()?;
     UserDao::sign_in(db, &user.id, &ip)?;
@@ -138,23 +140,27 @@ pub fn sign_up(
     db: Database,
     jwt: State<Arc<Jwt>>,
     i18n: I18n,
-) -> Result<JsonValue> {
+) -> JsonValueResult {
     form.validate()?;
     let db = db.deref();
     let queue = queue.deref();
     let jwt = jwt.deref();
 
     if let Ok(_) = UserDao::by_email(db, &form.email) {
-        return Err(i18n.e(
-            "nut.errors.already-exist.email",
-            &Some(json!({"email":form.email})),
-        ));
+        return Err(i18n
+            .e(
+                "nut.errors.already-exist.email",
+                &Some(json!({"email":form.email})),
+            )
+            .into());
     }
     if let Ok(_) = UserDao::by_nick_name(db, &form.nick_name) {
-        return Err(i18n.e(
-            "nut.errors.already-exist.nick-name",
-            &Some(json!({"name":&form.nick_name})),
-        ));
+        return Err(i18n
+            .e(
+                "nut.errors.already-exist.nick-name",
+                &Some(json!({"name":&form.nick_name})),
+            )
+            .into());
     }
 
     let home = form.home.clone();
@@ -190,7 +196,7 @@ pub fn confirm(
     db: Database,
     jwt: State<Arc<Jwt>>,
     i18n: I18n,
-) -> Result<JsonValue> {
+) -> JsonValueResult {
     form.validate()?;
     let db = db.deref();
     let queue = queue.deref();
@@ -198,7 +204,9 @@ pub fn confirm(
 
     let it = UserDao::by_email(db, &form.email)?;
     if let Some(_) = it.confirmed_at {
-        return Err(i18n.e("nut.errors.user.already-confirm", &None::<String>));
+        return Err(i18n
+            .e("nut.errors.user.already-confirm", &None::<String>)
+            .into());
     }
     send_email(&i18n, jwt, queue, &it, &Action::Confirm, &form.home)?;
     Ok(json!({}))
@@ -211,7 +219,7 @@ pub fn unlock(
     i18n: I18n,
     db: Database,
     jwt: State<Arc<Jwt>>,
-) -> Result<JsonValue> {
+) -> JsonValueResult {
     form.validate()?;
     let db = db.deref();
     let queue = queue.deref();
@@ -219,7 +227,9 @@ pub fn unlock(
 
     let it = UserDao::by_email(db, &form.email)?;
     if None == it.locked_at {
-        return Err(i18n.e("nut.errors.user.is-not-lock", &None::<String>));
+        return Err(i18n
+            .e("nut.errors.user.is-not-lock", &None::<String>)
+            .into());
     }
     send_email(&i18n, jwt, queue, &it, &Action::Unlock, &form.home)?;
     Ok(json!({}))
@@ -232,7 +242,7 @@ pub fn forgot_password(
     db: Database,
     i18n: I18n,
     jwt: State<Arc<Jwt>>,
-) -> Result<JsonValue> {
+) -> JsonValueResult {
     form.validate()?;
     let db = db.deref();
     let queue = queue.deref();
@@ -258,11 +268,11 @@ pub fn reset_password(
     db: Database,
     jwt: State<Arc<Jwt>>,
     i18n: I18n,
-) -> Result<JsonValue> {
+) -> JsonValueResult {
     form.validate()?;
     let token = jwt.parse::<Token>(&form.token)?.claims;
     if token.act != Action::ResetPassword {
-        return Err(i18n.e("flashes.bad-action", &None::<String>));
+        return Err(i18n.e("flashes.bad-action", &None::<String>).into());
     }
 
     let db = db.deref();
@@ -274,14 +284,14 @@ pub fn reset_password(
 }
 
 #[get("/users/logs")]
-pub fn logs(user: CurrentUser, db: Database) -> Result<Json<Vec<Log>>> {
+pub fn logs(user: CurrentUser, db: Database) -> JsonResult<Vec<Log>> {
     let db = db.deref();
     let items = LogDao::all(db, &user.id, 1 << 10)?;
     Ok(Json(items))
 }
 
 #[get("/users/profile")]
-pub fn get_profile(user: CurrentUser, db: Database) -> Result<Json<Profile>> {
+pub fn get_profile(user: CurrentUser, db: Database) -> JsonResult<Profile> {
     let db = db.deref();
     let it = UserDao::by_id(db, &user.id)?;
     Ok(Json(it.into()))
@@ -312,7 +322,7 @@ impl From<User> for Profile {
 }
 
 #[post("/users/profile", format = "json", data = "<form>")]
-pub fn post_profile(user: CurrentUser, form: Json<Profile>, db: Database) -> Result<Json<()>> {
+pub fn post_profile(user: CurrentUser, form: Json<Profile>, db: Database) -> JsonResult<()> {
     let db = db.deref();
     let now = Utc::now().naive_utc();
     let it = users::dsl::users.filter(users::dsl::id.eq(&user.id));
@@ -342,7 +352,7 @@ pub fn change_password(
     form: Json<ChangePassword>,
     user: CurrentUser,
     i18n: I18n,
-) -> Result<Json<()>> {
+) -> JsonResult<()> {
     form.validate()?;
     let db = db.deref();
     let user = UserDao::by_id(db, &user.id)?;
@@ -353,7 +363,7 @@ pub fn change_password(
 }
 
 #[delete("/users/sign-out")]
-pub fn sign_out(user: CurrentUser, i18n: I18n) -> Result<Json<()>> {
+pub fn sign_out(user: CurrentUser, i18n: I18n) -> JsonResult<()> {
     i18n.l(&user.id, "nut.logs.user.sign-out", &None::<String>)?;
     Ok(Json(()))
 }

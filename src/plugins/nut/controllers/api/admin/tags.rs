@@ -3,7 +3,7 @@ use std::ops::Deref;
 use rocket_contrib::json::Json;
 use validator::Validate;
 
-use super::super::super::super::super::super::{errors::Result, orm::Database};
+use super::super::super::super::super::super::{errors::JsonResult, orm::Database};
 use super::super::super::super::{
     models::tag::{Dao as TagDao, Item as Tag},
     request::Administrator,
@@ -21,21 +21,21 @@ pub struct Form {
 }
 
 #[get("/admin/tags")]
-pub fn index(_user: Administrator, db: Database) -> Result<Json<Vec<Tag>>> {
+pub fn index(_user: Administrator, db: Database) -> JsonResult<Vec<Tag>> {
     let db = db.deref();
     let it = TagDao::all(db)?;
     Ok(Json(it))
 }
 
 #[get("/admin/tags/<id>")]
-pub fn show(_user: Administrator, id: i64, db: Database) -> Result<Json<Tag>> {
+pub fn show(_user: Administrator, id: i64, db: Database) -> JsonResult<Tag> {
     let db = db.deref();
     let it = TagDao::by_id(db, &id)?;
     Ok(Json(it))
 }
 
 #[post("/admin/tags", format = "json", data = "<form>")]
-pub fn create(_user: Administrator, form: Json<Form>, db: Database) -> Result<Json<()>> {
+pub fn create(_user: Administrator, form: Json<Form>, db: Database) -> JsonResult<()> {
     form.validate()?;
     let db = db.deref();
     TagDao::create(db, &form.name, &form.icon, &form.color)?;
@@ -43,7 +43,7 @@ pub fn create(_user: Administrator, form: Json<Form>, db: Database) -> Result<Js
 }
 
 #[post("/admin/tags/<id>", format = "json", data = "<form>")]
-pub fn update(_user: Administrator, id: i64, form: Json<Form>, db: Database) -> Result<Json<()>> {
+pub fn update(_user: Administrator, id: i64, form: Json<Form>, db: Database) -> JsonResult<()> {
     form.validate()?;
     let db = db.deref();
     TagDao::update(db, &id, &form.name, &form.icon, &form.color)?;
@@ -51,7 +51,7 @@ pub fn update(_user: Administrator, id: i64, form: Json<Form>, db: Database) -> 
 }
 
 #[delete("/admin/tags/<id>")]
-pub fn destory(_user: Administrator, id: i64, db: Database) -> Result<Json<()>> {
+pub fn destory(_user: Administrator, id: i64, db: Database) -> JsonResult<()> {
     let db = db.deref();
     TagDao::delete(db, &id)?;
     Ok(Json(()))
