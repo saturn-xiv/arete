@@ -2,62 +2,37 @@
 
 A web application by Rust and React.
 
+## Clone source code
+
+```bash
+$ git clone https://github.com/saturn-xiv/arete.git ~/workspace/arete
+```
+
+## Start docker
+
+```bash
+$ docker pull chonglou/arete:latest 
+$ docker create --name arete -d -p 2222:22 -p 8080:8080 -p 3000:3000 -v $HOME/.ssh:/home/deploy/.ssh -v $HOME/workspace:/workspace chonglou/arete:latest 
+$ docker start arete 
+```
+
+## Login into docker
+
+```bash
+$ ssh -p 2222 deploy@localhost # default password is 'hi'
+> cd /workspace/arete
+> make npm # install frontend dependencies
+> make check # 
+```
+
 ## Development
 
-### Editor(atom)
-
--   ide-rust
--   ide-typescript
--   file-icons
--   atom-beautify
--   autosave
--   language-docker
--   language-babel
-
-[Add to ~/.atom/config.cson](https://flight-manual.atom.io/using-atom/sections/basic-customization/#customizing-language-recognition)
-
-```text
-'*':
-  core:
-    customFileTypes:
-      'source.tsx': [
-        'tsx'
-      ]
-```
-
-### Install dependencies
-
--   For Mac
-
 ```bash
-$ brew install git redis postgresql rabbitmq
-$ brew services start redis
-$ brew services start postgresql
-$ brew services start rabbitmq
-```
-
--   For Ubuntu
-
-```bash
-$ sudo apt-get install git build-essential redis rabbitmq-server postgresql libpq-dev
-```
-
--   [Install nodejs](doc/NODEJS.md)
--   [Install rust](doc/RUST.md)
--   [Create database](doc/POSTGRESQL.md)
--   [Create RabbitMQ virtual host](doc/RABBITMQ.md)
-
-```bash
-$ git clone https://github.com/saturn-xiv/arete.git
-$ cd arete
-$ cargo install diesel_cli --no-default-features --features postgres
-$ make npm
-$ make check
-$ ./target/debug/arete generate:config # please fix config.toml then
-$ ./target/debug/arete database:migrate # migrate database
-$ ./target/debug/arete i18n:sync -d locales # import locale items
-$ cargo run # http://localhost:8080
-$ cd dashboard && npm start # http://localhost:3000/my/
+> ./target/debug/arete generate:config # please fix config.toml then
+> ./target/debug/arete database:migrate # migrate database
+> ./target/debug/arete i18n:sync -d locales # import locale items
+> cargo run # http://localhost:8080
+> cd dashboard && npm start # http://localhost:3000/my/
 ```
 
 ## Deployment
