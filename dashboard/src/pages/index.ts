@@ -64,6 +64,15 @@ const routes: IPage[] = [{
   component: () => import('./admin/site/Smtp'),
   path: '/admin/site/smtp',
 }, {
+  component: () => import('./admin/tags/Index'),
+  path: '/admin/tags',
+}, {
+  component: () => import('./admin/tags/Form'),
+  path: '/admin/tags/new',
+}, {
+  component: () => import('./admin/tags/Form'),
+  path: '/admin/tags/:id/edit',
+}, {
   component: () => import('./Home'),
   path: '/',
 }]

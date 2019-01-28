@@ -11,9 +11,9 @@ import { httpDelete, httpGet } from '../../../utils/request'
 
 export interface IItem {
   id: number,
-  lang: string,
-  code: string,
-  message: string,
+  name: string,
+  color: string,
+  icon: string,
   updatedAt: Date,
 }
 
@@ -33,28 +33,30 @@ class Widget extends React.Component<InjectedIntlProps, IState> {
   }
   public handleRemove = (id: number) => {
     const { formatMessage } = this.props.intl
-    httpDelete(`/admin/locales/${id}`).then(() => {
+    httpDelete(`/admin/tags/${id}`).then(() => {
       message.success(formatMessage({ id: 'flashes.success' }))
       const items = this.state.items.filter((it) => it.id !== id)
       this.setState({ items })
     }).catch(message.error)
   }
   public componentDidMount() {
-    httpGet(`/admin/locales`).then((rst) => {
+    httpGet(`/admin/tags`).then((rst) => {
       this.setState({ items: rst })
     }).catch(message.error)
   }
   public render() {
     const columns = [{
-      dataIndex: 'lang',
-      key: 'lang',
-      render: (v: string) => (<FormattedMessage id={`languages.${v}`} />),
-      title: (<FormattedMessage id="nut.models.locale.lang" />),
-      width: 120,
+      dataIndex: 'name',
+      key: 'name',
+      title: (<FormattedMessage id="form.labels.name" />),
     }, {
-      dataIndex: 'code',
-      key: 'code',
-      title: (<FormattedMessage id="nut.models.locale.code" />),
+      dataIndex: 'color',
+      key: 'color',
+      title: (<FormattedMessage id="form.labels.color" />),
+    }, {
+      dataIndex: 'icon',
+      key: 'icon',
+      title: (<FormattedMessage id="form.labels.icon" />),
     }, {
       dataIndex: 'updatedAt',
       key: 'updatedAt',
@@ -63,8 +65,8 @@ class Widget extends React.Component<InjectedIntlProps, IState> {
       width: 280,
     }, {
       key: 'action',
-      render: (it: IItem) => (<ActionCell toEdit={`/admin/locales/${it.id}/edit`} confirmRemove={{ id: 'nut.admin.locales.index.confirm', values: { code: it.code, lang: it.lang } }} onRemove={() => this.handleRemove(it.id)} />),
-      title: (<ActionColumn to="/admin/locales/new" />),
+      render: (it: IItem) => (<ActionCell toEdit={`/admin/tags/${it.id}/edit`} confirmRemove={{ id: 'nut.admin.tags.index.confirm', values: { name: it.name } }} onRemove={() => this.handleRemove(it.id)} />),
+      title: (<ActionColumn to="/admin/tags/new" />),
       width: 120,
     }]
     return (<Authorized authority={RoleTypes.ADMIN}>
@@ -72,8 +74,7 @@ class Widget extends React.Component<InjectedIntlProps, IState> {
         rowKey="id"
         columns={columns}
         data={this.state.items}
-        expandedRowRender={(it: IItem) => (<>{it.message}</>)}
-        title={{ id: 'nut.admin.locales.index.title' }} />
+        title={{ id: 'nut.admin.tags.index.title' }} />
     </Authorized>)
   }
 }
