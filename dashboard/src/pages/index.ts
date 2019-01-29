@@ -73,6 +73,15 @@ const routes: IPage[] = [{
   component: () => import('./admin/tags/Form'),
   path: '/admin/tags/:id/edit',
 }, {
+  component: () => import('./admin/categories/Index'),
+  path: '/admin/categories',
+}, {
+  component: () => import('./admin/categories/Form'),
+  path: '/admin/categories/new',
+}, {
+  component: () => import('./admin/categories/Form'),
+  path: '/admin/categories/:id/edit',
+}, {
   component: () => import('./Home'),
   path: '/',
 }]

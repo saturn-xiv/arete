@@ -48,6 +48,8 @@ form:
     port: Port
     icon: Icon
     color: Color
+    position: Position
+    parent: Parent
   validations:
     required: Field is required
     email: Bad email address.
@@ -174,6 +176,11 @@ nut:
     categories:
       index:
         title: Categories
+        confirm: Are you sure to remove category {name}?
+      new:
+        title: Add a new category
+      edit:
+        title: Edit category {name}
     friend-links:
       index:
         title: Friend links

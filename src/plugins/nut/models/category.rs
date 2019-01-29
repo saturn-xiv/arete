@@ -109,6 +109,13 @@ impl Dao for Connection {
     }
 
     fn delete(&self, id: &i64) -> Result<()> {
+        let now = Utc::now().naive_utc();
+        update(categories::dsl::categories.filter(categories::dsl::parent_id.eq(&Some(*id))))
+            .set((
+                categories::dsl::parent_id.eq(&None::<i64>),
+                categories::dsl::updated_at.eq(&now),
+            ))
+            .execute(self)?;
         delete(
             category_resources::dsl::category_resources.filter(category_resources::dsl::id.eq(id)),
         )
