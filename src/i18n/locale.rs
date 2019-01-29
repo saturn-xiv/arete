@@ -12,6 +12,7 @@ use super::super::{
 };
 
 #[derive(Queryable, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Item {
     pub id: i64,
     pub lang: String,

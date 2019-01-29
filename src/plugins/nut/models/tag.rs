@@ -10,6 +10,7 @@ use super::super::super::super::{
 };
 
 #[derive(Queryable, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Item {
     pub id: i64,
     pub name: String,
@@ -27,8 +28,7 @@ pub trait Dao {
     fn delete(&self, id: &i64) -> Result<()>;
     fn bind(&self, tag: &i64, rty: &String, rid: &i64) -> Result<()>;
     fn unbind(&self, tag: &i64, rty: &String, rid: &i64) -> Result<()>;
-    fn resources(&self, tag: &i64, rty: &String) -> Result<Vec<i64>>;
-    fn children(&self, tag: &i64) -> Result<Vec<(String, i64)>>;
+    fn resources(&self, tag: &i64) -> Result<Vec<(String, i64)>>;
 }
 
 impl Dao for Connection {
@@ -42,9 +42,9 @@ impl Dao for Connection {
         let now = Utc::now().naive_utc();
         insert_into(tags::dsl::tags)
             .values((
-                tags::dsl::name.eq(&name),
-                tags::dsl::icon.eq(&icon),
-                tags::dsl::color.eq(&color),
+                tags::dsl::name.eq(name),
+                tags::dsl::icon.eq(icon),
+                tags::dsl::color.eq(color),
                 tags::dsl::updated_at.eq(&now),
             ))
             .execute(self)?;
@@ -55,9 +55,9 @@ impl Dao for Connection {
         let now = Utc::now().naive_utc();
         update(tags::dsl::tags.filter(tags::dsl::id.eq(id)))
             .set((
-                tags::dsl::name.eq(&name),
-                tags::dsl::icon.eq(&icon),
-                tags::dsl::color.eq(&color),
+                tags::dsl::name.eq(name),
+                tags::dsl::icon.eq(icon),
+                tags::dsl::color.eq(color),
                 tags::dsl::updated_at.eq(&now),
             ))
             .execute(self)?;
@@ -82,9 +82,9 @@ impl Dao for Connection {
         let now = Utc::now().naive_utc();
         insert_into(tag_resources::dsl::tag_resources)
             .values((
-                tag_resources::dsl::tag_id.eq(&tag),
-                tag_resources::dsl::resource_id.eq(&rid),
-                tag_resources::dsl::resource_type.eq(&rty),
+                tag_resources::dsl::tag_id.eq(tag),
+                tag_resources::dsl::resource_id.eq(rid),
+                tag_resources::dsl::resource_type.eq(rty),
                 tag_resources::dsl::created_at.eq(&now),
             ))
             .execute(self)?;
@@ -100,16 +100,7 @@ impl Dao for Connection {
         .execute(self)?;
         Ok(())
     }
-    fn resources(&self, tag: &i64, rty: &String) -> Result<Vec<i64>> {
-        let items = tag_resources::dsl::tag_resources
-            .select(tag_resources::dsl::resource_id)
-            .filter(tag_resources::dsl::tag_id.eq(tag))
-            .filter(tag_resources::dsl::resource_type.eq(rty))
-            .order(tag_resources::dsl::created_at.desc())
-            .load::<i64>(self)?;
-        Ok(items)
-    }
-    fn children(&self, tag: &i64) -> Result<Vec<(String, i64)>> {
+    fn resources(&self, tag: &i64) -> Result<Vec<(String, i64)>> {
         let items = tag_resources::dsl::tag_resources
             .select((
                 tag_resources::dsl::resource_type,

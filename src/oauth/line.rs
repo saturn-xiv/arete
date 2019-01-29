@@ -1,6 +1,7 @@
 use url::form_urlencoded;
 
 #[derive(Serialize, Deserialize, Default, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct Config {
     pub channel_id: String,
     pub channel_secret: String,

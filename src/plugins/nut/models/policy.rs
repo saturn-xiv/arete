@@ -11,7 +11,8 @@ use super::super::super::super::{
     orm::{schema::policies, Connection},
 };
 
-#[derive(Queryable)]
+#[derive(Queryable, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Item {
     pub id: i64,
     pub user_id: i64,

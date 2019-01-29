@@ -11,6 +11,7 @@ use super::super::super::super::{
 use super::super::MediaType;
 
 #[derive(Queryable, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Item {
     pub id: i64,
     pub ip: IpNetwork,
