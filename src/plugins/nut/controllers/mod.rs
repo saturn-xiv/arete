@@ -49,6 +49,11 @@ lazy_static! {
                 api::admin::tags::show,
                 api::admin::tags::update,
                 api::admin::tags::destory,
+                api::admin::categories::index,
+                api::admin::categories::create,
+                api::admin::categories::show,
+                api::admin::categories::update,
+                api::admin::categories::destory,
             ],
         ));
 
