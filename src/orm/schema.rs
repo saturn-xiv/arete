@@ -35,6 +35,7 @@ table! {
         name -> Varchar,
         icon -> Varchar,
         color -> Varchar,
+        position -> Int2,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
