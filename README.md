@@ -12,7 +12,7 @@ $ git clone https://github.com/saturn-xiv/arete.git ~/workspace/arete
 
 ```bash
 $ docker pull chonglou/arete:latest 
-$ docker create --name arete -d -p 2222:22 -p 8080:8080 -p 3000:3000 -v $HOME/.ssh:/home/deploy/.ssh -v $HOME/workspace:/workspace chonglou/arete:latest 
+$ docker create --name arete -p 2222:22 -p 8080:8080 -p 3000:3000 -p 15672:15672 -v $HOME/.ssh:/home/deploy/.ssh -v $HOME/workspace:/workspace chonglou/arete:latest 
 $ docker start arete 
 ```
 
@@ -22,11 +22,26 @@ $ docker start arete
 $ ssh -p 2222 deploy@localhost # default password is 'hi'
 > cd /workspace/arete
 > make npm # install frontend dependencies
-> make check # 
+> make check # build backend and documents
 ```
 
 ## Development
 
+- Create database
+
+```bash
+> psql -U postgres
+  CREATE DATABASE arete;
+```
+
+- Create rabbitmq virtual host
+
+```bash
+> rabbitmqctl add_vhost /arete
+```
+
+- Usage
+ 
 ```bash
 > ./target/debug/arete generate:config # please fix config.toml then
 > ./target/debug/arete database:migrate # migrate database
@@ -40,10 +55,6 @@ $ ssh -p 2222 deploy@localhost # default password is 'hi'
 ### Build by docker
 
 ```bash
-$ git clone https://github.com/saturn-xiv/arete.git
-$ cd arete
-$ docker build -t arete .
-$ docker run --rm -it -v `pwd`:/workspace arete
 > make clean
 > make npm
 > make # dist.tar.xz
