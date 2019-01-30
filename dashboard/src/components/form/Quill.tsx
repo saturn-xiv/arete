@@ -1,5 +1,11 @@
+import { Form } from 'antd'
 import * as React from 'react'
+import { FormattedMessage } from 'react-intl'
 import ReactQuill from 'react-quill'
+
+import { formItemLayout } from '.'
+
+const FormItem = Form.Item
 
 interface IProps {
   value: string,
@@ -62,7 +68,9 @@ class Widget extends React.Component<IProps> {
       'image',
       'video'
     ]
-    return (<ReactQuill modules={modules} formats={formats} value={value} onChange={onChange} theme="snow" />)
+    return (<FormItem {...formItemLayout} label={<FormattedMessage id="form.labels.body" />}>
+      <ReactQuill modules={modules} formats={formats} value={value} onChange={onChange} theme="snow" />
+    </FormItem>)
   }
 }
 

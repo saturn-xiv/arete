@@ -54,6 +54,16 @@ lazy_static! {
                 api::admin::categories::show,
                 api::admin::categories::update,
                 api::admin::categories::destory,
+                api::admin::links::index,
+                api::admin::links::create,
+                api::admin::links::show,
+                api::admin::links::update,
+                api::admin::links::destory,
+                api::admin::cards::index,
+                api::admin::cards::create,
+                api::admin::cards::show,
+                api::admin::cards::update,
+                api::admin::cards::destory,
             ],
         ));
 

@@ -27,6 +27,7 @@ form:
     password: Password must at least 6 characters.
     password-confirmation: Passwords must match.
   labels:
+    title: Title
     body: Body
     content: Content
     email: Email
@@ -50,6 +51,12 @@ form:
     color: Color
     position: Position
     parent: Parent
+    loc: Location
+    label: Label
+    href: Href
+    lang: Lang
+    x: X
+    y: Y
   validations:
     required: Field is required
     email: Bad email address.
@@ -151,9 +158,19 @@ nut:
     links:
       index:
         title: Nav-Bar links
+        confirm: Are you sure to remove link {label}?
+      new:
+        title: Add a new link
+      edit:
+        title: Edit link {label}
     cards:
       index:
         title: Card panels
+        confirm: Are you sure to remove card {title}?
+      new:
+        title: Add a new card
+      edit:
+        title: Edit card {title}
     locales:
       index:
         title: Internationalization
@@ -187,7 +204,6 @@ nut:
   models:
     locale:
       code: Code
-      lang: Lang
       message: Message
     site:
       title: Title

@@ -82,6 +82,24 @@ const routes: IPage[] = [{
   component: () => import('./admin/categories/Form'),
   path: '/admin/categories/:id/edit',
 }, {
+  component: () => import('./admin/cards/Index'),
+  path: '/admin/cards',
+}, {
+  component: () => import('./admin/cards/Form'),
+  path: '/admin/cards/new',
+}, {
+  component: () => import('./admin/cards/Form'),
+  path: '/admin/cards/:id/edit',
+}, {
+  component: () => import('./admin/links/Index'),
+  path: '/admin/links',
+}, {
+  component: () => import('./admin/links/Form'),
+  path: '/admin/links/new',
+}, {
+  component: () => import('./admin/links/Form'),
+  path: '/admin/links/:id/edit',
+}, {
   component: () => import('./Home'),
   path: '/',
 }]

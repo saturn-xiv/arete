@@ -8,14 +8,14 @@ import { RouteComponentProps, withRouter } from 'react-router'
 import { ISiteState } from '../../../actions'
 import { ILabel } from '../../../components'
 import { Authorized, RoleTypes } from '../../../components/authorized'
-import { formItemLayout, LANGUAGE_WIDTH, TEXTAREA_ROWS } from '../../../components/form'
+import { formItemLayout, LANGUAGE_WIDTH } from '../../../components/form'
 import Layout from '../../../components/form/Layout'
 import Submit from '../../../components/form/Submit'
 import { IApplicationState } from '../../../reducers'
 import { httpGet, httpPost } from '../../../utils/request'
 
-const FormItem = Form.Item
 const Option = Select.Option
+const FormItem = Form.Item
 
 interface IProps {
   site: ISiteState,
@@ -32,7 +32,7 @@ class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProp
   constructor(props: RouteComponentProps<any> & InjectedIntlProps & FormComponentProps & IProps) {
     super(props)
     this.state = {
-      title: { id: 'nut.admin.locales.new.title' }
+      title: { id: 'nut.admin.links.new.title' }
     }
   }
   public handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -41,25 +41,35 @@ class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProp
     const id = match.params.id
     form.validateFields((err, values) => {
       if (!err) {
-        httpPost((id ? `/admin/locales/${id}` : '/admin/locales'), values).then((_) => {
+        httpPost(
+          (id ? `/admin/links/${id}` : '/admin/links'),
+          values,
+        ).then((_) => {
           message.success(intl.formatMessage({ id: "flashes.success" }))
-          history.push('/admin/locales')
+          history.push('/admin/links')
         }).catch(message.error)
       }
     })
   }
+
   public componentDidMount() {
     const { form, match } = this.props
     const id = match.params.id
     if (id) {
-      httpGet(`/admin/locales/${id}`).then((rst) => {
-        form.setFieldsValue({ lang: rst.lang, code: rst.code, message: rst.message })
+      httpGet(`/admin/links/${id}`).then((rst) => {
+        form.setFieldsValue({
+          href: rst.href,
+          label: rst.label,
+          lang: rst.lang,
+          loc: rst.loc,
+          x: rst.x,
+          y: rst.y,
+        })
         this.setState({
           title: {
-            id: "nut.admin.locales.edit.title",
+            id: "nut.admin.links.edit.title",
             values: {
-              code: rst.code,
-              lang: rst.lang,
+              label: rst.label,
             },
           }
         })
@@ -87,9 +97,9 @@ class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProp
               </Select>)
             }
           </FormItem>
-          <FormItem {...formItemLayout} label={<FormattedMessage id="nut.models.locale.code" />}>
+          <FormItem {...formItemLayout} label={<FormattedMessage id="form.labels.label" />}>
             {
-              getFieldDecorator('code', {
+              getFieldDecorator('label', {
                 rules: [
                   {
                     message: formatMessage({ id: "form.validations.required" }),
@@ -99,16 +109,58 @@ class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProp
               })(<Input />)
             }
           </FormItem>
-          <FormItem {...formItemLayout} label={<FormattedMessage id="nut.models.locale.message" />}>
+          <FormItem {...formItemLayout} label={<FormattedMessage id="form.labels.href" />}>
             {
-              getFieldDecorator('message', {
+              getFieldDecorator('href', {
                 rules: [
                   {
                     message: formatMessage({ id: "form.validations.required" }),
                     required: true,
-                  },
+                  }
                 ]
-              })(<Input.TextArea rows={TEXTAREA_ROWS} />)
+              })(<Input />)
+            }
+          </FormItem>
+          <FormItem {...formItemLayout} label={<FormattedMessage id="form.labels.loc" />}>
+            {
+              getFieldDecorator('loc', {
+                rules: [
+                  {
+                    message: formatMessage({ id: "form.validations.required" }),
+                    required: true,
+                  }
+                ]
+              })(<Select style={{ width: 150 }} >
+                {['bootstrap-header', 'bootstrap-sider'].map((it) => (<Option key={it} value={it}>{it}</Option>))}
+              </Select>)
+            }
+          </FormItem>
+          <FormItem {...formItemLayout} label={<FormattedMessage id="form.labels.x" />}>
+            {
+              getFieldDecorator('x', {
+                rules: [
+                  {
+                    message: formatMessage({ id: "form.validations.required" }),
+                    required: true,
+                  }
+                ]
+              })(<Select style={{ width: 150 }} >
+                {Array.from({ length: 20 }, (v, i) => i - 10).map((it) => (<Option key={it.toString()} value={it}>{it}</Option>))}
+              </Select>)
+            }
+          </FormItem>
+          <FormItem {...formItemLayout} label={<FormattedMessage id="form.labels.y" />}>
+            {
+              getFieldDecorator('y', {
+                rules: [
+                  {
+                    message: formatMessage({ id: "form.validations.required" }),
+                    required: true,
+                  }
+                ]
+              })(<Select style={{ width: 150 }} >
+                {Array.from({ length: 20 }, (v, i) => i - 10).map((it) => (<Option key={it.toString()} value={it}>{it}</Option>))}
+              </Select>)
             }
           </FormItem>
 

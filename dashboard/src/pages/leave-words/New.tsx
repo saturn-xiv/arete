@@ -4,7 +4,7 @@ import * as React from 'react'
 import { FormattedMessage, InjectedIntlProps, injectIntl, intlShape } from 'react-intl'
 
 import { MediaType } from '../../components'
-import { formItemLayout } from '../../components/form'
+import { formItemLayout, TEXTAREA_ROWS } from '../../components/form'
 import Submit from '../../components/form/Submit'
 import { httpPost } from '../../utils/request'
 import Layout from '../users/SharedLinks'
@@ -42,7 +42,7 @@ class Widget extends React.Component<InjectedIntlProps & FormComponentProps> {
                   required: true,
                 },
               ]
-            })(<Input.TextArea rows={6} />)
+            })(<Input.TextArea rows={TEXTAREA_ROWS} />)
           }
         </FormItem>
 

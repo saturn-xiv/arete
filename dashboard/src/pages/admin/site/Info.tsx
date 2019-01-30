@@ -7,7 +7,7 @@ import { connect } from 'react-redux'
 import { ISiteState } from '../../../actions'
 import { ILabel } from '../../../components'
 import { Authorized, RoleTypes } from '../../../components/authorized'
-import { formItemLayout } from '../../../components/form'
+import { formItemLayout, TEXTAREA_ROWS } from '../../../components/form'
 import Layout from '../../../components/form/Layout'
 import Submit from '../../../components/form/Submit'
 import { IApplicationState } from '../../../reducers'
@@ -132,7 +132,7 @@ class Widget extends React.Component<InjectedIntlProps & FormComponentProps & IP
                     required: true,
                   },
                 ]
-              })(<Input.TextArea rows={6} />)
+              })(<Input.TextArea rows={TEXTAREA_ROWS} />)
             }
           </FormItem>
           <FormItem {...formItemLayout} label={<FormattedMessage id="nut.models.site.copyright" />}>

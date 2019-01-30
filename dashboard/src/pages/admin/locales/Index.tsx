@@ -3,6 +3,7 @@ import * as React from 'react'
 import { FormattedMessage, InjectedIntlProps, injectIntl, intlShape } from 'react-intl'
 
 import { Authorized, RoleTypes } from '../../../components/authorized'
+import { ACTION_WIDTH, LANGUAGE_WIDTH, TIMESTAMP_WIDTH } from '../../../components/form'
 import Timestamp from '../../../components/moment/Timestamp'
 import ActionCell from '../../../components/table/action/Cell'
 import ActionColumn from '../../../components/table/action/Column'
@@ -49,8 +50,8 @@ class Widget extends React.Component<InjectedIntlProps, IState> {
       dataIndex: 'lang',
       key: 'lang',
       render: (v: string) => (<FormattedMessage id={`languages.${v}`} />),
-      title: (<FormattedMessage id="nut.models.locale.lang" />),
-      width: 120,
+      title: (<FormattedMessage id="form.labels.lang" />),
+      width: LANGUAGE_WIDTH,
     }, {
       dataIndex: 'code',
       key: 'code',
@@ -60,12 +61,12 @@ class Widget extends React.Component<InjectedIntlProps, IState> {
       key: 'updatedAt',
       render: (v: Date) => (<Timestamp date={v} />),
       title: (<FormattedMessage id="form.labels.updated-at" />),
-      width: 280,
+      width: TIMESTAMP_WIDTH,
     }, {
       key: 'action',
       render: (it: IItem) => (<ActionCell toEdit={`/admin/locales/${it.id}/edit`} confirmRemove={{ id: 'nut.admin.locales.index.confirm', values: { code: it.code, lang: it.lang } }} onRemove={() => this.handleRemove(it.id)} />),
       title: (<ActionColumn to="/admin/locales/new" />),
-      width: 120,
+      width: ACTION_WIDTH,
     }]
     return (<Authorized authority={RoleTypes.ADMIN}>
       <Layout

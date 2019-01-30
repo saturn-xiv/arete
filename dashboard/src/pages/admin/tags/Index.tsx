@@ -3,6 +3,7 @@ import * as React from 'react'
 import { FormattedMessage, InjectedIntlProps, injectIntl, intlShape } from 'react-intl'
 
 import { Authorized, RoleTypes } from '../../../components/authorized'
+import { ACTION_WIDTH, TIMESTAMP_WIDTH } from '../../../components/form'
 import Timestamp from '../../../components/moment/Timestamp'
 import ActionCell from '../../../components/table/action/Cell'
 import ActionColumn from '../../../components/table/action/Column'
@@ -62,12 +63,12 @@ class Widget extends React.Component<InjectedIntlProps, IState> {
       key: 'updatedAt',
       render: (v: Date) => (<Timestamp date={v} />),
       title: (<FormattedMessage id="form.labels.updated-at" />),
-      width: 280,
+      width: TIMESTAMP_WIDTH,
     }, {
       key: 'action',
       render: (it: IItem) => (<ActionCell toEdit={`/admin/tags/${it.id}/edit`} confirmRemove={{ id: 'nut.admin.tags.index.confirm', values: { name: it.name } }} onRemove={() => this.handleRemove(it.id)} />),
       title: (<ActionColumn to="/admin/tags/new" />),
-      width: 120,
+      width: ACTION_WIDTH,
     }]
     return (<Authorized authority={RoleTypes.ADMIN}>
       <Layout
