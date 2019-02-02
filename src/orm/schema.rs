@@ -100,7 +100,6 @@ table! {
         title -> Varchar,
         home -> Varchar,
         logo -> Varchar,
-        lang -> Varchar,
         position -> Int2,
         created_at -> Timestamp,
         updated_at -> Timestamp,

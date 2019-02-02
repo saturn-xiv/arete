@@ -64,6 +64,11 @@ lazy_static! {
                 api::admin::cards::show,
                 api::admin::cards::update,
                 api::admin::cards::destory,
+                api::admin::friend_links::index,
+                api::admin::friend_links::create,
+                api::admin::friend_links::show,
+                api::admin::friend_links::update,
+                api::admin::friend_links::destory,
             ],
         ));
 

@@ -1,5 +1,6 @@
 pub mod card;
 pub mod category;
+pub mod friend_link;
 pub mod leave_word;
 pub mod link;
 pub mod log;

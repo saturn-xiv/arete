@@ -100,6 +100,15 @@ const routes: IPage[] = [{
   component: () => import('./admin/links/Form'),
   path: '/admin/links/:id/edit',
 }, {
+  component: () => import('./admin/friend-links/Index'),
+  path: '/admin/friend-links',
+}, {
+  component: () => import('./admin/friend-links/Form'),
+  path: '/admin/friend-links/new',
+}, {
+  component: () => import('./admin/friend-links/Form'),
+  path: '/admin/friend-links/:id/edit',
+}, {
   component: () => import('./Home'),
   path: '/',
 }]

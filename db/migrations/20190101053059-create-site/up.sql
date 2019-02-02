@@ -34,12 +34,11 @@ CREATE TABLE friend_links(
   title VARCHAR(255) NOT NULL,
   home VARCHAR(255) NOT NULL,
   logo VARCHAR(255) NOT NULL,
-  lang VARCHAR(8) NOT NULL,
   position SMALLINT NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL
 );
-CREATE INDEX idx_friend_links_lang ON friend_links(lang);
+CREATE INDEX idx_friend_links_title ON friend_links(title);
 
 CREATE TABLE leave_words(
   id BIGSERIAL PRIMARY KEY,

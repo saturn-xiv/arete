@@ -201,6 +201,11 @@ nut:
     friend-links:
       index:
         title: Friend links
+        confirm: Are you sure to remove friend link {title}?
+      new:
+        title: Add a new friend link
+      edit:
+        title: Edit friend link {title}
   models:
     locale:
       code: Code
@@ -211,6 +216,8 @@ nut:
       keywords: Keywords
       description: Description
       copyright: Copyright
+    friend-link:
+      home: Home
   mailer:
     users:
       confirm:
