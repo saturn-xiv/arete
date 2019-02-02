@@ -69,6 +69,9 @@ lazy_static! {
                 api::admin::friend_links::show,
                 api::admin::friend_links::update,
                 api::admin::friend_links::destory,
+                api::admin::votes::index,
+                api::admin::votes::destory,
+                api::admin::users::index,
             ],
         ));
 

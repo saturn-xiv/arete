@@ -57,6 +57,9 @@ form:
     lang: Lang
     x: X
     y: Y
+    resource: Resource
+    point: Point
+    user: User
   validations:
     required: Field is required
     email: Bad email address.
@@ -182,6 +185,7 @@ nut:
     votes:
       index:
         title: Votes
+        confirm: Are you sure to remove votes {id}@{type}?
     tags:
       index:
         title: Tags
@@ -218,6 +222,11 @@ nut:
       copyright: Copyright
     friend-link:
       home: Home
+    user:
+      sign-in:
+        current: Current sign in
+        last: Last sign in
+        count: Sign in count
   mailer:
     users:
       confirm:

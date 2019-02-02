@@ -7,3 +7,4 @@ pub mod log;
 pub mod policy;
 pub mod tag;
 pub mod user;
+pub mod vote;
