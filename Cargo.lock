@@ -2191,6 +2191,7 @@ dependencies = [
  "derive_builder 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "failure 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "quick-xml 0.13.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "reqwest 0.9.9 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]

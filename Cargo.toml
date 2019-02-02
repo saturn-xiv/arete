@@ -46,7 +46,6 @@ mime = "0.3"
 rocket = "0.4"
 robots_txt = "0.6"
 sitemap = "0.3"
-rss = "1.6"
 ipnetwork = "0.13" 
 mustache = "*"
 lazy_static = "1"
@@ -72,8 +71,12 @@ features = ["serde"]
 version = "0.5"
 features = ["serde"]
 
+[dependencies.rss]
+version = "1"
+features = ["from_url"]
+
 [dependencies.url]
-version = "1.7"
+version = "1"
 features=["query_encoding"]
 
 [dependencies.uuid]
@@ -82,7 +85,7 @@ features = ["v4"]
 
 # https://github.com/diesel-rs/diesel/issues/1942
 [dependencies.diesel]
-version = "1.4"
+version = "1"
 features = ["postgres", "chrono", "serde_json", "uuid", "network-address", "numeric", "r2d2", "128-column-tables"]
 
 [dependencies.rocket_contrib]
