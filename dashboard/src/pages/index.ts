@@ -115,6 +115,9 @@ const routes: IPage[] = [{
   component: () => import('./admin/users/Index'),
   path: '/admin/users',
 }, {
+  component: () => import('./admin/users/Authority'),
+  path: '/admin/users/:id/authority',
+}, {
   component: () => import('./Home'),
   path: '/',
 }]

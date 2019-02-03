@@ -9,6 +9,10 @@ import Head from './Head'
 export const enum RoleTypes {
   ROOT = 'root',
   ADMIN = 'admin',
+  SURVEY = 'survey',
+  VENDOR = 'vendor',
+  ALBUM = 'album',
+  SCHEDULE = 'schedule',
 }
 
 export const havePermission = (user: IUserState, authority?: string): boolean => {

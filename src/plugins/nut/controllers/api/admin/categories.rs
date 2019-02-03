@@ -1,5 +1,7 @@
 use std::ops::Deref;
 
+use diesel::Connection as DieselConnection;
+use failure::Error;
 use rocket_contrib::json::Json;
 use validator::Validate;
 
@@ -70,6 +72,9 @@ pub fn update(_user: Administrator, id: i64, form: Json<Form>, db: Database) -> 
 #[delete("/admin/categories/<id>")]
 pub fn destory(_user: Administrator, id: i64, db: Database) -> JsonResult<()> {
     let db = db.deref();
-    CategoryDao::delete(db, &id)?;
+    db.transaction::<_, Error, _>(|| {
+        CategoryDao::delete(db, &id)?;
+        Ok(())
+    })?;
     Ok(Json(()))
 }

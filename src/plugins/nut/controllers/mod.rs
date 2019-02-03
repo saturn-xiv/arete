@@ -72,6 +72,8 @@ lazy_static! {
                 api::admin::votes::index,
                 api::admin::votes::destory,
                 api::admin::users::index,
+                api::admin::users::get_authority,
+                api::admin::users::post_authority,
             ],
         ));
 

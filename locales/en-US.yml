@@ -60,6 +60,8 @@ form:
     resource: Resource
     point: Point
     user: User
+    range:
+      date: Date
   validations:
     required: Field is required
     email: Bad email address.
@@ -154,6 +156,13 @@ nut:
     users:
       index:
         title: Users
+      authority:
+        title: Authority for {name}
+        admin: Administrator
+        survey: Survey Module Manager
+        vendor: Vendor Module Manager
+        album: Album Module Manager
+        schedule: Schedule Module Manager
     leave-words:
       index:
         title: Leave words

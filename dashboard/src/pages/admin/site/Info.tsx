@@ -73,7 +73,7 @@ class Widget extends React.Component<InjectedIntlProps & FormComponentProps & IP
     return (<Authorized authority={RoleTypes.ADMIN}>
       <Layout title={this.state.title}>
         <Form onSubmit={this.handleSubmit}>
-          <FormItem {...formItemLayout} label={<FormattedMessage id="nut.models.locale.lang" />}>
+          <FormItem {...formItemLayout} label={<FormattedMessage id="form.labels.lang" />}>
             {
               getFieldDecorator('lang', {
                 rules: [

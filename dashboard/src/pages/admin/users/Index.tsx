@@ -1,6 +1,7 @@
-import { message } from 'antd'
+import { Button, message } from 'antd'
 import * as React from 'react'
 import { FormattedMessage, InjectedIntlProps, injectIntl, intlShape } from 'react-intl'
+import { RouteComponentProps, withRouter } from 'react-router'
 
 import { Authorized, RoleTypes } from '../../../components/authorized'
 import { ACTION_WIDTH, TIMESTAMP_WIDTH } from '../../../components/form'
@@ -26,8 +27,8 @@ interface IState {
   items: IItem[],
 }
 
-class Widget extends React.Component<InjectedIntlProps, IState> {
-  public static propTypes: React.ValidationMap<InjectedIntlProps> = {
+class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProps, IState> {
+  public static propTypes: React.ValidationMap<RouteComponentProps<any> & InjectedIntlProps> = {
     intl: intlShape.isRequired,
   }
   constructor(props: any) {
@@ -43,6 +44,7 @@ class Widget extends React.Component<InjectedIntlProps, IState> {
     }).catch(message.error)
   }
   public render() {
+    const { history } = this.props
     const columns = [{
       dataIndex: 'signInCount',
       key: 'signInCount',
@@ -67,7 +69,7 @@ class Widget extends React.Component<InjectedIntlProps, IState> {
       width: TIMESTAMP_WIDTH,
     }, {
       key: 'action',
-      render: (it: IItem) => (<div />),
+      render: (it: IItem) => (<Button onClick={() => history.push(`/admin/users/${it.id}/authority`)} icon="idcard" type="dashed" />),
       title: (<ActionColumn />),
       width: ACTION_WIDTH,
     }]
@@ -81,4 +83,4 @@ class Widget extends React.Component<InjectedIntlProps, IState> {
   }
 }
 
-export default injectIntl(Widget)
+export default withRouter(injectIntl(Widget))
