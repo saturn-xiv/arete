@@ -1,4 +1,5 @@
 pub mod admin;
+pub mod attachments;
 pub mod leave_words;
 pub mod locales;
 pub mod ueditor;

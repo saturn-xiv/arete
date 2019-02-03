@@ -87,6 +87,7 @@ function siderBar(user: IUserState): IMenu[] {
 
   items.push({
     children: [
+      { children: (<FormattedMessage id="nut.attachments.index.title" />), key: "to-/attachments" },
       { children: (<FormattedMessage id="nut.users.logs.title" />), key: "to-/users/logs" },
       { children: (<FormattedMessage id="nut.users.change-password.title" />), key: "to-/users/change-password" },
       { children: (<FormattedMessage id="nut.users.profile.title" />), key: "to-/users/profile" },

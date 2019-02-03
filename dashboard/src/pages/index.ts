@@ -4,6 +4,12 @@ interface IPage {
 }
 
 const routes: IPage[] = [{
+  component: () => import('./attachments/Index'),
+  path: '/attachments',
+}, {
+  component: () => import('./attachments/New'),
+  path: '/attachments/new',
+}, {
   component: () => import('./users/SignIn'),
   path: '/users/sign-in',
 }, {

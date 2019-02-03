@@ -60,6 +60,8 @@ form:
     resource: Resource
     point: Point
     user: User
+    mime-type: Mime Type
+    size: Size
     range:
       date: Date
   validations:
@@ -97,6 +99,15 @@ nut:
     new:
       helper: Please leave your contact information for us to replay to you.
       title: Leave a message
+  attachments:
+    index:
+      title: Attachments
+      confirm: Are you sure to remove file {title}?
+    new:
+      title: Upload new files
+      uploading: Uploading file {title}.
+      done: File {title} uploaded successfully.
+      error: file {title} upload failed.
   users:
     change-password:
       success: Your password has been changed successfully.

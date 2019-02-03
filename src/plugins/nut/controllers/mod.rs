@@ -10,6 +10,9 @@ lazy_static! {
         items.push((
             "/api",
             routes![
+                api::attachments::index,
+                api::attachments::create,
+                api::attachments::destory,
                 api::users::sign_in,
                 api::users::sign_up,
                 api::users::confirm,

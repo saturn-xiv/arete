@@ -45,6 +45,7 @@ pub fn launch(cfg: Config) -> Result<()> {
         .manage(jwt.clone())
         .manage(enc.clone())
         .manage(queue.clone())
+        .manage(cfg.clone())
         .attach(Database::fairing())
         .attach(Redis::fairing())
         .attach(Template::fairing());

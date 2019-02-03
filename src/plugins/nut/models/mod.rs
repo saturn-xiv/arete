@@ -1,3 +1,4 @@
+pub mod attachment;
 pub mod card;
 pub mod category;
 pub mod friend_link;
