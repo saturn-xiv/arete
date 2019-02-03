@@ -80,7 +80,8 @@ RUN zsh -c "source $HOME/.zshrc \
 # saturn-xiv
 RUN zsh -c "source $HOME/.zshrc \
   && git clone https://github.com/saturn-xiv/arete.git /opt/saturn-xiv/arete \
-  && cargo install diesel_cli"
+  && cargo install diesel_cli \
+  && cargo install cargo-deb"
 
 # setup
 USER root
