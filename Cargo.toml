@@ -2,10 +2,10 @@
 name = "arete"
 version = "0.1.0"
 authors = ["Jeremy Zheng <jitang.zheng@gmail.com>"]
-description = "A web application by Rust and React.."
+description = "A web application by Rust and React."
 homepage = "https://github.com/saturn-xiv/arete"
 license = "MIT"
-edition = "2018"
+readme = "README.md"
 
 [profile.release]
 lto = true
@@ -88,7 +88,6 @@ features=["query_encoding"]
 version = "0.7"
 features = ["v4"]
 
-# https://github.com/diesel-rs/diesel/issues/1942
 [dependencies.diesel]
 version = "1"
 features = ["postgres", "chrono", "serde_json", "uuid", "network-address", "numeric", "r2d2", "128-column-tables"]
@@ -97,3 +96,17 @@ features = ["postgres", "chrono", "serde_json", "uuid", "network-address", "nume
 version = "0.4"
 default-features = false
 features = ["tera_templates", "handlebars_templates", "diesel_postgres_pool", "redis_pool", "json", "serve", "uuid", "helmet"]
+
+[package.metadata.deb]
+maintainer = "Jeremy Zheng <jitang.zheng@gmail.com>"
+copyright = "2018-2020, Jeremy Zheng <jitang.zheng@gmail.com>"
+license-file = ["LICENSE"]
+depends = "$auto, systemd"
+extended-description = "A web application by Rust and React."
+section = "admin"
+priority = "optional"
+assets = [
+    ["node_modules", "usr/share/arete/", "755"],    
+    ["dashboard/build", "usr/share/arete/dashboard", "755"],
+    ["target/release/arete", "usr/bin/", "755"]
+]
