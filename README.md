@@ -16,7 +16,7 @@ $ docker create --name arete -p 2222:22 -p 8080:8080 -p 3000:3000 -p 15672:15672
 $ docker start arete 
 ```
 
-## Login into docker
+## Log into docker
 
 ```bash
 $ ssh -p 2222 deploy@localhost # default password is 'hi'
@@ -49,6 +49,7 @@ $ ssh -p 2222 deploy@localhost # default password is 'hi'
 > cargo run # http://localhost:8080
 > cd dashboard && npm start # http://localhost:3000/my/
 ```
+**Create the admin in http://localhost:3000/my/install** 
 
 ## Deployment
 
