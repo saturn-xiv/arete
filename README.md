@@ -53,12 +53,11 @@ $ ssh -p 2222 deploy@localhost # default password is 'hi'
 
 ## Deployment
 
-### Build by docker
-
 ```bash
-> make clean
 > make npm
-> make # dist.tar.xz
+> make
+> cargo deb
+> dpkg-deb --contents target/debian/arete_0.1.0_amd64.deb
 ```
 
 ## Documents
