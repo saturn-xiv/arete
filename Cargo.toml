@@ -98,13 +98,10 @@ default-features = false
 features = ["tera_templates", "handlebars_templates", "diesel_postgres_pool", "redis_pool", "json", "serve", "uuid", "helmet"]
 
 [package.metadata.deb]
-maintainer = "Jeremy Zheng <jitang.zheng@gmail.com>"
-copyright = "2018-2020, Jeremy Zheng <jitang.zheng@gmail.com>"
-license-file = ["LICENSE"]
-depends = "$auto, systemd"
-extended-description = "A web application by Rust and React."
+depends = "$auto, systemd, nodejs, npm"
 section = "admin"
 priority = "optional"
+maintainer-scripts = "scripts"
 assets = [
     ["package.json", "usr/share/arete/", "644"],
     ["package-lock.json", "usr/share/arete/", "644"],
