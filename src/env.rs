@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 use rocket::config::{Config as RocketConfig, Environment, Limits, LoggingLevel, Value};
 
 use super::{
-    crypto::{self, Encryptor},
+    crypto::Key,
     errors::Result,
     orm::{Connection as DbConnection, Pool as DbPool},
     queue::rabbitmq::Config as RabbitMQConfig,
@@ -30,7 +30,7 @@ pub const BANNER: &'static str = include_str!("banner.txt");
 #[serde(rename_all = "camelCase")]
 pub struct Config {
     pub env: String,
-    pub secrets: String,
+    pub secrets: Key,
     pub database: String,
     pub redis: String,
     pub rabbitmq: RabbitMQConfig,
@@ -42,7 +42,7 @@ impl Default for Config {
         Self {
             env: Environment::Development.to_string(),
             http: Http::default(),
-            secrets: base64::encode(&crypto::sodium::Encryptor::random(32)),
+            secrets: Key::default(),
             redis: "redis://127.0.0.1:6379/0".to_string(),
             database: format!("postgres://postgres:@127.0.0.1:5432/{}", NAME),
             rabbitmq: RabbitMQConfig::default(),
@@ -76,7 +76,7 @@ impl Config {
             .address("0.0.0.0")
             .workers(self.http.workers)
             .port(self.http.port)
-            .secret_key(&self.secrets[..])
+            .secret_key(self.secrets.0.clone())
             .keep_alive(match self.http.keep_alive {
                 Some(v) => v,
                 None => 0,
@@ -98,15 +98,9 @@ impl Config {
                 Environment::Production => LoggingLevel::Normal,
                 _ => LoggingLevel::Debug,
             })
-            .workers(12)
             .finalize()?;
 
         Ok(it)
-    }
-
-    pub fn secrets(&self) -> Result<Vec<u8>> {
-        let buf = base64::decode(&self.secrets)?;
-        Ok(buf)
     }
 
     pub fn redis(&self) -> Result<RedisPool> {

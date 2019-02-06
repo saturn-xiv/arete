@@ -17,9 +17,9 @@ use super::super::super::{
 
 pub fn launch(cfg: Config) -> Result<()> {
     let queue = Arc::new(cfg.rabbitmq.clone().open()?);
-    let jwt = Arc::new(Jwt::new(cfg.secrets.clone()));
+    let jwt = Arc::new(Jwt::new(cfg.secrets.0.clone()));
     let dbp = cfg.database()?;
-    let enc = Arc::new(Sodium::new(&cfg.secrets()?)?);
+    let enc = Arc::new(Sodium::new(cfg.secrets.clone())?);
 
     info!("start send email thread");
     {

@@ -4,14 +4,16 @@ use sodiumoxide::{
 };
 
 use super::super::errors::{Error, Result};
+use super::Key;
 
 pub struct Encryptor {
     key: secretbox::Key,
 }
 
 impl Encryptor {
-    pub fn new(key: &[u8]) -> Result<Self> {
-        match secretbox::Key::from_slice(key) {
+    pub fn new(key: Key) -> Result<Self> {
+        let key: Result<Vec<u8>> = key.into();
+        match secretbox::Key::from_slice(&key?) {
             Some(key) => Ok(Self { key: key }),
             None => Err(Error::SodiumBadKey.into()),
         }
