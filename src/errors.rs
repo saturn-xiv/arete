@@ -4,7 +4,7 @@ use std::result::Result as StdResult;
 use failure::{Error as FailureError, Fail};
 use rocket::{
     http::{ContentType, Status},
-    response::Responder,
+    response::{content::Xml, Responder},
     Request, Response,
 };
 use rocket_contrib::{
@@ -17,6 +17,7 @@ pub type Result<T> = StdResult<T, FailureError>;
 pub type TemplateResult = StdResult<Template, HttpError>;
 pub type JsonValueResult = StdResult<JsonValue, HttpError>;
 pub type JsonResult<T> = StdResult<Json<T>, HttpError>;
+pub type XmlResult<T> = StdResult<Xml<T>, HttpError>;
 
 #[derive(Fail, Debug)]
 pub enum Error {
