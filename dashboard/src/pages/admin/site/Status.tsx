@@ -133,6 +133,7 @@ class Widget extends React.Component<InjectedIntlProps, IState> {
               <List
                 size="small"
                 bordered={true}
+                pagination={{ position: 'bottom' }}
                 dataSource={redis.split("\n").filter((it) => it.trim().length > 0)}
                 renderItem={(it: string) => (<List.Item>{it}</List.Item>)}
               />
