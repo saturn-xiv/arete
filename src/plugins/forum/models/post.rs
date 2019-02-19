@@ -32,6 +32,8 @@ pub trait Dao {
     fn get(&self, id: &i64) -> Result<Item>;
     fn update(&self, id: &i64, body: &String, media_type: &MediaType) -> Result<()>;
     fn latest(&self) -> Result<Vec<Item>>;
+    fn by_user(&self, id: &i64) -> Result<Vec<Item>>;
+    fn by_topic(&self, id: &i64) -> Result<Vec<Item>>;
     fn delete(&self, id: &i64) -> Result<()>;
 }
 
@@ -79,6 +81,20 @@ impl Dao for Connection {
     }
     fn latest(&self) -> Result<Vec<Item>> {
         let items = forum_posts::dsl::forum_posts
+            .order(forum_posts::dsl::updated_at.desc())
+            .load::<Item>(self)?;
+        Ok(items)
+    }
+    fn by_user(&self, id: &i64) -> Result<Vec<Item>> {
+        let items = forum_posts::dsl::forum_posts
+            .filter(forum_posts::dsl::user_id.eq(id))
+            .order(forum_posts::dsl::updated_at.desc())
+            .load::<Item>(self)?;
+        Ok(items)
+    }
+    fn by_topic(&self, id: &i64) -> Result<Vec<Item>> {
+        let items = forum_posts::dsl::forum_posts
+            .filter(forum_posts::dsl::topic_id.eq(id))
             .order(forum_posts::dsl::updated_at.desc())
             .load::<Item>(self)?;
         Ok(items)

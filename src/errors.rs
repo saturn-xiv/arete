@@ -43,6 +43,8 @@ pub enum Error {
     #[fail(display = "{}", _0)]
     R2d2(#[fail(cause)] r2d2::Error),
 
+    #[fail(display = "{}", _0)]
+    Http(Status),
     #[fail(display = "bad media type {}", _0)]
     BadMediaType(String),
     #[fail(display = "bad gender {}", _0)]
