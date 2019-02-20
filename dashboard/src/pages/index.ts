@@ -4,6 +4,26 @@ interface IPage {
 }
 
 const routes: IPage[] = [{
+  component: () => import('./forum/topics/Index'),
+  path: '/forum/topics',
+}, {
+  component: () => import('./forum/topics/Form'),
+  path: '/forum/topics/new',
+}, {
+  component: () => import('./forum/topics/Form'),
+  path: '/forum/topics/:id/edit',
+}, {
+  component: () => import('./forum/posts/Index'),
+  path: '/forum/posts',
+}, {
+  component: () => import('./forum/posts/Form'),
+  path: '/forum/posts/new',
+}, {
+  component: () => import('./forum/posts/Form'),
+  path: '/forum/posts/:id/edit',
+},
+
+{
   component: () => import('./attachments/Index'),
   path: '/attachments',
 }, {

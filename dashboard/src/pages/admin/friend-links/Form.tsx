@@ -5,31 +5,25 @@ import { FormattedMessage, InjectedIntlProps, injectIntl, intlShape } from 'reac
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 
-import { ISiteState } from '../../../actions'
 import { ILabel } from '../../../components'
 import { Authorized, RoleTypes } from '../../../components/authorized'
 import { formItemLayout } from '../../../components/form'
 import Layout from '../../../components/form/Layout'
 import Submit from '../../../components/form/Submit'
-import { IApplicationState } from '../../../reducers'
 import { httpGet, httpPost } from '../../../utils/request'
 
 const Option = Select.Option
 const FormItem = Form.Item
 
-interface IProps {
-  site: ISiteState,
-}
-
 interface IState {
   title: ILabel,
 }
 
-class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProps & FormComponentProps & IProps, IState> {
+class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProps & FormComponentProps, IState> {
   public static propTypes: React.ValidationMap<any> = {
     intl: intlShape.isRequired,
   }
-  constructor(props: RouteComponentProps<any> & InjectedIntlProps & FormComponentProps & IProps) {
+  constructor(props: RouteComponentProps<any> & InjectedIntlProps & FormComponentProps) {
     super(props)
     this.state = {
       title: { id: 'nut.admin.friend-links.new.title' }
@@ -140,13 +134,10 @@ class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProp
 }
 
 
-const mapStateToProps = ({ site }: IApplicationState) => ({
-  site
-})
+const mapStateToProps = () => ({})
 
 
-const mapDispatchToProps = () => ({
-})
+const mapDispatchToProps = () => ({})
 
 export default withRouter(connect(
   mapStateToProps,

@@ -11,7 +11,6 @@ import { Authorized, RoleTypes } from '../../../components/authorized'
 import { formItemLayout } from '../../../components/form'
 import Layout from '../../../components/form/Layout'
 import Submit from '../../../components/form/Submit'
-import { IApplicationState } from '../../../reducers'
 import { httpGet, httpPost } from '../../../utils/request'
 
 const FormItem = Form.Item
@@ -145,13 +144,10 @@ class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProp
 }
 
 
-const mapStateToProps = ({ site }: IApplicationState) => ({
-    site
-})
+const mapStateToProps = () => ({})
 
 
-const mapDispatchToProps = () => ({
-})
+const mapDispatchToProps = () => ({})
 
 export default withRouter(connect(
     mapStateToProps,

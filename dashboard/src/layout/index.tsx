@@ -133,7 +133,10 @@ function siderBar(user: IUserState): IMenu[] {
 
   if (process.env.REACT_APP_FEATURE_FORUM) {
     items.push({
-      children: [],
+      children: [
+        { children: (<FormattedMessage id="forum.topics.index.title" />), key: "to-/forum/topics" },
+        { children: (<FormattedMessage id="forum.posts.index.title" />), key: "to-/forum/posts" },
+      ],
       icon: 'snippets',
       key: 'forum',
       label: (<FormattedMessage id="forum.dashboard.title" />),

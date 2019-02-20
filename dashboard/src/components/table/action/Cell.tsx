@@ -8,14 +8,16 @@ import { ILabel } from '../..'
 interface IProps {
   confirmRemove: ILabel,
   onRemove: () => void,
-  toEdit?: string
+  toEdit?: string,
+  children?: React.ReactNode,
 }
 
 class Widget extends React.Component<RouteComponentProps<any> & IProps> {
   public render() {
-    const { history, toEdit } = this.props
+    const { children, history, toEdit } = this.props
     return (<Button.Group size="small">
       {toEdit && (<Button onClick={() => history.push(toEdit)} icon="edit" type="dashed" />)}
+      {children}
       <Popconfirm onConfirm={this.props.onRemove} title={<FormattedMessage {...this.props.confirmRemove} />}>
         <Button icon="delete" type="danger" />
       </Popconfirm>

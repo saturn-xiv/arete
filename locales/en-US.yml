@@ -286,6 +286,22 @@ album:
 forum:
   dashboard:
     title: Forum
+  topics:
+    index:
+      title: Topics
+      confirm: Are you sure to remove topic {title}?
+    new:
+      title: Add a new topic
+    edit:
+      title: Edit topic {title}
+  posts:
+    index:
+      title: Posts
+      confirm: Are you sure to remove post {id}?
+    new:
+      title: Add a new post
+    edit:
+      title: Edit post {id}
 cbeta:
   dashboard:
     title: CBETA
