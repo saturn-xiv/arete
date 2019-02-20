@@ -16,7 +16,13 @@ export interface IUserState {
 
 export interface ISiteState {
   readonly version?: string,
+  readonly who?: ICurrentUser,
   readonly languages: string[],
+}
+
+export interface ICurrentUser {
+  readonly logo: string,
+  readonly realName: string,
 }
 
 export const userSignIn = (token: string) => action(UserActionTypes.SIGN_IN, token)

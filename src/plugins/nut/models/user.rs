@@ -97,6 +97,28 @@ pub struct New<'a> {
     pub updated_at: &'a NaiveDateTime,
 }
 
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Show {
+    pub real_name: String,
+    pub nick_name: String,
+    pub email: String,
+    pub logo: String,
+    pub provider_type: String,
+}
+
+impl From<Item> for Show {
+    fn from(it: Item) -> Self {
+        Self {
+            real_name: it.real_name,
+            nick_name: it.nick_name,
+            logo: it.logo,
+            email: it.email,
+            provider_type: it.provider_type,
+        }
+    }
+}
+
 pub trait Dao {
     fn by_id(&self, id: &i64) -> Result<Item>;
     fn by_uid(&self, uid: &String) -> Result<Item>;
@@ -113,6 +135,7 @@ pub trait Dao {
     fn lock(&self, id: &i64, on: bool) -> Result<()>;
     fn confirm(&self, id: &i64) -> Result<()>;
     fn unlock(&self, id: &i64) -> Result<()>;
+    fn show(&self, id: &i64) -> Result<Show>;
     fn count(&self) -> Result<i64>;
     fn password<T: Encryptor>(&self, id: &i64, password: &String) -> Result<()>;
 }
@@ -232,6 +255,27 @@ impl Dao for Connection {
             ))
             .execute(self)?;
         Ok(())
+    }
+
+    fn show(&self, id: &i64) -> Result<Show> {
+        let (rn, nn, e, l, pt) = users::dsl::users
+            .select((
+                users::dsl::real_name,
+                users::dsl::nick_name,
+                users::dsl::email,
+                users::dsl::logo,
+                users::dsl::provider_type,
+            ))
+            .filter(users::dsl::id.eq(id))
+            .first::<(String, String, String, String, String)>(self)?;
+
+        Ok(Show {
+            real_name: rn,
+            nick_name: nn,
+            email: e,
+            logo: l,
+            provider_type: pt,
+        })
     }
 
     fn count(&self) -> Result<i64> {

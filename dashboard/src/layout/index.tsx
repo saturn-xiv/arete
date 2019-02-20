@@ -8,6 +8,7 @@ import { RouteComponentProps, withRouter } from 'react-router'
 import { Dispatch } from 'redux'
 
 import { ISiteState, IUserState, siteRefresh, userSignIn, userSignOut } from '../actions'
+// import * as logo from '../assets/cloud.svg'
 import { havePermission, RoleTypes } from '../components/authorized'
 import { set as setLocale } from '../intl'
 import { IApplicationState } from '../reducers'
@@ -243,7 +244,7 @@ class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProp
     }
   }
   public handleMenuItem = (e: ClickParam) => {
-    const { history, intl, signOut } = this.props
+    const { history, refresh, site, intl, signOut } = this.props
     const key = e.key
 
     const to = 'to-'
@@ -283,8 +284,9 @@ class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProp
             httpDelete('/users/sign-out')
               .then(() => message.success(intl.formatMessage({ id: 'flashes.success' })))
               .catch(message.error)
-            history.push('/users/sign-in')
             signOut()
+            refresh(Object.assign({}, site, { who: null }))
+            history.push('/users/sign-in')
           }
         });
         return
@@ -303,9 +305,15 @@ class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProp
     }
   }
   public render() {
+    const { who } = this.props.site
     return (<Layout>
       <Sider breakpoint="lg" collapsedWidth="0" trigger={null} collapsible={true} collapsed={this.state.collapsed}>
-        <div className="sider-logo" />
+        {who && (<div className="header-logo">
+          <a href="/" target="_blank">
+            <img src={who.logo} />
+            <h1>{who.realName}</h1>
+          </a>
+        </div>)}
         <Menu onClick={this.handleMenuItem} theme="dark" mode="inline" defaultSelectedKeys={[]}>
           {
             siderBar(this.props.user).map((it) => (<Menu.SubMenu
@@ -321,6 +329,9 @@ class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProp
           <Menu onClick={this.handleMenuItem} mode="horizontal">
             <Menu.Item key='toggle'>
               <Icon className="trigger" type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'} />
+            </Menu.Item>
+            <Menu.Item key='hi'>
+              <span />
             </Menu.Item>
             {
               headerBar(this.props.user).map((it) => (<Menu.Item

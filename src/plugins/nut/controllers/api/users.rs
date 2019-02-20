@@ -23,7 +23,7 @@ use super::super::super::{
     models::{
         log::{Dao as LogDao, Item as Log},
         policy::Dao as PolicyDao,
-        user::{Dao as UserDao, Item as User},
+        user::{Dao as UserDao, Item as User, Show as UserInfo},
     },
     request::CurrentUser,
     tasks::send_email,
@@ -104,7 +104,7 @@ pub fn sign_in(
     let token = jwt.sum(
         None,
         &Token {
-            uid: user.uid,
+            uid: user.uid.clone(),
             act: Action::SignIn,
             nbf: nbf,
             exp: exp,
@@ -115,7 +115,11 @@ pub fn sign_in(
                 .collect(),
         },
     )?;
-    Ok(json!({ "token": token }))
+    let user: UserInfo = user.into();
+    Ok(json!({
+        "token": token,
+        "info": user,
+    }))
 }
 
 #[derive(Debug, Validate, Deserialize)]

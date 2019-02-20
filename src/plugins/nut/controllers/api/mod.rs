@@ -19,18 +19,29 @@ use super::super::super::super::{
     i18n::{locale::Dao as LocaleDao, I18n},
     orm::Database,
 };
-use super::super::models::{
-    policy::{Dao as PolicyDao, Item as Policy, Role},
-    user::Dao as UserDao,
+use super::super::{
+    models::{
+        policy::{Dao as PolicyDao, Item as Policy, Role},
+        user::Dao as UserDao,
+    },
+    request::CurrentUser,
 };
 
 #[get("/about")]
-pub fn about(db: Database) -> JsonValueResult {
+pub fn about(user: Option<CurrentUser>, db: Database) -> JsonValueResult {
     let db = db.deref();
     let languages = LocaleDao::languages(db)?;
+    let user = match user {
+        Some(it) => {
+            let it = UserDao::show(db, &it.id)?;
+            Some(it)
+        }
+        None => None,
+    };
     Ok(json!({
         "languages": languages,
         "version": env::version(),
+        "who": user,
     }))
 }
 
