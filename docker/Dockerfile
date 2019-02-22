@@ -2,9 +2,9 @@ FROM ubuntu:latest
 
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt-get update
-RUN apt-get -y upgrade
-RUN apt-get -y install apt-utils apt-transport-https wget gnupg software-properties-common \ 
+RUN apt update
+RUN apt -y upgrade
+RUN apt -y install apt-utils apt-transport-https wget gnupg software-properties-common \ 
   curl build-essential cmake pkg-config dh-autoreconf dh-make checkinstall \
   cpio meson intltool libtool gawk texinfo bison bc zsh moreutils tree tzdata \
   libncurses5-dev \  
@@ -17,23 +17,23 @@ RUN apt-get -y install apt-utils apt-transport-https wget gnupg software-propert
 
 # RUN add-apt-repository -y ppa:webupd8team/java
 # RUN echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | debconf-set-selections
-# RUN apt-get update
-# RUN apt-get -y install oracle-java8-installer
+# RUN apt update
+# RUN apt -y install oracle-java8-installer
 
 # RUN wget -O - "https://artifacts.elastic.co/GPG-KEY-elasticsearch" | apt-key add -
 # RUN echo "deb https://artifacts.elastic.co/packages/6.x/apt stable main" > /etc/apt/sources.list.d/elasticsearch.list
-# RUN apt-get update
-# RUN apt-get -y install elasticsearch
+# RUN apt update
+# RUN apt -y install elasticsearch
 
 # http://www.rabbitmq.com/which-erlang.html
 RUN wget -O - "https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-release-signing-key.asc" | apt-key add -
 RUN echo "deb https://dl.bintray.com/rabbitmq-erlang/debian `lsb_release -c -s` erlang" > /etc/apt/sources.list.d/rabbitmq.list
 RUN echo "deb https://dl.bintray.com/rabbitmq/debian `lsb_release -c -s` main" >> /etc/apt/sources.list.d/rabbitmq.list
-RUN apt-get update
-RUN apt-get -y install rabbitmq-server
+RUN apt update
+RUN apt -y install rabbitmq-server
 
-RUN apt-get -y autoremove
-RUN apt-get -y clean
+RUN apt -y autoremove
+RUN apt -y clean
 
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
 RUN locale-gen
