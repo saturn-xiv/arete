@@ -5,10 +5,8 @@ use diesel::{insert_into, prelude::*};
 use ipnetwork::IpNetwork;
 use serde_json::Value;
 
-use super::super::super::super::{
-    errors::Result,
-    orm::{schema::survey_responses, Connection},
-};
+use super::super::super::super::{errors::Result, orm::Connection};
+use super::super::schema::survey_responses;
 
 #[derive(Queryable)]
 pub struct Item {

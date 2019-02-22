@@ -10,6 +10,13 @@ use diesel::{connection::SimpleConnection, delete, insert_into, prelude::*, upda
 use super::super::{errors::Result, rfc::RFC822};
 use super::{schema::schema_migrations, Connection};
 
+pub struct Migration {
+    pub version: &'static str,
+    pub name: &'static str,
+    pub up: &'static str,
+    pub down: &'static str,
+}
+
 pub const UP: &'static str = include_str!("up.sql");
 
 pub fn new(name: String) -> Result<()> {
@@ -95,14 +102,14 @@ impl<'a> PartialEq for New<'a> {
     }
 }
 
-pub trait Migration {
+pub trait Dao {
     fn load(&self) -> Result<()>;
     fn migrate(&self) -> Result<()>;
     fn rollback(&self) -> Result<()>;
     fn versions(&self) -> Result<Vec<Item>>;
 }
 
-impl Migration for Connection {
+impl Dao for Connection {
     fn load(&self) -> Result<()> {
         self.batch_execute(UP)?;
         for it in fs::read_dir(root_dir())? {

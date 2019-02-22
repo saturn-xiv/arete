@@ -1,15 +1,19 @@
-pub mod catchers;
-pub mod controllers;
+// pub mod catchers;
+// pub mod controllers;
 pub mod models;
-pub mod request;
-pub mod tasks;
+// pub mod request;
+// pub mod tasks;
+pub mod schema;
 
 use std::fmt;
 use std::str::FromStr;
 
 use failure::Error as FailureError;
 
-use super::super::errors::{Error, Result};
+use super::super::{
+    errors::{Error, Result},
+    orm::migration::Migration,
+};
 
 pub enum MediaType {
     TEXT,
@@ -38,4 +42,22 @@ impl FromStr for MediaType {
             t => Err(Error::BadMediaType(t.to_string()).into()),
         }
     }
+}
+
+lazy_static! {
+    static ref AUTH: Migration = Migration {
+        name: "create-auth",
+        version: "20190101053052",
+        up: include_str!("auth-up.sql"),
+        down: include_str!("auth-down.sql"),
+    };
+}
+
+lazy_static! {
+    static ref SITE: Migration = Migration {
+        name: "create-site",
+        version: "20190101053059",
+        up: include_str!("site-up.sql"),
+        down: include_str!("site-down.sql"),
+    };
 }

@@ -1,13 +1,8 @@
 use chrono::{NaiveDateTime, Utc};
 use diesel::{delete, insert_into, prelude::*, update};
 
-use super::super::super::super::{
-    errors::Result,
-    orm::{
-        schema::{tag_resources, tags},
-        Connection,
-    },
-};
+use super::super::super::super::{errors::Result, orm::Connection};
+use super::super::schema::{tag_resources, tags};
 
 #[derive(Queryable, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -26,8 +21,8 @@ pub trait Dao {
     fn update(&self, id: &i64, name: &String, icon: &String, color: &String) -> Result<()>;
     fn all(&self) -> Result<Vec<Item>>;
     fn delete(&self, id: &i64) -> Result<()>;
-    fn bind(&self, tag: &i64, rty: &String, rid: &i64) -> Result<()>;
-    fn unbind(&self, tag: &i64, rty: &String, rid: &i64) -> Result<()>;
+    fn bind(&self, tags: &[i64], rty: &String, rid: &i64) -> Result<()>;
+    fn unbind(&self, rty: &String, rid: &i64) -> Result<()>;
     fn resources(&self, tag: &i64) -> Result<Vec<(String, i64)>>;
 }
 
@@ -78,22 +73,24 @@ impl Dao for Connection {
         Ok(())
     }
 
-    fn bind(&self, tag: &i64, rty: &String, rid: &i64) -> Result<()> {
+    fn bind(&self, tags: &[i64], rty: &String, rid: &i64) -> Result<()> {
         let now = Utc::now().naive_utc();
-        insert_into(tag_resources::dsl::tag_resources)
-            .values((
-                tag_resources::dsl::tag_id.eq(tag),
-                tag_resources::dsl::resource_id.eq(rid),
-                tag_resources::dsl::resource_type.eq(rty),
-                tag_resources::dsl::created_at.eq(&now),
-            ))
-            .execute(self)?;
+        for it in tags {
+            insert_into(tag_resources::dsl::tag_resources)
+                .values((
+                    tag_resources::dsl::tag_id.eq(it),
+                    tag_resources::dsl::resource_id.eq(rid),
+                    tag_resources::dsl::resource_type.eq(rty),
+                    tag_resources::dsl::created_at.eq(&now),
+                ))
+                .execute(self)?;
+        }
         Ok(())
     }
-    fn unbind(&self, tag: &i64, rty: &String, rid: &i64) -> Result<()> {
+
+    fn unbind(&self, rty: &String, rid: &i64) -> Result<()> {
         delete(
             tag_resources::dsl::tag_resources
-                .filter(tag_resources::dsl::tag_id.eq(tag))
                 .filter(tag_resources::dsl::resource_type.eq(rty))
                 .filter(tag_resources::dsl::resource_id.eq(rid)),
         )

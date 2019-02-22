@@ -4,11 +4,8 @@ use chrono::NaiveDateTime;
 use diesel::{delete, insert_into, prelude::*};
 use ipnetwork::IpNetwork;
 
-use super::super::super::super::{
-    errors::Result,
-    orm::{schema::leave_words, Connection},
-};
-use super::super::MediaType;
+use super::super::super::super::{errors::Result, orm::Connection};
+use super::super::{schema::leave_words, MediaType};
 
 #[derive(Queryable, Serialize)]
 #[serde(rename_all = "camelCase")]

@@ -6,10 +6,8 @@ use chrono::{Duration, NaiveDate, NaiveDateTime, Utc};
 use diesel::{delete, insert_into, prelude::*, update};
 use failure::Error;
 
-use super::super::super::super::{
-    errors::Result,
-    orm::{schema::policies, Connection},
-};
+use super::super::super::super::{errors::Result, orm::Connection};
+use super::super::schema::policies;
 
 #[derive(Queryable, Serialize)]
 #[serde(rename_all = "camelCase")]

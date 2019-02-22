@@ -1,14 +1,12 @@
 use chrono::{NaiveDateTime, Utc};
 use diesel::{delete, insert_into, prelude::*, update};
 
-use super::super::super::super::{
-    errors::Result,
-    orm::{
-        schema::{forum_topics, forum_topics_categories, forum_topics_tags},
-        Connection,
-    },
+use super::super::super::super::{errors::Result, orm::Connection};
+use super::super::super::nut::{
+    models::{category::Dao as CategoryDao, tag::Dao as TagDao},
+    MediaType,
 };
-use super::super::super::nut::MediaType;
+use super::super::schema::forum_topics;
 
 #[derive(Queryable, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -68,24 +66,10 @@ impl Dao for Connection {
             ))
             .returning(forum_topics::dsl::id)
             .get_result(self)?;
-        for it in tags {
-            insert_into(forum_topics_tags::dsl::forum_topics_tags)
-                .values((
-                    forum_topics_tags::dsl::tag_id.eq(&it),
-                    forum_topics_tags::dsl::topic_id.eq(&id),
-                    forum_topics_tags::dsl::created_at.eq(&now),
-                ))
-                .execute(self)?;
-        }
-        for it in categories {
-            insert_into(forum_topics_categories::dsl::forum_topics_categories)
-                .values((
-                    forum_topics_categories::dsl::category_id.eq(&it),
-                    forum_topics_categories::dsl::topic_id.eq(&id),
-                    forum_topics_categories::dsl::created_at.eq(&now),
-                ))
-                .execute(self)?;
-        }
+
+        CategoryDao::bind(self, tags, &RESOURCE_TYPE.to_string(), &id)?;
+        TagDao::bind(self, categories, &RESOURCE_TYPE.to_string(), &id)?;
+
         Ok(id)
     }
     fn get(&self, id: &i64) -> Result<Item> {
@@ -114,35 +98,11 @@ impl Dao for Connection {
             ))
             .execute(self)?;
 
-        delete(
-            forum_topics_tags::dsl::forum_topics_tags
-                .filter(forum_topics_tags::dsl::topic_id.eq(id)),
-        )
-        .execute(self)?;
-        for it in tags {
-            insert_into(forum_topics_tags::dsl::forum_topics_tags)
-                .values((
-                    forum_topics_tags::dsl::tag_id.eq(&it),
-                    forum_topics_tags::dsl::topic_id.eq(id),
-                    forum_topics_tags::dsl::created_at.eq(&now),
-                ))
-                .execute(self)?;
-        }
+        CategoryDao::unbind(self, &RESOURCE_TYPE.to_string(), id)?;
+        CategoryDao::bind(self, tags, &RESOURCE_TYPE.to_string(), id)?;
+        TagDao::unbind(self, &RESOURCE_TYPE.to_string(), id)?;
+        TagDao::bind(self, &categories, &RESOURCE_TYPE.to_string(), id)?;
 
-        delete(
-            forum_topics_categories::dsl::forum_topics_categories
-                .filter(forum_topics_categories::dsl::topic_id.eq(id)),
-        )
-        .execute(self)?;
-        for it in categories {
-            insert_into(forum_topics_categories::dsl::forum_topics_categories)
-                .values((
-                    forum_topics_categories::dsl::category_id.eq(&it),
-                    forum_topics_categories::dsl::topic_id.eq(id),
-                    forum_topics_categories::dsl::created_at.eq(&now),
-                ))
-                .execute(self)?;
-        }
         Ok(())
     }
     fn latest(&self) -> Result<Vec<Item>> {
@@ -159,18 +119,12 @@ impl Dao for Connection {
         Ok(items)
     }
     fn delete(&self, id: &i64) -> Result<()> {
-        delete(
-            forum_topics_tags::dsl::forum_topics_tags
-                .filter(forum_topics_tags::dsl::topic_id.eq(id)),
-        )
-        .execute(self)?;
-        delete(
-            forum_topics_categories::dsl::forum_topics_categories
-                .filter(forum_topics_categories::dsl::topic_id.eq(id)),
-        )
-        .execute(self)?;
+        CategoryDao::unbind(self, &RESOURCE_TYPE.to_string(), id)?;
+        TagDao::unbind(self, &RESOURCE_TYPE.to_string(), id)?;
         delete(forum_topics::dsl::forum_topics.filter(forum_topics::dsl::id.eq(id)))
             .execute(self)?;
         Ok(())
     }
 }
+
+pub const RESOURCE_TYPE: &'static str = "forum.topic";

@@ -10,8 +10,9 @@ use uuid::Uuid;
 use super::super::super::super::{
     crypto::Encryptor,
     errors::{Error, Result},
-    orm::{schema::users, Connection},
+    orm::Connection,
 };
+use super::super::schema::users;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum Type {

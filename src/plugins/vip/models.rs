@@ -7,8 +7,9 @@ use serde_json::{from_value, to_value, Value};
 
 use super::super::super::{
     errors::{Error, Result},
-    orm::{schema::vip_members, Connection},
+    orm::Connection,
 };
+use super::schema::vip_members;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum Gender {

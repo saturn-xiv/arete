@@ -66,7 +66,7 @@ pub mod jwt;
 pub mod oauth;
 pub mod orm;
 pub mod parser;
-// pub mod plugins;
+pub mod plugins;
 pub mod queue;
 pub mod redis;
 pub mod request;

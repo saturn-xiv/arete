@@ -1,11 +1,9 @@
 use chrono::{NaiveDateTime, Utc};
 use diesel::{delete, insert_into, prelude::*, update};
 
-use super::super::super::super::{
-    errors::Result,
-    orm::{schema::forum_posts, Connection},
-};
+use super::super::super::super::{errors::Result, orm::Connection};
 use super::super::super::nut::MediaType;
+use super::super::schema::forum_posts;
 
 #[derive(Queryable, Serialize)]
 #[serde(rename_all = "camelCase")]

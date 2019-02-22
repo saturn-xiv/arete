@@ -5,9 +5,22 @@ use diesel::{insert_into, prelude::*, update};
 use serde::{de::DeserializeOwned, ser::Serialize};
 use serde_json;
 
-use super::{crypto::Encryptor, errors::Result, orm::Connection};
+use super::{
+    crypto::Encryptor,
+    errors::Result,
+    orm::{migration::Migration, Connection},
+};
 
 use self::schema::settings;
+
+lazy_static! {
+    static ref MIGRATION: Migration = Migration {
+        name: "create-settings",
+        version: "20190101053042",
+        up: include_str!("up.sql"),
+        down: include_str!("down.sql"),
+    };
+}
 
 #[derive(Queryable)]
 pub struct Item {

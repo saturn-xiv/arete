@@ -1,13 +1,8 @@
 use chrono::{NaiveDateTime, Utc};
 use diesel::{delete, insert_into, prelude::*, update};
 
-use super::super::super::super::{
-    errors::Result,
-    orm::{
-        schema::{categories, category_resources},
-        Connection,
-    },
-};
+use super::super::super::super::{errors::Result, orm::Connection};
+use super::super::schema::{categories, category_resources};
 
 #[derive(Queryable, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -43,8 +38,8 @@ pub trait Dao {
     ) -> Result<()>;
     fn all(&self) -> Result<Vec<Item>>;
     fn delete(&self, id: &i64) -> Result<()>;
-    fn bind(&self, category: &i64, rty: &String, rid: &i64) -> Result<()>;
-    fn unbind(&self, category: &i64, rty: &String, rid: &i64) -> Result<()>;
+    fn bind(&self, categories: &[i64], rty: &String, rid: &i64) -> Result<()>;
+    fn unbind(&self, rty: &String, rid: &i64) -> Result<()>;
     fn resources(&self, category: &i64, rty: &String) -> Result<Vec<i64>>;
     fn children(&self, category: &Option<i64>) -> Result<Vec<Item>>;
 }
@@ -124,22 +119,23 @@ impl Dao for Connection {
         Ok(())
     }
 
-    fn bind(&self, category: &i64, rty: &String, rid: &i64) -> Result<()> {
+    fn bind(&self, categories: &[i64], rty: &String, rid: &i64) -> Result<()> {
         let now = Utc::now().naive_utc();
-        insert_into(category_resources::dsl::category_resources)
-            .values((
-                category_resources::dsl::category_id.eq(&category),
-                category_resources::dsl::resource_id.eq(&rid),
-                category_resources::dsl::resource_type.eq(&rty),
-                category_resources::dsl::created_at.eq(&now),
-            ))
-            .execute(self)?;
+        for it in categories {
+            insert_into(category_resources::dsl::category_resources)
+                .values((
+                    category_resources::dsl::category_id.eq(it),
+                    category_resources::dsl::resource_id.eq(&rid),
+                    category_resources::dsl::resource_type.eq(&rty),
+                    category_resources::dsl::created_at.eq(&now),
+                ))
+                .execute(self)?;
+        }
         Ok(())
     }
-    fn unbind(&self, category: &i64, rty: &String, rid: &i64) -> Result<()> {
+    fn unbind(&self, rty: &String, rid: &i64) -> Result<()> {
         delete(
             category_resources::dsl::category_resources
-                .filter(category_resources::dsl::category_id.eq(category))
                 .filter(category_resources::dsl::resource_type.eq(rty))
                 .filter(category_resources::dsl::resource_id.eq(rid)),
         )

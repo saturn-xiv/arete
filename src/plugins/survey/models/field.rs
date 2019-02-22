@@ -2,10 +2,8 @@ use chrono::{NaiveDateTime, Utc};
 use diesel::{delete, insert_into, prelude::*, update};
 use serde_json::{from_value, to_value, Value};
 
-use super::super::super::super::{
-    errors::Result,
-    orm::{schema::survey_fields, Connection},
-};
+use super::super::super::super::{errors::Result, orm::Connection};
+use super::super::schema::survey_fields;
 
 #[derive(Queryable)]
 pub struct Item {

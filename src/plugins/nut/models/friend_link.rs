@@ -1,10 +1,8 @@
 use chrono::{NaiveDateTime, Utc};
 use diesel::{delete, insert_into, prelude::*, update};
 
-use super::super::super::super::{
-    errors::Result,
-    orm::{schema::friend_links, Connection},
-};
+use super::super::super::super::{errors::Result, orm::Connection};
+use super::super::schema::friend_links;
 
 #[derive(Queryable, Serialize)]
 #[serde(rename_all = "camelCase")]

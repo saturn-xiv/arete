@@ -1,11 +1,8 @@
 use chrono::{NaiveDateTime, Utc};
 use diesel::{delete, insert_into, prelude::*, update};
 
-use super::super::super::super::{
-    errors::Result,
-    orm::{schema::cards, Connection},
-};
-use super::super::MediaType;
+use super::super::super::super::{errors::Result, orm::Connection};
+use super::super::{schema::cards, MediaType};
 
 #[derive(Queryable, Serialize)]
 #[serde(rename_all = "camelCase")]

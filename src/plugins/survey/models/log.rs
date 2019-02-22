@@ -4,10 +4,8 @@ use chrono::{NaiveDateTime, Utc};
 use diesel::{insert_into, prelude::*};
 use ipnetwork::IpNetwork;
 
-use super::super::super::super::{
-    errors::Result,
-    orm::{schema::survey_logs, Connection},
-};
+use super::super::super::super::{errors::Result, orm::Connection};
+use super::super::schema::survey_logs;
 
 #[derive(Queryable)]
 pub struct Item {
