@@ -6,6 +6,7 @@ description = "A web application by Rust and React."
 homepage = "https://github.com/saturn-xiv/arete"
 license = "MIT"
 readme = "README.md"
+build = "build.rs"
 
 [profile.release]
 lto = true
@@ -32,7 +33,9 @@ tokio-io = "0.1"
 tokio-codec = "0.1"
 failure = "0.1"
 language-tags = "0.2"
-hyper = "0.10" # https://github.com/SergioBenitez/Rocket/blob/v0.4/core/http/Cargo.toml
+hyper = "0.12"
+juniper = "0.10"
+juniper_hyper = "0.1"
 r2d2_redis = "0.8"
 lapin-futures = "0.15"
 nix = "0.13"
@@ -43,7 +46,6 @@ md5 = "0.6"
 git2 = "0.8"
 ssh2 = "0.3"
 mime = "0.3"
-rocket = "0.4"
 robots_txt = "0.6"
 sitemap = "0.3"
 ipnetwork = "0.13" 
@@ -70,7 +72,7 @@ features = ["serde"]
 [dependencies.multipart]
 version = "0.16"
 default-features = false
-features = ["rocket", "server"]
+features = ["server"]
 
 [dependencies.chrono-tz]
 version = "0.5"
@@ -88,17 +90,16 @@ features=["query_encoding"]
 version = "0.7"
 features = ["v4"]
 
+[dependencies.openssl-sys]
+version = "*"
+features = ["vendored"]
+
 [dependencies.diesel]
 version = "1"
 features = ["postgres", "chrono", "serde_json", "uuid", "network-address", "numeric", "r2d2", "128-column-tables"]
 
-[dependencies.rocket_contrib]
-version = "0.4"
-default-features = false
-features = ["tera_templates", "handlebars_templates", "diesel_postgres_pool", "redis_pool", "json", "serve", "uuid", "helmet"]
-
 [package.metadata.deb]
-depends = "$auto, systemd, nodejs, npm"
+depends = "$auto, nginx, nodejs, npm"
 section = "admin"
 priority = "optional"
 maintainer-scripts = "scripts"
