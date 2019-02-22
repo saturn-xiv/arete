@@ -1,5 +1,3 @@
-#![feature(proc_macro_hygiene, decl_macro)]
-
 #[macro_use]
 extern crate serde_derive;
 #[macro_use]
@@ -11,16 +9,13 @@ extern crate validator_derive;
 #[macro_use]
 extern crate diesel;
 #[macro_use]
-extern crate rocket;
-#[macro_use]
-extern crate rocket_contrib;
-#[macro_use]
 extern crate failure;
 
 extern crate base64;
 extern crate chrono;
 extern crate chrono_tz;
 extern crate clap;
+extern crate cookie;
 extern crate encoding_rs;
 extern crate eui48;
 extern crate futures;
@@ -29,6 +24,8 @@ extern crate hex;
 extern crate hyper;
 extern crate ipnetwork;
 extern crate jsonwebtoken;
+extern crate juniper;
+extern crate juniper_hyper;
 extern crate language_tags;
 extern crate lapin_futures as lapin;
 extern crate lettre;
@@ -69,9 +66,10 @@ pub mod jwt;
 pub mod oauth;
 pub mod orm;
 pub mod parser;
-pub mod plugins;
+// pub mod plugins;
 pub mod queue;
 pub mod redis;
+pub mod request;
 pub mod rfc;
 pub mod settings;
 pub mod sys;

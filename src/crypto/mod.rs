@@ -20,7 +20,7 @@ pub struct Key(pub String);
 
 impl Default for Key {
     fn default() -> Self {
-        Self(base64::encode(&sodium::Encryptor::random(32)))
+        Key(base64::encode(&sodium::Encryptor::random(32)))
     }
 }
 
