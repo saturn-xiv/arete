@@ -2,63 +2,27 @@
 
 A web application by Rust and React.
 
-## Clone source code
+## Build
+
+Please install docker, redis, postgresql, rabbitmq at first.
 
 ```bash
-$ git clone https://github.com/saturn-xiv/arete.git ~/workspace/arete
+$ git clone https://github.com/saturn-xiv/arete.git ~/workspace/arete # clone source code
+$ cd arete
+$ docker run --rm -it -v `pwd`:/workspace chonglou/arete:latest # start docker container
+> make assets # build frontend application
+> cargo deb # build for debian/ubuntu package(NEED BUILD ASSETS AT FIRST)
+> make package # for statically link package
 ```
 
-## Start docker
+## How to use
 
-```bash
-$ docker pull chonglou/arete:latest 
-$ docker create --name arete -p 2222:22 -p 8080:8080 -p 3000:3000 -p 15672:15672 -v $HOME/.ssh:/home/deploy/.ssh -v $HOME/workspace:/workspace chonglou/arete:latest 
-$ docker start arete 
-```
-
-## Log into docker
-
-```bash
-$ ssh -p 2222 deploy@localhost # default password is 'hi'
-> cd /workspace/arete
-> make npm # install frontend dependencies
-> make check # build backend and documents
-```
-
-## Development
-
-- Create database
-
-```bash
-> psql -U postgres
-  CREATE DATABASE arete;
-```
-
-- Create rabbitmq virtual host
-
-```bash
-> rabbitmqctl add_vhost /arete
-```
-
-- Usage
- 
-```bash
-> ./target/debug/arete generate:config # please fix config.toml then
-> ./target/debug/arete database:migrate # migrate database
-> ./target/debug/arete i18n:sync -d locales # import locale items
-> cargo run # http://localhost:8080
-> cd dashboard && npm start # http://localhost:3000/my/
-```
-**Create the admin in http://localhost:3000/my/install** 
-
-## Deployment
-
-```bash
-> make npm
-> make
-> cargo deb
-> dpkg-deb --contents target/debian/arete_0.1.0_amd64.deb
-```
+* Generate **config.toml** `arete generate:config`, then change it if you need
+* Migrate database `arete database:migrate`
+* Import locale records `arete i18n:sync -d /usr/share/arete/locales`
+* Generate nginx config file `arete generate:nginx`, then mv it into **/etc/nginx/sites-enabled/** and restart nginx
+* Generate systemd config file `arete generate:systemd`, then mv it into **/lib/systemd/system/** and start it
+* Create the admin in http://YOUR-HOST/my/install** 
 
 ## Documents
 
