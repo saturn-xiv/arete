@@ -18,4 +18,6 @@ clean:
 	cd dashboard && rm -rf build
 
 schema:
-	DATABASE_URL="postgres://postgres:@localhost:5432/arete" diesel print-schema > src/orm/schema.rs
+	diesel print-schema -o schema_migrations > src/orm/schema.rs
+	diesel print-schema -o settings > src/settings/schema.rs
+	diesel print-schema -o locales > src/i18n/schema.rs
