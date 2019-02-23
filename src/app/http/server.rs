@@ -43,6 +43,7 @@ pub fn launch(cfg: Config) -> Result<()> {
         let ctx = ctx.clone();
         let pool = pool.clone();
         service_fn(move |req| -> Box<Future<Item = _, Error = _> + Send> {
+            info!("{:?} {} {}", req.version(), req.method(), req.uri());
             let root = root.clone();
             let ctx = ctx.clone();
             let pool = pool.clone();
