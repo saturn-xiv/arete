@@ -9,8 +9,7 @@ use serde_json;
 use validator::Validate;
 
 use super::super::super::super::{
-    crypto::sodium::Encryptor as Sodium, errors::Result, orm::Pool as DbPool, queue::Handler,
-    settings::Dao as SettingsDao,
+    errors::Result, graphql::context::Context, queue::Handler, settings::Dao as SettingsDao,
 };
 
 #[derive(Debug, Validate, Serialize, Deserialize)]
@@ -65,12 +64,8 @@ impl Into<Result<Email>> for Job {
     }
 }
 
-pub struct Printer {}
-
-impl Printer {
-    pub fn new(_dbp: DbPool, _enc: Arc<Sodium>) -> Self {
-        Self {}
-    }
+pub struct Printer {
+    pub ctx: Arc<Context>,
 }
 
 impl Handler for Printer {
@@ -82,14 +77,7 @@ impl Handler for Printer {
 }
 
 pub struct SendEmail {
-    dbp: DbPool,
-    enc: Arc<Sodium>,
-}
-
-impl SendEmail {
-    pub fn new(dbp: DbPool, enc: Arc<Sodium>) -> Self {
-        Self { dbp: dbp, enc: enc }
-    }
+    pub ctx: Arc<Context>,
 }
 
 impl Handler for SendEmail {
@@ -97,10 +85,9 @@ impl Handler for SendEmail {
         let task: Task = serde_json::from_slice(&payload)?;
 
         info!("send email: {}<{}> {}", task.name, task.email, task.subject);
-        let db = self.dbp.get()?;
+        let db = self.ctx.db()?;
         let db = db.deref();
-        let enc = self.enc.deref();
-        let cfg: Config = SettingsDao::get(db, enc, &NAME.to_string())?;
+        let cfg: Config = SettingsDao::get(db, &self.ctx.encryptor, &NAME.to_string())?;
 
         let mut mailer = SmtpClient::new_simple(&cfg.host)?
             .credentials(Credentials::new(cfg.email.clone(), cfg.password.clone()))

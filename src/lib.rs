@@ -10,6 +10,8 @@ extern crate validator_derive;
 extern crate diesel;
 #[macro_use]
 extern crate failure;
+#[macro_use]
+extern crate juniper;
 
 extern crate base64;
 extern crate chrono;
@@ -19,12 +21,12 @@ extern crate cookie;
 extern crate encoding_rs;
 extern crate eui48;
 extern crate futures;
+extern crate futures_cpupool;
 extern crate git2;
 extern crate hex;
 extern crate hyper;
 extern crate ipnetwork;
 extern crate jsonwebtoken;
-extern crate juniper;
 extern crate juniper_hyper;
 extern crate language_tags;
 extern crate lapin_futures as lapin;
@@ -61,6 +63,7 @@ pub mod cache;
 pub mod crypto;
 pub mod env;
 pub mod errors;
+pub mod graphql;
 pub mod i18n;
 pub mod jwt;
 pub mod oauth;

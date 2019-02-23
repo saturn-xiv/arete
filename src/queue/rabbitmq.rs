@@ -17,10 +17,7 @@ use serde::ser::Serialize;
 use serde_json;
 use tokio::{net::TcpStream, runtime::Runtime};
 
-use super::super::{
-    env::NAME,
-    errors::{Error, Result},
-};
+use super::super::errors::{Error, Result};
 use super::{Handler, Queue};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -40,7 +37,7 @@ impl Default for Config {
             port: 5672,
             username: "guest".to_string(),
             password: "guest".to_string(),
-            virtual_host: format!("/{}", NAME),
+            virtual_host: "dev".to_string(),
         }
     }
 }

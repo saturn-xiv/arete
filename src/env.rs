@@ -44,9 +44,7 @@ pub struct Config {
 pub struct Http {
     pub port: u16,
     pub theme: String,
-    pub workers: u16,
-    pub limits: u64,
-    pub keep_alive: Option<u32>,
+    pub workers: usize,
 }
 
 impl Default for Http {
@@ -54,9 +52,7 @@ impl Default for Http {
         Self {
             port: 8080,
             workers: 1 << 3,
-            limits: 1 << 5,
             theme: "bootstrap".to_string(),
-            keep_alive: Some(120),
         }
     }
 }

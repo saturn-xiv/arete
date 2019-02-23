@@ -52,7 +52,7 @@ pub trait Dao {
     fn by_lang_and_code(&self, lang: &String, code: &String) -> Result<Item>;
     fn delete(&self, id: &i64) -> Result<()>;
     fn create(&self, lang: &String, code: &String, message: &String) -> Result<()>;
-    fn update(&self, id: &i64, lang: &String, code: &String, message: &String) -> Result<()>;
+    fn update(&self, id: &i64, code: &String, message: &String) -> Result<()>;
 }
 
 fn loop_yaml(
@@ -176,12 +176,11 @@ impl Dao for Connection {
             .first::<Item>(self)?;
         Ok(it)
     }
-    fn update(&self, id: &i64, lang: &String, code: &String, message: &String) -> Result<()> {
+    fn update(&self, id: &i64, code: &String, message: &String) -> Result<()> {
         let now = Utc::now().naive_utc();
         let it = locales::dsl::locales.filter(locales::dsl::id.eq(id));
         update(it)
             .set((
-                locales::dsl::lang.eq(lang),
                 locales::dsl::code.eq(code),
                 locales::dsl::message.eq(message),
                 locales::dsl::updated_at.eq(&now),
