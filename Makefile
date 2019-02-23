@@ -1,5 +1,8 @@
 dist=dist
 
+deb: react
+	cargo deb
+
 musl: react
 	mkdir -pv $(dist)	
 	PKG_CONFIG_ALLOW_CROSS=1 cargo build --release --target=x86_64-unknown-linux-musl	
@@ -13,8 +16,8 @@ react:
 	cd dashboard && (if [ ! -d "node_modules" ]; then npm install; fi) && npm run build
 
 clean:
-	rm -rv $(dist) $(dist).tar.xz node_modules
 	cargo clean
+	rm -rf $(dist) $(dist).tar.xz node_modules
 	cd dashboard && rm -rf build node_modules
 
 schema:
