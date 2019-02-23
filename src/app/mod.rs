@@ -62,9 +62,8 @@ pub fn launch() -> Result<()> {
         );
     }
 
-    if let Some(matches) = matches.subcommand_matches(i18n::sync::COMMAND_NAME) {
-        let dir = matches.value_of(i18n::sync::ARG_DIR_NAME).unwrap();
-        return i18n::sync::run(cfg, dir.to_string());
+    if let Some(_) = matches.subcommand_matches(i18n::sync::COMMAND_NAME) {
+        return i18n::sync::run(cfg);
     }
 
     if let Some(_) = matches.subcommand_matches(database::migrate::COMMAND_NAME) {

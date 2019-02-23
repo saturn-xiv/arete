@@ -1,7 +1,3 @@
-use std::ffi::OsStr;
-use std::fs;
-use std::path::Path;
-
 use chrono::{NaiveDateTime, Utc};
 use diesel::{delete, insert_into, prelude::*, update};
 use yaml_rust::{Yaml, YamlLoader};
@@ -41,8 +37,13 @@ pub struct New<'a> {
     pub updated_at: &'a NaiveDateTime,
 }
 
+pub struct File<'a> {
+    pub lang: &'a str,
+    pub body: &'a str,
+}
+
 pub trait Dao {
-    fn sync<P: AsRef<Path>>(&self, root: P) -> Result<(usize, usize)>;
+    fn sync(&self, &Vec<File>) -> Result<(usize, usize)>;
     fn languages(&self) -> Result<Vec<String>>;
     fn count(&self, lang: &String) -> Result<i64>;
     fn all(&self) -> Result<Vec<Item>>;
@@ -60,7 +61,7 @@ fn loop_yaml(
     prefix: Option<String>,
     node: Yaml,
 ) -> Result<(usize, usize)> {
-    let mut finded = 0;
+    let mut find = 0;
     let mut inserted = 0;
     let sep = ".";
     match node {
@@ -70,7 +71,7 @@ fn loop_yaml(
                 None => "".to_string(),
             };
             // debug!("find {} {} => {}", lang, k, v);
-            finded += 1;
+            find += 1;
 
             let cnt: i64 = locales::dsl::locales
                 .count()
@@ -103,7 +104,7 @@ fn loop_yaml(
                             v,
                         )?;
                         inserted += i;
-                        finded += f;
+                        find += f;
                     }
                     k => {
                         error!("bad key {:?}", k);
@@ -115,34 +116,24 @@ fn loop_yaml(
             error!("bad key {:?}", k);
         }
     };
-    Ok((inserted, finded))
+    Ok((inserted, find))
 }
 
 impl Dao for Connection {
-    fn sync<P: AsRef<Path>>(&self, root: P) -> Result<(usize, usize)> {
-        let mut finded = 0;
+    fn sync(&self, items: &Vec<File>) -> Result<(usize, usize)> {
+        let mut find = 0;
         let mut inserted = 0;
-        let ext = "yml";
 
-        for it in fs::read_dir(root)? {
-            let it = it?.path();
-            if Some(OsStr::new(ext)) == it.extension() {
-                let buf = fs::read_to_string(&it)?;
-                if let Some(name) = it.file_name() {
-                    if let Some(name) = name.to_str() {
-                        let lang = &name[..(name.len() - ext.len() - 1)];
-                        info!("find locale {}", lang);
-                        for it in YamlLoader::load_from_str(&buf)? {
-                            let (i, f) = loop_yaml(&self, lang, None, it)?;
-                            inserted += i;
-                            finded += f;
-                        }
-                    }
-                }
+        for it in items {
+            info!("find locale {}", it.lang);
+            for node in YamlLoader::load_from_str(it.body)? {
+                let (i, f) = loop_yaml(&self, it.lang, None, node)?;
+                inserted += i;
+                find += f;
             }
         }
 
-        Ok((inserted, finded))
+        Ok((inserted, find))
     }
 
     fn languages(&self) -> Result<Vec<String>> {

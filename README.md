@@ -19,7 +19,7 @@ $ docker run --rm -it -v `pwd`:/workspace chonglou/arete:latest # start docker c
 
 * Generate **config.toml** `arete generate:config`, then change it if you need
 * Migrate database `arete database:migrate`
-* Import locale records `arete i18n:sync -d /usr/share/arete/locales`
+* Import locale records `arete i18n:sync`
 * Generate nginx config file `arete generate:nginx`, then mv it into **/etc/nginx/sites-enabled/** and restart nginx
 * Generate systemd config file `arete generate:systemd`, then mv it into **/lib/systemd/system/** and start it
 * Create the admin in http://YOUR-HOST/my/install** 
