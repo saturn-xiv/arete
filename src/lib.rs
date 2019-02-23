@@ -67,6 +67,7 @@ pub mod crypto;
 pub mod env;
 pub mod errors;
 pub mod graphql;
+pub mod http;
 pub mod i18n;
 pub mod jwt;
 pub mod oauth;
