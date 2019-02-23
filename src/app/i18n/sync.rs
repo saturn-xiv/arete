@@ -25,9 +25,9 @@ pub fn command<'a, 'b>() -> App<'a, 'b> {
 }
 
 pub fn run(cfg: Config, dir: String) -> Result<()> {
-    let db = cfg.database()?;
+    let db = cfg.postgresql.open()?;
     let db = db.get()?;
-    let (inserted, finded) = db.transaction::<_, Error, _>(|| LocaleDao::sync(db.deref(), &dir))?;
-    info!("find {} recored, insert {}", finded, inserted);
+    let (inserted, find) = db.transaction::<_, Error, _>(|| LocaleDao::sync(db.deref(), &dir))?;
+    info!("find {} records, insert {}", find, inserted);
     Ok(())
 }

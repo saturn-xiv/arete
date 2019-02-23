@@ -6,12 +6,23 @@ use std::time::Duration;
 use lettre::{smtp::authentication::Credentials, SmtpClient, Transport};
 use lettre_email::{Email, EmailBuilder};
 use serde_json;
+use validator::Validate;
 
 use super::super::super::super::{
     crypto::sodium::Encryptor as Sodium, errors::Result, orm::Pool as DbPool, queue::Handler,
     settings::Dao as SettingsDao,
 };
-use super::super::controllers::api::admin::site::smtp::Form as Config;
+
+#[derive(Debug, Validate, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Config {
+    #[validate(length(min = "1"))]
+    pub host: String,
+    #[validate(email, length(min = "1"))]
+    pub email: String,
+    #[validate(length(min = "1"))]
+    pub password: String,
+}
 
 #[cfg(debug_assertions)]
 pub type Consumer = Printer;

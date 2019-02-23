@@ -2,10 +2,10 @@ pub mod controllers;
 pub mod models;
 pub mod schema;
 
-use super::super::orm::migration::Migration;
+use super::super::orm::migration::New as Migration;
 
 lazy_static! {
-    static ref MIGRATION: Migration = Migration {
+    pub static ref MIGRATION: Migration<'static> = Migration {
         name: "create-survey",
         version: "20190101053114",
         up: include_str!("up.sql"),

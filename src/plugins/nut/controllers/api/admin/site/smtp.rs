@@ -11,16 +11,6 @@ use super::super::super::super::super::super::super::{
 };
 use super::super::super::super::super::request::Administrator;
 
-#[derive(Debug, Validate, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Form {
-    #[validate(length(min = "1"))]
-    pub host: String,
-    #[validate(email, length(min = "1"))]
-    pub email: String,
-    #[validate(length(min = "1"))]
-    pub password: String,
-}
 
 impl Default for Form {
     fn default() -> Self {

@@ -8,13 +8,13 @@ use serde_json;
 use super::{
     crypto::Encryptor,
     errors::Result,
-    orm::{migration::Migration, Connection},
+    orm::{migration::New as Migration, Connection},
 };
 
 use self::schema::settings;
 
 lazy_static! {
-    static ref MIGRATION: Migration = Migration {
+    pub static ref MIGRATION: Migration<'static> = Migration {
         name: "create-settings",
         version: "20190101053042",
         up: include_str!("up.sql"),

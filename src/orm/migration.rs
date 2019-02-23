@@ -1,8 +1,5 @@
 use std::cmp::Ordering;
 use std::fmt;
-use std::fs;
-use std::os::unix::fs::OpenOptionsExt;
-use std::path::{Path, PathBuf};
 
 use chrono::{NaiveDateTime, Utc};
 use diesel::{connection::SimpleConnection, delete, insert_into, prelude::*, update};
@@ -10,39 +7,7 @@ use diesel::{connection::SimpleConnection, delete, insert_into, prelude::*, upda
 use super::super::{errors::Result, rfc::RFC822};
 use super::{schema::schema_migrations, Connection};
 
-pub struct Migration {
-    pub version: &'static str,
-    pub name: &'static str,
-    pub up: &'static str,
-    pub down: &'static str,
-}
-
 pub const UP: &'static str = include_str!("up.sql");
-
-pub fn new(name: String) -> Result<()> {
-    let dir = root_dir().join(format!(
-        "{}-{}",
-        Utc::now().format("%Y%m%d%H%M%S").to_string(),
-        name
-    ));
-    fs::create_dir(&dir)?;
-    for it in vec!["up", "down"] {
-        let mut file = dir.join(it);
-        file.set_extension("sql");
-        info!("generate file {}", file.display());
-        fs::OpenOptions::new()
-            .write(true)
-            .create_new(true)
-            .mode(0o644)
-            .open(file)?;
-    }
-
-    Ok(())
-}
-
-fn root_dir() -> PathBuf {
-    Path::new("db").join("migrations")
-}
 
 #[derive(Queryable)]
 pub struct Item {
@@ -69,7 +34,7 @@ impl fmt::Display for Item {
     }
 }
 
-#[derive(Insertable, Eq)]
+#[derive(Insertable, Eq, Clone)]
 #[table_name = "schema_migrations"]
 pub struct New<'a> {
     pub version: &'a str,
@@ -103,38 +68,28 @@ impl<'a> PartialEq for New<'a> {
 }
 
 pub trait Dao {
-    fn load(&self) -> Result<()>;
+    fn load(&self, items: &Vec<New>) -> Result<()>;
     fn migrate(&self) -> Result<()>;
     fn rollback(&self) -> Result<()>;
     fn versions(&self) -> Result<Vec<Item>>;
 }
 
 impl Dao for Connection {
-    fn load(&self) -> Result<()> {
+    fn load(&self, items: &Vec<New>) -> Result<()> {
         self.batch_execute(UP)?;
-        for it in fs::read_dir(root_dir())? {
-            let it = it?.path();
-            if let Some(name) = it.file_name() {
-                if let Some(name) = name.to_str() {
-                    info!("find migration: {}", it.display());
-                    let it = New {
-                        version: &name[..14],
-                        name: &name[15..],
-                        up: &fs::read_to_string(it.join("up.sql"))?,
-                        down: &fs::read_to_string(it.join("down.sql"))?,
-                    };
-                    let c: i64 = schema_migrations::dsl::schema_migrations
-                        .filter(schema_migrations::dsl::version.eq(it.version))
-                        .filter(schema_migrations::dsl::name.eq(it.name))
-                        .count()
-                        .get_result(self)?;
-                    if c == 0 {
-                        info!("migration {} not exist, insert it", it);
-                        insert_into(schema_migrations::dsl::schema_migrations)
-                            .values(&it)
-                            .execute(self)?;
-                    }
-                }
+
+        for it in items {
+            info!("find migration: {}", it);
+            let c: i64 = schema_migrations::dsl::schema_migrations
+                .filter(schema_migrations::dsl::version.eq(it.version))
+                .filter(schema_migrations::dsl::name.eq(it.name))
+                .count()
+                .get_result(self)?;
+            if c == 0 {
+                info!("migration {} not exist, insert it", it);
+                insert_into(schema_migrations::dsl::schema_migrations)
+                    .values(it)
+                    .execute(self)?;
             }
         }
 

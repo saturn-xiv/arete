@@ -4,7 +4,7 @@ use failure::Error;
 
 use super::super::super::{
     errors::Result,
-    orm::{migration::Migration, Connection},
+    orm::{migration::Dao, Connection},
 };
 
 pub const COMMAND_NAME: &'static str = "database:rollback";
@@ -14,8 +14,5 @@ pub fn command<'a, 'b>() -> App<'a, 'b> {
 }
 
 pub fn run(db: &Connection) -> Result<()> {
-    db.transaction::<_, Error, _>(|| {
-        db.load()?;
-        db.rollback()
-    })
+    db.transaction::<_, Error, _>(|| db.rollback())
 }

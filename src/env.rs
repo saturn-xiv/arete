@@ -33,7 +33,7 @@ impl Default for Environment {
 pub struct Config {
     pub env: Environment,
     pub secrets: Key,
-    pub database: PostgreSqlConfig,
+    pub postgresql: PostgreSqlConfig,
     pub redis: RedisConfig,
     pub rabbitmq: RabbitMQConfig,
     pub http: Http,

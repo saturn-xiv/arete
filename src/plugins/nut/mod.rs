@@ -1,9 +1,8 @@
-// pub mod catchers;
 // pub mod controllers;
 pub mod models;
 // pub mod request;
-// pub mod tasks;
 pub mod schema;
+pub mod tasks;
 
 use std::fmt;
 use std::str::FromStr;
@@ -12,7 +11,7 @@ use failure::Error as FailureError;
 
 use super::super::{
     errors::{Error, Result},
-    orm::migration::Migration,
+    orm::migration::New as Migration,
 };
 
 pub enum MediaType {
@@ -45,7 +44,7 @@ impl FromStr for MediaType {
 }
 
 lazy_static! {
-    static ref AUTH: Migration = Migration {
+    pub static ref AUTH: Migration<'static> = Migration {
         name: "create-auth",
         version: "20190101053052",
         up: include_str!("auth-up.sql"),
@@ -54,7 +53,7 @@ lazy_static! {
 }
 
 lazy_static! {
-    static ref SITE: Migration = Migration {
+    pub static ref SITE: Migration<'static> = Migration {
         name: "create-site",
         version: "20190101053059",
         up: include_str!("site-up.sql"),

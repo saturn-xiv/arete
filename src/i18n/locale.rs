@@ -8,12 +8,12 @@ use yaml_rust::{Yaml, YamlLoader};
 
 use super::super::{
     errors::Result,
-    orm::{migration::Migration, Connection},
+    orm::{migration::New as Migration, Connection},
 };
 use super::schema::locales;
 
 lazy_static! {
-    static ref MIGRATION: Migration = Migration {
+    pub static ref MIGRATION: Migration<'static> = Migration {
         name: "create-locales",
         version: "20190101053014",
         up: include_str!("up.sql"),
