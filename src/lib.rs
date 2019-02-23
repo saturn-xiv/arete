@@ -13,6 +13,7 @@ extern crate failure;
 #[macro_use]
 extern crate juniper;
 
+extern crate askama;
 extern crate base64;
 extern crate chrono;
 extern crate chrono_tz;

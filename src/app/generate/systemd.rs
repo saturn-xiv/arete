@@ -1,8 +1,10 @@
 use std::env::current_dir;
 use std::fs;
+use std::io::prelude::*;
 use std::os::unix::fs::OpenOptionsExt;
 use std::path::Path;
 
+use askama::Template;
 use clap::{App, SubCommand};
 use nix::unistd::{Gid, Uid};
 
@@ -12,13 +14,14 @@ pub const COMMAND_NAME: &'static str = "generate:systemd";
 pub const COMMAND_ABOUT: &'static str = "Generate systemd service.conf";
 pub const ARG_SERVICE_NAME: &'static str = "name";
 
-#[derive(Serialize)]
-struct Config {
-    user: String,
-    group: String,
-    name: String,
-    root: String,
-    description: String,
+#[derive(Template)]
+#[template(path = "systemd.conf", escape = "none")]
+struct Config<'a> {
+    user: &'a str,
+    group: &'a str,
+    name: &'a str,
+    root: &'a str,
+    description: &'a str,
 }
 
 pub fn command<'a, 'b>() -> App<'a, 'b> {
@@ -36,8 +39,15 @@ pub fn command<'a, 'b>() -> App<'a, 'b> {
 }
 
 pub fn run(name: String, description: String) -> Result<()> {
-    let tpl = mustache::compile_str(include_str!("systemd.conf.mu"))?;
     let cur = current_dir()?;
+    let tpl = Config {
+        user: &Uid::current().to_string(),
+        group: &Gid::current().to_string(),
+        name: &name,
+        description: &description,
+        root: &format!("{}", cur.display()),
+    }
+    .render()?;
 
     let file = Path::new("tmp").join(format!("{}.service", name));
     info!("generate file {}", file.display());
@@ -46,15 +56,6 @@ pub fn run(name: String, description: String) -> Result<()> {
         .create_new(true)
         .mode(0o644)
         .open(file)?;
-    tpl.render(
-        &mut fd,
-        &Config {
-            user: Uid::current().to_string(),
-            group: Gid::current().to_string(),
-            name: name.clone(),
-            description: description,
-            root: format!("{}", cur.display()),
-        },
-    )?;
+    fd.write_all(tpl.as_bytes())?;
     Ok(())
 }

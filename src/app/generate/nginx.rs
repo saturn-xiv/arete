@@ -1,25 +1,18 @@
 use std::env::current_dir;
 use std::fs;
+use std::io::prelude::*;
 use std::os::unix::fs::OpenOptionsExt;
 use std::path::Path;
 
+use askama::Template;
 use clap::{App, SubCommand};
-use mustache;
 
-use super::super::super::errors::Result;
+use super::super::super::{env::NAME, errors::Result};
 
 pub const COMMAND_NAME: &'static str = "generate:nginx";
 pub const COMMAND_ABOUT: &'static str = "Generate nginx.conf";
 pub const ARG_HTTPS: &'static str = "https";
 pub const ARG_SERVER_NAME: &'static str = "server_name";
-
-#[derive(Serialize)]
-struct Config {
-    name: String,
-    port: u16,
-    ssl: bool,
-    root: String,
-}
 
 pub fn command<'a, 'b>() -> App<'a, 'b> {
     SubCommand::with_name(COMMAND_NAME)
@@ -43,9 +36,26 @@ pub fn command<'a, 'b>() -> App<'a, 'b> {
         )
 }
 
-pub fn run(name: String, port: u16, ssl: bool) -> Result<()> {
-    let tpl = mustache::compile_str(include_str!("nginx.conf.mu"))?;
+#[derive(Template)]
+#[template(path = "nginx.conf", escape = "none")]
+struct Config<'a> {
+    name: &'a str,
+    domain: &'a str,
+    root: &'a str,
+    port: u16,
+    ssl: bool,
+}
+
+pub fn run(domain: String, port: u16, ssl: bool) -> Result<()> {
     let cur = current_dir()?;
+    let tpl = Config {
+        domain: &domain,
+        name: NAME,
+        port: port,
+        ssl: ssl,
+        root: &format!("{}", cur.display()),
+    }
+    .render()?;
 
     let file = Path::new("tmp").join("nginx.conf");
     info!("generate file {}", file.display());
@@ -54,14 +64,7 @@ pub fn run(name: String, port: u16, ssl: bool) -> Result<()> {
         .create_new(true)
         .mode(0o644)
         .open(file)?;
-    tpl.render(
-        &mut fd,
-        &Config {
-            name: name,
-            port: port,
-            ssl: ssl,
-            root: format!("{}", cur.display()),
-        },
-    )?;
+    fd.write_all(tpl.as_bytes())?;
+
     Ok(())
 }
