@@ -110,13 +110,14 @@ section = "admin"
 priority = "optional"
 maintainer-scripts = "scripts"
 assets = [
+    ["log4rs.yml", "etc/arete/", "644"],
     ["LICENSE", "usr/share/arete/", "644"],
     ["README.md", "usr/share/arete/", "644"],
     ["package.json", "usr/share/arete/", "644"],
     ["package-lock.json", "usr/share/arete/", "644"],
-    ["log4rs.yml", "etc/arete/", "644"],    
+    ["assets/*", "usr/share/arete/assets/", "644"],
     ["dashboard/build/*", "usr/share/arete/dashboard/", "644"],
     ["dashboard/build/static/css/*", "usr/share/arete/dashboard/static/css/", "644"],
-    ["dashboard/build/static/js/*", "usr/share/arete/dashboard/static/js/", "644"],    
+    ["dashboard/build/static/js/*", "usr/share/arete/dashboard/static/js/", "644"],
     ["target/release/arete", "usr/bin/", "755"]
 ]

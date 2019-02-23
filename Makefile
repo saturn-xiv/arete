@@ -1,6 +1,6 @@
 dist=dist
 
-package: assets
+musl: react
 	mkdir -pv $(dist)	
 	PKG_CONFIG_ALLOW_CROSS=1 cargo build --release --target=x86_64-unknown-linux-musl	
 	strip -s target/x86_64-unknown-linux-musl/release/arete
@@ -8,14 +8,14 @@ package: assets
 	cp -rv dashboard/build $(dist)/dashboard
 	cd $(dist) && tar cfJ ../$(dist).tar.xz *
 
-assets:
+react:
 	if [ ! -d "node_modules" ]; then npm install; fi
 	cd dashboard && (if [ ! -d "node_modules" ]; then npm install; fi) && npm run build
 
 clean:
-	rm -rv $(dist) $(dist).tar.xz
+	rm -rv $(dist) $(dist).tar.xz node_modules
 	cargo clean
-	cd dashboard && rm -rf build
+	cd dashboard && rm -rf build node_modules
 
 schema:
 	diesel print-schema -o schema_migrations > src/orm/schema.rs
