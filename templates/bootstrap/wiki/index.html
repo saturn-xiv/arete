@@ -1,3 +1,8 @@
-{% for it in pages %}
-  <a href="/wiki/{{it.0 | safe}}">{{it.1}}</a>
-{% endfor %}
+{% extends "bootstrap/index.html" %}
+
+{% block title %}Widi index{% endblock %}
+
+
+{% block content %}
+<h1>wiki index</h1>
+{% endblock %}

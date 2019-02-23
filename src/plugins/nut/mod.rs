@@ -1,8 +1,10 @@
 // pub mod controllers;
-pub mod models;
 // pub mod request;
+pub mod graphql;
+pub mod models;
 pub mod schema;
 pub mod tasks;
+pub mod themes;
 
 use std::fmt;
 use std::str::FromStr;

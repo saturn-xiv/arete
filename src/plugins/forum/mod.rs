@@ -1,6 +1,7 @@
 // pub mod controllers;
 pub mod models;
 pub mod schema;
+pub mod themes;
 
 use super::super::orm::migration::New as Migration;
 

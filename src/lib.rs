@@ -81,3 +81,4 @@ pub mod request;
 pub mod rfc;
 pub mod settings;
 pub mod sys;
+pub mod themes;

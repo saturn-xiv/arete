@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>{% block title %}{{ title }} - My Site{% endblock %}</title>
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+    {% include "bootstrap/layout/header.html" %}
+    <div id="content">
+        {% block content %}{% endblock %}
+    </div>
+    {% include "bootstrap/layout/footer.html" %}
+</body>
+
+</html>
