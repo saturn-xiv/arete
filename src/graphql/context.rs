@@ -1,5 +1,3 @@
-use serde::Serialize;
-
 use super::super::{
     crypto::sodium::Encryptor as Sodium,
     env::Config,
@@ -36,8 +34,3 @@ impl Context {
 }
 
 impl juniper::Context for Context {}
-
-pub trait Handler {
-    type Item: Serialize;
-    fn handle(&self, ctx: &Context) -> Result<Self::Item>;
-}

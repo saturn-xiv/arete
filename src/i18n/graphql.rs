@@ -6,7 +6,7 @@ use validator::Validate;
 
 use super::super::{
     errors::Result,
-    graphql::context::{Context, Handler},
+    graphql::{context::Context, session::Session, Handler},
 };
 use super::locale::Dao as LocaleDao;
 
@@ -31,8 +31,8 @@ pub struct Save {
 
 impl Handler for Save {
     type Item = ();
-    fn handle(&self, ctx: &Context) -> Result<Self::Item> {
-        let db = ctx.db()?;
+    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
+        let db = c.db()?;
         let db = db.deref();
         match LocaleDao::by_lang_and_code(db, &self.lang, &self.code) {
             Ok(it) => {
@@ -55,8 +55,8 @@ pub struct ByLang {
 
 impl Handler for ByLang {
     type Item = Vec<Item>;
-    fn handle(&self, ctx: &Context) -> Result<Self::Item> {
-        let db = ctx.db()?;
+    fn handle(&self, c: &Context, _s: &Session) -> Result<Self::Item> {
+        let db = c.db()?;
         let db = db.deref();
         let items = LocaleDao::by_lang(db, &self.lang)?
             .iter()

@@ -58,6 +58,9 @@ extern crate validator;
 extern crate xml;
 extern crate yaml_rust;
 
+#[macro_use]
+pub mod macros;
+
 pub mod app;
 pub mod cache;
 pub mod crypto;

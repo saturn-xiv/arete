@@ -10,7 +10,6 @@ pub trait FromRequest: Sized {
     fn from_request<S>(req: &Request<S>) -> Option<Self>;
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Home {
     pub host: String,
     pub schema: String,
@@ -33,7 +32,6 @@ impl FromRequest for Home {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Token(pub String);
 
 impl FromRequest for Token {
@@ -51,7 +49,6 @@ impl FromRequest for Token {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Locale(pub String);
 
 impl FromRequest for Locale {

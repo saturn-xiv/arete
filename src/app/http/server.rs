@@ -13,7 +13,7 @@ use hyper::{
 use super::super::super::{
     env::{self, Config},
     errors::Result,
-    graphql::{context::Context, mutation::Mutation, query::Query, Schema},
+    graphql::{context::Context, mutation::Mutation, query::Query, session::Session, Schema},
     plugins::nut::tasks::send_email,
     queue::Queue,
 };
@@ -45,8 +45,8 @@ pub fn launch(cfg: Config) -> Result<()> {
         service_fn(move |req| -> Box<Future<Item = _, Error = _> + Send> {
             info!("{:?} {} {}", req.version(), req.method(), req.uri());
             let root = root.clone();
-            let ctx = ctx.clone();
             let pool = pool.clone();
+            let ctx = Arc::new((ctx.clone(), Session::new(&ctx, &req)));
             match (req.method(), req.uri().path()) {
                 (&Method::GET, "/doc") => Box::new(juniper_hyper::graphiql(GRAPHQL)),
                 (&Method::GET, GRAPHQL) => Box::new(juniper_hyper::graphql(pool, root, ctx, req)),

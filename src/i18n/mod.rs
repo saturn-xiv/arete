@@ -3,19 +3,14 @@ pub mod locale;
 pub mod schema;
 
 use failure::Error;
-use hyper::Request;
 use mustache;
 use serde::ser::Serialize;
 
-use super::{
-    orm::Connection,
-    request::{FromRequest, Locale},
-};
+use super::orm::Connection;
 
 use self::locale::Dao;
 
 pub trait I18n {
-    fn detect<S>(&self, req: &Request<S>) -> String;
     fn exist(&self, lang: &String) -> bool;
     fn tr<S: Serialize>(&self, lang: &String, code: &String, args: &Option<S>) -> Option<String>;
     fn e<C: Into<String>, S: Serialize>(&self, lang: &String, code: C, args: &Option<S>) -> Error;
@@ -52,13 +47,5 @@ impl I18n for Connection {
             Some(msg) => msg,
             None => format!("{}.{}", lang, code),
         }
-    }
-    fn detect<S>(&self, req: &Request<S>) -> String {
-        if let Some(it) = Locale::from_request(req) {
-            if self.exist(&it.0) {
-                return it.0;
-            }
-        }
-        "en-US".to_string()
     }
 }
