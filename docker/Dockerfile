@@ -51,9 +51,11 @@ RUN mkdir /opt/saturn-xiv
 RUN chown deploy:deploy /opt/saturn-xiv
 USER deploy
 
+# oh-my-zsh
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)" || true
 RUN mkdir $HOME/downloads
 
+# java sdk
 ARG JDK_VERSION="8.0.201-oracle"
 RUN curl -s "https://get.sdkman.io" | zsh
 RUN sed -i -e 's/sdkman_auto_answer=false/sdkman_auto_answer=true/g' $HOME/.sdkman/etc/config
@@ -62,6 +64,7 @@ RUN zsh -c "source $HOME/.zshrc \
   && sdk install maven \
   && sdk install gradle"
 
+# android
 ARG ANDROID_SDK_VERSION="4333796"
 RUN wget -P $HOME/downloads https://dl.google.com/android/repository/sdk-tools-linux-$ANDROID_SDK_VERSION.zip
 RUN mkdir -pv $HOME/local/android-sdk
@@ -69,16 +72,34 @@ RUN unzip $HOME/downloads/sdk-tools-linux-$ANDROID_SDK_VERSION.zip -d $HOME/loca
 RUN zsh -c "source $HOME/.zshrc \
   && yes | $HOME/local/android-sdk/tools/bin/sdkmanager --licenses"
 
+# nodejs
 RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | zsh
 RUN zsh -c "source $HOME/.zshrc \
   && nvm install node"
 
+# ruby
+ARG RUBY_VERSION="2.6.1"
+RUN git clone https://github.com/rbenv/rbenv.git $HOME/.rbenv
+RUN echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> $HOME/.zshrc
+RUN echo 'eval "$(rbenv init -)"' >> $HOME/.zshrc
+RUN echo 'alias rake="noglob rake"' >> $HOME/.zshrc
+RUN git clone https://github.com/rbenv/ruby-build.git $HOME/.rbenv/plugins/ruby-build
+RUN git clone https://github.com/rbenv/rbenv-vars.git $HOME/.rbenv/plugins/rbenv-vars
+RUN zsh -c "source $HOME/.zshrc \
+  && rbenv install ${RUBY_VERSION} \
+  && rbenv global ${RUBY_VERSION} \
+  && gem install bundler \
+  && gem install rubocop \
+  && gem install rails"
+
+# rust
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 RUN echo 'source $HOME/.cargo/env' >> $HOME/.zshrc
 RUN zsh -c "source $HOME/.zshrc \ 
   && rustup target add x86_64-unknown-linux-musl \  
   && rustup component add rls rust-analysis rust-src rustfmt clippy"
 
+# arete
 RUN zsh -c "source $HOME/.zshrc \
   && git clone https://github.com/saturn-xiv/arete.git /opt/saturn-xiv/arete \
   && cargo install diesel_cli \
