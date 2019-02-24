@@ -1,14 +1,14 @@
 use juniper::FieldResult;
 use validator::Validate;
 
-use super::super::{i18n, plugins::nut};
+use super::super::{env::VERSION, i18n, plugins::nut};
 use super::{Context, Handler};
 
 pub struct Query;
 
 graphql_object!(Query: Context |&self| {
     field apiVersion() -> &str {
-         env!("CARGO_PKG_VERSION")
+         VERSION
     }
     field listLocaleByLang(&executor, lang: String) -> FieldResult<Vec<i18n::graphql::Item>> {
         __graphql!(executor, &i18n::graphql::ByLang{lang: lang.clone()})

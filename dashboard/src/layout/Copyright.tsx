@@ -15,9 +15,9 @@ class Widget extends React.Component<IProps> {
     return (<>
       <Icon type="copyright" />
       &nbsp;
-            <FormattedMessage id="site.copyright" />
+      <FormattedMessage id="site.copyright" />
       &nbsp;
-            {this.props.site.version}
+      ({this.props.site.version})
       <BackTop />
     </>)
   }
