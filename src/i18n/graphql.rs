@@ -47,7 +47,7 @@ impl Handler for Save {
     }
 }
 
-#[derive(GraphQLInputObject, Validate)]
+#[derive(Validate)]
 pub struct ByLang {
     #[validate(length(min = "1"))]
     pub lang: String,
@@ -69,6 +69,19 @@ impl Handler for ByLang {
             })
             .collect();
 
+        Ok(items)
+    }
+}
+
+#[derive(Validate)]
+pub struct Languages;
+
+impl Handler for Languages {
+    type Item = Vec<String>;
+    fn handle(&self, c: &Context, _s: &Session) -> Result<Self::Item> {
+        let db = c.db()?;
+        let db = db.deref();
+        let items = LocaleDao::languages(db)?;
         Ok(items)
     }
 }

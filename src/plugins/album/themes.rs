@@ -1,1 +1,1 @@
-pub trait Wiki{}
+pub trait Wiki {}

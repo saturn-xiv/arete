@@ -12,13 +12,6 @@ import { detect as detectMoment } from './components/moment'
 
 const KEY = "locale"
 
-export interface ILocale {
-  id: number,
-  code: string,
-  message: string,
-  createdAt: Date,
-}
-
 export const set = (l: string) => {
   Cookies.set(KEY, l, {
     expires: Math.pow(2, 16),

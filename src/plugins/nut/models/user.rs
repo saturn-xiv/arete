@@ -37,7 +37,7 @@ impl fmt::Display for Type {
     }
 }
 
-#[derive(Queryable, Serialize)]
+#[derive(Queryable, Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Item {
     pub id: i64,
@@ -98,7 +98,7 @@ pub struct New<'a> {
     pub updated_at: &'a NaiveDateTime,
 }
 
-#[derive(Serialize)]
+#[derive(GraphQLObject, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Show {
     pub real_name: String,

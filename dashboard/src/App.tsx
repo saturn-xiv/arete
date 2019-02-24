@@ -7,17 +7,21 @@ import { Provider, ProviderProps } from 'react-redux'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 
 import './App.css'
-import { ILocale } from './intl'
 import Layout from './layout'
 import pages from './pages'
 import NoMatch from './pages/NoMatch'
 
 const Loading = () => (<Spin size="large" />)
 
+export interface IMessage {
+  code: string,
+  message: string,
+}
+
 interface IProps {
   locale: string,
   antd: AntdLocale,
-  messages: ILocale[],
+  messages: IMessage[],
 }
 
 class Widget extends React.Component<ProviderProps & IProps> {

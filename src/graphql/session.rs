@@ -3,14 +3,20 @@ use std::ops::Deref;
 use hyper::Request;
 
 use super::super::{
+    errors::Result,
     i18n::I18n,
+    jwt::Jwt,
     orm::Connection,
-    request::{FromRequest, Locale, Token},
+    plugins::nut::{
+        graphql::mutation::users::{Action, Token},
+        models::user::{Dao as UserDao, Item as User},
+    },
+    request::{FromRequest, Locale, Token as TokenS},
 };
 use super::context::Context;
 
 pub struct Session {
-    pub user: Option<i64>,
+    pub user: Option<User>,
     pub lang: String,
 }
 
@@ -19,14 +25,15 @@ impl Session {
     pub fn new<S>(ctx: &Context, req: &Request<S>) -> Self {
         if let Ok(db) = ctx.db() {
             let db = db.deref();
-            let lang = Self::locale(db, req);
-            let user = match Token::from_request(req) {
-                Some(_) => Some(0),
-                None => None,
-            };
             return Self {
-                user: user,
-                lang: lang,
+                user: match Self::user(&ctx.jwt, db, req) {
+                    Ok(v) => v,
+                    Err(e) => {
+                        error!("{}", e);
+                        None
+                    }
+                },
+                lang: Self::locale(db, req),
             };
         }
 
@@ -34,6 +41,21 @@ impl Session {
             user: None,
             lang: Self::DEFAULT_LANG.to_string(),
         }
+    }
+
+    fn user<S>(jwt: &Jwt, db: &Connection, req: &Request<S>) -> Result<Option<User>> {
+        if let Some(token) = TokenS::from_request(req) {
+            let token = jwt.parse::<Token>(&token.0)?.claims;
+            if token.act == Action::SignIn {
+                if let Ok(user) = UserDao::by_uid(db, &token.uid) {
+                    if let Ok(_) = user.available() {
+                        return Ok(Some(user));
+                    }
+                }
+            }
+        };
+
+        Ok(None)
     }
 
     fn locale<S>(db: &Connection, req: &Request<S>) -> String {

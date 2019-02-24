@@ -56,4 +56,6 @@ pub enum Error {
     RabbitMQEmptyContentType,
     #[fail(display = "bad message content type {}", _0)]
     RabbitMQBadContentType(String),
+    #[fail(display = "{}", _0)]
+    Http(hyper::StatusCode),
 }

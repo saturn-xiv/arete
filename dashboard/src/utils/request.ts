@@ -1,4 +1,26 @@
+import { message } from 'antd'
+
 import { get as getToken } from './token'
+
+interface IQuery {
+  query: string,
+}
+
+export function graphql<T>(body: IQuery, handler: (v: T) => void) {
+  return fetch('/graphql', {
+    body: JSON.stringify(body),
+    credentials: 'include',
+    headers: {
+      'Authorization': `Bearer ${getToken()}`,
+      'Content-Type': 'application/json; charset=utf-8',
+    },
+    method: 'POST',
+  }).then((res) => res.ok
+    ? res.json()
+    : res.text().then(err => {
+      throw err
+    })).then((rst) => handler(rst.data)).catch(message.error)
+}
 
 export const backend = (u: string) => `/api${u}`
 

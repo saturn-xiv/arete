@@ -73,21 +73,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for CurrentUser {
         let jwt = req.guard::<State<Arc<Jwt>>>()?;
         let jwt = jwt.deref();
 
-        if let Ok(token) = jwt.parse::<controllers::api::users::Token>(&token) {
-            let token = token.claims;
-            if token.act == controllers::api::users::Action::SignIn {
-                if let Ok(user) = UserDao::by_uid(db, &token.uid) {
-                    if let Ok(_) = user.available() {
-                        if let Ok(policies) = PolicyDao::all(db, &user.id) {
-                            return Outcome::Success(CurrentUser {
-                                id: user.id,
-                                policies: policies,
-                            });
-                        }
-                    }
-                }
-            }
-        }
+        
 
         Outcome::Failure((Status::Unauthorized, ()))
     }

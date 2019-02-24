@@ -12,11 +12,14 @@ import { ISiteState, IUserState, siteRefresh, userSignIn, userSignOut } from '..
 import { havePermission, RoleTypes } from '../components/authorized'
 import { set as setLocale } from '../intl'
 import { IApplicationState } from '../reducers'
-import { httpDelete, httpGet } from '../utils/request'
+import { graphql, httpDelete } from '../utils/request'
 import { get as getToken } from '../utils/token'
 import Footer from './Footer'
 
 const { Header, Sider, Content } = Layout
+
+interface IAbout { apiVersion: string, currentUser?: ICurrentUser, availableLanguage: string[] }
+interface ICurrentUser { logo: string, realName: string }
 
 interface IProps {
   children: React.ReactNode,
@@ -298,9 +301,19 @@ class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProp
     }
   }
   public componentDidMount() {
-    httpGet(`/about`).then((rst) => {
-      this.props.refresh(rst)
-    }).catch(message.error)
+    graphql({
+      query: `{
+  apiVersion,
+  currentUser{logo, realName},
+  availableLanguage
+}`}, (rst: IAbout) => {
+        this.props.refresh({
+          languages: rst.availableLanguage,
+          version: rst.apiVersion,
+          who: rst.currentUser,
+        })
+      })
+
 
     const token = getToken()
     if (token) {
