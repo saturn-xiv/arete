@@ -1,9 +1,19 @@
 pub mod bootstrap;
 pub mod materialize;
 
-use super::plugins::{forum, nut, wiki};
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub enum Theme {
+    Bootstrap,
+    Materialize,
+}
 
-pub trait Theme:
-    nut::themes::Site + forum::themes::Topic + forum::themes::Post + wiki::themes::Wiki
-{
+impl Default for Theme {
+    fn default() -> Self {
+        Theme::Bootstrap
+    }
+}
+
+impl Theme {
+    pub const KEY: &'static str = "site.theme";
 }

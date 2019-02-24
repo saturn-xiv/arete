@@ -39,9 +39,7 @@ pub fn launch(cfg: Config) -> Result<()> {
     }
 
     let root = Arc::new(Schema::new(Query, Mutation));
-    let router = Arc::new(Router {
-        theme: cfg.http.theme.clone(),
-    });
+    let router = Arc::new(Router::new()?);
     let pool = CpuPool::new(cfg.http.workers);
     let service = move || {
         let root = root.clone();
