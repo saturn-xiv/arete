@@ -7,27 +7,20 @@ use super::super::super::super::{
     errors::Result,
     graphql::{context::Context, session::Session, Handler, I16, I64},
 };
-use super::super::models::card::{Dao as CardDao, Item};
+use super::super::models::link::{Dao as LinkDao, Item};
 
 #[derive(GraphQLInputObject, Validate)]
 pub struct Create {
     #[validate(length(min = "1"))]
     pub lang: String,
     #[validate(length(min = "1"))]
-    pub title: String,
-    #[validate(length(min = "1"))]
-    pub logo: String,
-    #[validate(length(min = "1"))]
-    pub body: String,
-    #[validate(length(min = "1"))]
-    pub media_type: String,
+    pub label: String,
     #[validate(length(min = "1"))]
     pub href: String,
     #[validate(length(min = "1"))]
-    pub action: String,
-    #[validate(length(min = "1"))]
     pub loc: String,
-    pub position: I16,
+    pub x: I16,
+    pub y: I16,
 }
 
 impl Handler for Create {
@@ -36,17 +29,14 @@ impl Handler for Create {
         let db = c.db()?;
         let db = db.deref();
         s.administrator(db)?;
-        CardDao::create(
+        LinkDao::create(
             db,
             &self.lang,
-            &self.title,
-            &self.logo,
-            &self.body,
-            &self.media_type.parse()?,
+            &self.label,
             &self.href,
-            &self.action,
             &self.loc,
-            &self.position.0,
+            &self.x.0,
+            &self.y.0,
         )?;
         Ok(())
     }
@@ -58,20 +48,13 @@ pub struct Update {
     #[validate(length(min = "1"))]
     pub lang: String,
     #[validate(length(min = "1"))]
-    pub title: String,
-    #[validate(length(min = "1"))]
-    pub logo: String,
-    #[validate(length(min = "1"))]
-    pub body: String,
-    #[validate(length(min = "1"))]
-    pub media_type: String,
+    pub label: String,
     #[validate(length(min = "1"))]
     pub href: String,
     #[validate(length(min = "1"))]
-    pub action: String,
-    #[validate(length(min = "1"))]
     pub loc: String,
-    pub position: I16,
+    pub x: I16,
+    pub y: I16,
 }
 
 impl Handler for Update {
@@ -80,20 +63,44 @@ impl Handler for Update {
         let db = c.db()?;
         let db = db.deref();
         s.administrator(db)?;
-        CardDao::update(
+        LinkDao::update(
             db,
             &self.id.0,
             &self.lang,
-            &self.title,
-            &self.logo,
-            &self.body,
-            &self.media_type.parse()?,
+            &self.label,
             &self.href,
-            &self.action,
             &self.loc,
-            &self.position.0,
+            &self.x.0,
+            &self.y.0,
         )?;
         Ok(())
+    }
+}
+
+#[derive(GraphQLObject)]
+pub struct Link {
+    pub id: I64,
+    pub lang: String,
+    pub label: String,
+    pub href: String,
+    pub loc: String,
+    pub x: I16,
+    pub y: I16,
+    pub updated_at: NaiveDateTime,
+}
+
+impl From<Item> for Link {
+    fn from(it: Item) -> Self {
+        Self {
+            id: I64(it.id),
+            lang: it.lang,
+            label: it.label,
+            href: it.href,
+            loc: it.loc,
+            x: I16(it.x),
+            y: I16(it.y),
+            updated_at: it.updated_at,
+        }
     }
 }
 
@@ -103,45 +110,12 @@ pub struct Show {
 }
 
 impl Handler for Show {
-    type Item = Card;
+    type Item = Link;
     fn handle(&self, c: &Context, _s: &Session) -> Result<Self::Item> {
         let db = c.db()?;
         let db = db.deref();
-        let it = CardDao::by_id(db, &self.id)?;
+        let it = LinkDao::by_id(db, &self.id)?;
         Ok(it.into())
-    }
-}
-
-#[derive(GraphQLObject)]
-pub struct Card {
-    pub id: I64,
-    pub title: String,
-    pub body: String,
-    pub media_type: String,
-    pub action: String,
-    pub href: String,
-    pub logo: String,
-    pub loc: String,
-    pub lang: String,
-    pub position: I16,
-    pub updated_at: NaiveDateTime,
-}
-
-impl From<Item> for Card {
-    fn from(it: Item) -> Self {
-        Self {
-            id: I64(it.id),
-            title: it.title,
-            body: it.body,
-            media_type: it.media_type,
-            action: it.action,
-            href: it.href,
-            logo: it.logo,
-            loc: it.loc,
-            lang: it.lang,
-            position: I16(it.position),
-            updated_at: it.updated_at,
-        }
     }
 }
 
@@ -149,11 +123,11 @@ impl From<Item> for Card {
 pub struct Index {}
 
 impl Handler for Index {
-    type Item = Vec<Card>;
+    type Item = Vec<Link>;
     fn handle(&self, c: &Context, _s: &Session) -> Result<Self::Item> {
         let db = c.db()?;
         let db = db.deref();
-        let items = CardDao::all(db)?.into_iter().map(|x| x.into()).collect();
+        let items = LinkDao::all(db)?.into_iter().map(|x| x.into()).collect();
         Ok(items)
     }
 }
@@ -169,7 +143,7 @@ impl Handler for Destroy {
         let db = c.db()?;
         let db = db.deref();
         s.administrator(db)?;
-        CardDao::delete(db, &self.id)?;
+        LinkDao::delete(db, &self.id)?;
         Ok(())
     }
 }

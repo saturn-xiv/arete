@@ -72,5 +72,15 @@ graphql_object!(
         field destroyCard(&executor, id: I64) -> FieldResult<()> {
             __graphql!(executor, &nut::graphql::cards::Destroy{id: id.0})
         }
+
+        field createLink(&executor, form: nut::graphql::links::Create) -> FieldResult<()> {
+            __graphql!(executor, &form)
+        }
+        field updateLink(&executor, form: nut::graphql::links::Update) -> FieldResult<()> {
+            __graphql!(executor, &form)
+        }
+        field destroyLink(&executor, id: I64) -> FieldResult<()> {
+            __graphql!(executor, &nut::graphql::links::Destroy{id: id.0})
+        }
     }
 );

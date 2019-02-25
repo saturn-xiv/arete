@@ -1,7 +1,6 @@
 use std::ops::Deref;
 
 use chrono::NaiveDateTime;
-
 use validator::Validate;
 
 use super::super::super::super::{

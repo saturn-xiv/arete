@@ -48,4 +48,11 @@ graphql_object!(Query: Context |&self| {
     field showCard(&executor, id: I64) -> FieldResult<nut::graphql::cards::Card> {
         __graphql!(executor, &nut::graphql::cards::Show{id: id.0})
     }
+
+    field indexLink(&executor) -> FieldResult<Vec<nut::graphql::links::Link>> {
+        __graphql!(executor, &nut::graphql::links::Index{})
+    }
+    field showLink(&executor, id: I64) -> FieldResult<nut::graphql::links::Link> {
+        __graphql!(executor, &nut::graphql::links::Show{id: id.0})
+    }
 });
