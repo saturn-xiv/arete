@@ -19,7 +19,8 @@ pub struct Item {
     pub updated_at: NaiveDateTime,
 }
 
-#[derive(GraphQLInputObject, Validate)]
+#[derive(GraphQLInputObject, Validate, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Save {
     #[validate(length(min = "1"))]
     pub lang: String,

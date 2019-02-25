@@ -12,6 +12,8 @@ extern crate diesel;
 extern crate failure;
 #[macro_use]
 extern crate juniper;
+#[macro_use]
+extern crate serde_json;
 
 extern crate askama;
 extern crate base64;
@@ -45,7 +47,6 @@ extern crate rand;
 extern crate regex;
 extern crate reqwest;
 extern crate serde;
-extern crate serde_json;
 extern crate serde_xml_rs;
 extern crate sodiumoxide;
 extern crate ssh2;

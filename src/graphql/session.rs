@@ -14,7 +14,7 @@ use super::super::{
             user::{Dao as UserDao, Item as User},
         },
     },
-    request::{FromRequest, Locale, Token as TokenS},
+    request::{ClientIp, FromRequest, Locale, Token as Auth},
 };
 use super::context::Context;
 
@@ -27,6 +27,11 @@ pub struct Session {
 impl Session {
     const DEFAULT_LANG: &'static str = "en-US";
     pub fn new<S>(ctx: &Context, req: &Request<S>) -> Self {
+        let client_ip = match ClientIp::from_request(req) {
+            Some(s) => Some(s.0),
+            None => None,
+        };
+
         if let Ok(db) = ctx.db() {
             let db = db.deref();
             return Self {
@@ -37,12 +42,14 @@ impl Session {
                         None
                     }
                 },
+                client_ip: client_ip,
                 lang: Self::locale(db, req),
             };
         }
 
         Self {
             user: None,
+            client_ip: client_ip,
             lang: Self::DEFAULT_LANG.to_string(),
         }
     }
@@ -71,7 +78,7 @@ impl Session {
     }
 
     fn user<S>(jwt: &Jwt, db: &Connection, req: &Request<S>) -> Result<Option<User>> {
-        if let Some(token) = TokenS::from_request(req) {
+        if let Some(token) = Auth::from_request(req) {
             let token = jwt.parse::<Token>(&token.0)?.claims;
             if token.act == Action::SignIn {
                 if let Ok(user) = UserDao::by_uid(db, &token.uid) {

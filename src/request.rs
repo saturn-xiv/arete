@@ -1,3 +1,5 @@
+use std::fmt;
+
 use cookie::Cookie;
 use hyper::{
     header::{ACCEPT_LANGUAGE, AUTHORIZATION, COOKIE},
@@ -48,6 +50,17 @@ pub struct Home {
     pub host: String,
     pub schema: String,
     pub port: Option<u16>,
+}
+
+impl fmt::Display for Home {
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        if let Some(p) = self.port {
+            if (self.schema == "http" && p != 80) || (self.schema == "https" && p != 443) {
+                return write!(fmt, "{}://{}:{}", self.schema, self.host, p);
+            }
+        }
+        write!(fmt, "{}://{}", self.schema, self.host)
+    }
 }
 
 impl FromRequest for Home {

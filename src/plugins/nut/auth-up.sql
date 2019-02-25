@@ -10,9 +10,9 @@ CREATE TABLE users(
   logo VARCHAR(255) NOT NULL,
   sign_in_count BIGINT NOT NULL DEFAULT 0,
   current_sign_in_at TIMESTAMP,
-  current_sign_in_ip INET,
+  current_sign_in_ip VARCHAR(45),
   last_sign_in_at TIMESTAMP,
-  last_sign_in_ip INET,
+  last_sign_in_ip VARCHAR(45),
   confirmed_at TIMESTAMP,
   locked_at TIMESTAMP,
   deleted_at TIMESTAMP,
@@ -28,7 +28,7 @@ CREATE UNIQUE INDEX idx_users_provider ON users(provider_type, provider_id);
 CREATE TABLE logs(
   id BIGSERIAL PRIMARY KEY,
   user_id BIGINT NOT NULL,
-  ip INET NOT NULL,
+  ip VARCHAR(45),
   message VARCHAR(255) NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
