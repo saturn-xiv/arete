@@ -23,7 +23,7 @@ $ ssh -p 2222 deploy@localhost # default password is 'hi'
 * Import locale records `arete i18n:sync`
 * Generate nginx config file `arete generate:nginx`, then mv it into **/etc/nginx/sites-enabled/** and restart nginx
 * Generate systemd config file `arete generate:systemd`, then mv it into **/lib/systemd/system/** and start it
-* Create the admin in http://YOUR-HOST/my/install** 
+* Create the admin in **http://YOUR-HOST/my/install** 
 
 ## Documents
 
