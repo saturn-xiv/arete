@@ -75,7 +75,8 @@ RUN zsh -c "source $HOME/.zshrc \
 # nodejs
 RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | zsh
 RUN zsh -c "source $HOME/.zshrc \
-  && nvm install node"
+  && nvm install node \
+  && npm install -g yarn"
 
 # ruby
 ARG RUBY_VERSION="2.6.1"
