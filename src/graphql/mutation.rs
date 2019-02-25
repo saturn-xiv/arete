@@ -62,5 +62,15 @@ graphql_object!(
         field destroyVote(&executor, id: I64) -> FieldResult<()> {
             __graphql!(executor, &nut::graphql::votes::Destroy{id: id.0})
         }
+
+        field createCard(&executor, form: nut::graphql::cards::Create) -> FieldResult<()> {
+            __graphql!(executor, &form)
+        }
+        field updateCard(&executor, form: nut::graphql::cards::Update) -> FieldResult<()> {
+            __graphql!(executor, &form)
+        }
+        field destroyCard(&executor, id: I64) -> FieldResult<()> {
+            __graphql!(executor, &nut::graphql::cards::Destroy{id: id.0})
+        }
     }
 );

@@ -25,14 +25,8 @@ pub trait Handler {
 #[derive(Serialize)]
 pub struct I64(pub i64);
 
-impl From<I64> for i64 {
-    fn from(v: I64) -> i64 {
-        v.0
-    }
-}
-
 graphql_scalar!(I64 as "I64" where Scalar = <S> {
-    description: "For PostgreSql BIGSERIAL type"
+    description: "i64"
 
     resolve(&self) -> Value {
         Value::scalar(self.0.to_string())
@@ -42,6 +36,34 @@ graphql_scalar!(I64 as "I64" where Scalar = <S> {
         if let Some(v) = v.as_scalar_value::<String>(){
             if let Ok(v) = v.parse::<i64>(){
                 return Some(I64(v));
+            }
+        }
+        None
+    }
+
+    from_str<'a>(value: ScalarToken<'a>) -> ParseScalarResult<'a, S> {
+        if let ScalarToken::String(value) =  value {
+            Ok(S::from(value.to_owned()))
+        } else {
+            Err(ParseError::UnexpectedToken(Token::Scalar(value)))
+        }
+    }
+});
+
+#[derive(Serialize)]
+pub struct I16(pub i16);
+
+graphql_scalar!(I16 as "I16" where Scalar = <S> {
+    description: "i16"
+
+    resolve(&self) -> Value {
+        Value::scalar(self.0.to_string())
+    }
+
+    from_input_value(v: &InputValue) -> Option<I16> {
+        if let Some(v) = v.as_scalar_value::<String>(){
+            if let Ok(v) = v.parse::<i16>(){
+                return Some(I16(v));
             }
         }
         None

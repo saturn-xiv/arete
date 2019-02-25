@@ -8,7 +8,7 @@ use super::super::super::super::{
     errors::Result,
     graphql::{context::Context, session::Session, Handler, I64},
 };
-use super::super::{models::leave_word::Dao as LeaveWordDao, MediaType};
+use super::super::models::leave_word::{Dao as LeaveWordDao, Item};
 
 #[derive(GraphQLInputObject, Validate)]
 pub struct Create {
@@ -23,12 +23,7 @@ impl Handler for Create {
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db()?;
         let db = db.deref();
-        LeaveWordDao::add(
-            db,
-            &s.client_ip,
-            &self.body,
-            &self.media_type.parse::<MediaType>()?,
-        )?;
+        LeaveWordDao::add(db, &s.client_ip, &self.body, &self.media_type.parse()?)?;
         Ok(())
     }
 }
@@ -40,6 +35,18 @@ pub struct LeaveWord {
     pub body: String,
     pub media_type: String,
     pub created_at: NaiveDateTime,
+}
+
+impl From<Item> for LeaveWord {
+    fn from(it: Item) -> Self {
+        Self {
+            id: I64(it.id),
+            ip: it.ip,
+            body: it.body,
+            media_type: it.media_type,
+            created_at: it.created_at,
+        }
+    }
 }
 
 #[derive(Validate)]
@@ -55,13 +62,7 @@ impl Handler for Index {
         s.administrator(db)?;
         let items = LeaveWordDao::all(db, self.limit)?
             .into_iter()
-            .map(|x| LeaveWord {
-                id: I64(x.id),
-                ip: x.ip,
-                body: x.body,
-                media_type: x.media_type,
-                created_at: x.created_at,
-            })
+            .map(|x| x.into())
             .collect();
         Ok(items)
     }

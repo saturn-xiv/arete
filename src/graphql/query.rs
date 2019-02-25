@@ -41,4 +41,11 @@ graphql_object!(Query: Context |&self| {
     field indexVote(&executor) -> FieldResult<Vec<nut::graphql::votes::Vote>> {
         __graphql!(executor, &nut::graphql::votes::Index{})
     }
+
+    field indexCard(&executor) -> FieldResult<Vec<nut::graphql::cards::Card>> {
+        __graphql!(executor, &nut::graphql::cards::Index{})
+    }
+    field showCard(&executor, id: I64) -> FieldResult<nut::graphql::cards::Card> {
+        __graphql!(executor, &nut::graphql::cards::Show{id: id.0})
+    }
 });
