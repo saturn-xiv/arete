@@ -213,6 +213,38 @@ impl Handler for Confirm {
 
 #[derive(GraphQLInputObject, Validate, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct ConfirmToken {
+    #[validate(length(min = "1"))]
+    pub token: String,
+}
+
+impl Handler for ConfirmToken {
+    type Item = ();
+    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
+        let db = c.db()?;
+        let db = db.deref();
+
+        let token = c.jwt.parse::<Token>(&self.token)?.claims;
+        if token.act != Action::Confirm {
+            return __i18n_e!(db, &s.lang, "flashes.bad-action");
+        }
+
+        let it = UserDao::by_uid(db, &token.uid)?;
+        if let Some(_) = it.confirmed_at {
+            return __i18n_e!(db, &s.lang, "nut.errors.user.already-confirm");
+        }
+
+        db.transaction::<_, Error, _>(move || {
+            UserDao::confirm(db, &it.id)?;
+            __i18n_l!(db, &it.id, &s.client_ip, &s.lang, "nut.logs.user.confirm")?;
+            Ok(())
+        })?;
+        Ok(())
+    }
+}
+
+#[derive(GraphQLInputObject, Validate, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Unlock {
     #[validate(email)]
     pub email: String,
@@ -239,6 +271,38 @@ impl Handler for Unlock {
             &Action::Unlock,
             &self.home,
         )?;
+        Ok(())
+    }
+}
+
+#[derive(GraphQLInputObject, Validate, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UnlockToken {
+    #[validate(length(min = "1"))]
+    pub token: String,
+}
+
+impl Handler for UnlockToken {
+    type Item = ();
+    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
+        let db = c.db()?;
+        let db = db.deref();
+
+        let token = c.jwt.parse::<Token>(&self.token)?.claims;
+        if token.act != Action::Unlock {
+            return __i18n_e!(db, &s.lang, "flashes.bad-action");
+        }
+
+        let it = UserDao::by_uid(db, &token.uid)?;
+        if None == it.locked_at {
+            return __i18n_e!(db, &s.lang, "nut.errors.user.is-not-lock");
+        }
+        db.transaction::<_, Error, _>(move || {
+            UserDao::unlock(db, &it.id)?;
+            __i18n_l!(db, &it.id, &s.client_ip, &s.lang, "nut.logs.user.unlock")?;
+            Ok(())
+        })?;
+
         Ok(())
     }
 }

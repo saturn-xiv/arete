@@ -11,6 +11,7 @@ graphql_object!(
         field saveLocale(&executor, form: i18n::graphql::Save) -> FieldResult<()> {
             __graphql!(executor, &form)
         }
+
         field userSignIn(&executor, form: nut::graphql::mutation::users::SignIn) -> FieldResult<String> {
             __graphql!(executor, &form)
         }
@@ -20,7 +21,13 @@ graphql_object!(
         field userConfirm(&executor, form: nut::graphql::mutation::users::Confirm) -> FieldResult<()> {
             __graphql!(executor, &form)
         }
+        field userConfirmToken(&executor, form: nut::graphql::mutation::users::ConfirmToken) -> FieldResult<()> {
+            __graphql!(executor, &form)
+        }
         field userUnlock(&executor, form: nut::graphql::mutation::users::Unlock) -> FieldResult<()> {
+            __graphql!(executor, &form)
+        }
+        field userUnlockToken(&executor, form: nut::graphql::mutation::users::UnlockToken) -> FieldResult<()> {
             __graphql!(executor, &form)
         }
         field userForgotPassword(&executor, form: nut::graphql::mutation::users::ForgotPassword) -> FieldResult<()> {

@@ -10,6 +10,7 @@ graphql_object!(Query: Context |&self| {
     field apiVersion() -> &str {
          VERSION
     }
+
     field listLocaleByLang(&executor, lang: String) -> FieldResult<Vec<i18n::graphql::Item>> {
         __graphql!(executor, &i18n::graphql::ByLang{lang: lang.clone()})
     }
