@@ -48,5 +48,15 @@ graphql_object!(
         field userSignOut(&executor) -> FieldResult<()> {
             __graphql!(executor, &nut::graphql::mutation::users::SignOut{})
         }
+
+        field indexLeaveWord(&executor, limit: BigSerial) -> FieldResult<Vec<nut::graphql::mutation::leave_words::LeaveWord>> {
+            __graphql!(executor, &nut::graphql::mutation::leave_words::Index{limit: limit.0})
+        }
+        field createLeaveWord(&executor, form: nut::graphql::mutation::leave_words::Create) -> FieldResult<()> {
+            __graphql!(executor, &form)
+        }
+        field destroyLeaveWord(&executor, id: BigSerial) -> FieldResult<()> {
+            __graphql!(executor, &nut::graphql::mutation::leave_words::Destroy{id: id.0})
+        }
     }
 );
