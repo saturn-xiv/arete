@@ -19,6 +19,7 @@ use super::super::{
 use super::context::Context;
 
 pub struct Session {
+    pub client_ip: Option<String>,
     pub user: Option<User>,
     pub lang: String,
 }

@@ -10,6 +10,40 @@ pub trait FromRequest: Sized {
     fn from_request<S>(req: &Request<S>) -> Option<Self>;
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For
+pub struct ClientIp(pub String);
+
+impl FromRequest for ClientIp {
+    fn from_request<S>(req: &Request<S>) -> Option<Self> {
+        let headers = req.headers();
+        if let Some(it) = headers.get("X-Forwarded-For") {
+            if let Ok(it) = it.to_str() {
+                if let Some(it) = it.split(",").next() {
+                    let it = it.trim();
+                    if !it.is_empty() {
+                        return Some(Self(it.to_string()));
+                    }
+                }
+            }
+        }
+        if let Some(it) = headers.get("X-Real-Ip") {
+            if let Ok(it) = it.to_str() {
+                if !it.is_empty() {
+                    return Some(Self(it.to_string()));
+                }
+            }
+        }
+        if let Some(it) = headers.get("X-Appengine-Remote-Addr") {
+            if let Ok(it) = it.to_str() {
+                if !it.is_empty() {
+                    return Some(Self(it.to_string()));
+                }
+            }
+        }
+        None
+    }
+}
+
 pub struct Home {
     pub host: String,
     pub schema: String,
