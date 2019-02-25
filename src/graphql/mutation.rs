@@ -82,5 +82,15 @@ graphql_object!(
         field destroyLink(&executor, id: I64) -> FieldResult<()> {
             __graphql!(executor, &nut::graphql::links::Destroy{id: id.0})
         }
+
+        field createFriendLink(&executor, form: nut::graphql::friend_links::Create) -> FieldResult<()> {
+            __graphql!(executor, &form)
+        }
+        field updateFriendLink(&executor, form: nut::graphql::friend_links::Update) -> FieldResult<()> {
+            __graphql!(executor, &form)
+        }
+        field destroyFriendLink(&executor, id: I64) -> FieldResult<()> {
+            __graphql!(executor, &nut::graphql::friend_links::Destroy{id: id.0})
+        }
     }
 );

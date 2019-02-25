@@ -55,4 +55,11 @@ graphql_object!(Query: Context |&self| {
     field showLink(&executor, id: I64) -> FieldResult<nut::graphql::links::Link> {
         __graphql!(executor, &nut::graphql::links::Show{id: id.0})
     }
+
+    field indexFriendLink(&executor) -> FieldResult<Vec<nut::graphql::friend_links::FriendLink>> {
+        __graphql!(executor, &nut::graphql::friend_links::Index{})
+    }
+    field showFriendLink(&executor, id: I64) -> FieldResult<nut::graphql::friend_links::FriendLink> {
+        __graphql!(executor, &nut::graphql::friend_links::Show{id: id.0})
+    }
 });
