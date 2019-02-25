@@ -79,6 +79,7 @@ RUN zsh -c "source $HOME/.zshrc \
 
 # ruby
 ARG RUBY_VERSION="2.6.1"
+ARG RAILS_VERSION="6.0.0.beta1"
 RUN git clone https://github.com/rbenv/rbenv.git $HOME/.rbenv
 RUN echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> $HOME/.zshrc
 RUN echo 'eval "$(rbenv init -)"' >> $HOME/.zshrc
@@ -90,7 +91,7 @@ RUN zsh -c "source $HOME/.zshrc \
   && rbenv global ${RUBY_VERSION} \
   && gem install bundler \
   && gem install rubocop \
-  && gem install rails"
+  && gem install rails -v ${RAILS_VERSION}"
 
 # rust
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
