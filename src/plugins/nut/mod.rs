@@ -3,6 +3,7 @@
 pub mod graphql;
 pub mod models;
 pub mod schema;
+pub mod seo;
 pub mod tasks;
 pub mod themes;
 

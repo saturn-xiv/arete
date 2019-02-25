@@ -1,5 +1,5 @@
 // http://www.robotstxt.org/
-#[get("/robots.txt")]
+// "/robots.txt"
 pub fn txt() -> &'static str {
     // TODO
     r#"
