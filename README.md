@@ -9,7 +9,9 @@ Please install docker, redis, postgresql, rabbitmq at first.
 ```bash
 $ git clone https://github.com/saturn-xiv/arete.git ~/workspace/arete # clone source code
 $ cd arete
-$ docker run --rm -it -v `pwd`:/workspace chonglou/arete:latest # start docker container
+$ docker run --name arete -d -p 2222:22 -p 3000:3000 -v $HOME/.ssh:/home/deploy/.ssh -v `pwd`:/workspace chonglou/arete:latest # ONLY for start docker container first time
+$ docker start arete # start docker container NEXT time
+$ ssh -p 2222 deploy@localhost # default password is 'hi'
 > make deb # build for debian/ubuntu package
 > dpkg -c target/debian/arete_0.1.0_amd64.deb
 ```
