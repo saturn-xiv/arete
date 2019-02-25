@@ -1,7 +1,11 @@
 use std::ops::Deref;
 
-use hyper::{Method, Request};
-use mime::Mime;
+use failure::Error;
+use hyper::{
+    header::{HeaderValue, CONTENT_TYPE},
+    Body, Method, Request, Response as HyperResponse, StatusCode,
+};
+use mime::{Mime, APPLICATION_JSON, TEXT_HTML_UTF_8, TEXT_PLAIN_UTF_8, TEXT_XML};
 use regex::{Captures, Regex};
 
 use super::{
@@ -19,7 +23,7 @@ impl Router {
         Self { routes: routes }
     }
 
-    pub fn handle<S>(&self, ctx: &Context, req: &Request<S>) -> Result<Option<(Mime, Vec<u8>)>> {
+    pub fn handle<S>(&self, ctx: &Context, req: &Request<S>) -> Result<Option<Response>> {
         let theme = match self.theme(ctx) {
             Ok(v) => v,
             Err(_) => Theme::default(),
@@ -71,5 +75,52 @@ impl Router {
 }
 
 pub trait Route: Sync + Send {
-    fn handle(&self, theme: &Theme, ctx: &Context, cap: &Captures) -> Result<(Mime, Vec<u8>)>;
+    fn handle(&self, theme: &Theme, ctx: &Context, cap: &Captures) -> Result<Response>;
+}
+
+pub enum Response {
+    Html(String),
+    Text(String),
+    Json(String),
+    Xml(String),
+    File(Mime, Vec<u8>),
+    NotFound,
+    InternalServerError(Error),
+}
+
+macro_rules! content_type {
+    ($x:expr, $y:expr, $z:expr) => {{
+        let mut res = HyperResponse::new($y);
+        match HeaderValue::from_str(&$x.to_string()) {
+            Ok(t) => {
+                res.headers_mut().insert(CONTENT_TYPE, t);
+            }
+            Err(e) => {
+                error!("{}", e);
+            }
+        }
+        *res.status_mut() = $z;
+        res
+    }};
+}
+
+impl From<Response> for HyperResponse<Body> {
+    fn from(it: Response) -> HyperResponse<Body> {
+        match it {
+            Response::Html(v) => content_type!(TEXT_HTML_UTF_8, Body::from(v), StatusCode::OK),
+            Response::Text(v) => content_type!(TEXT_PLAIN_UTF_8, Body::from(v), StatusCode::OK),
+            Response::Json(v) => content_type!(APPLICATION_JSON, Body::from(v), StatusCode::OK),
+            Response::Xml(v) => content_type!(TEXT_XML, Body::from(v), StatusCode::OK),
+            Response::File(t, v) => content_type!(t, Body::from(v), StatusCode::OK),
+            Response::NotFound => content_type!(TEXT_PLAIN_UTF_8, Body::empty(), StatusCode::OK),
+            Response::InternalServerError(e) => {
+                error!("{}", e);
+                content_type!(
+                    TEXT_PLAIN_UTF_8,
+                    Body::from(e.to_string()),
+                    StatusCode::INTERNAL_SERVER_ERROR
+                )
+            }
+        }
+    }
 }
