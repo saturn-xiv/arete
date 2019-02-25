@@ -1,13 +1,13 @@
 use std::fmt;
 use std::ops::Deref;
 
-use chrono::{Duration, NaiveDateTime, Utc};
-use diesel::{prelude::*, update};
+use chrono::{Duration, NaiveDateTime};
+use diesel::prelude::*;
 use failure::Error;
 use uuid::Uuid;
 use validator::Validate;
 
-use super::super::super::super::super::{
+use super::super::super::super::{
     crypto::sodium::Encryptor as Sodium,
     errors::Result,
     graphql::{context::Context, session::Session, BigSerial, Handler},
@@ -16,14 +16,26 @@ use super::super::super::super::super::{
     orm::Connection as Db,
     queue::{rabbitmq::RabbitMQ, Queue},
 };
-use super::super::super::{
+use super::super::{
     models::{
         log::Dao as LogDao,
-        user::{Dao as UserDao, Item as User},
+        user::{Dao as UserDao, Item as User, Show as UserInfo},
     },
-    schema::users,
     tasks::send_email,
 };
+
+#[derive(Validate)]
+pub struct Current;
+
+impl Handler for Current {
+    type Item = Option<UserInfo>;
+    fn handle(&self, _: &Context, s: &Session) -> Result<Self::Item> {
+        if let Some(ref v) = s.user {
+            return Ok(Some((*v).clone().into()));
+        }
+        Ok(None)
+    }
+}
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
 pub enum Action {
@@ -424,15 +436,7 @@ impl Handler for Profile {
         let db = c.db()?;
         let db = db.deref();
         let user = s.current_user()?;
-        let now = Utc::now().naive_utc();
-
-        update(users::dsl::users.filter(users::dsl::id.eq(&user.id)))
-            .set((
-                users::dsl::real_name.eq(&self.real_name),
-                users::dsl::logo.eq(&self.logo),
-                users::dsl::updated_at.eq(&now),
-            ))
-            .execute(db)?;
+        UserDao::set_profile(db, &user.id, &self.real_name, &self.logo)?;
         Ok(())
     }
 }

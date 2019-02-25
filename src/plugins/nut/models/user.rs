@@ -123,6 +123,7 @@ pub trait Dao {
     fn by_uid(&self, uid: &String) -> Result<Item>;
     fn by_email(&self, email: &String) -> Result<Item>;
     fn by_nick_name(&self, nick_name: &String) -> Result<Item>;
+    fn set_profile(&self, id: &i64, real_name: &String, logo: &String) -> Result<()>;
     fn sign_in(&self, id: &i64, ip: &Option<String>) -> Result<()>;
     fn sign_up<T: Encryptor>(
         &self,
@@ -225,6 +226,18 @@ impl Dao for Connection {
         update(it)
             .set((
                 users::dsl::locked_at.eq(&if on { Some(now) } else { None }),
+                users::dsl::updated_at.eq(&now),
+            ))
+            .execute(self)?;
+        Ok(())
+    }
+
+    fn set_profile(&self, id: &i64, real_name: &String, logo: &String) -> Result<()> {
+        let now = Utc::now().naive_utc();
+        update(users::dsl::users.filter(users::dsl::id.eq(id)))
+            .set((
+                users::dsl::real_name.eq(real_name),
+                users::dsl::logo.eq(logo),
                 users::dsl::updated_at.eq(&now),
             ))
             .execute(self)?;

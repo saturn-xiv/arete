@@ -4,11 +4,11 @@ use chrono::NaiveDateTime;
 
 use validator::Validate;
 
-use super::super::super::super::super::{
+use super::super::super::super::{
     errors::Result,
     graphql::{context::Context, session::Session, BigSerial, Handler},
 };
-use super::super::super::{models::leave_word::Dao as LeaveWordDao, MediaType};
+use super::super::{models::leave_word::Dao as LeaveWordDao, MediaType};
 
 #[derive(GraphQLInputObject, Validate, Deserialize)]
 #[serde(rename_all = "camelCase")]

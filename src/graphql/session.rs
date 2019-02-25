@@ -8,7 +8,7 @@ use super::super::{
     jwt::Jwt,
     orm::Connection,
     plugins::nut::{
-        graphql::mutation::users::{Action, Token},
+        graphql::users::{Action, Token},
         models::{
             policy::{Dao as PolicyDao, Role},
             user::{Dao as UserDao, Item as User},

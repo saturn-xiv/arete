@@ -12,51 +12,45 @@ graphql_object!(
             __graphql!(executor, &form)
         }
 
-        field userSignIn(&executor, form: nut::graphql::mutation::users::SignIn) -> FieldResult<String> {
+        field userSignIn(&executor, form: nut::graphql::users::SignIn) -> FieldResult<String> {
             __graphql!(executor, &form)
         }
-        field userSignUp(&executor, form: nut::graphql::mutation::users::SignUp) -> FieldResult<()> {
+        field userSignUp(&executor, form: nut::graphql::users::SignUp) -> FieldResult<()> {
             __graphql!(executor, &form)
         }
-        field userConfirm(&executor, form: nut::graphql::mutation::users::Confirm) -> FieldResult<()> {
+        field userConfirm(&executor, form: nut::graphql::users::Confirm) -> FieldResult<()> {
             __graphql!(executor, &form)
         }
-        field userConfirmToken(&executor, form: nut::graphql::mutation::users::ConfirmToken) -> FieldResult<()> {
+        field userConfirmToken(&executor, form: nut::graphql::users::ConfirmToken) -> FieldResult<()> {
             __graphql!(executor, &form)
         }
-        field userUnlock(&executor, form: nut::graphql::mutation::users::Unlock) -> FieldResult<()> {
+        field userUnlock(&executor, form: nut::graphql::users::Unlock) -> FieldResult<()> {
             __graphql!(executor, &form)
         }
-        field userUnlockToken(&executor, form: nut::graphql::mutation::users::UnlockToken) -> FieldResult<()> {
+        field userUnlockToken(&executor, form: nut::graphql::users::UnlockToken) -> FieldResult<()> {
             __graphql!(executor, &form)
         }
-        field userForgotPassword(&executor, form: nut::graphql::mutation::users::ForgotPassword) -> FieldResult<()> {
+        field userForgotPassword(&executor, form: nut::graphql::users::ForgotPassword) -> FieldResult<()> {
             __graphql!(executor, &form)
         }
-        field userResetPassword(&executor, form: nut::graphql::mutation::users::ResetPassword) -> FieldResult<()> {
+        field userResetPassword(&executor, form: nut::graphql::users::ResetPassword) -> FieldResult<()> {
             __graphql!(executor, &form)
         }
-        field userLogs(&executor, limit: BigSerial) -> FieldResult<Vec<nut::graphql::mutation::users::Log>> {
-            __graphql!(executor, &nut::graphql::mutation::users::Logs{limit: limit.0})
-        }
-        field userChangePassword(&executor, form: nut::graphql::mutation::users::ChangePassword) -> FieldResult<()> {
+        field userChangePassword(&executor, form: nut::graphql::users::ChangePassword) -> FieldResult<()> {
             __graphql!(executor, &form)
         }
-        field userProfile(&executor, form: nut::graphql::mutation::users::Profile) -> FieldResult<()> {
+        field userProfile(&executor, form: nut::graphql::users::Profile) -> FieldResult<()> {
             __graphql!(executor, &form)
         }
         field userSignOut(&executor) -> FieldResult<()> {
-            __graphql!(executor, &nut::graphql::mutation::users::SignOut{})
+            __graphql!(executor, &nut::graphql::users::SignOut{})
         }
 
-        field indexLeaveWord(&executor, limit: BigSerial) -> FieldResult<Vec<nut::graphql::mutation::leave_words::LeaveWord>> {
-            __graphql!(executor, &nut::graphql::mutation::leave_words::Index{limit: limit.0})
-        }
-        field createLeaveWord(&executor, form: nut::graphql::mutation::leave_words::Create) -> FieldResult<()> {
+        field createLeaveWord(&executor, form: nut::graphql::leave_words::Create) -> FieldResult<()> {
             __graphql!(executor, &form)
         }
         field destroyLeaveWord(&executor, id: BigSerial) -> FieldResult<()> {
-            __graphql!(executor, &nut::graphql::mutation::leave_words::Destroy{id: id.0})
+            __graphql!(executor, &nut::graphql::leave_words::Destroy{id: id.0})
         }
     }
 );
