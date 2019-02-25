@@ -1,3 +1,4 @@
+use std::fmt;
 use std::ops::Deref;
 
 use failure::Error;
@@ -17,6 +18,16 @@ pub struct Router {
     routes: Vec<(Method, Regex, Box<Route>)>,
 }
 
+impl fmt::Display for Router {
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        write!(fmt, "METHOD\tRANK\tURI")?;
+        for (m, r, _) in self.routes.iter() {
+            write!(fmt, "{}\t{}\n", m, r)?;
+        }
+        Ok(())
+    }
+}
+
 impl Router {
     pub fn new() -> Self {
         let routes = Vec::new();
@@ -32,6 +43,7 @@ impl Router {
         for (mt, re, rt) in self.routes.iter() {
             if method == mt {
                 if let Some(cap) = re.captures(path) {
+                    info!("match {}", re);
                     let rs = rt.handle(&theme, ctx, &cap)?;
                     return Ok(Some(rs));
                 }
