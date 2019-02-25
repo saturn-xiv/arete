@@ -19,7 +19,7 @@ use super::super::super::super::{
 use super::super::{
     models::{
         log::Dao as LogDao,
-        policy::{Dao as PolicyDao, Item as Policy, Role},
+        policy::{Dao as PolicyDao, Item as Policy},
         user::{Dao as UserDao, Item as User},
     },
     tasks::send_email,
@@ -74,14 +74,29 @@ pub struct SetAuthority {
 }
 
 impl Handler for SetAuthority {
-    type Item = Info;
+    type Item = ();
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db()?;
         let db = db.deref();
 
         s.administrator(db)?;
-        let it = UserDao::by_uid(db, &self.uid)?;
-        Ok(it.into())
+
+        let user = UserDao::by_uid(db, &self.uid)?;
+        db.transaction::<_, Error, _>(move || {
+            PolicyDao::forbidden(db, &user.id)?;
+            for it in self.policies.iter() {
+                PolicyDao::apply(
+                    db,
+                    &user.id,
+                    &it.role.parse()?,
+                    &it.resource,
+                    &it.nbf,
+                    &it.exp,
+                )?;
+            }
+            Ok(())
+        })?;
+        Ok(())
     }
 }
 
@@ -234,19 +249,24 @@ impl Handler for SignIn {
             return Err(e.into());
         }
         user.available()?;
-        UserDao::sign_in(db, &user.id, &s.client_ip)?;
-        __i18n_l!(
-            db,
-            &user.id,
-            &s.client_ip,
-            &s.lang,
-            "nut.logs.user.sign-in.success"
-        )?;
+
+        let uid = user.uid.clone();
+        db.transaction::<_, Error, _>(move || {
+            UserDao::sign_in(db, &user.id, &s.client_ip)?;
+            __i18n_l!(
+                db,
+                &user.id,
+                &s.client_ip,
+                &s.lang,
+                "nut.logs.user.sign-in.success"
+            )?;
+            Ok(())
+        })?;
         let (nbf, exp) = Jwt::timestamps(Duration::weeks(1));
         let token = c.jwt.sum(
             None,
             &Token {
-                uid: user.uid.clone(),
+                uid: uid,
                 act: Action::SignIn,
                 nbf: nbf,
                 exp: exp,

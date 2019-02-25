@@ -30,6 +30,9 @@ graphql_object!(Query: Context |&self| {
     field showUser(&executor, uid: String) -> FieldResult<nut::graphql::users::Info> {
         __graphql!(executor, &nut::graphql::users::Show{uid: uid.clone()})
     }
+    field getUserAuthority(&executor, uid: String) -> FieldResult<Vec<nut::graphql::users::Authority>> {
+        __graphql!(executor, &nut::graphql::users::GetAuthority{uid: uid.clone()})
+    }
 
     field indexLeaveWord(&executor, limit: BigSerial) -> FieldResult<Vec<nut::graphql::leave_words::LeaveWord>> {
         __graphql!(executor, &nut::graphql::leave_words::Index{limit: limit.0})

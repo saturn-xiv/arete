@@ -49,6 +49,7 @@ pub trait Dao {
     fn all(&self, user: &i64) -> Result<Vec<Item>>;
     fn can(&self, user: &i64, role: &Role, resource: &Option<String>) -> bool;
     fn deny(&self, user: &i64, role: &Role, resource: &Option<String>) -> Result<()>;
+    fn forbidden(&self, user: &i64) -> Result<()>;
     fn apply(
         &self,
         user: &i64,
@@ -102,6 +103,11 @@ impl Dao for Connection {
             )
             .execute(self),
         }?;
+        Ok(())
+    }
+
+    fn forbidden(&self, user: &i64) -> Result<()> {
+        delete(policies::dsl::policies.filter(policies::dsl::user_id.eq(user))).execute(self)?;
         Ok(())
     }
 

@@ -45,6 +45,9 @@ graphql_object!(
         field userSignOut(&executor) -> FieldResult<()> {
             __graphql!(executor, &nut::graphql::users::SignOut{})
         }
+        field setUserAuthority(&executor, form: nut::graphql::users::SetAuthority) -> FieldResult<()> {
+            __graphql!(executor, &form)
+        }
 
         field createLeaveWord(&executor, form: nut::graphql::leave_words::Create) -> FieldResult<()> {
             __graphql!(executor, &form)
