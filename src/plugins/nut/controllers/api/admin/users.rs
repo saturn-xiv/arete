@@ -19,20 +19,6 @@ use super::super::super::super::{
     request::Administrator,
 };
 
-#[derive(Queryable, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Item {
-    pub id: i64,
-    pub real_name: String,
-    pub nick_name: String,
-    pub email: String,
-    pub provider_type: String,
-    pub sign_in_count: i64,
-    pub current_sign_in_at: Option<NaiveDateTime>,
-    pub current_sign_in_ip: Option<IpNetwork>,
-    pub last_sign_in_at: Option<NaiveDateTime>,
-    pub last_sign_in_ip: Option<IpNetwork>,
-}
 
 #[get("/admin/users")]
 pub fn index(_user: Administrator, db: Database) -> JsonResult<Vec<Item>> {
@@ -56,13 +42,6 @@ pub fn index(_user: Administrator, db: Database) -> JsonResult<Vec<Item>> {
     Ok(Json(items))
 }
 
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct User {
-    pub nick_name: String,
-    pub real_name: String,
-    pub policies: Vec<(Role, Option<String>)>,
-}
 
 #[get("/admin/users/<id>/authority")]
 pub fn get_authority(_user: Administrator, id: i64, db: Database) -> JsonResult<User> {

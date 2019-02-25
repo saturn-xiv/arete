@@ -46,7 +46,7 @@ pub struct New<'a> {
 }
 
 pub trait Dao {
-    fn all(&self, user: &i64) -> Result<Vec<(Role, Option<String>)>>;
+    fn all(&self, user: &i64) -> Result<Vec<Item>>;
     fn can(&self, user: &i64, role: &Role, resource: &Option<String>) -> bool;
     fn deny(&self, user: &i64, role: &Role, resource: &Option<String>) -> Result<()>;
     fn apply(
@@ -60,23 +60,11 @@ pub trait Dao {
 }
 
 impl Dao for Connection {
-    fn all(&self, user: &i64) -> Result<Vec<(Role, Option<String>)>> {
+    fn all(&self, user: &i64) -> Result<Vec<Item>> {
         let items = policies::dsl::policies
             .filter(policies::dsl::user_id.eq(user))
             .load::<Item>(self)?;
-        Ok(items
-            .iter()
-            .filter(|x| x.enable())
-            .map(|x| {
-                (
-                    x.role.parse().unwrap(),
-                    match x.resource {
-                        Some(ref v) => Some(v.clone()),
-                        None => None,
-                    },
-                )
-            })
-            .collect::<_>())
+        Ok(items.into_iter().filter(|x| x.enable()).collect::<_>())
     }
     fn can(&self, user: &i64, role: &Role, resource: &Option<String>) -> bool {
         let it = match resource {

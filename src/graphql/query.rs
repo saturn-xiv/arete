@@ -17,12 +17,18 @@ graphql_object!(Query: Context |&self| {
     field availableLanguage(&executor) -> FieldResult<Vec<String>> {
         __graphql!(executor, &i18n::graphql::Languages)
     }
-    field currentUser(&executor) -> FieldResult<Option<nut::models::user::Show>> {
+    field currentUser(&executor) -> FieldResult<Option<nut::graphql::users::Info>> {
         __graphql!(executor, &nut::graphql::users::Current)
     }
 
     field userLogs(&executor, limit: BigSerial) -> FieldResult<Vec<nut::graphql::users::Log>> {
         __graphql!(executor, &nut::graphql::users::Logs{limit: limit.0})
+    }
+    field indexUser(&executor) -> FieldResult<Vec<nut::graphql::users::Info>> {
+        __graphql!(executor, &nut::graphql::users::Index{})
+    }
+    field showUser(&executor, uid: String) -> FieldResult<nut::graphql::users::Info> {
+        __graphql!(executor, &nut::graphql::users::Show{uid: uid.clone()})
     }
 
     field indexLeaveWord(&executor, limit: BigSerial) -> FieldResult<Vec<nut::graphql::leave_words::LeaveWord>> {

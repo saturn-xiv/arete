@@ -1,7 +1,7 @@
 use std::fmt;
 use std::ops::Deref;
 
-use chrono::{Duration, NaiveDateTime};
+use chrono::{Duration, NaiveDate, NaiveDateTime};
 use diesel::prelude::*;
 use failure::Error;
 use uuid::Uuid;
@@ -19,16 +19,145 @@ use super::super::super::super::{
 use super::super::{
     models::{
         log::Dao as LogDao,
-        user::{Dao as UserDao, Item as User, Show as UserInfo},
+        policy::{Dao as PolicyDao, Item as Policy, Role},
+        user::{Dao as UserDao, Item as User},
     },
     tasks::send_email,
 };
+
+#[derive(GraphQLInputObject)]
+pub struct Authority {
+    pub role: String,
+    pub resource: Option<String>,
+    pub nbf: NaiveDate,
+    pub exp: NaiveDate,
+}
+
+impl From<Policy> for Authority {
+    fn from(it: Policy) -> Self {
+        Self {
+            role: it.role,
+            resource: it.resource,
+            nbf: it.nbf,
+            exp: it.exp,
+        }
+    }
+}
+
+#[derive(Validate)]
+pub struct GetAuthority {
+    #[validate(length(min = "1"))]
+    pub uid: String,
+}
+
+impl Handler for GetAuthority {
+    type Item = Vec<Authority>;
+    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
+        let db = c.db()?;
+        let db = db.deref();
+
+        s.administrator(db)?;
+        let user = UserDao::by_uid(db, &self.uid)?;
+        let items = PolicyDao::all(db, &user.id)?
+            .into_iter()
+            .map(|x| x.into())
+            .collect();
+        Ok(items)
+    }
+}
+
+#[derive(GraphQLInputObject, Validate)]
+pub struct SetAuthority {
+    #[validate(length(min = "1"))]
+    pub uid: String,
+    pub policies: Vec<Authority>,
+}
+
+impl Handler for SetAuthority {
+    type Item = Info;
+    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
+        let db = c.db()?;
+        let db = db.deref();
+
+        s.administrator(db)?;
+        let it = UserDao::by_uid(db, &self.uid)?;
+        Ok(it.into())
+    }
+}
+
+#[derive(Validate)]
+pub struct Show {
+    #[validate(length(min = "1"))]
+    pub uid: String,
+}
+
+impl Handler for Show {
+    type Item = Info;
+    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
+        let db = c.db()?;
+        let db = db.deref();
+
+        s.administrator(db)?;
+        let it = UserDao::by_uid(db, &self.uid)?;
+        Ok(it.into())
+    }
+}
+
+#[derive(Validate)]
+pub struct Index;
+
+impl Handler for Index {
+    type Item = Vec<Info>;
+    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
+        let db = c.db()?;
+        let db = db.deref();
+
+        s.administrator(db)?;
+        let items = UserDao::all(db)?.into_iter().map(|x| x.into()).collect();
+        Ok(items)
+    }
+}
+
+#[derive(GraphQLObject)]
+pub struct Info {
+    pub real_name: String,
+    pub nick_name: String,
+    pub email: String,
+    pub logo: String,
+    pub uid: String,
+    pub provider_type: String,
+    pub sign_in_count: BigSerial,
+    pub current_sign_in_at: Option<NaiveDateTime>,
+    pub current_sign_in_ip: Option<String>,
+    pub last_sign_in_at: Option<NaiveDateTime>,
+    pub last_sign_in_ip: Option<String>,
+    pub updated_at: NaiveDateTime,
+}
+
+impl From<User> for Info {
+    fn from(it: User) -> Self {
+        Self {
+            real_name: it.real_name,
+            nick_name: it.nick_name,
+            logo: it.logo,
+            email: it.email,
+            uid: it.uid,
+            provider_type: it.provider_type,
+            sign_in_count: BigSerial(it.sign_in_count),
+            current_sign_in_at: it.current_sign_in_at,
+            current_sign_in_ip: it.current_sign_in_ip,
+            last_sign_in_at: it.last_sign_in_at,
+            last_sign_in_ip: it.last_sign_in_ip,
+            updated_at: it.updated_at,
+        }
+    }
+}
 
 #[derive(Validate)]
 pub struct Current;
 
 impl Handler for Current {
-    type Item = Option<UserInfo>;
+    type Item = Option<Info>;
     fn handle(&self, _: &Context, s: &Session) -> Result<Self::Item> {
         if let Some(ref v) = s.user {
             return Ok(Some((*v).clone().into()));
@@ -38,6 +167,7 @@ impl Handler for Current {
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub enum Action {
     SignIn,
     Confirm,
@@ -65,8 +195,7 @@ pub struct Token {
     pub exp: i64,
 }
 
-#[derive(GraphQLInputObject, Validate, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(GraphQLInputObject, Validate)]
 pub struct SignIn {
     #[validate(length(min = "1"))]
     pub login: String,
@@ -127,8 +256,7 @@ impl Handler for SignIn {
     }
 }
 
-#[derive(GraphQLInputObject, Validate, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(GraphQLInputObject, Validate)]
 pub struct SignUp {
     #[validate(length(min = "1", max = "32"))]
     pub real_name: String,
@@ -191,8 +319,7 @@ impl Handler for SignUp {
     }
 }
 
-#[derive(GraphQLInputObject, Validate, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(GraphQLInputObject, Validate)]
 pub struct Confirm {
     #[validate(email)]
     pub email: String,
@@ -223,8 +350,7 @@ impl Handler for Confirm {
     }
 }
 
-#[derive(GraphQLInputObject, Validate, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(GraphQLInputObject, Validate)]
 pub struct ConfirmToken {
     #[validate(length(min = "1"))]
     pub token: String,
@@ -255,8 +381,7 @@ impl Handler for ConfirmToken {
     }
 }
 
-#[derive(GraphQLInputObject, Validate, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(GraphQLInputObject, Validate)]
 pub struct Unlock {
     #[validate(email)]
     pub email: String,
@@ -287,8 +412,7 @@ impl Handler for Unlock {
     }
 }
 
-#[derive(GraphQLInputObject, Validate, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(GraphQLInputObject, Validate)]
 pub struct UnlockToken {
     #[validate(length(min = "1"))]
     pub token: String,
@@ -319,8 +443,7 @@ impl Handler for UnlockToken {
     }
 }
 
-#[derive(GraphQLInputObject, Validate, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(GraphQLInputObject, Validate)]
 pub struct ForgotPassword {
     #[validate(email)]
     pub email: String,
@@ -348,8 +471,7 @@ impl Handler for ForgotPassword {
     }
 }
 
-#[derive(GraphQLInputObject, Validate, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(GraphQLInputObject, Validate)]
 pub struct ResetPassword {
     #[validate(length(min = "1"))]
     pub token: String,
@@ -383,7 +505,7 @@ impl Handler for ResetPassword {
     }
 }
 
-#[derive(GraphQLObject, Serialize)]
+#[derive(GraphQLObject)]
 pub struct Log {
     pub id: BigSerial,
     pub ip: Option<String>,
@@ -391,8 +513,7 @@ pub struct Log {
     pub created_at: NaiveDateTime,
 }
 
-#[derive(Validate, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Validate)]
 pub struct Logs {
     #[validate(range(min = "1", max = "10240"))]
     pub limit: i64,
@@ -405,11 +526,11 @@ impl Handler for Logs {
         let db = db.deref();
         let user = s.current_user()?;
         let items = LogDao::all(db, &user.id, self.limit)?
-            .iter()
+            .into_iter()
             .map(|it| Log {
                 id: BigSerial(it.id),
-                ip: it.ip.clone(),
-                message: it.message.clone(),
+                ip: it.ip,
+                message: it.message,
                 created_at: it.created_at,
             })
             .collect();
@@ -417,8 +538,7 @@ impl Handler for Logs {
     }
 }
 
-#[derive(GraphQLInputObject, Validate, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(GraphQLInputObject, Validate)]
 pub struct Profile {
     #[validate(email, length(min = "2", max = "64"))]
     pub email: String,
@@ -441,8 +561,7 @@ impl Handler for Profile {
     }
 }
 
-#[derive(GraphQLInputObject, Validate, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(GraphQLInputObject, Validate)]
 pub struct ChangePassword {
     #[validate(length(min = "1"))]
     pub current_password: String,
@@ -474,8 +593,7 @@ impl Handler for ChangePassword {
     }
 }
 
-#[derive(Validate, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Validate)]
 pub struct SignOut {}
 
 impl Handler for SignOut {

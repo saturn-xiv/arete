@@ -10,8 +10,7 @@ use super::super::super::super::{
 };
 use super::super::{models::leave_word::Dao as LeaveWordDao, MediaType};
 
-#[derive(GraphQLInputObject, Validate, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(GraphQLInputObject, Validate)]
 pub struct Create {
     #[validate(length(min = "1"))]
     pub body: String,
@@ -34,7 +33,7 @@ impl Handler for Create {
     }
 }
 
-#[derive(GraphQLObject, Serialize)]
+#[derive(GraphQLObject)]
 pub struct LeaveWord {
     pub id: BigSerial,
     pub ip: Option<String>,
@@ -43,8 +42,7 @@ pub struct LeaveWord {
     pub created_at: NaiveDateTime,
 }
 
-#[derive(Validate, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Validate)]
 pub struct Index {
     pub limit: i64,
 }
@@ -56,12 +54,12 @@ impl Handler for Index {
         let db = db.deref();
         s.administrator(db)?;
         let items = LeaveWordDao::all(db, self.limit)?
-            .iter()
+            .into_iter()
             .map(|x| LeaveWord {
                 id: BigSerial(x.id),
-                ip: x.ip.clone(),
-                body: x.body.clone(),
-                media_type: x.media_type.clone(),
+                ip: x.ip,
+                body: x.body,
+                media_type: x.media_type,
                 created_at: x.created_at,
             })
             .collect();
@@ -69,8 +67,7 @@ impl Handler for Index {
     }
 }
 
-#[derive(Validate, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Validate)]
 pub struct Destroy {
     pub id: i64,
 }

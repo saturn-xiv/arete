@@ -1,16 +1,15 @@
 use std::ops::Deref;
 
 use chrono::NaiveDateTime;
-use serde::Serialize;
 use validator::Validate;
 
 use super::super::{
     errors::Result,
     graphql::{context::Context, session::Session, BigSerial, Handler},
 };
-use super::locale::Dao as LocaleDao;
+use super::locale::{Dao as LocaleDao, Item as Locale};
 
-#[derive(GraphQLObject, Serialize)]
+#[derive(GraphQLObject)]
 pub struct Item {
     pub id: BigSerial,
     pub lang: String,
@@ -19,8 +18,19 @@ pub struct Item {
     pub updated_at: NaiveDateTime,
 }
 
-#[derive(GraphQLInputObject, Validate, Deserialize)]
-#[serde(rename_all = "camelCase")]
+impl From<Locale> for Item {
+    fn from(it: Locale) -> Self {
+        Self {
+            id: BigSerial(it.id),
+            lang: it.lang,
+            code: it.code,
+            message: it.message,
+            updated_at: it.updated_at,
+        }
+    }
+}
+
+#[derive(GraphQLInputObject, Validate)]
 pub struct Save {
     #[validate(length(min = "1"))]
     pub lang: String,
@@ -61,14 +71,8 @@ impl Handler for ByLang {
         let db = c.db()?;
         let db = db.deref();
         let items = LocaleDao::by_lang(db, &self.lang)?
-            .iter()
-            .map(|x| Item {
-                id: BigSerial(x.id),
-                lang: x.lang.clone(),
-                code: x.code.clone(),
-                message: x.message.clone(),
-                updated_at: x.updated_at.clone(),
-            })
+            .into_iter()
+            .map(|x| x.into())
             .collect();
 
         Ok(items)

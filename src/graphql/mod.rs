@@ -18,7 +18,7 @@ pub type Schema =
 pub type Context = (Arc<context::Context>, session::Session);
 
 pub trait Handler {
-    type Item: Serialize;
+    type Item;
     fn handle(&self, c: &context::Context, s: &session::Session) -> Result<Self::Item>;
 }
 
