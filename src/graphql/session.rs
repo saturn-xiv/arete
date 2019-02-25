@@ -1,15 +1,18 @@
 use std::ops::Deref;
 
-use hyper::Request;
+use hyper::{Request, StatusCode};
 
 use super::super::{
-    errors::Result,
+    errors::{Error, Result},
     i18n::I18n,
     jwt::Jwt,
     orm::Connection,
     plugins::nut::{
         graphql::mutation::users::{Action, Token},
-        models::user::{Dao as UserDao, Item as User},
+        models::{
+            policy::{Dao as PolicyDao, Role},
+            user::{Dao as UserDao, Item as User},
+        },
     },
     request::{FromRequest, Locale, Token as TokenS},
 };
@@ -40,6 +43,29 @@ impl Session {
         Self {
             user: None,
             lang: Self::DEFAULT_LANG.to_string(),
+        }
+    }
+
+    pub fn administrator(&self, db: &Connection) -> Result<&User> {
+        let user = self.current_user()?;
+        if PolicyDao::can(db, &user.id, &Role::Admin, &None) {
+            return Ok(user);
+        }
+        Err(Error::Http(StatusCode::FORBIDDEN).into())
+    }
+
+    pub fn auth(&self, db: &Connection, role: &Role, resource: &Option<String>) -> Result<&User> {
+        let user = self.current_user()?;
+        if PolicyDao::can(db, &user.id, role, resource) {
+            return Ok(user);
+        }
+        self.administrator(db)
+    }
+
+    pub fn current_user(&self) -> Result<&User> {
+        match self.user {
+            Some(ref v) => Ok(v),
+            None => Err(Error::Http(StatusCode::UNAUTHORIZED).into()),
         }
     }
 

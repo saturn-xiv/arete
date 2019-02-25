@@ -34,6 +34,7 @@ impl Handler for Save {
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db()?;
         let db = db.deref();
+        s.administrator(db)?;
         match LocaleDao::by_lang_and_code(db, &self.lang, &self.code) {
             Ok(it) => {
                 LocaleDao::update(db, &it.id, &self.code, &self.message)?;
