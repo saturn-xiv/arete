@@ -4,7 +4,7 @@ A web application by Rust and React.
 
 ## Build
 
-Please install docker, redis, postgresql, rabbitmq at first.
+Please install [docker](https://docs.docker.com/install/linux/docker-ce/ubuntu/) at first.
 
 ```bash
 $ git clone https://github.com/saturn-xiv/arete.git ~/workspace/arete # clone source code
