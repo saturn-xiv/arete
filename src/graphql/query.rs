@@ -37,4 +37,8 @@ graphql_object!(Query: Context |&self| {
     field indexLeaveWord(&executor, limit: BigSerial) -> FieldResult<Vec<nut::graphql::leave_words::LeaveWord>> {
         __graphql!(executor, &nut::graphql::leave_words::Index{limit: limit.0})
     }
+
+    field indexVote(&executor) -> FieldResult<Vec<nut::graphql::votes::Vote>> {
+        __graphql!(executor, &nut::graphql::votes::Index{})
+    }
 });

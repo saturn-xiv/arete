@@ -55,5 +55,12 @@ graphql_object!(
         field destroyLeaveWord(&executor, id: BigSerial) -> FieldResult<()> {
             __graphql!(executor, &nut::graphql::leave_words::Destroy{id: id.0})
         }
+
+        field updateVote(&executor, form: nut::graphql::votes::Update) -> FieldResult<()> {
+            __graphql!(executor, &form)
+        }
+        field destroyVote(&executor, id: BigSerial) -> FieldResult<()> {
+            __graphql!(executor, &nut::graphql::votes::Destroy{id: id.0})
+        }
     }
 );
