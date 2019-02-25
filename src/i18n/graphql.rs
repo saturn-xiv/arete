@@ -6,13 +6,13 @@ use validator::Validate;
 
 use super::super::{
     errors::Result,
-    graphql::{context::Context, session::Session, Handler},
+    graphql::{context::Context, session::Session, BigSerial, Handler},
 };
 use super::locale::Dao as LocaleDao;
 
 #[derive(GraphQLObject, Serialize)]
 pub struct Item {
-    pub id: String,
+    pub id: BigSerial,
     pub lang: String,
     pub code: String,
     pub message: String,
@@ -63,7 +63,7 @@ impl Handler for ByLang {
         let items = LocaleDao::by_lang(db, &self.lang)?
             .iter()
             .map(|x| Item {
-                id: x.id.to_string(),
+                id: BigSerial(x.id),
                 lang: x.lang.clone(),
                 code: x.code.clone(),
                 message: x.message.clone(),

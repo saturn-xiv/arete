@@ -20,7 +20,7 @@ pub struct Router {
 
 impl fmt::Display for Router {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        write!(fmt, "METHOD\tRANK\tURI")?;
+        write!(fmt, "METHOD\tURI")?;
         for (m, r, _) in self.routes.iter() {
             write!(fmt, "{}\t{}\n", m, r)?;
         }
