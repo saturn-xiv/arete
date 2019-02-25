@@ -14,9 +14,9 @@ pub struct Router {
 }
 
 impl Router {
-    pub fn new() -> Result<Self> {
+    pub fn new() -> Self {
         let routes = Vec::new();
-        Ok(Self { routes: routes })
+        Self { routes: routes }
     }
 
     pub fn handle<S>(&self, ctx: &Context, req: &Request<S>) -> Result<Option<(Mime, Vec<u8>)>> {

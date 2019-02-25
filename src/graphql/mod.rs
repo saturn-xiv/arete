@@ -9,7 +9,8 @@ use serde::Serialize;
 
 use super::errors::Result;
 
-pub type Schema = juniper::RootNode<'static, query::Query, mutation::Mutation>;
+pub type Schema =
+    juniper::RootNode<'static, query::Query, mutation::Mutation, juniper::DefaultScalarValue>;
 pub type Context = (Arc<context::Context>, session::Session);
 
 pub trait Handler {

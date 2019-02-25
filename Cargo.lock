@@ -88,8 +88,8 @@ dependencies = [
  "hyper 0.12.24 (registry+https://github.com/rust-lang/crates.io-index)",
  "ipnetwork 0.13.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "jsonwebtoken 5.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "juniper 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "juniper_hyper 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "juniper 0.11.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "juniper_hyper 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "language-tags 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "lapin-futures 0.15.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy_static 1.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1103,22 +1103,22 @@ dependencies = [
 
 [[package]]
 name = "juniper"
-version = "0.10.0"
+version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "chrono 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "fnv 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "indexmap 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "juniper_codegen 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "juniper_codegen 0.11.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.88 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.88 (registry+https://github.com/rust-lang/crates.io-index)",
  "url 1.7.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "uuid 0.6.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "uuid 0.7.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "juniper_codegen"
-version = "0.10.0"
+version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "lazy_static 1.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1130,16 +1130,17 @@ dependencies = [
 
 [[package]]
 name = "juniper_hyper"
-version = "0.1.0"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "futures 0.1.25 (registry+https://github.com/rust-lang/crates.io-index)",
- "futures-cpupool 0.1.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "hyper 0.12.24 (registry+https://github.com/rust-lang/crates.io-index)",
- "juniper 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "juniper 0.11.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.88 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.88 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.38 (registry+https://github.com/rust-lang/crates.io-index)",
+ "tokio 0.1.15 (registry+https://github.com/rust-lang/crates.io-index)",
+ "tokio-threadpool 0.1.11 (registry+https://github.com/rust-lang/crates.io-index)",
  "url 1.7.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -3095,9 +3096,9 @@ dependencies = [
 "checksum ipnetwork 0.13.1 (registry+https://github.com/rust-lang/crates.io-index)" = "1d1d8b990621b5b0806fac3dbf71d1833a4c0a9e25702d10bd8b2c629c7ae01c"
 "checksum itoa 0.4.3 (registry+https://github.com/rust-lang/crates.io-index)" = "1306f3464951f30e30d12373d31c79fbd52d236e5e896fd92f96ec7babbbe60b"
 "checksum jsonwebtoken 5.0.1 (registry+https://github.com/rust-lang/crates.io-index)" = "8d438ea707d465c230305963b67f8357a1d56fcfad9434797d7cb1c46c2e41df"
-"checksum juniper 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)" = "13962d1128aaff5703fff17de07d605bfbfe537b204dba0ccff62385acbb990a"
-"checksum juniper_codegen 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)" = "18321cfd2e19478b4de0713ff97b18dfb9998ab7809e9571f68e847c5b16cf8b"
-"checksum juniper_hyper 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "765b8044466ed66ba9107c45228f5ca5188eb37ab52f4172381c347f1bf094f8"
+"checksum juniper 0.11.1 (registry+https://github.com/rust-lang/crates.io-index)" = "d95deabb0bc5e15f508d48017b3791502e734a3d64c261d8ef9658899f04f351"
+"checksum juniper_codegen 0.11.1 (registry+https://github.com/rust-lang/crates.io-index)" = "f787e228fc7df6061a0b9474dc0223199c7b917a3fe2ba874272b077a1c8a46b"
+"checksum juniper_hyper 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "dfd5e767dc1995bed51db52f185e4393d51b31f9e3e8bf49b9254afb56c5de2c"
 "checksum kernel32-sys 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "7507624b29483431c0ba2d82aece8ca6cdba9382bff4ddd0f7490560c056098d"
 "checksum language-tags 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "a91d884b6667cd606bb5a69aa0c99ba811a115fc68915e7056ec08a46e93199a"
 "checksum lapin-async 0.15.0 (registry+https://github.com/rust-lang/crates.io-index)" = "1a78f5e949ded314f74be719426213f3dd872e02b1dff9ca8a2d98745962d073"

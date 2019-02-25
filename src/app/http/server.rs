@@ -3,7 +3,6 @@ use std::thread;
 use std::time::Duration;
 
 use futures::future;
-use futures_cpupool::CpuPool;
 use hyper::{
     header::{HeaderValue, CONTENT_TYPE},
     rt::{self, Future},
@@ -15,8 +14,7 @@ use super::super::super::{
     env::{self, Config},
     errors::Result,
     graphql::{context::Context, mutation::Mutation, query::Query, session::Session, Schema},
-    http::Router,
-    plugins::nut::tasks::send_email,
+    plugins::{nut::tasks::send_email, ROUTER},
     queue::Queue,
 };
 
@@ -39,26 +37,22 @@ pub fn launch(cfg: Config) -> Result<()> {
     }
 
     let root = Arc::new(Schema::new(Query, Mutation));
-    let router = Arc::new(Router::new()?);
-    let pool = CpuPool::new(cfg.http.workers);
+
     let service = move || {
         let root = root.clone();
         let ctx = ctx.clone();
-        let pool = pool.clone();
-        let router = router.clone();
         service_fn(move |req| -> Box<Future<Item = _, Error = _> + Send> {
             info!("{:?} {} {}", req.version(), req.method(), req.uri());
             let root = root.clone();
-            let pool = pool.clone();
             let ctx = ctx.clone();
             let gtx = Arc::new((ctx.clone(), Session::new(&ctx, &req)));
 
             match (req.method(), req.uri().path()) {
                 (&Method::GET, "/doc") => Box::new(juniper_hyper::graphiql(GRAPHQL)),
-                (&Method::GET, GRAPHQL) => Box::new(juniper_hyper::graphql(pool, root, gtx, req)),
-                (&Method::POST, GRAPHQL) => Box::new(juniper_hyper::graphql(pool, root, gtx, req)),
+                (&Method::GET, GRAPHQL) => Box::new(juniper_hyper::graphql(root, gtx, req)),
+                (&Method::POST, GRAPHQL) => Box::new(juniper_hyper::graphql(root, gtx, req)),
                 _ => {
-                    let response = match router.handle(&ctx, &req) {
+                    let response = match ROUTER.handle(&ctx, &req) {
                         Ok(v) => match v {
                             Some((t, s)) => {
                                 let mut res = Response::new(Body::from(s));
