@@ -2,7 +2,7 @@ use juniper::FieldResult;
 use validator::Validate;
 
 use super::super::{i18n, plugins::nut};
-use super::{BigSerial, Context, Handler};
+use super::{Context, Handler, I64};
 
 pub struct Mutation;
 
@@ -52,14 +52,14 @@ graphql_object!(
         field createLeaveWord(&executor, form: nut::graphql::leave_words::Create) -> FieldResult<()> {
             __graphql!(executor, &form)
         }
-        field destroyLeaveWord(&executor, id: BigSerial) -> FieldResult<()> {
+        field destroyLeaveWord(&executor, id: I64) -> FieldResult<()> {
             __graphql!(executor, &nut::graphql::leave_words::Destroy{id: id.0})
         }
 
         field updateVote(&executor, form: nut::graphql::votes::Update) -> FieldResult<()> {
             __graphql!(executor, &form)
         }
-        field destroyVote(&executor, id: BigSerial) -> FieldResult<()> {
+        field destroyVote(&executor, id: I64) -> FieldResult<()> {
             __graphql!(executor, &nut::graphql::votes::Destroy{id: id.0})
         }
     }

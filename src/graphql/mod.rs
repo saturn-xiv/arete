@@ -23,25 +23,25 @@ pub trait Handler {
 }
 
 #[derive(Serialize)]
-pub struct BigSerial(pub i64);
+pub struct I64(pub i64);
 
-impl From<BigSerial> for i64 {
-    fn from(v: BigSerial) -> i64 {
+impl From<I64> for i64 {
+    fn from(v: I64) -> i64 {
         v.0
     }
 }
 
-graphql_scalar!(BigSerial as "BigSerial" where Scalar = <S> {
+graphql_scalar!(I64 as "I64" where Scalar = <S> {
     description: "For PostgreSql BIGSERIAL type"
 
     resolve(&self) -> Value {
         Value::scalar(self.0.to_string())
     }
 
-    from_input_value(v: &InputValue) -> Option<BigSerial> {
+    from_input_value(v: &InputValue) -> Option<I64> {
         if let Some(v) = v.as_scalar_value::<String>(){
             if let Ok(v) = v.parse::<i64>(){
-                return Some(BigSerial(v));
+                return Some(I64(v));
             }
         }
         None

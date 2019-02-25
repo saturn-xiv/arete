@@ -2,7 +2,7 @@ use juniper::FieldResult;
 use validator::Validate;
 
 use super::super::{env::VERSION, i18n, plugins::nut};
-use super::{BigSerial, Context, Handler};
+use super::{Context, Handler, I64};
 
 pub struct Query;
 
@@ -21,7 +21,7 @@ graphql_object!(Query: Context |&self| {
         __graphql!(executor, &nut::graphql::users::Current)
     }
 
-    field userLogs(&executor, limit: BigSerial) -> FieldResult<Vec<nut::graphql::users::Log>> {
+    field userLogs(&executor, limit: I64) -> FieldResult<Vec<nut::graphql::users::Log>> {
         __graphql!(executor, &nut::graphql::users::Logs{limit: limit.0})
     }
     field indexUser(&executor) -> FieldResult<Vec<nut::graphql::users::Info>> {
@@ -34,7 +34,7 @@ graphql_object!(Query: Context |&self| {
         __graphql!(executor, &nut::graphql::users::GetAuthority{uid: uid.clone()})
     }
 
-    field indexLeaveWord(&executor, limit: BigSerial) -> FieldResult<Vec<nut::graphql::leave_words::LeaveWord>> {
+    field indexLeaveWord(&executor, limit: I64) -> FieldResult<Vec<nut::graphql::leave_words::LeaveWord>> {
         __graphql!(executor, &nut::graphql::leave_words::Index{limit: limit.0})
     }
 

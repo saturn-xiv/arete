@@ -6,7 +6,7 @@ use validator::Validate;
 
 use super::super::super::super::{
     errors::Result,
-    graphql::{context::Context, session::Session, BigSerial, Handler},
+    graphql::{context::Context, session::Session, Handler, I64},
 };
 use super::super::{models::leave_word::Dao as LeaveWordDao, MediaType};
 
@@ -35,7 +35,7 @@ impl Handler for Create {
 
 #[derive(GraphQLObject)]
 pub struct LeaveWord {
-    pub id: BigSerial,
+    pub id: I64,
     pub ip: Option<String>,
     pub body: String,
     pub media_type: String,
@@ -56,7 +56,7 @@ impl Handler for Index {
         let items = LeaveWordDao::all(db, self.limit)?
             .into_iter()
             .map(|x| LeaveWord {
-                id: BigSerial(x.id),
+                id: I64(x.id),
                 ip: x.ip,
                 body: x.body,
                 media_type: x.media_type,

@@ -5,13 +5,13 @@ use validator::Validate;
 
 use super::super::{
     errors::Result,
-    graphql::{context::Context, session::Session, BigSerial, Handler},
+    graphql::{context::Context, session::Session, Handler, I64},
 };
 use super::locale::{Dao as LocaleDao, Item as Locale};
 
 #[derive(GraphQLObject)]
 pub struct Item {
-    pub id: BigSerial,
+    pub id: I64,
     pub lang: String,
     pub code: String,
     pub message: String,
@@ -21,7 +21,7 @@ pub struct Item {
 impl From<Locale> for Item {
     fn from(it: Locale) -> Self {
         Self {
-            id: BigSerial(it.id),
+            id: I64(it.id),
             lang: it.lang,
             code: it.code,
             message: it.message,

@@ -6,7 +6,7 @@ use validator::Validate;
 
 use super::super::super::super::{
     errors::Result,
-    graphql::{context::Context, session::Session, BigSerial, Handler},
+    graphql::{context::Context, session::Session, Handler, I64},
 };
 use super::super::models::vote::{Dao as VoteDao, Item};
 
@@ -14,7 +14,7 @@ use super::super::models::vote::{Dao as VoteDao, Item};
 pub struct Update {
     #[validate(length(min = "1"))]
     pub resource_type: String,
-    pub resource_id: BigSerial,
+    pub resource_id: I64,
     pub like: bool,
 }
 
@@ -31,19 +31,19 @@ impl Handler for Update {
 
 #[derive(GraphQLObject)]
 pub struct Vote {
-    pub id: BigSerial,
-    pub point: BigSerial,
+    pub id: I64,
+    pub point: I64,
     pub resource_type: String,
-    pub resource_id: BigSerial,
+    pub resource_id: I64,
     pub updated_at: NaiveDateTime,
 }
 
 impl From<Item> for Vote {
     fn from(it: Item) -> Self {
         Self {
-            id: BigSerial(it.id),
-            point: BigSerial(it.id),
-            resource_id: BigSerial(it.resource_id),
+            id: I64(it.id),
+            point: I64(it.id),
+            resource_id: I64(it.resource_id),
             resource_type: it.resource_type,
             updated_at: it.updated_at,
         }

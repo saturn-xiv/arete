@@ -10,7 +10,7 @@ use validator::Validate;
 use super::super::super::super::{
     crypto::sodium::Encryptor as Sodium,
     errors::Result,
-    graphql::{context::Context, session::Session, BigSerial, Handler},
+    graphql::{context::Context, session::Session, Handler, I64},
     i18n::I18n,
     jwt::Jwt,
     orm::Connection as Db,
@@ -141,7 +141,7 @@ pub struct Info {
     pub logo: String,
     pub uid: String,
     pub provider_type: String,
-    pub sign_in_count: BigSerial,
+    pub sign_in_count: I64,
     pub current_sign_in_at: Option<NaiveDateTime>,
     pub current_sign_in_ip: Option<String>,
     pub last_sign_in_at: Option<NaiveDateTime>,
@@ -158,7 +158,7 @@ impl From<User> for Info {
             email: it.email,
             uid: it.uid,
             provider_type: it.provider_type,
-            sign_in_count: BigSerial(it.sign_in_count),
+            sign_in_count: I64(it.sign_in_count),
             current_sign_in_at: it.current_sign_in_at,
             current_sign_in_ip: it.current_sign_in_ip,
             last_sign_in_at: it.last_sign_in_at,
@@ -527,7 +527,7 @@ impl Handler for ResetPassword {
 
 #[derive(GraphQLObject)]
 pub struct Log {
-    pub id: BigSerial,
+    pub id: I64,
     pub ip: Option<String>,
     pub message: String,
     pub created_at: NaiveDateTime,
@@ -548,7 +548,7 @@ impl Handler for Logs {
         let items = LogDao::all(db, &user.id, self.limit)?
             .into_iter()
             .map(|it| Log {
-                id: BigSerial(it.id),
+                id: I64(it.id),
                 ip: it.ip,
                 message: it.message,
                 created_at: it.created_at,
