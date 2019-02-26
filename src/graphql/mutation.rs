@@ -95,5 +95,25 @@ graphql_object!(
         field destroyFriendLink(&executor, id: I64) -> FieldResult<()> {
             __graphql!(executor, &nut::graphql::friend_links::Destroy{id: id.0})
         }
+
+        field createTag(&executor, form: nut::graphql::tags::Create) -> FieldResult<()> {
+            __graphql!(executor, &form)
+        }
+        field updateTag(&executor, form: nut::graphql::tags::Update) -> FieldResult<()> {
+            __graphql!(executor, &form)
+        }
+        field destroyTag(&executor, id: I64) -> FieldResult<()> {
+            __graphql!(executor, &nut::graphql::tags::Destroy{id: id.0})
+        }
+
+        field createCategory(&executor, form: nut::graphql::categories::Create) -> FieldResult<()> {
+            __graphql!(executor, &form)
+        }
+        field updateCategory(&executor, form: nut::graphql::categories::Update) -> FieldResult<()> {
+            __graphql!(executor, &form)
+        }
+        field destroyCategory(&executor, id: I64) -> FieldResult<()> {
+            __graphql!(executor, &nut::graphql::categories::Destroy{id: id.0})
+        }
     }
 );

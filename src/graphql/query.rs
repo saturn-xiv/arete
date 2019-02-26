@@ -66,4 +66,18 @@ graphql_object!(Query: Context |&self| {
     field showFriendLink(&executor, id: I64) -> FieldResult<nut::graphql::friend_links::FriendLink> {
         __graphql!(executor, &nut::graphql::friend_links::Show{id: id.0})
     }
+
+    field indexTag(&executor) -> FieldResult<Vec<nut::graphql::tags::Tag>> {
+        __graphql!(executor, &nut::graphql::tags::Index{})
+    }
+    field showTag(&executor, id: I64) -> FieldResult<nut::graphql::tags::Tag> {
+        __graphql!(executor, &nut::graphql::tags::Show{id: id.0})
+    }
+
+    field indexCategory(&executor) -> FieldResult<Vec<nut::graphql::categories::Category>> {
+        __graphql!(executor, &nut::graphql::categories::Index{})
+    }
+    field showCategory(&executor, id: I64) -> FieldResult<nut::graphql::categories::Category> {
+        __graphql!(executor, &nut::graphql::categories::Show{id: id.0})
+    }
 });
