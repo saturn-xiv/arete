@@ -24,7 +24,6 @@ extern crate cookie;
 extern crate encoding_rs;
 extern crate eui48;
 extern crate futures;
-extern crate futures_cpupool;
 extern crate git2;
 extern crate hex;
 extern crate hyper;
