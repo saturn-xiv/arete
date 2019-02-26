@@ -11,6 +11,9 @@ graphql_object!(
         field saveLocale(&executor, form: i18n::graphql::Save) -> FieldResult<()> {
             __graphql!(executor, &form)
         }
+        field destroyLocale(&executor, id: I64) -> FieldResult<()> {
+            __graphql!(executor, &i18n::graphql::Destroy{id: id.0})
+        }
 
         field userSignIn(&executor, form: nut::graphql::users::SignIn) -> FieldResult<String> {
             __graphql!(executor, &form)

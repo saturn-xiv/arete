@@ -7,10 +7,10 @@ use super::super::{
     errors::Result,
     graphql::{context::Context, session::Session, Handler, I64},
 };
-use super::locale::{Dao as LocaleDao, Item as Locale};
+use super::locale::{Dao as LocaleDao, Item};
 
 #[derive(GraphQLObject)]
-pub struct Item {
+pub struct Locale {
     pub id: I64,
     pub lang: String,
     pub code: String,
@@ -18,8 +18,8 @@ pub struct Item {
     pub updated_at: NaiveDateTime,
 }
 
-impl From<Locale> for Item {
-    fn from(it: Locale) -> Self {
+impl From<Item> for Locale {
+    fn from(it: Item) -> Self {
         Self {
             id: I64(it.id),
             lang: it.lang,
@@ -66,7 +66,7 @@ pub struct ByLang {
 }
 
 impl Handler for ByLang {
-    type Item = Vec<Item>;
+    type Item = Vec<Locale>;
     fn handle(&self, c: &Context, _s: &Session) -> Result<Self::Item> {
         let db = c.db()?;
         let db = db.deref();
@@ -80,6 +80,22 @@ impl Handler for ByLang {
 }
 
 #[derive(Validate)]
+pub struct Show {
+    pub id: i64,
+}
+
+impl Handler for Show {
+    type Item = Locale;
+    fn handle(&self, c: &Context, _s: &Session) -> Result<Self::Item> {
+        let db = c.db()?;
+        let db = db.deref();
+        let it = LocaleDao::by_id(db, &self.id)?;
+
+        Ok(it.into())
+    }
+}
+
+#[derive(Validate)]
 pub struct Languages;
 
 impl Handler for Languages {
@@ -89,5 +105,21 @@ impl Handler for Languages {
         let db = db.deref();
         let items = LocaleDao::languages(db)?;
         Ok(items)
+    }
+}
+
+#[derive(Validate)]
+pub struct Destroy {
+    pub id: i64,
+}
+
+impl Handler for Destroy {
+    type Item = ();
+    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
+        let db = c.db()?;
+        let db = db.deref();
+        s.administrator(db)?;
+        LocaleDao::delete(db, &self.id)?;
+        Ok(())
     }
 }
