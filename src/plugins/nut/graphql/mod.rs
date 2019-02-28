@@ -1,3 +1,4 @@
+pub mod attachments;
 pub mod cards;
 pub mod categories;
 pub mod friend_links;

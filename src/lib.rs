@@ -37,7 +37,6 @@ extern crate lettre_email;
 extern crate log4rs;
 extern crate md5;
 extern crate mime;
-extern crate multipart;
 extern crate mustache;
 extern crate nix;
 extern crate r2d2;

@@ -71,6 +71,10 @@ graphql_object!(Mutation: Context | &self | {
         __graphql!(executor, &form)
     }
 
+    field destroyAttachment(&executor, id: I64) -> FieldResult<()> {
+        __graphql!(executor, &nut::graphql::attachments::Destroy{id: id.0})
+    }
+
     field createLeaveWord(&executor, form: nut::graphql::leave_words::Create) -> FieldResult<()> {
         __graphql!(executor, &form)
     }

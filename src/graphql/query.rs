@@ -51,6 +51,13 @@ graphql_object!(Query: Context |&self| {
         __graphql!(executor, &nut::graphql::users::GetAuthority{uid: uid.clone()})
     }
 
+    field indexAttachment(&executor) -> FieldResult<Vec<nut::graphql::attachments::Attachment>> {
+        __graphql!(executor, &nut::graphql::attachments::Index{})
+    }
+    field showAttachment(&executor, id: I64) -> FieldResult<nut::graphql::attachments::Attachment> {
+        __graphql!(executor, &nut::graphql::attachments::Show{id: id.0})
+    }
+
     field indexLeaveWord(&executor, limit: I64) -> FieldResult<Vec<nut::graphql::leave_words::LeaveWord>> {
         __graphql!(executor, &nut::graphql::leave_words::Index{limit: limit.0})
     }
