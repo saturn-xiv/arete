@@ -8,6 +8,10 @@ pub struct Mutation;
 
 graphql_object!(
     Mutation: Context | &self | {
+        field install(&executor, form: nut::graphql::Install) -> FieldResult<()> {
+            __graphql!(executor, &form)
+        }
+
         field saveLocale(&executor, form: i18n::graphql::Save) -> FieldResult<()> {
             __graphql!(executor, &form)
         }
