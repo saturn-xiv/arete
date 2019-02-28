@@ -1,5 +1,3 @@
-// pub mod controllers;
-// pub mod request;
 pub mod graphql;
 pub mod models;
 pub mod schema;

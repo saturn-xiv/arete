@@ -1,7 +1,10 @@
 use juniper::FieldResult;
 use validator::Validate;
 
-use super::super::{i18n, plugins::nut};
+use super::super::{
+    i18n,
+    plugins::{forum, nut},
+};
 use super::{Context, Handler, I64};
 
 pub struct Mutation;
@@ -137,6 +140,25 @@ graphql_object!(Mutation: Context | &self | {
     }
     field destroyCategory(&executor, id: I64) -> FieldResult<()> {
         __graphql!(executor, &nut::graphql::categories::Destroy{id: id.0})
+    }
+
+    field createForumPost(&executor, form: forum::graphql::posts::Create) -> FieldResult<()> {
+        __graphql!(executor, &form)
+    }
+    field updateForumPost(&executor, form: forum::graphql::posts::Update) -> FieldResult<()> {
+        __graphql!(executor, &form)
+    }
+    field destroyForumPost(&executor, id: I64) -> FieldResult<()> {
+        __graphql!(executor, &forum::graphql::posts::Destroy{id: id.0})
+    }
+    field createForumTopic(&executor, form: forum::graphql::topics::Create) -> FieldResult<()> {
+        __graphql!(executor, &form)
+    }
+    field updateForumTopic(&executor, form: forum::graphql::topics::Update) -> FieldResult<()> {
+        __graphql!(executor, &form)
+    }
+    field destroyForumTopic(&executor, id: I64) -> FieldResult<()> {
+        __graphql!(executor, &forum::graphql::topics::Destroy{id: id.0})
     }
 
 });

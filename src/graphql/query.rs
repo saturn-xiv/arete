@@ -1,7 +1,11 @@
 use juniper::FieldResult;
 use validator::Validate;
 
-use super::super::{env::VERSION, i18n, plugins::nut};
+use super::super::{
+    env::VERSION,
+    i18n,
+    plugins::{forum, nut},
+};
 use super::{Context, Handler, I64};
 
 pub struct Query;
@@ -99,5 +103,18 @@ graphql_object!(Query: Context |&self| {
     }
     field showCategory(&executor, id: I64) -> FieldResult<nut::graphql::categories::Category> {
         __graphql!(executor, &nut::graphql::categories::Show{id: id.0})
+    }
+
+    field indexForumPost(&executor) -> FieldResult<Vec<forum::graphql::posts::Post>> {
+        __graphql!(executor, &forum::graphql::posts::Index{})
+    }
+    field showForumPost(&executor, id: I64) -> FieldResult<forum::graphql::posts::Post> {
+        __graphql!(executor, &forum::graphql::posts::Show{id: id.0})
+    }
+    field indexForumTopic(&executor) -> FieldResult<Vec<forum::graphql::topics::Topic>> {
+        __graphql!(executor, &forum::graphql::topics::Index{})
+    }
+    field showForumTopic(&executor, id: I64) -> FieldResult<forum::graphql::topics::Topic> {
+        __graphql!(executor, &forum::graphql::topics::Show{id: id.0})
     }
 });

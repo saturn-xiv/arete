@@ -1,3 +1,2 @@
-// pub mod controllers;
-// pub mod models;
+pub mod models;
 pub mod themes;

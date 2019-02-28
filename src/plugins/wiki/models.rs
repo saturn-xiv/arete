@@ -3,17 +3,9 @@ use std::fs::{read_dir, DirEntry, File};
 use std::io::{prelude::*, BufReader};
 use std::path::{Path, PathBuf};
 
-use rocket_contrib::templates::Template;
-
 use super::super::super::errors::Result;
 
 pub const MARKDOWN: &'static str = "md";
-
-#[derive(Responder)]
-pub enum Page {
-    File(File),
-    Html(Template),
-}
 
 fn root() -> PathBuf {
     Path::new("tmp").join("wiki")
