@@ -73,11 +73,6 @@ features = ["secure", "percent-encode"]
 version = "0.4"
 features = ["serde"]
 
-[dependencies.multipart]
-version = "0.16"
-default-features = false
-features = ["server"]
-
 [dependencies.chrono-tz]
 version = "0.5"
 features = ["serde"]
