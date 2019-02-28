@@ -31,4 +31,10 @@ impl super::Cache for Connection {
             .query(db)?;
         Ok(val)
     }
+    fn clear(&self) -> Result<()> {
+        warn!("clear cache");
+        let rst = cmd("flushdb").query::<String>(self.deref())?;
+        info!("{}", rst);
+        Ok(())
+    }
 }

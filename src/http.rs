@@ -15,7 +15,7 @@ use super::{
 };
 
 pub struct Router {
-    routes: Vec<(Method, Regex, Box<Route>)>,
+    pub routes: Vec<(Method, Regex, Box<Route>)>,
 }
 
 impl fmt::Display for Router {

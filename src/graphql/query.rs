@@ -11,6 +11,19 @@ graphql_object!(Query: Context |&self| {
          VERSION
     }
 
+    field author(&executor) -> FieldResult<nut::graphql::site::Author> {
+        __graphql!(executor, &nut::graphql::site::GetAuthor{})
+    }
+    field smtp(&executor) -> FieldResult<nut::tasks::send_email::Config> {
+        __graphql!(executor, &nut::tasks::send_email::Get{})
+    }
+    field seo(&executor) -> FieldResult<nut::graphql::site::Seo> {
+        __graphql!(executor, &nut::graphql::site::GetSeo{})
+    }
+    field status(&executor) -> FieldResult<nut::graphql::site::status::Status> {
+        __graphql!(executor, &nut::graphql::site::status::Get{})
+    }
+
     field listLocaleByLang(&executor, lang: String) -> FieldResult<Vec<i18n::graphql::Locale>> {
         __graphql!(executor, &i18n::graphql::ByLang{lang: lang.clone()})
     }

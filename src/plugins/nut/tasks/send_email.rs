@@ -6,13 +6,20 @@ use std::time::Duration;
 use lettre::{smtp::authentication::Credentials, SmtpClient, Transport};
 use lettre_email::{Email, EmailBuilder};
 use serde_json;
+use uuid::Uuid;
 use validator::Validate;
 
 use super::super::super::super::{
-    errors::Result, graphql::context::Context, queue::Handler, settings::Dao as SettingsDao,
+    crypto::sodium::Encryptor as Sodium,
+    errors::Result,
+    graphql::{context::Context, session::Session, Handler},
+    queue::Handler as QueueHandler,
+    queue::Queue,
+    settings::Dao as SettingsDao,
 };
+use super::super::models::user::Dao as UserDao;
 
-#[derive(Debug, Validate, Serialize, Deserialize)]
+#[derive(Debug, GraphQLInputObject, Validate, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Config {
     #[validate(length(min = "1"))]
@@ -21,6 +28,79 @@ pub struct Config {
     pub email: String,
     #[validate(length(min = "1"))]
     pub password: String,
+}
+
+impl Default for Config {
+    fn default() -> Self {
+        Self {
+            host: "smtp.gmail.com".to_string(),
+            email: "change-me@gmail.com".to_string(),
+            password: "".to_string(),
+        }
+    }
+}
+
+impl Config {
+    const KEY: &'static str = "site.smtp";
+}
+
+#[derive(Validate)]
+pub struct Get {}
+
+impl Handler for Get {
+    type Item = Config;
+    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
+        let db = c.db()?;
+        let db = db.deref();
+        s.administrator(db)?;
+
+        let it: Config = match SettingsDao::get(db, &c.encryptor, &Config::KEY.to_string()) {
+            Ok(v) => v,
+            Err(_) => Config::default(),
+        };
+        Ok(it)
+    }
+}
+
+impl Handler for Config {
+    type Item = ();
+    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
+        let db = c.db()?;
+        let db = db.deref();
+        s.administrator(db)?;
+        SettingsDao::set::<String, Config, Sodium>(
+            db,
+            &c.encryptor,
+            &Self::KEY.to_string(),
+            &self,
+            true,
+        )?;
+        Ok(())
+    }
+}
+
+#[derive(Validate)]
+pub struct Test {}
+
+impl Handler for Test {
+    type Item = ();
+    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
+        let db = c.db()?;
+        let db = db.deref();
+        let user = s.administrator(db)?;
+        let user = UserDao::by_id(db, &user.id)?;
+        c.queue.publish(
+            NAME.to_string(),
+            Uuid::new_v4().to_string(),
+            Task {
+                email: user.email.clone(),
+                name: user.real_name.clone(),
+                subject: format!("Hi, {}", user.real_name),
+                body: "This is a test email.".to_string(),
+            },
+        )?;
+        Ok(())
+    }
 }
 
 #[cfg(debug_assertions)]
@@ -68,7 +148,7 @@ pub struct Printer {
     pub ctx: Arc<Context>,
 }
 
-impl Handler for Printer {
+impl QueueHandler for Printer {
     fn handle(&self, _id: String, payload: Vec<u8>) -> Result<()> {
         let task: Task = serde_json::from_slice(&payload)?;
         info!("send email {}", task);
@@ -80,7 +160,7 @@ pub struct SendEmail {
     pub ctx: Arc<Context>,
 }
 
-impl Handler for SendEmail {
+impl QueueHandler for SendEmail {
     fn handle(&self, _id: String, payload: Vec<u8>) -> Result<()> {
         let task: Task = serde_json::from_slice(&payload)?;
 

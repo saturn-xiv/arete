@@ -5,7 +5,7 @@ use super::super::{
     jwt::Jwt,
     orm::{Pool as Database, PooledConnection as DbConnection},
     queue::rabbitmq::RabbitMQ,
-    redis::Pool as Cache,
+    redis::{Pool as Cache, PooledConnection as CacheConnection},
 };
 
 pub struct Context {
@@ -29,6 +29,10 @@ impl Context {
     }
     pub fn db(&self) -> Result<DbConnection> {
         let it = self.db.get()?;
+        Ok(it)
+    }
+    pub fn cache(&self) -> Result<CacheConnection> {
+        let it = self.cache.get()?;
         Ok(it)
     }
 }

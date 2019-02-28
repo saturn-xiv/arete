@@ -12,4 +12,5 @@ pub trait Cache {
         F: FnOnce() -> Result<V>,
         K: Serialize,
         V: DeserializeOwned + Serialize;
+    fn clear(&self) -> Result<()>;
 }
