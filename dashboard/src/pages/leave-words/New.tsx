@@ -6,7 +6,7 @@ import { FormattedMessage, InjectedIntlProps, injectIntl, intlShape } from 'reac
 import { MediaType } from '../../components'
 import { formItemLayout, TEXTAREA_ROWS } from '../../components/form'
 import Submit from '../../components/form/Submit'
-import { httpPost } from '../../utils/request'
+import { graphql } from '../../utils/request'
 import Layout from '../users/SharedLinks'
 
 const FormItem = Form.Item
@@ -20,10 +20,18 @@ class Widget extends React.Component<InjectedIntlProps & FormComponentProps> {
     const { form, intl } = this.props
     form.validateFields((err, values) => {
       if (!err) {
-        httpPost("/leave-words", Object.assign({}, values, { mediaType: MediaType.TEXT })).then((_) => {
+        graphql({
+          query: `mutation ($body: String!, $mediaType: String!){
+            createLeaveWord(body: $body, mediaType: $mediaType),
+          }`,
+          variables: {
+            body: values.body,
+            mediaType: MediaType.TEXT
+          }
+        }, () => {
           message.success(intl.formatMessage({ id: "flashes.success" }))
           form.setFieldsValue({ body: '' })
-        }).catch(message.error)
+        })
       }
     })
   }

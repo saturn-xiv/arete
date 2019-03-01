@@ -18,12 +18,12 @@ pub struct Create {
 }
 
 impl Handler for Create {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db()?;
         let db = db.deref();
         LeaveWordDao::add(db, &s.client_ip, &self.body, &self.media_type.parse()?)?;
-        Ok(())
+        Ok(None)
     }
 }
 

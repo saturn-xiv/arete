@@ -7,6 +7,9 @@ interface IQuery {
   variables: object,
 }
 
+interface IError {
+  message: string,
+}
 export function graphql<T>(body: IQuery, handler: (v: T) => void) {
   return fetch('/graphql', {
     body: JSON.stringify(body),
@@ -21,8 +24,16 @@ export function graphql<T>(body: IQuery, handler: (v: T) => void) {
     ? res.json()
     : res.text().then(err => {
       throw err
-    })).then((rst) => handler(rst.data)).catch(message.error)
+    })).then((rst) => {
+      if (rst.errors) {
+        rst.errors.forEach((it: IError) => message.error(it.message))
+      } else {
+        handler(rst.data)
+      }
+    }).catch(message.error)
 }
+
+// TODO CAN BE DELETE 
 
 export const backend = (u: string) => `/api${u}`
 

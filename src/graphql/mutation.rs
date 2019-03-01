@@ -78,8 +78,11 @@ graphql_object!(Mutation: Context | &self | {
         __graphql!(executor, &nut::graphql::attachments::Destroy{id: id.0})
     }
 
-    field createLeaveWord(&executor, form: nut::graphql::leave_words::Create) -> FieldResult<()> {
-        __graphql!(executor, &form)
+    field createLeaveWord(&executor, body: String, media_type: String) -> FieldResult<Option<String>> {
+        __graphql!(executor, &nut::graphql::leave_words::Create{
+            body: body.clone(),
+            media_type: media_type.clone(),
+        })
     }
     field destroyLeaveWord(&executor, id: I64) -> FieldResult<()> {
         __graphql!(executor, &nut::graphql::leave_words::Destroy{id: id.0})

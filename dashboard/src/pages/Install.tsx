@@ -29,11 +29,9 @@ class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProp
     form.validateFields((err, values) => {
       if (!err) {
         graphql({
-          query: `{
-        install(lang: "aaa") {
-          code, message
-        }
-        }`, variables: {}
+          query: `mutation ($realName: String!, $email: String!, $password: String!) {
+  install(realName: $realName, email: $email, password: $password)
+}`, variables: values
         }, () => {
           message.success(intl.formatMessage({ id: "flashes.success" }))
           history.push("/users/sign-in")

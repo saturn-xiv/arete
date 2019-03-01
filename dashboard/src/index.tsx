@@ -15,10 +15,10 @@ moment.locale(lang.moment)
 const store = createStore(rootReducers)
 
 graphql({
-  query: `
-query ($lang: String!) {
-  listLocaleByLang(lang: $lang){ code, message }
-}`, variables: { lang: lang.locale }
+  query: `query ($lang: String!) {
+    listLocaleByLang(lang: $lang){ code, message },
+  }`,
+  variables: { lang: lang.locale }
 }, (rst: {
   listLocaleByLang: IMessage[],
 }) => {
