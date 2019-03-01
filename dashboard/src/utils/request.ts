@@ -4,6 +4,7 @@ import { get as getToken } from './token'
 
 interface IQuery {
   query: string,
+  variables: object,
 }
 
 export function graphql<T>(body: IQuery, handler: (v: T) => void) {
@@ -11,6 +12,7 @@ export function graphql<T>(body: IQuery, handler: (v: T) => void) {
     body: JSON.stringify(body),
     credentials: 'include',
     headers: {
+      'Accept': 'application/json',
       'Authorization': `Bearer ${getToken()}`,
       'Content-Type': 'application/json; charset=utf-8',
     },

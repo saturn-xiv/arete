@@ -31,7 +31,7 @@ graphql_object!(Query: Context |&self| {
     field listLocaleByLang(&executor, lang: String) -> FieldResult<Vec<i18n::graphql::Locale>> {
         __graphql!(executor, &i18n::graphql::ByLang{lang: lang.clone()})
     }
-    field listLocaleByLang(&executor, id: I64) -> FieldResult<i18n::graphql::Locale> {
+    field showLocale(&executor, id: I64) -> FieldResult<i18n::graphql::Locale> {
         __graphql!(executor, &i18n::graphql::Show{id: id.0})
     }
 

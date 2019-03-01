@@ -302,17 +302,18 @@ class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProp
   }
   public componentDidMount() {
     graphql({
-      query: `{
+      query: `query {
   apiVersion,
   currentUser{logo, realName},
   availableLanguage
-}`}, (rst: IAbout) => {
-        this.props.refresh({
-          languages: rst.availableLanguage,
-          version: rst.apiVersion,
-          who: rst.currentUser,
-        })
+}`, variables: {}
+    }, (rst: IAbout) => {
+      this.props.refresh({
+        languages: rst.availableLanguage,
+        version: rst.apiVersion,
+        who: rst.currentUser,
       })
+    })
 
 
     const token = getToken()

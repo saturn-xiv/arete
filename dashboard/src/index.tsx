@@ -15,13 +15,13 @@ moment.locale(lang.moment)
 const store = createStore(rootReducers)
 
 graphql({
-  query: `{
-listLocaleByLang(lang: "${lang.locale}") {
-  code, message
-}
-}`}, (rst: {
-    listLocaleByLang: IMessage[],
-  }) => {
+  query: `
+query ($lang: String!) {
+  listLocaleByLang(lang: $lang){ code, message }
+}`, variables: { lang: lang.locale }
+}, (rst: {
+  listLocaleByLang: IMessage[],
+}) => {
     ReactDOM.render(
       (<App store={store} locale={lang.locale} antd={lang.antd} messages={rst.listLocaleByLang} />),
       document.getElementById('root') as HTMLElement

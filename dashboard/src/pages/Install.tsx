@@ -6,7 +6,7 @@ import { RouteComponentProps, withRouter } from 'react-router'
 
 import { formItemLayout } from '../components/form'
 import Submit from '../components/form/Submit'
-import { httpPost } from '../utils/request'
+import { graphql } from '../utils/request'
 import Layout from './users/SharedLinks'
 
 const FormItem = Form.Item
@@ -28,10 +28,16 @@ class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProp
     const { form, history, intl } = this.props
     form.validateFields((err, values) => {
       if (!err) {
-        httpPost("/install", values).then((_) => {
+        graphql({
+          query: `{
+        install(lang: "aaa") {
+          code, message
+        }
+        }`, variables: {}
+        }, () => {
           message.success(intl.formatMessage({ id: "flashes.success" }))
           history.push("/users/sign-in")
-        }).catch(message.error)
+        })
       }
     })
   }
