@@ -1,3 +1,4 @@
+pub mod actix;
 pub mod context;
 pub mod mutation;
 pub mod query;
@@ -13,14 +14,19 @@ use serde::Serialize;
 
 use super::errors::Result;
 
+pub fn new() -> Schema {
+    Schema::new(query::Query {}, mutation::Mutation {})
+}
+
 pub type Schema =
     juniper::RootNode<'static, query::Query, mutation::Mutation, juniper::DefaultScalarValue>;
-pub type Context = (Arc<context::Context>, session::Session);
 
 pub trait Handler {
     type Item;
     fn handle(&self, c: &context::Context, s: &session::Session) -> Result<Self::Item>;
 }
+
+pub type Context = (context::Context, session::Session);
 
 #[derive(Serialize)]
 pub struct I64(pub i64);

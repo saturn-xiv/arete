@@ -34,24 +34,24 @@ impl Router {
         Self { routes: routes }
     }
 
-    pub fn handle<S>(&self, ctx: &Context, req: &Request<S>) -> Result<Option<Response>> {
-        let theme = match self.theme(ctx) {
-            Ok(v) => v,
-            Err(_) => Theme::default(),
-        };
-        let (method, path) = (req.method(), req.uri().path());
-        for (mt, re, rt) in self.routes.iter() {
-            if method == mt {
-                if let Some(cap) = re.captures(path) {
-                    info!("match {}", re);
-                    let rs = rt.handle(&theme, ctx, &cap)?;
-                    return Ok(Some(rs));
-                }
-            }
-        }
+    // pub fn handle<S>(&self, ctx: &Context, req: &Request<S>) -> Result<Option<Response>> {
+    //     let theme = match self.theme(ctx) {
+    //         Ok(v) => v,
+    //         Err(_) => Theme::default(),
+    //     };
+    //     let (method, path) = (req.method(), req.uri().path());
+    //     for (mt, re, rt) in self.routes.iter() {
+    //         if method == mt {
+    //             if let Some(cap) = re.captures(path) {
+    //                 info!("match {}", re);
+    //                 let rs = rt.handle(&theme, ctx, &cap)?;
+    //                 return Ok(Some(rs));
+    //             }
+    //         }
+    //     }
 
-        Ok(None)
-    }
+    //     Ok(None)
+    // }
 
     pub fn get<P: AsRef<str>>(&mut self, p: P, r: Box<Route>) -> Result<()> {
         self.add(Method::GET, p, r)
@@ -78,12 +78,12 @@ impl Router {
         Ok(())
     }
 
-    fn theme(&self, ctx: &Context) -> Result<Theme> {
-        let db = ctx.db()?;
-        let db = db.deref();
-        let it = SettingDao::get::<&'static str, Theme, Sodium>(db, &ctx.encryptor, &Theme::KEY)?;
-        Ok(it)
-    }
+    // fn theme(&self, ctx: &Context) -> Result<Theme> {
+    //     let db = ctx.db()?;
+    //     let db = db.deref();
+    //     let it = SettingDao::get::<&'static str, Theme, Sodium>(db, &ctx.encryptor, &Theme::KEY)?;
+    //     Ok(it)
+    // }
 }
 
 pub trait Route: Sync + Send {

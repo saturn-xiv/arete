@@ -1,29 +1,34 @@
 use std::fmt;
 
-use cookie::Cookie;
-use hyper::{
-    header::{ACCEPT_LANGUAGE, AUTHORIZATION, COOKIE},
-    Request,
+use actix::prelude::*;
+use actix_web::{
+    error::{ErrorBadRequest, ErrorUnauthorized},
+    http::header::{LanguageTag, ACCEPT_LANGUAGE, AUTHORIZATION},
+    Error, FromRequest, HttpRequest, Result,
 };
-use language_tags::LanguageTag;
-use url::Url;
-
-pub trait FromRequest: Sized {
-    fn from_request<S>(req: &Request<S>) -> Option<Self>;
-}
 
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For
 pub struct ClientIp(pub String);
 
-impl FromRequest for ClientIp {
-    fn from_request<S>(req: &Request<S>) -> Option<Self> {
+impl fmt::Display for ClientIp {
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        write!(fmt, "{}", self.0)
+    }
+}
+
+impl<S> FromRequest<S> for ClientIp {
+    type Config = ();
+    type Result = Result<Self, Error>;
+
+    #[inline]
+    fn from_request(req: &HttpRequest<S>, _cfg: &Self::Config) -> Self::Result {
         let headers = req.headers();
         if let Some(it) = headers.get("X-Forwarded-For") {
             if let Ok(it) = it.to_str() {
                 if let Some(it) = it.split(",").next() {
                     let it = it.trim();
                     if !it.is_empty() {
-                        return Some(Self(it.to_string()));
+                        return Ok(Self(it.to_string()));
                     }
                 }
             }
@@ -31,99 +36,91 @@ impl FromRequest for ClientIp {
         if let Some(it) = headers.get("X-Real-Ip") {
             if let Ok(it) = it.to_str() {
                 if !it.is_empty() {
-                    return Some(Self(it.to_string()));
+                    return Ok(Self(it.to_string()));
                 }
             }
         }
         if let Some(it) = headers.get("X-Appengine-Remote-Addr") {
             if let Ok(it) = it.to_str() {
                 if !it.is_empty() {
-                    return Some(Self(it.to_string()));
+                    return Ok(Self(it.to_string()));
                 }
             }
         }
-        None
+
+        Ok(Self(req.connection_info().host().to_string()))
     }
 }
 
-pub struct Home {
-    pub host: String,
-    pub schema: String,
-    pub port: Option<u16>,
+pub struct Home(pub String);
+
+impl Home {
+    pub const KEY: &'static str = "home";
 }
 
 impl fmt::Display for Home {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        if let Some(p) = self.port {
-            if (self.schema == "http" && p != 80) || (self.schema == "https" && p != 443) {
-                return write!(fmt, "{}://{}:{}", self.schema, self.host, p);
-            }
-        }
-        write!(fmt, "{}://{}", self.schema, self.host)
+        write!(fmt, "{}", self.0)
     }
 }
 
-impl FromRequest for Home {
-    fn from_request<S>(req: &Request<S>) -> Option<Self> {
-        let u = req.uri();
-        if let Some(s) = u.scheme_str() {
-            if let Some(h) = u.host() {
-                return Some(Self {
-                    host: h.to_string(),
-                    schema: s.to_string(),
-                    port: u.port_u16(),
-                });
-            }
-        }
-        None
+impl<S> FromRequest<S> for Home {
+    type Config = ();
+    type Result = Result<Self, Error>;
+
+    #[inline]
+    fn from_request(req: &HttpRequest<S>, _cfg: &Self::Config) -> Self::Result {
+        Ok(Self(req.url_for_static(Self::KEY)?.to_string()))
     }
 }
 
 pub struct Token(pub String);
 
-impl FromRequest for Token {
-    fn from_request<S>(req: &Request<S>) -> Option<Self> {
+impl<S> FromRequest<S> for Token {
+    type Config = ();
+    type Result = Result<Self, Error>;
+
+    #[inline]
+    fn from_request(req: &HttpRequest<S>, _cfg: &Self::Config) -> Self::Result {
         let headers = req.headers();
         if let Some(it) = headers.get(AUTHORIZATION) {
             if let Ok(it) = it.to_str() {
                 let bearer = "Bearer ";
                 if it.starts_with(bearer) {
-                    return Some(Self(it[bearer.len()..].to_string()));
+                    return Ok(Self(it[bearer.len()..].to_string()));
                 }
             }
         }
-        None
+        Err(ErrorUnauthorized("bad token"))
     }
 }
 
 pub struct Locale(pub String);
 
-impl FromRequest for Locale {
-    fn from_request<S>(req: &Request<S>) -> Option<Self> {
+impl Default for Locale {
+    fn default() -> Self {
+        Self("en-US".to_string())
+    }
+}
+impl<S> FromRequest<S> for Locale {
+    type Config = ();
+    type Result = Result<Self, Error>;
+
+    #[inline]
+    fn from_request(req: &HttpRequest<S>, _cfg: &Self::Config) -> Self::Result {
         let key = "locale";
 
         // 1. Check URL arguments.
-        if let Ok(it) = Url::parse(&req.uri().to_string()) {
-            if let Some((_, v)) = it.query_pairs().find(|(k, _)| k == key) {
-                return Some(Self(v.to_string()));
-            }
+        if let Some(it) = req.query().get(key) {
+            return Ok(Self(it.to_string()));
+        }
+
+        // 2. Get language information from cookies.
+        if let Some(it) = req.cookie(key) {
+            return Ok(Self(it.to_string()));
         }
 
         let headers = req.headers();
-
-        // 2. Get language information from cookies.
-        if let Some(it) = headers.get(COOKIE) {
-            if let Ok(it) = it.to_str() {
-                for it in it.split(";") {
-                    if let Ok(it) = Cookie::parse(it) {
-                        if it.name() == key {
-                            return Some(Self(it.value().to_string()));
-                        }
-                    }
-                }
-            }
-        }
-
         // 3. Get language information from 'Accept-Language'.
         // https://www.w3.org/International/questions/qa-accept-lang-locales
         // https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.4
@@ -131,11 +128,11 @@ impl FromRequest for Locale {
             if let Ok(it) = it.to_str() {
                 if let Ok(it) = it.parse::<LanguageTag>() {
                     if let Some(it) = it.language {
-                        return Some(Self(it));
+                        return Ok(Self(it));
                     }
                 }
             }
         }
-        None
+        Ok(Locale::default())
     }
 }

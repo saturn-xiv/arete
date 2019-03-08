@@ -4,6 +4,8 @@ pub mod schema;
 use std::default::Default;
 use std::fmt;
 
+use actix::prelude::*;
+
 use super::errors::Result;
 
 // https://www.postgresql.org/docs/current/runtime-config-logging.html
@@ -12,6 +14,12 @@ pub type Connection = diesel::pg::PgConnection;
 pub type Pool = diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<Connection>>;
 pub type PooledConnection =
     diesel::r2d2::PooledConnection<diesel::r2d2::ConnectionManager<Connection>>;
+
+pub struct DbExecutor(pub Pool);
+
+impl Actor for DbExecutor {
+    type Context = SyncContext<Self>;
+}
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]

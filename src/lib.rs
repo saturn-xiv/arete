@@ -15,6 +15,8 @@ extern crate juniper;
 #[macro_use]
 extern crate serde_json;
 
+extern crate actix;
+extern crate actix_web;
 extern crate askama;
 extern crate base64;
 extern crate chrono;

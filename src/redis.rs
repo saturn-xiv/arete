@@ -1,11 +1,19 @@
 use std::default::Default;
 use std::fmt;
 
+use actix::prelude::*;
+
 use super::errors::Result;
 
 pub type Connection = r2d2_redis::redis::Connection;
 pub type Pool = r2d2_redis::r2d2::Pool<r2d2_redis::RedisConnectionManager>;
 pub type PooledConnection = r2d2_redis::r2d2::PooledConnection<r2d2_redis::RedisConnectionManager>;
+
+pub struct CacheExecutor(pub Pool);
+
+impl Actor for CacheExecutor {
+    type Context = SyncContext<Self>;
+}
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
