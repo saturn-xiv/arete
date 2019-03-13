@@ -1,5 +1,6 @@
 use chrono::NaiveDateTime;
 use diesel::{insert_into, prelude::*};
+use ipnetwork::IpNetwork;
 
 use super::super::super::super::{errors::Result, orm::Connection};
 use super::super::schema::logs;
@@ -9,18 +10,18 @@ use super::super::schema::logs;
 pub struct Item {
     pub id: i64,
     pub user_id: i64,
-    pub ip: Option<String>,
+    pub ip: IpNetwork,
     pub message: String,
     pub created_at: NaiveDateTime,
 }
 
 pub trait Dao {
-    fn add<S: Into<String>>(&self, user: &i64, ip: &Option<String>, message: S) -> Result<()>;
+    fn add<S: Into<String>>(&self, user: &i64, ip: &IpNetwork, message: S) -> Result<()>;
     fn all(&self, user: &i64, limit: i64) -> Result<Vec<Item>>;
 }
 
 impl Dao for Connection {
-    fn add<S: Into<String>>(&self, user: &i64, ip: &Option<String>, message: S) -> Result<()> {
+    fn add<S: Into<String>>(&self, user: &i64, ip: &IpNetwork, message: S) -> Result<()> {
         insert_into(logs::dsl::logs)
             .values((
                 logs::dsl::user_id.eq(user),

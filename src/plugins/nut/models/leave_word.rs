@@ -1,5 +1,6 @@
 use chrono::NaiveDateTime;
 use diesel::{delete, insert_into, prelude::*};
+use ipnetwork::IpNetwork;
 
 use super::super::super::super::{errors::Result, orm::Connection};
 use super::super::{schema::leave_words, MediaType};
@@ -8,20 +9,20 @@ use super::super::{schema::leave_words, MediaType};
 #[serde(rename_all = "camelCase")]
 pub struct Item {
     pub id: i64,
-    pub ip: Option<String>,
+    pub ip: IpNetwork,
     pub body: String,
     pub media_type: String,
     pub created_at: NaiveDateTime,
 }
 
 pub trait Dao {
-    fn add(&self, ip: &Option<String>, body: &String, media_type: &MediaType) -> Result<()>;
+    fn add(&self, ip: &IpNetwork, body: &String, media_type: &MediaType) -> Result<()>;
     fn all(&self, limit: i64) -> Result<Vec<Item>>;
     fn delete(&self, id: &i64) -> Result<()>;
 }
 
 impl Dao for Connection {
-    fn add(&self, ip: &Option<String>, body: &String, media_type: &MediaType) -> Result<()> {
+    fn add(&self, ip: &IpNetwork, body: &String, media_type: &MediaType) -> Result<()> {
         insert_into(leave_words::dsl::leave_words)
             .values((
                 leave_words::dsl::ip.eq(ip),

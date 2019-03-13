@@ -1,5 +1,6 @@
 use chrono::{NaiveDateTime, Utc};
 use diesel::{insert_into, prelude::*};
+use ipnetwork::IpNetwork;
 use serde_json::Value;
 
 use super::super::super::super::{errors::Result, orm::Connection};
@@ -11,7 +12,7 @@ pub struct Item {
     pub form_id: i64,
     pub email: String,
     pub username: String,
-    pub ip: Option<String>,
+    pub ip: IpNetwork,
     pub content: Value,
     pub created_at: NaiveDateTime,
 }
@@ -22,7 +23,7 @@ pub trait Dao {
         form: &i64,
         email: &String,
         username: &String,
-        ip: &Option<String>,
+        ip: &IpNetwork,
         content: &Value,
     ) -> Result<i64>;
     fn by_form(&self, id: &i64) -> Result<Vec<Item>>;
@@ -34,7 +35,7 @@ impl Dao for Connection {
         form: &i64,
         email: &String,
         username: &String,
-        ip: &Option<String>,
+        ip: &IpNetwork,
         content: &Value,
     ) -> Result<i64> {
         let now = Utc::now().naive_utc();

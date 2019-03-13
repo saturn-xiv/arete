@@ -47,10 +47,10 @@ pub struct Config {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Http {
+    pub origin: String,
     pub port: u16,
     pub workers: usize,
     pub upload: Upload,
-    pub origin: String,
 }
 
 impl Default for Http {

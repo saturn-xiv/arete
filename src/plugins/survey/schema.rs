@@ -34,7 +34,7 @@ table! {
         id -> Int8,
         form_id -> Int8,
         user_id -> Nullable<Int8>,
-        ip -> Nullable<Varchar>,
+        ip -> Inet,
         message -> Varchar,
         created_at -> Timestamp,
     }
@@ -46,7 +46,7 @@ table! {
         form_id -> Int8,
         email -> Varchar,
         username -> Varchar,
-        ip -> Nullable<Varchar>,
+        ip -> Inet,
         content -> Json,
         created_at -> Timestamp,
     }

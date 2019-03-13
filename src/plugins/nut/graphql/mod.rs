@@ -59,7 +59,7 @@ impl Handler for Install {
             let (nbf, exp) = Policy::weeks(1 << 12);
             PolicyDao::apply(db, &it.id, &Role::Root, &None::<String>, &nbf, &exp)?;
             PolicyDao::apply(db, &it.id, &Role::Admin, &None::<String>, &nbf, &exp)?;
-            __i18n_l!(db, &it.id, &None, &s.lang, "nut.logs.init-database")?;
+            __i18n_l!(db, &it.id, &s.client_ip, &s.lang, "nut.logs.init-database")?;
 
             Ok(())
         })?;

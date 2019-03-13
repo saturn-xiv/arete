@@ -160,9 +160,9 @@ impl From<User> for Info {
             provider_type: it.provider_type,
             sign_in_count: I64(it.sign_in_count),
             current_sign_in_at: it.current_sign_in_at,
-            current_sign_in_ip: it.current_sign_in_ip,
+            current_sign_in_ip: it.current_sign_in_ip.map(|x| x.ip().to_string()),
             last_sign_in_at: it.last_sign_in_at,
-            last_sign_in_ip: it.last_sign_in_ip,
+            last_sign_in_ip: it.last_sign_in_ip.map(|x| x.ip().to_string()),
             updated_at: it.updated_at,
         }
     }
@@ -528,7 +528,7 @@ impl Handler for ResetPassword {
 #[derive(GraphQLObject)]
 pub struct Log {
     pub id: I64,
-    pub ip: Option<String>,
+    pub ip: String,
     pub message: String,
     pub created_at: NaiveDateTime,
 }
@@ -549,7 +549,7 @@ impl Handler for Logs {
             .into_iter()
             .map(|it| Log {
                 id: I64(it.id),
-                ip: it.ip,
+                ip: it.ip.ip().to_string(),
                 message: it.message,
                 created_at: it.created_at,
             })

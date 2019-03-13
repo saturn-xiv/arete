@@ -30,7 +30,7 @@ impl Handler for Create {
 #[derive(GraphQLObject)]
 pub struct LeaveWord {
     pub id: I64,
-    pub ip: Option<String>,
+    pub ip: String,
     pub body: String,
     pub media_type: String,
     pub created_at: NaiveDateTime,
@@ -40,7 +40,7 @@ impl From<Item> for LeaveWord {
     fn from(it: Item) -> Self {
         Self {
             id: I64(it.id),
-            ip: it.ip,
+            ip: it.ip.ip().to_string(),
             body: it.body,
             media_type: it.media_type,
             created_at: it.created_at,

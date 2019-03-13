@@ -1,4 +1,5 @@
 use actix_web::http::StatusCode;
+use ipnetwork::IpNetwork;
 
 use super::super::{
     errors::{Error, Result},
@@ -20,7 +21,7 @@ pub struct Session {
     pub lang: String,
     pub home: String,
     pub user: Option<User>,
-    pub client_ip: Option<String>,
+    pub client_ip: IpNetwork,
 }
 
 impl Session {
@@ -35,7 +36,7 @@ impl Session {
             return Self {
                 home: home.0,
                 user: Self::user(&ctx.jwt, &db, token),
-                client_ip: Some(client_ip.0),
+                client_ip: client_ip.0,
                 lang: Self::locale(&db, locale),
             };
         }
@@ -43,7 +44,7 @@ impl Session {
         Self {
             home: home.0,
             user: None,
-            client_ip: Some(client_ip.0),
+            client_ip: client_ip.0,
             lang: Locale::default().0,
         }
     }

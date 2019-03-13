@@ -30,7 +30,7 @@ CREATE TABLE survey_responses(
   form_id BIGINT NOT NULL,
   email VARCHAR(255) NOT NULL,
   username VARCHAR(32) NOT NULL,
-  ip VARCHAR(45),
+  ip INET NOT NULL,
   content JSON NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -42,7 +42,7 @@ CREATE TABLE survey_logs(
   id BIGSERIAL PRIMARY KEY,
   form_id BIGINT NOT NULL,
   user_id BIGINT,
-  ip VARCHAR(45),
+  ip INET NOT NULL,
   message VARCHAR(255) NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
