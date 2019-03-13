@@ -1,19 +1,15 @@
 use super::super::{
-    crypto::sodium::Encryptor as Sodium,
-    env::Config,
-    errors::Result,
-    jwt::Jwt,
-    orm::PooledConnection as DbConnection,
-    queue::rabbitmq::RabbitMQ,
-    redis::{Pool as Cache, PooledConnection as CacheConnection},
+    crypto::sodium::Encryptor as Sodium, env::Config, errors::Result, jwt::Jwt,
+    orm::PooledConnection as DbConnection, queue::rabbitmq::RabbitMQ,
+    redis::PooledConnection as CacheConnection,
 };
 
 pub struct Context {
-    pub db: DbConnection,
-    // pub cache: Cache,
-    // pub queue: RabbitMQ,
-    // pub jwt: Jwt,
-    // pub encryptor: Sodium,
+    // pub db: DbConnection,
+// pub cache: CacheConnection,
+// pub queue: RabbitMQ,
+// pub jwt: Jwt,
+// pub encryptor: Sodium,
 }
 
 impl Context {

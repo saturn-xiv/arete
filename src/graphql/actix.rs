@@ -46,7 +46,8 @@ impl Handler<GraphQLData> for GraphQLExecutor {
             &self.schema,
             &(
                 Context {
-                    db: self.db.get().map_err(ErrorInternalServerError)?,
+                    // db: self.db.get().map_err(ErrorInternalServerError)?,
+                    // cache: self.cache.get().map_err(ErrorInternalServerError)?,
                 },
                 msg.session,
             ),
@@ -72,13 +73,14 @@ pub fn post(
         Option<Token>,
     ),
 ) -> FutureResponse<HttpResponse> {
+    info!("{} {} ", home, locale);
     app.graphql
         .send(GraphQLData {
             request: body.0,
             session: Session {
-                home: home.0,
-                locale: locale.0,
-                token: token.map(|x| x.0),
+                // home: home.0,
+                // locale: locale.0,
+                // token: token.map(|x| x.0),
             },
         })
         .from_err()

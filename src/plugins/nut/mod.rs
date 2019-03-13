@@ -1,4 +1,5 @@
 // pub mod graphql;
+pub mod html;
 pub mod models;
 pub mod schema;
 pub mod seo;

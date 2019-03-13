@@ -9,7 +9,11 @@ use super::{Context, Handler, I64};
 
 pub struct Mutation;
 
-graphql_object!(Mutation: Context | &self | {});
+graphql_object!(Mutation: Context | &self | {
+    field aaa() -> &str {
+        "aaa"
+    }
+});
 
 // graphql_object!(Mutation: Context | &self | {
 //     field install(&executor, form: nut::graphql::Install) -> FieldResult<()> {

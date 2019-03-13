@@ -1,27 +1,26 @@
+use std::net::{SocketAddr, ToSocketAddrs};
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
 
 use actix::{prelude::*, System};
 use actix_web::{
-    http, middleware, server, App, AsyncResponder, Error, FutureResponse, HttpRequest,
-    HttpResponse, Json, State,
+    http,
+    middleware::{cors::Cors, Logger},
+    server, App, AsyncResponder, Error, FutureResponse, HttpRequest, HttpResponse, Json, State,
 };
 use futures::future::Future;
 
 use super::super::super::{
     env::{self, Config, NAME},
     errors::Result,
-    graphql::{
-        actix::{doc as graphiql_doc, post as graphiql_post, GraphQLExecutor},
-        // context::Context,
-        new as create_schema,
-    },
+    graphql,
     http::Response,
     orm::DbExecutor,
-    plugins::nut::tasks::send_email,
+    plugins::nut::{self, tasks::send_email},
     queue::Queue,
     redis::CacheExecutor,
+    request::Home,
 };
 use super::State as AppState;
 
@@ -47,10 +46,10 @@ pub fn launch(cfg: Config) -> Result<()> {
 
     let cache = cfg.redis.open()?;
     let db = cfg.postgresql.open()?;
-    let graphql = Arc::new(create_schema());
+    let gql = Arc::new(graphql::new());
     let (gdb, gch) = (db.clone(), cache.clone());
-    let graphql = SyncArbiter::start(3, move || GraphQLExecutor {
-        schema: graphql.clone(),
+    let gql = SyncArbiter::start(3, move || graphql::actix::GraphQLExecutor {
+        schema: gql.clone(),
         db: gdb.clone(),
         cache: gch.clone(),
     });
@@ -58,23 +57,27 @@ pub fn launch(cfg: Config) -> Result<()> {
     let db = SyncArbiter::start(3, move || DbExecutor(db.clone()));
     let cache = SyncArbiter::start(3, move || CacheExecutor(cache.clone()));
 
+    let addr = SocketAddr::from(([127, 0, 0, 1], cfg.http.port));
     server::new(move || {
         App::with_state(AppState {
-            graphql: graphql.clone(),
+            graphql: gql.clone(),
             db: db.clone(),
             cache: cache.clone(),
         })
-        .middleware(middleware::Logger::default())
+        .middleware(Logger::default())
         .resource("/graphql", |r| {
-            r.method(http::Method::POST).with(graphiql_post)
+            r.method(http::Method::GET).h(graphql::actix::doc);
+            r.method(http::Method::POST).with(graphql::actix::post)
         })
-        .resource("/graphiql", |r| r.method(http::Method::GET).h(graphiql_doc))
+        .resource("/", |r| {
+            r.name(Home::KEY);
+            r.method(http::Method::GET).f(nut::html::index)
+        })
     })
-    .bind("127.0.0.1:8080")
-    .unwrap()
+    .bind(&addr)?
     .start();
 
-    println!("Started http server: 127.0.0.1:8080");
+    let _ = sys.run();
     // let root = Arc::new(new_schema);
 
     // let service = move || {

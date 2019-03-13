@@ -1,24 +1,26 @@
 use std::ops::Deref;
 
+use actix::prelude::*;
 use hyper::{Request, StatusCode};
 
 use super::super::{
     errors::{Error, Result},
     i18n::I18n,
     jwt::Jwt,
-    orm::Connection,
+    orm::DbExecutor,
     plugins::nut::models::{
         policy::{Dao as PolicyDao, Role},
         user::{Dao as UserDao, Item as User},
     },
+    redis::CacheExecutor,
     request::ClientIp,
 };
 use super::context::Context;
 
 pub struct Session {
-    pub locale: String,
-    pub home: String,
-    pub token: Option<String>,
+    // pub locale: String,
+// pub home: String,
+// pub token: Option<String>,
 }
 
 impl Session {

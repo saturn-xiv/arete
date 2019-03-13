@@ -76,6 +76,12 @@ impl<S> FromRequest<S> for Home {
 
 pub struct Token(pub String);
 
+impl fmt::Display for Token {
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        write!(fmt, "{}", self.0)
+    }
+}
+
 impl<S> FromRequest<S> for Token {
     type Config = ();
     type Result = Result<Self, Error>;
@@ -97,6 +103,12 @@ impl<S> FromRequest<S> for Token {
 
 pub struct Locale(pub String);
 
+impl fmt::Display for Locale {
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        write!(fmt, "{}", self.0)
+    }
+}
+
 impl Default for Locale {
     fn default() -> Self {
         Self("en-US".to_string())
@@ -117,7 +129,7 @@ impl<S> FromRequest<S> for Locale {
 
         // 2. Get language information from cookies.
         if let Some(it) = req.cookie(key) {
-            return Ok(Self(it.to_string()));
+            return Ok(Self(it.value().to_string()));
         }
 
         let headers = req.headers();

@@ -10,12 +10,13 @@ use super::{Context, Handler, I64};
 
 pub struct Query;
 
-graphql_object!(Query: Context | &self | {});
+graphql_object!(Query: Context | &self | {
+    field apiVersion() -> &str {
+        VERSION
+    }
+});
 
 // graphql_object!(Query: Context |&self| {
-//     field apiVersion() -> &str {
-//          VERSION
-//     }
 
 //     field author(&executor) -> FieldResult<nut::graphql::site::Author> {
 //         __graphql!(executor, &nut::graphql::site::GetAuthor{})
