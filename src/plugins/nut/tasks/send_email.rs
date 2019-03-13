@@ -44,138 +44,138 @@ impl Config {
     const KEY: &'static str = "site.smtp";
 }
 
-// #[derive(Validate)]
-// pub struct Get {}
+#[derive(Validate)]
+pub struct Get {}
 
-// impl Handler for Get {
-//     type Item = Config;
-//     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-//         let db = c.db()?;
-//         let db = db.deref();
-//         s.administrator(db)?;
+impl Handler for Get {
+    type Item = Config;
+    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
+        let db = c.db()?;
+        let db = db.deref();
+        s.administrator(db)?;
 
-//         let it: Config = match SettingsDao::get(db, &c.encryptor, &Config::KEY.to_string()) {
-//             Ok(v) => v,
-//             Err(_) => Config::default(),
-//         };
-//         Ok(it)
-//     }
-// }
+        let it: Config = match SettingsDao::get(db, &c.encryptor, &Config::KEY.to_string()) {
+            Ok(v) => v,
+            Err(_) => Config::default(),
+        };
+        Ok(it)
+    }
+}
 
-// impl Handler for Config {
-//     type Item = ();
-//     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-//         let db = c.db()?;
-//         let db = db.deref();
-//         s.administrator(db)?;
-//         SettingsDao::set::<String, Config, Sodium>(
-//             db,
-//             &c.encryptor,
-//             &Self::KEY.to_string(),
-//             &self,
-//             true,
-//         )?;
-//         Ok(())
-//     }
-// }
+impl Handler for Config {
+    type Item = ();
+    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
+        let db = c.db()?;
+        let db = db.deref();
+        s.administrator(db)?;
+        SettingsDao::set::<String, Config, Sodium>(
+            db,
+            &c.encryptor,
+            &Self::KEY.to_string(),
+            &self,
+            true,
+        )?;
+        Ok(())
+    }
+}
 
-// #[derive(Validate)]
-// pub struct Test {}
+#[derive(Validate)]
+pub struct Test {}
 
-// impl Handler for Test {
-//     type Item = ();
-//     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-//         let db = c.db()?;
-//         let db = db.deref();
-//         let user = s.administrator(db)?;
-//         let user = UserDao::by_id(db, &user.id)?;
-//         c.queue.publish(
-//             NAME.to_string(),
-//             Uuid::new_v4().to_string(),
-//             Task {
-//                 email: user.email.clone(),
-//                 name: user.real_name.clone(),
-//                 subject: format!("Hi, {}", user.real_name),
-//                 body: "This is a test email.".to_string(),
-//             },
-//         )?;
-//         Ok(())
-//     }
-// }
+impl Handler for Test {
+    type Item = ();
+    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
+        let db = c.db()?;
+        let db = db.deref();
+        let user = s.administrator(db)?;
+        let user = UserDao::by_id(db, &user.id)?;
+        c.queue.publish(
+            NAME.to_string(),
+            Uuid::new_v4().to_string(),
+            Task {
+                email: user.email.clone(),
+                name: user.real_name.clone(),
+                subject: format!("Hi, {}", user.real_name),
+                body: "This is a test email.".to_string(),
+            },
+        )?;
+        Ok(())
+    }
+}
 
-// #[cfg(debug_assertions)]
-// pub type Consumer = Printer;
-// #[cfg(not(debug_assertions))]
-// pub type Consumer = SendEmail;
+#[cfg(debug_assertions)]
+pub type Consumer = Printer;
+#[cfg(not(debug_assertions))]
+pub type Consumer = SendEmail;
 
-// pub const NAME: &'static str = "send-email";
+pub const NAME: &'static str = "send-email";
 
-// #[derive(Debug, Serialize, Deserialize)]
-// #[serde(rename_all = "camelCase")]
-// pub struct Task {
-//     pub name: String,
-//     pub email: String,
-//     pub subject: String,
-//     pub body: String,
-// }
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Task {
+    pub name: String,
+    pub email: String,
+    pub subject: String,
+    pub body: String,
+}
 
-// impl fmt::Display for Task {
-//     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-//         write!(
-//             fmt,
-//             "{}<{}>\n{}\n{}",
-//             self.name, self.email, self.subject, self.body
-//         )
-//     }
-// }
+impl fmt::Display for Task {
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            fmt,
+            "{}<{}>\n{}\n{}",
+            self.name, self.email, self.subject, self.body
+        )
+    }
+}
 
-// pub struct Job(Task, Config);
+pub struct Job(Task, Config);
 
-// impl Into<Result<Email>> for Job {
-//     fn into(self) -> Result<Email> {
-//         let Job(t, c) = self;
-//         let v = EmailBuilder::new()
-//             .to((t.email, t.name))
-//             .from(c.email)
-//             .subject(t.subject)
-//             .text(t.body)
-//             .build()?;
-//         Ok(v)
-//     }
-// }
+impl Into<Result<Email>> for Job {
+    fn into(self) -> Result<Email> {
+        let Job(t, c) = self;
+        let v = EmailBuilder::new()
+            .to((t.email, t.name))
+            .from(c.email)
+            .subject(t.subject)
+            .text(t.body)
+            .build()?;
+        Ok(v)
+    }
+}
 
-// pub struct Printer {
-//     pub ctx: Arc<Context>,
-// }
+pub struct Printer {
+    pub ctx: Arc<Context>,
+}
 
-// impl QueueHandler for Printer {
-//     fn handle(&self, _id: String, payload: Vec<u8>) -> Result<()> {
-//         let task: Task = serde_json::from_slice(&payload)?;
-//         info!("send email {}", task);
-//         Ok(())
-//     }
-// }
+impl QueueHandler for Printer {
+    fn handle(&self, _id: String, payload: Vec<u8>) -> Result<()> {
+        let task: Task = serde_json::from_slice(&payload)?;
+        info!("send email {}", task);
+        Ok(())
+    }
+}
 
-// pub struct SendEmail {
-//     pub ctx: Arc<Context>,
-// }
+pub struct SendEmail {
+    pub ctx: Arc<Context>,
+}
 
-// impl QueueHandler for SendEmail {
-//     fn handle(&self, _id: String, payload: Vec<u8>) -> Result<()> {
-//         let task: Task = serde_json::from_slice(&payload)?;
+impl QueueHandler for SendEmail {
+    fn handle(&self, _id: String, payload: Vec<u8>) -> Result<()> {
+        let task: Task = serde_json::from_slice(&payload)?;
 
-//         info!("send email: {}<{}> {}", task.name, task.email, task.subject);
-//         let db = self.ctx.db()?;
-//         let db = db.deref();
-//         let cfg: Config = SettingsDao::get(db, &self.ctx.encryptor, &NAME.to_string())?;
+        info!("send email: {}<{}> {}", task.name, task.email, task.subject);
+        let db = self.ctx.db()?;
+        let db = db.deref();
+        let cfg: Config = SettingsDao::get(db, &self.ctx.encryptor, &NAME.to_string())?;
 
-//         let mut mailer = SmtpClient::new_simple(&cfg.host)?
-//             .credentials(Credentials::new(cfg.email.clone(), cfg.password.clone()))
-//             .timeout(Some(Duration::from_secs(60)))
-//             .transport();
-//         let email: Result<Email> = Job(task, cfg).into();
+        let mut mailer = SmtpClient::new_simple(&cfg.host)?
+            .credentials(Credentials::new(cfg.email.clone(), cfg.password.clone()))
+            .timeout(Some(Duration::from_secs(60)))
+            .transport();
+        let email: Result<Email> = Job(task, cfg).into();
 
-//         mailer.send(email?.into())?;
-//         Ok(())
-//     }
-// }
+        mailer.send(email?.into())?;
+        Ok(())
+    }
+}

@@ -1,102 +1,99 @@
-use std::ops::Deref;
-
-use actix::prelude::*;
-use hyper::{Request, StatusCode};
+use actix_web::http::StatusCode;
 
 use super::super::{
     errors::{Error, Result},
     i18n::I18n,
     jwt::Jwt,
-    orm::DbExecutor,
-    plugins::nut::models::{
-        policy::{Dao as PolicyDao, Role},
-        user::{Dao as UserDao, Item as User},
+    orm::Connection,
+    plugins::nut::{
+        graphql::users::{Action, Token},
+        models::{
+            policy::{Dao as PolicyDao, Role},
+            user::{Dao as UserDao, Item as User},
+        },
     },
-    redis::CacheExecutor,
-    request::ClientIp,
+    request::{ClientIp, Home, Locale, Token as Auth},
 };
 use super::context::Context;
 
 pub struct Session {
-    // pub locale: String,
-// pub home: String,
-// pub token: Option<String>,
+    pub lang: String,
+    pub home: String,
+    pub user: Option<User>,
+    pub client_ip: Option<String>,
 }
 
 impl Session {
-    //     const DEFAULT_LANG: &'static str = "en-US";
-    //     pub fn new<S>(ctx: &Context, req: &Request<S>) -> Self {
-    //         let client_ip = match ClientIp::from_request(req) {
-    //             Some(s) => Some(s.0),
-    //             None => None,
-    //         };
+    pub fn new(
+        ctx: &Context,
+        home: Home,
+        client_ip: ClientIp,
+        locale: Option<Locale>,
+        token: Option<Auth>,
+    ) -> Self {
+        if let Ok(db) = ctx.db() {
+            return Self {
+                home: home.0,
+                user: Self::user(&ctx.jwt, &db, token),
+                client_ip: Some(client_ip.0),
+                lang: Self::locale(&db, locale),
+            };
+        }
 
-    //         if let Ok(db) = ctx.db() {
-    //             let db = db.deref();
-    //             return Self {
-    //                 user: match Self::user(&ctx.jwt, db, req) {
-    //                     Ok(v) => v,
-    //                     Err(e) => {
-    //                         error!("{}", e);
-    //                         None
-    //                     }
-    //                 },
-    //                 client_ip: client_ip,
-    //                 lang: Self::locale(db, req),
-    //             };
-    //         }
+        Self {
+            home: home.0,
+            user: None,
+            client_ip: Some(client_ip.0),
+            lang: Locale::default().0,
+        }
+    }
 
-    //         Self {
-    //             user: None,
-    //             client_ip: client_ip,
-    //             lang: Self::DEFAULT_LANG.to_string(),
-    //         }
-    //     }
+    pub fn administrator(&self, db: &Connection) -> Result<&User> {
+        let user = self.current_user()?;
+        if PolicyDao::can(db, &user.id, &Role::Admin, &None) {
+            return Ok(user);
+        }
+        Err(Error::Http(StatusCode::FORBIDDEN).into())
+    }
 
-    // pub fn administrator(&self, db: &Connection) -> Result<&User> {
-    //     let user = self.current_user()?;
-    //     if PolicyDao::can(db, &user.id, &Role::Admin, &None) {
-    //         return Ok(user);
-    //     }
-    //     Err(Error::Http(StatusCode::FORBIDDEN).into())
-    // }
+    pub fn auth(&self, db: &Connection, role: &Role, resource: &Option<String>) -> Result<&User> {
+        let user = self.current_user()?;
+        if PolicyDao::can(db, &user.id, role, resource) {
+            return Ok(user);
+        }
+        self.administrator(db)
+    }
 
-    //     pub fn auth(&self, db: &Connection, role: &Role, resource: &Option<String>) -> Result<&User> {
-    //         let user = self.current_user()?;
-    //         if PolicyDao::can(db, &user.id, role, resource) {
-    //             return Ok(user);
-    //         }
-    //         self.administrator(db)
-    //     }
+    pub fn current_user(&self) -> Result<&User> {
+        match self.user {
+            Some(ref v) => Ok(v),
+            None => Err(Error::Http(StatusCode::UNAUTHORIZED).into()),
+        }
+    }
 
-    // pub fn current_user(&self) -> Result<&User> {
-    //     match self.user {
-    //         Some(ref v) => Ok(v),
-    //         None => Err(Error::Http(StatusCode::UNAUTHORIZED).into()),
-    //     }
-    // }
+    fn user(jwt: &Jwt, db: &Connection, token: Option<Auth>) -> Option<User> {
+        if let Some(token) = token {
+            if let Ok(token) = jwt.parse::<Token>(&token.0) {
+                let token = token.claims;
+                if token.act == Action::SignIn {
+                    if let Ok(user) = UserDao::by_uid(db, &token.uid) {
+                        if let Ok(_) = user.available() {
+                            return Some(user);
+                        }
+                    }
+                }
+            }
+        };
 
-    //     fn user<S>(jwt: &Jwt, db: &Connection, req: &Request<S>) -> Result<Option<User>> {
-    //         if let Some(token) = Auth::from_request(req) {
-    //             let token = jwt.parse::<Token>(&token.0)?.claims;
-    //             if token.act == Action::SignIn {
-    //                 if let Ok(user) = UserDao::by_uid(db, &token.uid) {
-    //                     if let Ok(_) = user.available() {
-    //                         return Ok(Some(user));
-    //                     }
-    //                 }
-    //             }
-    //         };
+        None
+    }
 
-    //         Ok(None)
-    //     }
-
-    //     fn locale<S>(db: &Connection, req: &Request<S>) -> String {
-    //         if let Some(it) = Locale::from_request(req) {
-    //             if I18n::exist(db, &it.0) {
-    //                 return it.0;
-    //             }
-    //         }
-    //         Self::DEFAULT_LANG.to_string()
-    //     }
+    fn locale(db: &Connection, locale: Option<Locale>) -> String {
+        if let Some(it) = locale {
+            if I18n::exist(db, &it.0) {
+                return it.0;
+            }
+        }
+        Locale::default().0
+    }
 }

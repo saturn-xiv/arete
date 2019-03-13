@@ -1,4 +1,4 @@
-use std::net::{SocketAddr, ToSocketAddrs};
+use std::net::SocketAddr;
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
@@ -7,62 +7,54 @@ use actix::{prelude::*, System};
 use actix_web::{
     http,
     middleware::{cors::Cors, Logger},
-    server, App, AsyncResponder, Error, FutureResponse, HttpRequest, HttpResponse, Json, State,
+    server, App,
 };
-use futures::future::Future;
 
 use super::super::super::{
     env::{self, Config, NAME},
     errors::Result,
     graphql,
-    http::Response,
-    orm::DbExecutor,
-    plugins::nut::{self, tasks::send_email},
+    plugins::nut,
     queue::Queue,
-    redis::CacheExecutor,
     request::Home,
 };
 use super::State as AppState;
 
 pub fn launch(cfg: Config) -> Result<()> {
-    // let ctx = Arc::new(Context::new(&cfg)?);
+    let ctx = Arc::new(graphql::context::Context::new(&cfg)?);
 
-    // info!("start send email thread");
-    // {
-    //     let ctx = ctx.clone();
-    //     thread::spawn(move || loop {
-    //         if let Ok(e) = ctx.queue.consume(
-    //             format!("{}-{}-{}", env::NAME, env::VERSION, send_email::NAME),
-    //             send_email::NAME.to_string(),
-    //             Box::new(send_email::Consumer { ctx: ctx.clone() }),
-    //         ) {
-    //             error!("send email thread failed {:?}", e);
-    //         }
-    //         thread::sleep(Duration::from_secs(30));
-    //     });
-    // }
+    info!("start send email thread");
+    {
+        let ctx = ctx.clone();
+        thread::spawn(move || loop {
+            if let Ok(e) = ctx.queue.consume(
+                format!(
+                    "{}-{}-{}",
+                    env::NAME,
+                    env::VERSION,
+                    nut::tasks::send_email::NAME
+                ),
+                nut::tasks::send_email::NAME.to_string(),
+                Box::new(nut::tasks::send_email::Consumer { ctx: ctx.clone() }),
+            ) {
+                error!("send email thread failed {:?}", e);
+            }
+            thread::sleep(Duration::from_secs(30));
+        });
+    }
 
     let sys = System::new(NAME);
 
-    let cache = cfg.redis.open()?;
-    let db = cfg.postgresql.open()?;
     let gql = Arc::new(graphql::new());
-    let (gdb, gch) = (db.clone(), cache.clone());
     let gql = SyncArbiter::start(3, move || graphql::actix::GraphQLExecutor {
         schema: gql.clone(),
-        db: gdb.clone(),
-        cache: gch.clone(),
     });
-
-    let db = SyncArbiter::start(3, move || DbExecutor(db.clone()));
-    let cache = SyncArbiter::start(3, move || CacheExecutor(cache.clone()));
 
     let addr = SocketAddr::from(([127, 0, 0, 1], cfg.http.port));
     server::new(move || {
         App::with_state(AppState {
             graphql: gql.clone(),
-            db: db.clone(),
-            cache: cache.clone(),
+            context: ctx.clone(),
         })
         .middleware(Logger::default())
         .resource("/graphql", |r| {

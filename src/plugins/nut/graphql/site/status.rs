@@ -15,7 +15,6 @@ use super::super::super::super::super::{
     orm::Connection as DbConnection,
     sys,
 };
-use super::super::super::super::ROUTER;
 
 const MB: u64 = 1024 * 1024;
 
@@ -209,14 +208,15 @@ impl Handler for Get {
             network: Network::new()?,
             redis: cmd("info").query::<String>(ch.deref())?,
             postgresql: PostgreSql::new(db.deref())?,
-            routes: ROUTER
-                .routes
-                .iter()
-                .map(|(m, p, _)| Route {
-                    path: p.to_string(),
-                    method: m.to_string(),
-                })
-                .collect(),
+            routes: Vec::new(),
+            // routes: ROUTER
+            //     .routes
+            //     .iter()
+            //     .map(|(m, p, _)| Route {
+            //         path: p.to_string(),
+            //         method: m.to_string(),
+            //     })
+            //     .collect(),
         })
     }
 }

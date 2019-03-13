@@ -1,6 +1,5 @@
 use std::fmt;
 
-use actix::prelude::*;
 use actix_web::{
     error::{ErrorBadRequest, ErrorUnauthorized},
     http::header::{LanguageTag, ACCEPT_LANGUAGE, AUTHORIZATION},
@@ -18,7 +17,7 @@ impl fmt::Display for ClientIp {
 
 impl<S> FromRequest<S> for ClientIp {
     type Config = ();
-    type Result = Result<Self, Error>;
+    type Result = Self;
 
     #[inline]
     fn from_request(req: &HttpRequest<S>, _cfg: &Self::Config) -> Self::Result {
@@ -28,7 +27,7 @@ impl<S> FromRequest<S> for ClientIp {
                 if let Some(it) = it.split(",").next() {
                     let it = it.trim();
                     if !it.is_empty() {
-                        return Ok(Self(it.to_string()));
+                        return Self(it.to_string());
                     }
                 }
             }
@@ -36,19 +35,19 @@ impl<S> FromRequest<S> for ClientIp {
         if let Some(it) = headers.get("X-Real-Ip") {
             if let Ok(it) = it.to_str() {
                 if !it.is_empty() {
-                    return Ok(Self(it.to_string()));
+                    return Self(it.to_string());
                 }
             }
         }
         if let Some(it) = headers.get("X-Appengine-Remote-Addr") {
             if let Ok(it) = it.to_str() {
                 if !it.is_empty() {
-                    return Ok(Self(it.to_string()));
+                    return Self(it.to_string());
                 }
             }
         }
 
-        Ok(Self(req.connection_info().host().to_string()))
+        Self(req.connection_info().host().to_string())
     }
 }
 
@@ -145,6 +144,6 @@ impl<S> FromRequest<S> for Locale {
                 }
             }
         }
-        Ok(Locale::default())
+        Err(ErrorBadRequest("can't find language tag"))
     }
 }

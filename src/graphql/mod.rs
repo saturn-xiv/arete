@@ -26,7 +26,7 @@ pub trait Handler {
     fn handle(&self, c: &context::Context, s: &session::Session) -> Result<Self::Item>;
 }
 
-pub type Context = (context::Context, session::Session);
+pub type Context = (Arc<context::Context>, session::Session);
 
 #[derive(Serialize)]
 pub struct I64(pub i64);

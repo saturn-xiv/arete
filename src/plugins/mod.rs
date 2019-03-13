@@ -6,12 +6,3 @@ pub mod ops;
 pub mod survey;
 pub mod vip;
 pub mod wiki;
-
-use super::http::Router;
-
-lazy_static! {
-    pub static ref ROUTER: Router = {
-        let it = Router::new();
-        it
-    };
-}
