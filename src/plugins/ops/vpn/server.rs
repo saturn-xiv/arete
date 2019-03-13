@@ -1,11 +1,15 @@
-use std::fs;
+use std::fs::OpenOptions;
 use std::io::prelude::*;
 use std::os::unix::fs::OpenOptionsExt;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use askama::Template;
 
 use super::super::super::super::errors::Result;
+
+lazy_static! {
+    static ref ROOT: PathBuf = Path::new("/etc").join("openvpn").join("server");
+}
 
 #[derive(Template)]
 #[template(path = "openvpn/server.conf", escape = "none")]
@@ -15,21 +19,21 @@ pub struct Config<'a> {
     pub network: &'a str,
     pub netmask: &'a str,
 }
-
-pub fn setup<'a>(cfg: &'a Config) -> Result<()> {
-    let root = Path::new("/etc").join("openvpn").join("server");
-    let cfg = cfg.render()?;
-    {
-        let file = root.join("server.conf");
-        info!("generate file {}", file.display());
-        let mut fd = fs::OpenOptions::new()
-            .write(true)
-            .create(true)
-            .mode(0o600)
-            .open(file)?;
-        fd.write_all(cfg.as_bytes())?;
+impl<'a> Config<'a> {
+    pub fn setup(&self) -> Result<()> {
+        let cfg = self.render()?;
+        {
+            let file = ROOT.join("server.conf");
+            info!("generate file {}", file.display());
+            let mut fd = OpenOptions::new()
+                .write(true)
+                .create(true)
+                .mode(0o600)
+                .open(file)?;
+            fd.write_all(cfg.as_bytes())?;
+        }
+        Ok(())
     }
-    Ok(())
 }
 
 pub fn create() -> Result<()> {

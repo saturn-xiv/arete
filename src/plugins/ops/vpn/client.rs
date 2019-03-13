@@ -1,11 +1,15 @@
-use std::fs;
+use std::fs::{remove_dir_all, OpenOptions};
 use std::io::prelude::*;
 use std::os::unix::fs::OpenOptionsExt;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use askama::Template;
 
 use super::super::super::super::errors::Result;
+
+lazy_static! {
+    static ref ROOT: PathBuf = Path::new("/etc").join("openvpn").join("client");
+}
 
 #[derive(Template)]
 #[template(path = "openvpn/client.conf", escape = "none")]
@@ -15,48 +19,53 @@ pub struct Config<'a> {
     pub tcp: bool,
 }
 
-pub fn setup<'a>(cfg: &'a Config, ca: &'a str, cert: &'a str, key: &'a str) -> Result<()> {
-    let root = Path::new("/etc").join("openvpn").join("client");
-    let cfg = cfg.render()?;
-    {
-        let file = root.join("client.conf");
-        info!("generate file {}", file.display());
-        let mut fd = fs::OpenOptions::new()
-            .write(true)
-            .create(true)
-            .mode(0o600)
-            .open(file)?;
-        fd.write_all(cfg.as_bytes())?;
+impl<'a> Config<'a> {
+    pub fn clean(&self) -> Result<()> {
+        remove_dir_all(&ROOT.as_path())?;
+        Ok(())
     }
-    {
-        let file = root.join("ca.crt");
-        info!("generate file {}", file.display());
-        let mut fd = fs::OpenOptions::new()
-            .write(true)
-            .create(true)
-            .mode(0o600)
-            .open(file)?;
-        fd.write_all(ca.as_bytes())?;
+    pub fn setup(&self, ca: &str, cert: &str, key: &str) -> Result<()> {
+        let cfg = self.render()?;
+        {
+            let file = ROOT.join("client.conf");
+            info!("generate file {}", file.display());
+            let mut fd = OpenOptions::new()
+                .write(true)
+                .create(true)
+                .mode(0o600)
+                .open(file)?;
+            fd.write_all(cfg.as_bytes())?;
+        }
+        {
+            let file = ROOT.join("ca.crt");
+            info!("generate file {}", file.display());
+            let mut fd = OpenOptions::new()
+                .write(true)
+                .create(true)
+                .mode(0o600)
+                .open(file)?;
+            fd.write_all(ca.as_bytes())?;
+        }
+        {
+            let file = ROOT.join("client.crt");
+            info!("generate file {}", file.display());
+            let mut fd = OpenOptions::new()
+                .write(true)
+                .create(true)
+                .mode(0o600)
+                .open(file)?;
+            fd.write_all(cert.as_bytes())?;
+        }
+        {
+            let file = ROOT.join("client.key");
+            info!("generate file {}", file.display());
+            let mut fd = OpenOptions::new()
+                .write(true)
+                .create(true)
+                .mode(0o600)
+                .open(file)?;
+            fd.write_all(key.as_bytes())?;
+        }
+        Ok(())
     }
-    {
-        let file = root.join("client.crt");
-        info!("generate file {}", file.display());
-        let mut fd = fs::OpenOptions::new()
-            .write(true)
-            .create(true)
-            .mode(0o600)
-            .open(file)?;
-        fd.write_all(cert.as_bytes())?;
-    }
-    {
-        let file = root.join("client.key");
-        info!("generate file {}", file.display());
-        let mut fd = fs::OpenOptions::new()
-            .write(true)
-            .create(true)
-            .mode(0o600)
-            .open(file)?;
-        fd.write_all(key.as_bytes())?;
-    }
-    Ok(())
 }
