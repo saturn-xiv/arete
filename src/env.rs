@@ -50,6 +50,7 @@ pub struct Http {
     pub port: u16,
     pub workers: usize,
     pub upload: Upload,
+    pub origin: String,
 }
 
 impl Default for Http {
@@ -58,6 +59,7 @@ impl Default for Http {
             port: 8080,
             workers: 1 << 3,
             upload: Upload::default(),
+            origin: "https://www.change-me.com".to_string(),
         }
     }
 }

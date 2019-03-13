@@ -15,6 +15,12 @@ impl fmt::Display for ClientIp {
     }
 }
 
+impl ClientIp {
+    pub const X_FORWARDED_FOR: &'static str = "X-Forwarded-For";
+    pub const X_REAL_IP: &'static str = "X-Real-Ip";
+    pub const X_APPENGINE_REMOTE_ADDR: &'static str = "X-Appengine-Remote-Addr";
+}
+
 impl<S> FromRequest<S> for ClientIp {
     type Config = ();
     type Result = Self;
@@ -22,7 +28,7 @@ impl<S> FromRequest<S> for ClientIp {
     #[inline]
     fn from_request(req: &HttpRequest<S>, _cfg: &Self::Config) -> Self::Result {
         let headers = req.headers();
-        if let Some(it) = headers.get("X-Forwarded-For") {
+        if let Some(it) = headers.get(Self::X_FORWARDED_FOR) {
             if let Ok(it) = it.to_str() {
                 if let Some(it) = it.split(",").next() {
                     let it = it.trim();
@@ -32,14 +38,14 @@ impl<S> FromRequest<S> for ClientIp {
                 }
             }
         }
-        if let Some(it) = headers.get("X-Real-Ip") {
+        if let Some(it) = headers.get(Self::X_REAL_IP) {
             if let Ok(it) = it.to_str() {
                 if !it.is_empty() {
                     return Self(it.to_string());
                 }
             }
         }
-        if let Some(it) = headers.get("X-Appengine-Remote-Addr") {
+        if let Some(it) = headers.get(Self::X_APPENGINE_REMOTE_ADDR) {
             if let Ok(it) = it.to_str() {
                 if !it.is_empty() {
                     return Self(it.to_string());

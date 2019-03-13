@@ -5,7 +5,10 @@ use std::time::Duration;
 
 use actix::{prelude::*, System};
 use actix_web::{
-    http,
+    http::{
+        header::{ACCEPT, ACCEPT_LANGUAGE, AUTHORIZATION, CONTENT_TYPE},
+        Method,
+    },
     middleware::{cors::Cors, Logger},
     server, App,
 };
@@ -16,7 +19,7 @@ use super::super::super::{
     graphql,
     plugins::nut,
     queue::Queue,
-    request::Home,
+    request::{ClientIp, Home},
 };
 use super::State as AppState;
 
@@ -51,63 +54,40 @@ pub fn launch(cfg: Config) -> Result<()> {
     });
 
     let addr = SocketAddr::from(([127, 0, 0, 1], cfg.http.port));
+    let origin = cfg.http.origin.clone();
     server::new(move || {
         App::with_state(AppState {
             graphql: gql.clone(),
             context: ctx.clone(),
         })
         .middleware(Logger::default())
-        .resource("/graphql", |r| {
-            r.method(http::Method::GET).h(graphql::actix::doc);
-            r.method(http::Method::POST).with(graphql::actix::post)
-        })
-        .resource("/", |r| {
-            r.name(Home::KEY);
-            r.method(http::Method::GET).f(nut::html::index)
+        .configure(|app| {
+            Cors::for_app(app)
+                .allowed_origin(&origin)
+                .allowed_methods(vec![Method::POST])
+                .allowed_headers(vec![AUTHORIZATION, CONTENT_TYPE, ACCEPT_LANGUAGE, ACCEPT])
+                .allowed_headers(vec![
+                    ClientIp::X_REAL_IP,
+                    ClientIp::X_FORWARDED_FOR,
+                    ClientIp::X_APPENGINE_REMOTE_ADDR,
+                ])
+                .supports_credentials()
+                .max_age(60 * 60)
+                .resource("/graphql", |r| {
+                    r.method(Method::GET).h(graphql::actix::doc);
+                    r.method(Method::POST).with(graphql::actix::post)
+                })
+                .resource("/", |r| {
+                    r.name(Home::KEY);
+                    r.method(Method::GET).f(nut::html::index)
+                })
+                .register()
         })
     })
     .bind(&addr)?
     .start();
 
     let _ = sys.run();
-    // let root = Arc::new(new_schema);
-
-    // let service = move || {
-    //     let root = root.clone();
-    //     let ctx = ctx.clone();
-    //     service_fn(move |req| -> Box<Future<Item = _, Error = _> + Send> {
-    //         info!("{:?} {} {}", req.version(), req.method(), req.uri());
-    //         let root = root.clone();
-    //         let ctx = ctx.clone();
-    //         let gtx = Arc::new((ctx.clone(), Session::new(&ctx, &req)));
-
-    //         match (req.method(), req.uri().path()) {
-    //             (&Method::GET, "/doc") => Box::new(juniper_hyper::graphiql(GRAPHQL)),
-    //             (&Method::GET, GRAPHQL) => Box::new(juniper_hyper::graphql(root, gtx, req)),
-    //             (&Method::POST, GRAPHQL) => Box::new(juniper_hyper::graphql(root, gtx, req)),
-    //             _ => {
-    //                 let res = match ROUTER.handle(&ctx, &req) {
-    //                     Ok(v) => match v {
-    //                         Some(r) => r,
-    //                         None => Response::NotFound,
-    //                     },
-    //                     Err(e) => Response::InternalServerError(e),
-    //                 };
-
-    //                 Box::new(future::ok(res.into()))
-    //             }
-    //         }
-    //     })
-    // };
-
-    // let addr = ([127, 0, 0, 1], cfg.http.port).into();
-    // let server = Server::bind(&addr)
-    //     .serve(service)
-    //     .map_err(|e| error!("server error: {}", e));
-    // info!("listening on http://{}", addr);
-    // rt::run(server);
 
     Ok(())
 }
-
-// const GRAPHQL: &'static str = "/graphql";
