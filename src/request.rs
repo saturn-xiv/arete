@@ -24,14 +24,14 @@ impl ClientIp {
 
 impl ClientIp {
     #[inline]
-    fn parse<S>(req: &HttpRequest<S>) -> String {
+    fn get<S>(req: &HttpRequest<S>) -> Option<String> {
         let headers = req.headers();
         if let Some(it) = headers.get(Self::X_FORWARDED_FOR) {
             if let Ok(it) = it.to_str() {
                 if let Some(it) = it.split(",").next() {
                     let it = it.trim();
                     if !it.is_empty() {
-                        return it.to_string();
+                        return Some(it.to_string());
                     }
                 }
             }
@@ -39,19 +39,25 @@ impl ClientIp {
         if let Some(it) = headers.get(Self::X_REAL_IP) {
             if let Ok(it) = it.to_str() {
                 if !it.is_empty() {
-                    return it.to_string();
+                    return Some(it.to_string());
                 }
             }
         }
         if let Some(it) = headers.get(Self::X_APPENGINE_REMOTE_ADDR) {
             if let Ok(it) = it.to_str() {
                 if !it.is_empty() {
-                    return it.to_string();
+                    return Some(it.to_string());
                 }
             }
         }
 
-        req.connection_info().host().to_string()
+        req.connection_info().remote().map(|x| {
+            match x.find(':') {
+                Some(i) => &x[..i],
+                None => x,
+            }
+            .to_string()
+        })
     }
 }
 
@@ -61,8 +67,11 @@ impl<S> FromRequest<S> for ClientIp {
 
     #[inline]
     fn from_request(req: &HttpRequest<S>, _cfg: &Self::Config) -> Self::Result {
-        let ip = Self::parse(req).parse().map_err(ErrorBadRequest)?;
-        Ok(Self(ip))
+        if let Some(it) = Self::get(req) {
+            let it = it.parse().map_err(ErrorBadRequest)?;
+            return Ok(Self(it));
+        }
+        Err(ErrorBadRequest("bad client ip"))
     }
 }
 
