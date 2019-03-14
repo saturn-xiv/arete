@@ -32,6 +32,7 @@ impl<'a> Config<'a> {
             let mut fd = OpenOptions::new()
                 .write(true)
                 .create(true)
+                .truncate(true)
                 .mode(0o600)
                 .open(file)?;
             fd.write_all(cfg.as_bytes())?;
@@ -42,6 +43,7 @@ impl<'a> Config<'a> {
             let mut fd = OpenOptions::new()
                 .write(true)
                 .create(true)
+                .truncate(true)
                 .mode(0o600)
                 .open(file)?;
             fd.write_all(ca.as_bytes())?;
@@ -52,6 +54,7 @@ impl<'a> Config<'a> {
             let mut fd = OpenOptions::new()
                 .write(true)
                 .create(true)
+                .truncate(true)
                 .mode(0o600)
                 .open(file)?;
             fd.write_all(cert.as_bytes())?;
@@ -62,6 +65,7 @@ impl<'a> Config<'a> {
             let mut fd = OpenOptions::new()
                 .write(true)
                 .create(true)
+                .truncate(true)
                 .mode(0o600)
                 .open(file)?;
             fd.write_all(key.as_bytes())?;
