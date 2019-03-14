@@ -95,6 +95,7 @@ RUN zsh -c "source $HOME/.zshrc \
   && gem install rails -v ${RAILS_VERSION}"
 
 # rust
+# https://rust-lang.github.io/rustup-components-history/index.html
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 RUN echo 'source $HOME/.cargo/env' >> $HOME/.zshrc
 RUN zsh -c "source $HOME/.zshrc \ 
