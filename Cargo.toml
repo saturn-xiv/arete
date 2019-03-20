@@ -51,6 +51,8 @@ ssh2 = "0.3"
 mime = "0.3"
 robots_txt = "0.6"
 sitemap = "0.3"
+lettre = "0.9"
+lettre_email = "0.9"
 ipnetwork = "0.13" # https://github.com/diesel-rs/diesel/blob/568d3e2420b44f5dffbd806a6c0e5e450f024394/diesel/Cargo.toml#L28 
 actix = "0.7"
 actix-web = "0.7"
@@ -62,13 +64,6 @@ serde_json = "1"
 regex = "1"
 clap = "2"
 jsonwebtoken = "5"
-
-# https://github.com/lettre/lettre/issues/312
-[dependencies.lettre]
-git = "https://github.com/lettre/lettre.git"
-
-[dependencies.lettre_email]
-git = "https://github.com/lettre/lettre.git"
 
 [dependencies.cookie]
 version = "0.11"
