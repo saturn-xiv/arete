@@ -11,6 +11,13 @@ build = "build.rs"
 [profile.release]
 lto = true
 
+[features]
+default = ["theme-bootstrap"]
+theme-bootstrap = []
+theme-semantic = []
+theme-bulma = []
+theme-materialize = []
+
 [dependencies]
 r2d2 = "0.8"
 log = "0.4"
@@ -45,7 +52,6 @@ mime = "0.3"
 robots_txt = "0.6"
 sitemap = "0.3"
 ipnetwork = "0.13" # https://github.com/diesel-rs/diesel/blob/568d3e2420b44f5dffbd806a6c0e5e450f024394/diesel/Cargo.toml#L28 
-askama = "0.8"
 actix = "0.7"
 actix-web = "0.7"
 mustache = "*"
@@ -67,6 +73,10 @@ git = "https://github.com/lettre/lettre.git"
 [dependencies.cookie]
 version = "0.11"
 features = ["secure", "percent-encode"]
+
+[dependencies.askama]
+version = "0.8"
+features = ["with-actix-web"]
 
 [dependencies.chrono]
 version = "0.4"

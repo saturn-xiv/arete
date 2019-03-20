@@ -1,7 +1,13 @@
-use actix_web::{HttpRequest, HttpResponse};
+use super::themes::{About, Contact, Index};
 
-use super::super::super::app::http::State as AppState;
+pub fn index((): ()) -> Index {
+    Index {}
+}
 
-pub fn index(_req: &HttpRequest<AppState>) -> HttpResponse {
-    unimplemented!()
+pub fn about((): ()) -> About {
+    About {}
+}
+
+pub fn contact((): ()) -> Contact {
+    Contact {}
 }

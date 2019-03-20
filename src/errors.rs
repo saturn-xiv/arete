@@ -58,4 +58,6 @@ pub enum Error {
     RabbitMQBadContentType(String),
     #[fail(display = "{}", _0)]
     Http(actix_web::http::StatusCode),
+    #[fail(display = "{}", _0)]
+    ActixWeb(actix_web::Error),
 }
