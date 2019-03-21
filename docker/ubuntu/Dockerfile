@@ -98,8 +98,9 @@ RUN zsh -c "source $HOME/.zshrc \
 # https://rust-lang.github.io/rustup-components-history/index.html
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 RUN echo 'source $HOME/.cargo/env' >> $HOME/.zshrc
-RUN zsh -c "source $HOME/.zshrc \ 
-  && rustup target add x86_64-unknown-linux-musl \  
+RUN zsh -c "source $HOME/.zshrc \
+  && rustup default nightly \
+  && rustup target add x86_64-unknown-linux-musl \
   && rustup component add rls rust-analysis rust-src rustfmt clippy"
 
 # arete
