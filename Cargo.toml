@@ -54,8 +54,8 @@ sitemap = "0.3"
 lettre = "0.9"
 lettre_email = "0.9"
 ipnetwork = "0.13" # https://github.com/diesel-rs/diesel/blob/568d3e2420b44f5dffbd806a6c0e5e450f024394/diesel/Cargo.toml#L28 
-actix = "0.7"
-actix-web = "0.7"
+hyper = "0.10"
+rocket = "0.4"
 mustache = "*"
 lazy_static = "1"
 serde = "1"
@@ -71,7 +71,12 @@ features = ["secure", "percent-encode"]
 
 [dependencies.askama]
 version = "0.8"
-features = ["with-actix-web"]
+features = ["with-rocket"]
+
+[dependencies.rocket_contrib]
+version = "0.4"
+default-features = false
+features = ["json", "helmet", "uuid", "serve", "json", "diesel_postgres_pool", "redis_pool"]
 
 [dependencies.chrono]
 version = "0.4"
