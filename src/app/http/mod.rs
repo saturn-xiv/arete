@@ -1,13 +1,15 @@
 pub mod routes;
 pub mod server;
 
-use std::sync::Arc;
+use rocket::{config::Config, custom, Rocket};
 
-use actix::prelude::*;
+use super::super::{catchers::catchers, plugins::nut};
 
-use super::super::graphql::{actix::GraphQLExecutor, context::Context};
-
-pub struct State {
-    pub graphql: Addr<GraphQLExecutor>,
-    pub context: Arc<Context>,
+pub fn rocket(cfg: Config) -> Rocket {
+    custom(cfg)
+        .mount(
+            "/",
+            routes![nut::html::about, nut::html::contact, nut::html::index],
+        )
+        .register(catchers())
 }

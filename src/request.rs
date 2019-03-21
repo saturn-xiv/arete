@@ -1,126 +1,46 @@
 use std::fmt;
+use std::ops::Deref;
 
-use actix_web::{
-    error::{ErrorBadRequest, ErrorUnauthorized},
-    http::header::{LanguageTag, ACCEPT_LANGUAGE, AUTHORIZATION},
-    Error, FromRequest, HttpRequest, Result,
+use hyper::header::Header;
+use language_tags::LanguageTag;
+use rocket::{
+    http::{
+        hyper::header::{AcceptLanguage, Authorization, Bearer},
+        RawStr, Status,
+    },
+    request::{self, FromRequest},
+    Outcome, Request, State,
 };
-use ipnetwork::IpNetwork;
+
+use super::{i18n::I18n, orm::Database};
 
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For
-pub struct ClientIp(pub IpNetwork);
-
-impl fmt::Display for ClientIp {
-    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        write!(fmt, "{}", self.0)
-    }
-}
-
-impl ClientIp {
-    pub const X_FORWARDED_FOR: &'static str = "X-Forwarded-For";
-    pub const X_REAL_IP: &'static str = "X-Real-Ip";
-    pub const X_APPENGINE_REMOTE_ADDR: &'static str = "X-Appengine-Remote-Addr";
-}
-
-impl ClientIp {
-    #[inline]
-    fn get<S>(req: &HttpRequest<S>) -> Option<String> {
-        let headers = req.headers();
-        if let Some(it) = headers.get(Self::X_FORWARDED_FOR) {
-            if let Ok(it) = it.to_str() {
-                if let Some(it) = it.split(",").next() {
-                    let it = it.trim();
-                    if !it.is_empty() {
-                        return Some(it.to_string());
-                    }
-                }
-            }
-        }
-        if let Some(it) = headers.get(Self::X_REAL_IP) {
-            if let Ok(it) = it.to_str() {
-                if !it.is_empty() {
-                    return Some(it.to_string());
-                }
-            }
-        }
-        if let Some(it) = headers.get(Self::X_APPENGINE_REMOTE_ADDR) {
-            if let Ok(it) = it.to_str() {
-                if !it.is_empty() {
-                    return Some(it.to_string());
-                }
-            }
-        }
-
-        req.connection_info().remote().map(|x| {
-            match x.find(':') {
-                Some(i) => &x[..i],
-                None => x,
-            }
-            .to_string()
-        })
-    }
-}
-
-impl<S> FromRequest<S> for ClientIp {
-    type Config = ();
-    type Result = Result<Self, Error>;
-
-    #[inline]
-    fn from_request(req: &HttpRequest<S>, _cfg: &Self::Config) -> Self::Result {
-        if let Some(it) = Self::get(req) {
-            let it = it.parse().map_err(ErrorBadRequest)?;
-            return Ok(Self(it));
-        }
-        Err(ErrorBadRequest("bad client ip"))
-    }
-}
-
-pub struct Home(pub String);
-
-impl Home {
-    pub const KEY: &'static str = "home";
-}
-
-impl fmt::Display for Home {
-    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        write!(fmt, "{}", self.0)
-    }
-}
-
-impl<S> FromRequest<S> for Home {
-    type Config = ();
-    type Result = Result<Self, Error>;
-
-    #[inline]
-    fn from_request(req: &HttpRequest<S>, _cfg: &Self::Config) -> Self::Result {
-        Ok(Self(req.url_for_static(Self::KEY)?.to_string()))
-    }
-}
+//     pub const X_FORWARDED_FOR: &'static str = "X-Forwarded-For";
+//     pub const X_REAL_IP: &'static str = "X-Real-Ip";
+//     pub const X_APPENGINE_REMOTE_ADDR: &'static str = "X-Appengine-Remote-Addr";
 
 pub struct Token(pub String);
+
+impl<'a, 'r> FromRequest<'a, 'r> for Token {
+    type Error = ();
+
+    fn from_request(req: &'a Request<'r>) -> request::Outcome<Self, Self::Error> {
+        if let Some(auth) = req
+            .headers()
+            .get_one(Authorization::<Bearer>::header_name())
+        {
+            if let Ok(auth) = auth.parse::<Bearer>() {
+                let header = "Bearer ";
+                return Outcome::Success(Token(auth.token[header.len()..].to_string()));
+            }
+        }
+        Outcome::Failure((Status::NonAuthoritativeInformation, ()))
+    }
+}
 
 impl fmt::Display for Token {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         write!(fmt, "{}", self.0)
-    }
-}
-
-impl<S> FromRequest<S> for Token {
-    type Config = ();
-    type Result = Result<Self, Error>;
-
-    #[inline]
-    fn from_request(req: &HttpRequest<S>, _cfg: &Self::Config) -> Self::Result {
-        let headers = req.headers();
-        if let Some(it) = headers.get(AUTHORIZATION) {
-            if let Ok(it) = it.to_str() {
-                let bearer = "Bearer ";
-                if it.starts_with(bearer) {
-                    return Ok(Self(it[bearer.len()..].to_string()));
-                }
-            }
-        }
-        Err(ErrorUnauthorized("bad token"))
     }
 }
 
@@ -137,37 +57,49 @@ impl Default for Locale {
         Self("en-US".to_string())
     }
 }
-impl<S> FromRequest<S> for Locale {
-    type Config = ();
-    type Result = Result<Self, Error>;
 
-    #[inline]
-    fn from_request(req: &HttpRequest<S>, _cfg: &Self::Config) -> Self::Result {
+impl<'a, 'r> Locale {
+    fn detect(req: &'a Request<'r>) -> Option<String> {
         let key = "locale";
 
         // 1. Check URL arguments.
-        if let Some(it) = req.query().get(key) {
-            return Ok(Self(it.to_string()));
+        if let Some(it) = req.get_query_value::<&'a RawStr>(key) {
+            if let Ok(it) = it {
+                return Some(it.to_string());
+            }
         }
 
         // 2. Get language information from cookies.
-        if let Some(it) = req.cookie(key) {
-            return Ok(Self(it.value().to_string()));
+        if let Some(it) = req.cookies().get(key) {
+            return Some(it.value().to_string());
         }
 
-        let headers = req.headers();
         // 3. Get language information from 'Accept-Language'.
         // https://www.w3.org/International/questions/qa-accept-lang-locales
         // https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.4
-        if let Some(it) = headers.get(ACCEPT_LANGUAGE) {
-            if let Ok(it) = it.to_str() {
-                if let Ok(it) = it.parse::<LanguageTag>() {
-                    if let Some(it) = it.language {
-                        return Ok(Self(it));
-                    }
+        if let Some(it) = req.headers().get_one(AcceptLanguage::header_name()) {
+            if let Ok(it) = it.parse::<LanguageTag>() {
+                if let Some(it) = it.language {
+                    return Some(it);
                 }
             }
         }
-        Err(ErrorBadRequest("can't find language tag"))
+
+        None
+    }
+}
+
+impl<'a, 'r> FromRequest<'a, 'r> for Locale {
+    type Error = ();
+
+    fn from_request(req: &'a Request<'r>) -> request::Outcome<Self, Self::Error> {
+        if let Some(it) = Self::detect(req) {
+            let Database(db) = req.guard::<Database>()?;
+            let db = db.deref();
+            if db.exist(&it) {
+                return Outcome::Success(Locale(it));
+            }
+        }
+        return Outcome::Success(Locale::default());
     }
 }

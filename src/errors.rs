@@ -57,7 +57,5 @@ pub enum Error {
     #[fail(display = "bad message content type {}", _0)]
     RabbitMQBadContentType(String),
     #[fail(display = "{}", _0)]
-    Http(actix_web::http::StatusCode),
-    #[fail(display = "{}", _0)]
-    ActixWeb(actix_web::Error),
+    Http(rocket::http::hyper::StatusCode),
 }

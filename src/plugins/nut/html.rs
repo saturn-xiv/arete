@@ -1,13 +1,16 @@
 use super::themes::{About, Contact, Index};
 
-pub fn index((): ()) -> Index {
+#[get("/")]
+pub fn index() -> Index {
     Index {}
 }
 
-pub fn about((): ()) -> About {
+#[get("/about")]
+pub fn about() -> About {
     About {}
 }
 
-pub fn contact((): ()) -> Contact {
+#[get("/contact")]
+pub fn contact() -> Contact {
     Contact {}
 }

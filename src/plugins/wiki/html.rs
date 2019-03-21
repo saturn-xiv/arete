@@ -1,11 +1,9 @@
-use actix_web::Path;
-
 use super::themes::{Index, Show};
 
 pub fn index((): ()) -> Index {
     Index {}
 }
 
-pub fn show(_name: Path<String>) -> Show {
+pub fn show(_name: String) -> Show {
     Show {}
 }

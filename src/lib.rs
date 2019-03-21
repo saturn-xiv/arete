@@ -1,3 +1,9 @@
+#![feature(proc_macro_hygiene, decl_macro)]
+
+#[macro_use]
+extern crate rocket;
+#[macro_use]
+extern crate rocket_contrib;
 #[macro_use]
 extern crate serde_derive;
 #[macro_use]
@@ -15,8 +21,6 @@ extern crate juniper;
 #[macro_use]
 extern crate serde_json;
 
-extern crate actix;
-extern crate actix_web;
 extern crate askama;
 extern crate base64;
 extern crate chrono;
@@ -28,6 +32,7 @@ extern crate eui48;
 extern crate futures;
 extern crate git2;
 extern crate hex;
+extern crate hyper;
 extern crate ipnetwork;
 extern crate jsonwebtoken;
 extern crate language_tags;
@@ -62,6 +67,7 @@ pub mod macros;
 
 pub mod app;
 pub mod cache;
+pub mod catchers;
 pub mod crypto;
 pub mod env;
 pub mod errors;
