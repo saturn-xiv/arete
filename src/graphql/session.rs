@@ -1,13 +1,19 @@
 use std::net::IpAddr;
+use std::ops::Deref;
+use std::sync::Arc;
 
 use ipnetwork::IpNetwork;
-use rocket::http::hyper::StatusCode;
+use rocket::{
+    http::Status,
+    request::{self, FromRequest},
+    Outcome, Request, State,
+};
 
 use super::super::{
     errors::{Error, Result},
     i18n::I18n,
     jwt::Jwt,
-    orm::Connection,
+    orm::{Connection, Database},
     plugins::nut::{
         graphql::users::{Action, Token},
         models::{
@@ -15,88 +21,60 @@ use super::super::{
             user::{Dao as UserDao, Item as User},
         },
     },
+    request::Token as Auth,
 };
 use super::context::Context;
 
 pub struct Session {
     pub lang: String,
-    pub token: Option<String>,
+    pub user: Option<User>,
     pub client_ip: IpNetwork,
 }
 
 impl Session {
-    // pub fn new(
-    //     ctx: &Context,
-    //     home: Home,
-    //     client_ip: ClientIp,
-    //     locale: Option<Locale>,
-    //     token: Option<Auth>,
-    // ) -> Self {
-    //     if let Ok(db) = ctx.db() {
-    //         return Self {
-    //             home: home.0,
-    //             user: Self::user(&ctx.jwt, &db, token),
-    //             client_ip: client_ip.0,
-    //             lang: Self::locale(&db, locale),
-    //         };
-    //     }
-
-    //     Self {
-    //         home: home.0,
-    //         user: None,
-    //         client_ip: client_ip.0,
-    //         lang: Locale::default().0,
-    //     }
-    // }
-
     pub fn administrator(&self, db: &Connection) -> Result<&User> {
-        // let user = self.current_user()?;
-        // if PolicyDao::can(db, &user.id, &Role::Admin, &None) {
-        //     return Ok(user);
-        // }
-        Err(Error::Http(StatusCode::Forbidden).into())
+        let user = self.current_user()?;
+        if PolicyDao::can(db, &user.id, &Role::Admin, &None) {
+            return Ok(user);
+        }
+        Err(Error::Http(Status::Forbidden).into())
     }
 
     pub fn auth(&self, db: &Connection, role: &Role, resource: &Option<String>) -> Result<&User> {
-        // let user = self.current_user()?;
-        // if PolicyDao::can(db, &user.id, role, resource) {
-        //     return Ok(user);
-        // }
+        let user = self.current_user()?;
+        if PolicyDao::can(db, &user.id, role, resource) {
+            return Ok(user);
+        }
         self.administrator(db)
     }
 
     pub fn current_user(&self) -> Result<&User> {
-        // match self.user {
-        //     Some(ref v) => Ok(v),
-        //     None => Err(Error::Http(StatusCode::Unauthorized).into()),
-        // }
-        Err(Error::Http(StatusCode::Unauthorized).into())
+        match self.user {
+            Some(ref v) => Ok(v),
+            None => Err(Error::Http(Status::Unauthorized).into()),
+        }
     }
+}
 
-    // fn user(jwt: &Jwt, db: &Connection, token: Option<Auth>) -> Option<User> {
-    //     if let Some(token) = token {
-    //         if let Ok(token) = jwt.parse::<Token>(&token.0) {
-    //             let token = token.claims;
-    //             if token.act == Action::SignIn {
-    //                 if let Ok(user) = UserDao::by_uid(db, &token.uid) {
-    //                     if let Ok(_) = user.available() {
-    //                         return Some(user);
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     };
+impl<'a, 'r> FromRequest<'a, 'r> for User {
+    type Error = ();
 
-    //     None
-    // }
+    fn from_request(req: &'a Request<'r>) -> request::Outcome<Self, Self::Error> {
+        let Auth(token) = req.guard::<Auth>()?;
+        let jwt = req.guard::<State<Arc<Jwt>>>()?;
+        if let Ok(token) = jwt.parse::<Token>(&token) {
+            let token = token.claims;
+            if token.act == Action::SignIn {
+                let Database(db) = req.guard::<Database>()?;
+                let db = db.deref();
+                if let Ok(user) = UserDao::by_uid(db, &token.uid) {
+                    if let Ok(_) = user.available() {
+                        return Outcome::Success(user);
+                    }
+                }
+            }
+        }
 
-    // fn locale(db: &Connection, locale: Option<Locale>) -> String {
-    //     if let Some(it) = locale {
-    //         if I18n::exist(db, &it.0) {
-    //             return it.0;
-    //         }
-    //     }
-    //     Locale::default().0
-
-    // }
+        Outcome::Failure((Status::NonAuthoritativeInformation, ()))
+    }
 }

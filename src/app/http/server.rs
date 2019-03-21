@@ -8,6 +8,7 @@ use super::super::super::{
     env::{self, Config, NAME},
     errors::{Error, Result},
     graphql,
+    jwt::Jwt,
     orm::Database,
     plugins::{forum, nut, wiki},
     queue::Queue,
@@ -39,6 +40,7 @@ pub fn launch(cfg: Config) -> Result<()> {
 
     let err = super::rocket(cfg.rocket()?)
         .manage(graphql::new())
+        .manage(Arc::new(Jwt::new(cfg.secrets.0.clone())))
         .attach(Database::fairing())
         .attach(Redis::fairing())
         .launch();

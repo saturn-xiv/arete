@@ -77,7 +77,7 @@ features = ["with-rocket"]
 [dependencies.rocket_contrib]
 version = "0.4"
 default-features = false
-features = ["json", "helmet", "uuid", "serve", "json", "diesel_postgres_pool", "redis_pool"]
+features = ["json", "tera_templates", "handlebars_templates", "helmet", "uuid", "serve", "json", "diesel_postgres_pool", "redis_pool"]
 
 [dependencies.chrono]
 version = "0.4"

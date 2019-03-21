@@ -4,6 +4,7 @@ pub mod query;
 pub mod session;
 
 use std::net::SocketAddr;
+use std::ops::Deref;
 use std::sync::Arc;
 
 use juniper::{
@@ -15,10 +16,8 @@ use rocket::{response::content::Html, State};
 use serde::Serialize;
 
 use super::{
-    errors::Result,
-    orm::Database,
-    redis::Redis,
-    request::{Locale, Token as Auth},
+    errors::Result, jwt::Jwt, orm::Database, plugins::nut::models::user::Item as User,
+    redis::Redis, request::Locale,
 };
 
 pub fn new() -> Schema {
@@ -103,22 +102,25 @@ pub fn post(
     db: Database,
     cache: Redis,
     locale: Locale,
-    token: Option<Auth>,
+    jwt: State<Arc<Jwt>>,
+    user: Option<User>,
     addr: SocketAddr,
     request: GraphQLRequest,
     schema: State<Schema>,
 ) -> GraphQLResponse {
+    let jwt = jwt.deref();
     request.execute(
         &schema,
         &(
             context::Context {
                 db: db,
                 cache: cache,
+                jwt: jwt.clone(),
             },
             session::Session {
                 client_ip: addr.ip().into(),
                 lang: locale.0,
-                token: token.map(|x| x.0),
+                user: user,
             },
         ),
     )

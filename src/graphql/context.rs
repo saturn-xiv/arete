@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use super::super::{
     crypto::sodium::Encryptor as Sodium,
     env::Config,
@@ -12,7 +14,7 @@ pub struct Context {
     pub db: Database,
     pub cache: Redis,
     // pub queue: RabbitMQ,
-    // pub jwt: Jwt,
+    pub jwt: Arc<Jwt>,
     // pub encryptor: Sodium,
 }
 

@@ -1,8 +1,23 @@
+use std::io::Cursor;
 use std::result::Result as StdResult;
 
 use failure::{Error as FailureError, Fail};
+use rocket::{
+    http::{ContentType, Status},
+    response::{content::Xml, Responder},
+    Request, Response,
+};
+use rocket_contrib::{
+    json::{Json, JsonValue},
+    templates::Template,
+};
 
 pub type Result<T> = StdResult<T, FailureError>;
+
+pub type TemplateResult = StdResult<Template, HttpError>;
+pub type JsonValueResult = StdResult<JsonValue, HttpError>;
+pub type JsonResult<T> = StdResult<Json<T>, HttpError>;
+pub type XmlResult<T> = StdResult<Xml<T>, HttpError>;
 
 #[derive(Fail, Debug)]
 pub enum Error {
@@ -57,5 +72,26 @@ pub enum Error {
     #[fail(display = "bad message content type {}", _0)]
     RabbitMQBadContentType(String),
     #[fail(display = "{}", _0)]
-    Http(rocket::http::hyper::StatusCode),
+    Http(rocket::http::Status),
+}
+
+#[derive(Debug)]
+pub struct HttpError(pub FailureError);
+
+impl<T: Into<FailureError>> From<T> for HttpError {
+    fn from(t: T) -> Self {
+        Self(t.into())
+    }
+}
+
+impl<'r> Responder<'r> for HttpError {
+    fn respond_to(self, _: &Request) -> StdResult<Response<'r>, Status> {
+        let err = self.0;
+        error!("{}", err);
+        Ok(Response::build()
+            .header(ContentType::Plain)
+            .status(Status::InternalServerError)
+            .sized_body(Cursor::new(format!("{}", err)))
+            .finalize())
+    }
 }
