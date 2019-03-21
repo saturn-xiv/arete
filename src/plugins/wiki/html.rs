@@ -1,9 +1,11 @@
 use super::themes::{Index, Show};
 
-pub fn index((): ()) -> Index {
+#[get("/")]
+pub fn index() -> Index {
     Index {}
 }
 
-pub fn show(_name: String) -> Show {
+#[get("/<name>")]
+pub fn show(name: String) -> Show {
     Show {}
 }

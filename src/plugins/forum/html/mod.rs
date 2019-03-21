@@ -3,6 +3,7 @@ pub mod topics;
 
 use super::themes::Index;
 
-pub fn index((): ()) -> Index {
+#[get("/")]
+pub fn index() -> Index {
     Index {}
 }

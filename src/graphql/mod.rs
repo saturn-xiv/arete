@@ -3,15 +3,23 @@ pub mod mutation;
 pub mod query;
 pub mod session;
 
+use std::net::SocketAddr;
 use std::sync::Arc;
 
 use juniper::{
     parser::{ParseError, ScalarToken, Token},
     ParseScalarResult, Value,
 };
+use juniper_rocket::{graphiql_source, GraphQLRequest, GraphQLResponse};
+use rocket::{response::content::Html, State};
 use serde::Serialize;
 
-use super::errors::Result;
+use super::{
+    errors::Result,
+    orm::Database,
+    redis::Redis,
+    request::{Locale, Token as Auth},
+};
 
 pub fn new() -> Schema {
     Schema::new(query::Query {}, mutation::Mutation {})
@@ -25,7 +33,7 @@ pub trait Handler {
     fn handle(&self, c: &context::Context, s: &session::Session) -> Result<Self::Item>;
 }
 
-pub type Context = (Arc<context::Context>, session::Session);
+pub type Context = (context::Context, session::Session);
 
 #[derive(Serialize)]
 pub struct I64(pub i64);
@@ -82,3 +90,36 @@ graphql_scalar!(I16 as "I16" where Scalar = <S> {
         }
     }
 });
+
+pub const GRAPHQL: &'static str = "/graphql";
+
+#[get("/")]
+pub fn get() -> Html<String> {
+    graphiql_source(GRAPHQL)
+}
+
+#[post("/", data = "<request>")]
+pub fn post(
+    db: Database,
+    cache: Redis,
+    locale: Locale,
+    token: Option<Auth>,
+    addr: SocketAddr,
+    request: GraphQLRequest,
+    schema: State<Schema>,
+) -> GraphQLResponse {
+    request.execute(
+        &schema,
+        &(
+            context::Context {
+                db: db,
+                cache: cache,
+            },
+            session::Session {
+                client_ip: addr.ip().into(),
+                lang: locale.0,
+                token: token.map(|x| x.0),
+            },
+        ),
+    )
+}

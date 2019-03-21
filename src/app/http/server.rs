@@ -38,6 +38,7 @@ pub fn launch(cfg: Config) -> Result<()> {
     // }
 
     let err = super::rocket(cfg.rocket()?)
+        .manage(graphql::new())
         .attach(Database::fairing())
         .attach(Redis::fairing())
         .launch();

@@ -1,3 +1,5 @@
+use std::net::IpAddr;
+
 use ipnetwork::IpNetwork;
 use rocket::http::hyper::StatusCode;
 
@@ -13,15 +15,13 @@ use super::super::{
             user::{Dao as UserDao, Item as User},
         },
     },
-    // request::{ClientIp, Home, Locale, Token as Auth},
 };
 use super::context::Context;
 
 pub struct Session {
-    // pub lang: String,
-// pub home: String,
-// pub user: Option<User>,
-// pub client_ip: IpNetwork,
+    pub lang: String,
+    pub token: Option<String>,
+    pub client_ip: IpNetwork,
 }
 
 impl Session {

@@ -1,9 +1,11 @@
 use super::super::themes::posts::{Index, Show};
 
-pub fn index((): ()) -> Index {
+#[get("/posts")]
+pub fn index() -> Index {
     Index {}
 }
 
-pub fn show(_id: i64) -> Show {
+#[get("/posts/<id>")]
+pub fn show(id: i64) -> Show {
     Show {}
 }
