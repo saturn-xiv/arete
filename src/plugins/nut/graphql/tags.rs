@@ -22,12 +22,12 @@ pub struct Create {
 }
 
 impl Handler for Create {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         s.administrator(db)?;
         TagDao::create(db, &self.name, &self.icon, &self.color)?;
-        Ok(())
+        Ok(None)
     }
 }
 
@@ -43,12 +43,12 @@ pub struct Update {
 }
 
 impl Handler for Update {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         s.administrator(db)?;
         TagDao::update(db, &self.id.0, &self.name, &self.icon, &self.color)?;
-        Ok(())
+        Ok(None)
     }
 }
 
@@ -105,7 +105,7 @@ pub struct Destroy {
 }
 
 impl Handler for Destroy {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         s.administrator(db)?;
@@ -113,6 +113,6 @@ impl Handler for Destroy {
             TagDao::delete(db, &self.id)?;
             Ok(())
         })?;
-        Ok(())
+        Ok(None)
     }
 }

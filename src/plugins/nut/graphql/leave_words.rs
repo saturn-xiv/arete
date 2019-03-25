@@ -71,11 +71,11 @@ pub struct Destroy {
 }
 
 impl Handler for Destroy {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         s.administrator(db)?;
         LeaveWordDao::delete(db, &self.id)?;
-        Ok(())
+        Ok(None)
     }
 }

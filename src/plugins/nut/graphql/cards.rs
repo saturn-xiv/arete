@@ -31,7 +31,7 @@ pub struct Create {
 }
 
 impl Handler for Create {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         s.administrator(db)?;
@@ -47,7 +47,7 @@ impl Handler for Create {
             &self.loc,
             &self.position.0,
         )?;
-        Ok(())
+        Ok(None)
     }
 }
 
@@ -74,7 +74,7 @@ pub struct Update {
 }
 
 impl Handler for Update {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         s.administrator(db)?;
@@ -91,7 +91,7 @@ impl Handler for Update {
             &self.loc,
             &self.position.0,
         )?;
-        Ok(())
+        Ok(None)
     }
 }
 
@@ -160,11 +160,11 @@ pub struct Destroy {
 }
 
 impl Handler for Destroy {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         s.administrator(db)?;
         CardDao::delete(db, &self.id)?;
-        Ok(())
+        Ok(None)
     }
 }

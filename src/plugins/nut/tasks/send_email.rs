@@ -64,13 +64,13 @@ impl Handler for Get {
 }
 
 impl Handler for Config {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         let enc = c.encryptor.deref();
         s.administrator(db)?;
         SettingsDao::set::<String, Config, Sodium>(db, enc, &Self::KEY.to_string(), &self, true)?;
-        Ok(())
+        Ok(None)
     }
 }
 
@@ -78,7 +78,7 @@ impl Handler for Config {
 pub struct Test {}
 
 impl Handler for Test {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         let user = s.administrator(db)?;
@@ -93,7 +93,7 @@ impl Handler for Test {
                 body: "This is a test email.".to_string(),
             },
         )?;
-        Ok(())
+        Ok(None)
     }
 }
 

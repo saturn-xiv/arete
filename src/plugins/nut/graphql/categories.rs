@@ -24,7 +24,7 @@ pub struct Create {
 }
 
 impl Handler for Create {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         s.administrator(db)?;
@@ -39,7 +39,7 @@ impl Handler for Create {
             &self.color,
             self.position.0,
         )?;
-        Ok(())
+        Ok(None)
     }
 }
 #[derive(GraphQLInputObject, Validate)]
@@ -56,7 +56,7 @@ pub struct Update {
 }
 
 impl Handler for Update {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         s.administrator(db)?;
@@ -72,7 +72,7 @@ impl Handler for Update {
             &self.color,
             self.position.0,
         )?;
-        Ok(())
+        Ok(None)
     }
 }
 
@@ -139,7 +139,7 @@ pub struct Destroy {
 }
 
 impl Handler for Destroy {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         s.administrator(db)?;
@@ -147,6 +147,6 @@ impl Handler for Destroy {
             CategoryDao::delete(db, &self.id)?;
             Ok(())
         })?;
-        Ok(())
+        Ok(None)
     }
 }

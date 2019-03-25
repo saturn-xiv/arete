@@ -73,7 +73,7 @@ pub struct SetAuthority {
 }
 
 impl Handler for SetAuthority {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
 
@@ -94,7 +94,7 @@ impl Handler for SetAuthority {
             }
             Ok(())
         })?;
-        Ok(())
+        Ok(None)
     }
 }
 
@@ -286,7 +286,7 @@ pub struct SignUp {
 }
 
 impl Handler for SignUp {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
 
@@ -329,7 +329,7 @@ impl Handler for SignUp {
             &Action::Confirm,
             &self.home,
         )?;
-        Ok(())
+        Ok(None)
     }
 }
 
@@ -342,7 +342,7 @@ pub struct Confirm {
 }
 
 impl Handler for Confirm {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
 
@@ -359,7 +359,7 @@ impl Handler for Confirm {
             &Action::Confirm,
             &self.home,
         )?;
-        Ok(())
+        Ok(None)
     }
 }
 
@@ -370,7 +370,7 @@ pub struct ConfirmToken {
 }
 
 impl Handler for ConfirmToken {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
 
@@ -389,7 +389,7 @@ impl Handler for ConfirmToken {
             __i18n_l!(db, &it.id, &s.client_ip, &s.lang, "nut.logs.user.confirm")?;
             Ok(())
         })?;
-        Ok(())
+        Ok(None)
     }
 }
 
@@ -402,7 +402,7 @@ pub struct Unlock {
 }
 
 impl Handler for Unlock {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
 
@@ -419,7 +419,7 @@ impl Handler for Unlock {
             &Action::Unlock,
             &self.home,
         )?;
-        Ok(())
+        Ok(None)
     }
 }
 
@@ -430,7 +430,7 @@ pub struct UnlockToken {
 }
 
 impl Handler for UnlockToken {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
 
@@ -449,7 +449,7 @@ impl Handler for UnlockToken {
             Ok(())
         })?;
 
-        Ok(())
+        Ok(None)
     }
 }
 
@@ -462,7 +462,7 @@ pub struct ForgotPassword {
 }
 
 impl Handler for ForgotPassword {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
 
@@ -476,7 +476,7 @@ impl Handler for ForgotPassword {
             &Action::ResetPassword,
             &self.home,
         )?;
-        Ok(())
+        Ok(None)
     }
 }
 
@@ -489,7 +489,7 @@ pub struct ResetPassword {
 }
 
 impl Handler for ResetPassword {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
 
@@ -509,7 +509,7 @@ impl Handler for ResetPassword {
             &s.lang,
             "nut.logs.user.reset-password"
         )?;
-        Ok(())
+        Ok(None)
     }
 }
 
@@ -558,12 +558,12 @@ pub struct Profile {
 }
 
 impl Handler for Profile {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         let user = s.current_user()?;
         UserDao::set_profile(db, &user.id, &self.real_name, &self.logo)?;
-        Ok(())
+        Ok(None)
     }
 }
 
@@ -576,7 +576,7 @@ pub struct ChangePassword {
 }
 
 impl Handler for ChangePassword {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         let user = s.current_user()?;
@@ -594,7 +594,7 @@ impl Handler for ChangePassword {
             Ok(())
         })?;
 
-        Ok(())
+        Ok(None)
     }
 }
 
@@ -602,7 +602,7 @@ impl Handler for ChangePassword {
 pub struct SignOut {}
 
 impl Handler for SignOut {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         let user = s.current_user()?;
@@ -615,7 +615,7 @@ impl Handler for SignOut {
             "nut.logs.user.sign-out"
         )?;
 
-        Ok(())
+        Ok(None)
     }
 }
 

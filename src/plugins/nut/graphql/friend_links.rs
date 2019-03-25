@@ -21,12 +21,12 @@ pub struct Create {
 }
 
 impl Handler for Create {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         s.administrator(db)?;
         FriendLinkDao::create(db, &self.title, &self.home, &self.logo, &self.position.0)?;
-        Ok(())
+        Ok(None)
     }
 }
 
@@ -43,7 +43,7 @@ pub struct Update {
 }
 
 impl Handler for Update {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         s.administrator(db)?;
@@ -55,7 +55,7 @@ impl Handler for Update {
             &self.logo,
             &self.position.0,
         )?;
-        Ok(())
+        Ok(None)
     }
 }
 
@@ -117,11 +117,11 @@ pub struct Destroy {
 }
 
 impl Handler for Destroy {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         s.administrator(db)?;
         FriendLinkDao::delete(db, &self.id)?;
-        Ok(())
+        Ok(None)
     }
 }

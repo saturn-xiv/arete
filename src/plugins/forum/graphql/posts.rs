@@ -25,7 +25,7 @@ pub struct Create {
 }
 
 impl Handler for Create {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         let user = s.current_user()?;
@@ -42,7 +42,7 @@ impl Handler for Create {
                 &self.media_type.parse()?,
             )
         })?;
-        Ok(())
+        Ok(None)
     }
 }
 
@@ -56,7 +56,7 @@ pub struct Update {
 }
 
 impl Handler for Update {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         let user = s.current_user()?;
@@ -64,7 +64,7 @@ impl Handler for Update {
         db.transaction::<_, FailueError, _>(|| {
             PostDao::update(db, &self.id.0, &self.body, &self.media_type.parse()?)
         })?;
-        Ok(())
+        Ok(None)
     }
 }
 
@@ -132,13 +132,13 @@ pub struct Destroy {
 }
 
 impl Handler for Destroy {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         let user = s.current_user()?;
         can_edit(db, user.id, self.id)?;
         db.transaction::<_, FailueError, _>(|| PostDao::delete(db, &self.id))?;
-        Ok(())
+        Ok(None)
     }
 }
 

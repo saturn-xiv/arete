@@ -41,7 +41,7 @@ pub struct Save {
 }
 
 impl Handler for Save {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         s.administrator(db)?;
@@ -54,7 +54,7 @@ impl Handler for Save {
             }
         }
 
-        Ok(())
+        Ok(None)
     }
 }
 
@@ -110,11 +110,11 @@ pub struct Destroy {
 }
 
 impl Handler for Destroy {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         s.administrator(db)?;
         LocaleDao::delete(db, &self.id)?;
-        Ok(())
+        Ok(None)
     }
 }

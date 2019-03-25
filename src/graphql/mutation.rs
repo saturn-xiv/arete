@@ -19,67 +19,67 @@ graphql_object!(
             })
         }
 
-        field author(&executor, form: nut::graphql::site::Author) -> FieldResult<()> {
+        field author(&executor, form: nut::graphql::site::Author) -> FieldResult<Option<String>> {
             __graphql!(executor, &form)
         }
-        field smtp(&executor, form: nut::tasks::send_email::Config) -> FieldResult<()> {
+        field smtp(&executor, form: nut::tasks::send_email::Config) -> FieldResult<Option<String>> {
             __graphql!(executor, &form)
         }
-        field seo(&executor, form: nut::graphql::site::Seo) -> FieldResult<()> {
+        field seo(&executor, form: nut::graphql::site::Seo) -> FieldResult<Option<String>> {
             __graphql!(executor, &form)
         }
-        field clearCache(&executor) -> FieldResult<()> {
+        field clearCache(&executor) -> FieldResult<Option<String>> {
             __graphql!(executor, &nut::graphql::site::ClearCache{})
         }
-        field sendTestEmail(&executor) -> FieldResult<()> {
+        field sendTestEmail(&executor) -> FieldResult<Option<String>> {
             __graphql!(executor, &nut::tasks::send_email::Test{})
         }
 
-        field saveLocale(&executor, form: i18n::graphql::Save) -> FieldResult<()> {
+        field saveLocale(&executor, form: i18n::graphql::Save) -> FieldResult<Option<String>> {
             __graphql!(executor, &form)
         }
-        field destroyLocale(&executor, id: I64) -> FieldResult<()> {
+        field destroyLocale(&executor, id: I64) -> FieldResult<Option<String>> {
             __graphql!(executor, &i18n::graphql::Destroy{id: id.0})
         }
 
         field userSignIn(&executor, form: nut::graphql::users::SignIn) -> FieldResult<String> {
             __graphql!(executor, &form)
         }
-        field userSignUp(&executor, form: nut::graphql::users::SignUp) -> FieldResult<()> {
+        field userSignUp(&executor, form: nut::graphql::users::SignUp) -> FieldResult<Option<String>> {
             __graphql!(executor, &form)
         }
-        field userConfirm(&executor, form: nut::graphql::users::Confirm) -> FieldResult<()> {
+        field userConfirm(&executor, form: nut::graphql::users::Confirm) -> FieldResult<Option<String>> {
             __graphql!(executor, &form)
         }
-        field userConfirmToken(&executor, form: nut::graphql::users::ConfirmToken) -> FieldResult<()> {
+        field userConfirmToken(&executor, form: nut::graphql::users::ConfirmToken) -> FieldResult<Option<String>> {
             __graphql!(executor, &form)
         }
-        field userUnlock(&executor, form: nut::graphql::users::Unlock) -> FieldResult<()> {
+        field userUnlock(&executor, form: nut::graphql::users::Unlock) -> FieldResult<Option<String>> {
             __graphql!(executor, &form)
         }
-        field userUnlockToken(&executor, form: nut::graphql::users::UnlockToken) -> FieldResult<()> {
+        field userUnlockToken(&executor, form: nut::graphql::users::UnlockToken) -> FieldResult<Option<String>> {
             __graphql!(executor, &form)
         }
-        field userForgotPassword(&executor, form: nut::graphql::users::ForgotPassword) -> FieldResult<()> {
+        field userForgotPassword(&executor, form: nut::graphql::users::ForgotPassword) -> FieldResult<Option<String>> {
             __graphql!(executor, &form)
         }
-        field userResetPassword(&executor, form: nut::graphql::users::ResetPassword) -> FieldResult<()> {
+        field userResetPassword(&executor, form: nut::graphql::users::ResetPassword) -> FieldResult<Option<String>> {
             __graphql!(executor, &form)
         }
-        field userChangePassword(&executor, form: nut::graphql::users::ChangePassword) -> FieldResult<()> {
+        field userChangePassword(&executor, form: nut::graphql::users::ChangePassword) -> FieldResult<Option<String>> {
             __graphql!(executor, &form)
         }
-        field userProfile(&executor, form: nut::graphql::users::Profile) -> FieldResult<()> {
+        field userProfile(&executor, form: nut::graphql::users::Profile) -> FieldResult<Option<String>> {
             __graphql!(executor, &form)
         }
-        field userSignOut(&executor) -> FieldResult<()> {
+        field userSignOut(&executor) -> FieldResult<Option<String>> {
             __graphql!(executor, &nut::graphql::users::SignOut{})
         }
-        field setUserAuthority(&executor, form: nut::graphql::users::SetAuthority) -> FieldResult<()> {
+        field setUserAuthority(&executor, form: nut::graphql::users::SetAuthority) -> FieldResult<Option<String>> {
             __graphql!(executor, &form)
         }
 
-        field destroyAttachment(&executor, id: I64) -> FieldResult<()> {
+        field destroyAttachment(&executor, id: I64) -> FieldResult<Option<String>> {
             __graphql!(executor, &nut::graphql::attachments::Destroy{id: id.0})
         }
 
@@ -89,83 +89,83 @@ graphql_object!(
                 media_type: media_type.clone(),
             })
         }
-        field destroyLeaveWord(&executor, id: I64) -> FieldResult<()> {
+        field destroyLeaveWord(&executor, id: I64) -> FieldResult<Option<String>> {
             __graphql!(executor, &nut::graphql::leave_words::Destroy{id: id.0})
         }
 
-        field updateVote(&executor, form: nut::graphql::votes::Update) -> FieldResult<()> {
+        field updateVote(&executor, form: nut::graphql::votes::Update) -> FieldResult<Option<String>> {
             __graphql!(executor, &form)
         }
-        field destroyVote(&executor, id: I64) -> FieldResult<()> {
+        field destroyVote(&executor, id: I64) -> FieldResult<Option<String>> {
             __graphql!(executor, &nut::graphql::votes::Destroy{id: id.0})
         }
 
-        field createCard(&executor, form: nut::graphql::cards::Create) -> FieldResult<()> {
+        field createCard(&executor, form: nut::graphql::cards::Create) -> FieldResult<Option<String>> {
             __graphql!(executor, &form)
         }
-        field updateCard(&executor, form: nut::graphql::cards::Update) -> FieldResult<()> {
+        field updateCard(&executor, form: nut::graphql::cards::Update) -> FieldResult<Option<String>> {
             __graphql!(executor, &form)
         }
-        field destroyCard(&executor, id: I64) -> FieldResult<()> {
+        field destroyCard(&executor, id: I64) -> FieldResult<Option<String>> {
             __graphql!(executor, &nut::graphql::cards::Destroy{id: id.0})
         }
 
-        field createLink(&executor, form: nut::graphql::links::Create) -> FieldResult<()> {
+        field createLink(&executor, form: nut::graphql::links::Create) -> FieldResult<Option<String>> {
             __graphql!(executor, &form)
         }
-        field updateLink(&executor, form: nut::graphql::links::Update) -> FieldResult<()> {
+        field updateLink(&executor, form: nut::graphql::links::Update) -> FieldResult<Option<String>> {
             __graphql!(executor, &form)
         }
-        field destroyLink(&executor, id: I64) -> FieldResult<()> {
+        field destroyLink(&executor, id: I64) -> FieldResult<Option<String>> {
             __graphql!(executor, &nut::graphql::links::Destroy{id: id.0})
         }
 
-        field createFriendLink(&executor, form: nut::graphql::friend_links::Create) -> FieldResult<()> {
+        field createFriendLink(&executor, form: nut::graphql::friend_links::Create) -> FieldResult<Option<String>> {
             __graphql!(executor, &form)
         }
-        field updateFriendLink(&executor, form: nut::graphql::friend_links::Update) -> FieldResult<()> {
+        field updateFriendLink(&executor, form: nut::graphql::friend_links::Update) -> FieldResult<Option<String>> {
             __graphql!(executor, &form)
         }
-        field destroyFriendLink(&executor, id: I64) -> FieldResult<()> {
+        field destroyFriendLink(&executor, id: I64) -> FieldResult<Option<String>> {
             __graphql!(executor, &nut::graphql::friend_links::Destroy{id: id.0})
         }
 
-        field createTag(&executor, form: nut::graphql::tags::Create) -> FieldResult<()> {
+        field createTag(&executor, form: nut::graphql::tags::Create) -> FieldResult<Option<String>> {
             __graphql!(executor, &form)
         }
-        field updateTag(&executor, form: nut::graphql::tags::Update) -> FieldResult<()> {
+        field updateTag(&executor, form: nut::graphql::tags::Update) -> FieldResult<Option<String>> {
             __graphql!(executor, &form)
         }
-        field destroyTag(&executor, id: I64) -> FieldResult<()> {
+        field destroyTag(&executor, id: I64) -> FieldResult<Option<String>> {
             __graphql!(executor, &nut::graphql::tags::Destroy{id: id.0})
         }
 
-        field createCategory(&executor, form: nut::graphql::categories::Create) -> FieldResult<()> {
+        field createCategory(&executor, form: nut::graphql::categories::Create) -> FieldResult<Option<String>> {
             __graphql!(executor, &form)
         }
-        field updateCategory(&executor, form: nut::graphql::categories::Update) -> FieldResult<()> {
+        field updateCategory(&executor, form: nut::graphql::categories::Update) -> FieldResult<Option<String>> {
             __graphql!(executor, &form)
         }
-        field destroyCategory(&executor, id: I64) -> FieldResult<()> {
+        field destroyCategory(&executor, id: I64) -> FieldResult<Option<String>> {
             __graphql!(executor, &nut::graphql::categories::Destroy{id: id.0})
         }
 
-        field createForumPost(&executor, form: forum::graphql::posts::Create) -> FieldResult<()> {
+        field createForumPost(&executor, form: forum::graphql::posts::Create) -> FieldResult<Option<String>> {
             __graphql!(executor, &form)
         }
-        field updateForumPost(&executor, form: forum::graphql::posts::Update) -> FieldResult<()> {
+        field updateForumPost(&executor, form: forum::graphql::posts::Update) -> FieldResult<Option<String>> {
             __graphql!(executor, &form)
         }
-        field destroyForumPost(&executor, id: I64) -> FieldResult<()> {
+        field destroyForumPost(&executor, id: I64) -> FieldResult<Option<String>> {
             __graphql!(executor, &forum::graphql::posts::Destroy{id: id.0})
         }
-        field createForumTopic(&executor, form: forum::graphql::topics::Create) -> FieldResult<()> {
+        field createForumTopic(&executor, form: forum::graphql::topics::Create) -> FieldResult<Option<String>> {
             __graphql!(executor, &form)
         }
-        field updateForumTopic(&executor, form: forum::graphql::topics::Update) -> FieldResult<()> {
+        field updateForumTopic(&executor, form: forum::graphql::topics::Update) -> FieldResult<Option<String>> {
             __graphql!(executor, &form)
         }
-        field destroyForumTopic(&executor, id: I64) -> FieldResult<()> {
+        field destroyForumTopic(&executor, id: I64) -> FieldResult<Option<String>> {
             __graphql!(executor, &forum::graphql::topics::Destroy{id: id.0})
         }
 

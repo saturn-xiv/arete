@@ -74,14 +74,14 @@ pub struct Destroy {
 }
 
 impl Handler for Destroy {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         let user = s.current_user()?;
         let it = AttachmentDao::by_id(db, &self.id)?;
         if it.user_id == self.id || PolicyDao::can(db, &user.id, &Role::Admin, &None) {
             AttachmentDao::delete(db, &self.id)?;
-            return Ok(());
+            return Ok(None);
         }
         Err(Error::Http(Status::Forbidden).into())
     }

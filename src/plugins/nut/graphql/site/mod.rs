@@ -34,7 +34,7 @@ impl Default for Author {
 }
 
 impl Handler for Author {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         s.administrator(db)?;
@@ -45,7 +45,7 @@ impl Handler for Author {
             &self,
             false,
         )?;
-        Ok(())
+        Ok(None)
     }
 }
 
@@ -97,13 +97,13 @@ impl Default for Seo {
 }
 
 impl Handler for Seo {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         let enc = c.encryptor.deref();
         s.administrator(db)?;
         SettingDao::set::<String, Seo, Sodium>(db, enc, &Self::KEY.to_string(), &self, false)?;
-        Ok(())
+        Ok(None)
     }
 }
 
@@ -128,11 +128,11 @@ impl Handler for GetSeo {
 pub struct ClearCache {}
 
 impl Handler for ClearCache {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         s.administrator(db)?;
         c.cache.clear()?;
-        Ok(())
+        Ok(None)
     }
 }

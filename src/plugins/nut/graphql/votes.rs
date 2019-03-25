@@ -18,12 +18,12 @@ pub struct Update {
 }
 
 impl Handler for Update {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         s.current_user()?;
         VoteDao::like(db, &self.resource_type, &self.resource_id.0, self.like)?;
-        Ok(())
+        Ok(None)
     }
 }
 
@@ -66,11 +66,11 @@ pub struct Destroy {
 }
 
 impl Handler for Destroy {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         s.administrator(db)?;
         VoteDao::delete(db, &self.id)?;
-        Ok(())
+        Ok(None)
     }
 }
