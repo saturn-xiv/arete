@@ -11,8 +11,12 @@ pub struct Mutation;
 
 graphql_object!(
     Mutation: Context | &self | {
-        field install(&executor, form: nut::graphql::Install) -> FieldResult<()> {
-            __graphql!(executor, &form)
+        field install(&executor, real_name: String, email: String, password: String) -> FieldResult<Option<String>> {
+            __graphql!(executor, &nut::graphql::Install{
+                real_name: real_name.clone(),
+                email: email.clone(),
+                password: password.clone(),
+            })
         }
 
         field author(&executor, form: nut::graphql::site::Author) -> FieldResult<()> {

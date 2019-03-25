@@ -38,7 +38,7 @@ pub struct Install {
 }
 
 impl Handler for Install {
-    type Item = ();
+    type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
 
@@ -63,6 +63,6 @@ impl Handler for Install {
             Ok(())
         })?;
 
-        Ok(())
+        Ok(None)
     }
 }

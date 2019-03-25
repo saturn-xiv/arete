@@ -30,8 +30,9 @@ class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProp
       if (!err) {
         graphql({
           query: `mutation ($realName: String!, $email: String!, $password: String!) {
-  install(realName: $realName, email: $email, password: $password)
-}`, variables: values
+            install(realName: $realName, email: $email, password: $password)
+          }`,
+          variables: values
         }, () => {
           message.success(intl.formatMessage({ id: "flashes.success" }))
           history.push("/users/sign-in")
