@@ -198,15 +198,13 @@ pub struct Get {}
 impl Handler for Get {
     type Item = Status;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         s.administrator(db)?;
 
-        let ch = c.cache()?;
         Ok(Status {
             os: Os::new()?,
             network: Network::new()?,
-            redis: cmd("info").query::<String>(ch.deref())?,
+            redis: cmd("info").query::<String>(c.cache.deref())?,
             postgresql: PostgreSql::new(db.deref())?,
             routes: Vec::new(),
             // routes: ROUTER

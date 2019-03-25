@@ -9,7 +9,7 @@ use rocket::{
         RawStr, Status,
     },
     request::{self, FromRequest},
-    Outcome, Request, State,
+    Outcome, Request,
 };
 
 use super::{i18n::I18n, orm::Database};

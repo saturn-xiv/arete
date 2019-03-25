@@ -16,8 +16,9 @@ use rocket::{response::content::Html, State};
 use serde::Serialize;
 
 use super::{
-    errors::Result, jwt::Jwt, orm::Database, plugins::nut::models::user::Item as User,
-    redis::Redis, request::Locale,
+    crypto::sodium::Encryptor as Sodium, errors::Result, jwt::Jwt, orm::Database,
+    plugins::nut::models::user::Item as User, queue::rabbitmq::RabbitMQ, redis::Redis,
+    request::Locale,
 };
 
 pub fn new() -> Schema {
@@ -103,12 +104,16 @@ pub fn post(
     cache: Redis,
     locale: Locale,
     jwt: State<Arc<Jwt>>,
+    encryptor: State<Arc<Sodium>>,
+    queue: State<Arc<RabbitMQ>>,
     user: Option<User>,
     addr: SocketAddr,
     request: GraphQLRequest,
     schema: State<Schema>,
 ) -> GraphQLResponse {
     let jwt = jwt.deref();
+    let queue = queue.deref();
+    let encryptor = encryptor.deref();
     request.execute(
         &schema,
         &(
@@ -116,6 +121,8 @@ pub fn post(
                 db: db,
                 cache: cache,
                 jwt: jwt.clone(),
+                encryptor: encryptor.clone(),
+                queue: queue.clone(),
             },
             session::Session {
                 client_ip: addr.ip().into(),

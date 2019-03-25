@@ -43,8 +43,7 @@ pub struct Save {
 impl Handler for Save {
     type Item = ();
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         s.administrator(db)?;
         match LocaleDao::by_lang_and_code(db, &self.lang, &self.code) {
             Ok(it) => {
@@ -68,8 +67,7 @@ pub struct ByLang {
 impl Handler for ByLang {
     type Item = Vec<Locale>;
     fn handle(&self, c: &Context, _s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         let items = LocaleDao::by_lang(db, &self.lang)?
             .into_iter()
             .map(|x| x.into())
@@ -87,8 +85,7 @@ pub struct Show {
 impl Handler for Show {
     type Item = Locale;
     fn handle(&self, c: &Context, _s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         let it = LocaleDao::by_id(db, &self.id)?;
 
         Ok(it.into())
@@ -101,8 +98,7 @@ pub struct Languages;
 impl Handler for Languages {
     type Item = Vec<String>;
     fn handle(&self, c: &Context, _s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         let items = LocaleDao::languages(db)?;
         Ok(items)
     }
@@ -116,8 +112,7 @@ pub struct Destroy {
 impl Handler for Destroy {
     type Item = ();
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         s.administrator(db)?;
         LocaleDao::delete(db, &self.id)?;
         Ok(())

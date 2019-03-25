@@ -13,6 +13,7 @@ use super::super::super::super::{
     crypto::sodium::Encryptor as Sodium,
     errors::Result,
     graphql::{context::Context, session::Session, Handler},
+    orm::Pool as Db,
     queue::Handler as QueueHandler,
     queue::Queue,
     settings::Dao as SettingsDao,
@@ -50,11 +51,11 @@ pub struct Get {}
 impl Handler for Get {
     type Item = Config;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
+        let enc = c.encryptor.deref();
         s.administrator(db)?;
 
-        let it: Config = match SettingsDao::get(db, &c.encryptor, &Config::KEY.to_string()) {
+        let it: Config = match SettingsDao::get(db, enc, &Config::KEY.to_string()) {
             Ok(v) => v,
             Err(_) => Config::default(),
         };
@@ -65,16 +66,10 @@ impl Handler for Get {
 impl Handler for Config {
     type Item = ();
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
+        let enc = c.encryptor.deref();
         s.administrator(db)?;
-        SettingsDao::set::<String, Config, Sodium>(
-            db,
-            &c.encryptor,
-            &Self::KEY.to_string(),
-            &self,
-            true,
-        )?;
+        SettingsDao::set::<String, Config, Sodium>(db, enc, &Self::KEY.to_string(), &self, true)?;
         Ok(())
     }
 }
@@ -85,8 +80,7 @@ pub struct Test {}
 impl Handler for Test {
     type Item = ();
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         let user = s.administrator(db)?;
         let user = UserDao::by_id(db, &user.id)?;
         c.queue.publish(
@@ -145,7 +139,8 @@ impl Into<Result<Email>> for Job {
 }
 
 pub struct Printer {
-    pub ctx: Arc<Context>,
+    pub db: Db,
+    pub encryptor: Arc<Sodium>,
 }
 
 impl QueueHandler for Printer {
@@ -157,7 +152,8 @@ impl QueueHandler for Printer {
 }
 
 pub struct SendEmail {
-    pub ctx: Arc<Context>,
+    pub db: Db,
+    pub encryptor: Arc<Sodium>,
 }
 
 impl QueueHandler for SendEmail {
@@ -165,9 +161,11 @@ impl QueueHandler for SendEmail {
         let task: Task = serde_json::from_slice(&payload)?;
 
         info!("send email: {}<{}> {}", task.name, task.email, task.subject);
-        let db = self.ctx.db()?;
+
+        let db = self.db.get()?;
         let db = db.deref();
-        let cfg: Config = SettingsDao::get(db, &self.ctx.encryptor, &NAME.to_string())?;
+        let enc = self.encryptor.deref();
+        let cfg: Config = SettingsDao::get(db, enc, &NAME.to_string())?;
 
         let mut mailer = SmtpClient::new_simple(&cfg.host)?
             .credentials(Credentials::new(cfg.email.clone(), cfg.password.clone()))

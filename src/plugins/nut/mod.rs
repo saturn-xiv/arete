@@ -3,7 +3,7 @@ pub mod html;
 pub mod models;
 pub mod schema;
 pub mod seo;
-// pub mod tasks;
+pub mod tasks;
 pub mod themes;
 
 use std::fmt;

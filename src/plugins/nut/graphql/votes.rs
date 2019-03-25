@@ -20,8 +20,7 @@ pub struct Update {
 impl Handler for Update {
     type Item = ();
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         s.current_user()?;
         VoteDao::like(db, &self.resource_type, &self.resource_id.0, self.like)?;
         Ok(())
@@ -55,8 +54,7 @@ pub struct Index {}
 impl Handler for Index {
     type Item = Vec<Vote>;
     fn handle(&self, c: &Context, _s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         let items = VoteDao::all(db)?.into_iter().map(|x| x.into()).collect();
         Ok(items)
     }
@@ -70,8 +68,7 @@ pub struct Destroy {
 impl Handler for Destroy {
     type Item = ();
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         s.administrator(db)?;
         VoteDao::delete(db, &self.id)?;
         Ok(())

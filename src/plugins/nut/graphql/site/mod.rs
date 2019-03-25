@@ -36,8 +36,7 @@ impl Default for Author {
 impl Handler for Author {
     type Item = ();
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         s.administrator(db)?;
         SettingDao::set::<String, Author, Sodium>(
             db,
@@ -56,9 +55,9 @@ pub struct GetAuthor {}
 impl Handler for GetAuthor {
     type Item = Author;
     fn handle(&self, c: &Context, _s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
-        let it: Author = match SettingDao::get(db, &c.encryptor, &Author::KEY.to_string()) {
+        let db = c.db.deref();
+        let enc = c.encryptor.deref();
+        let it: Author = match SettingDao::get(db, enc, &Author::KEY.to_string()) {
             Ok(v) => v,
             Err(_) => Author::default(),
         };
@@ -100,17 +99,10 @@ impl Default for Seo {
 impl Handler for Seo {
     type Item = ();
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
+        let enc = c.encryptor.deref();
         s.administrator(db)?;
-
-        SettingDao::set::<String, Seo, Sodium>(
-            db,
-            &c.encryptor,
-            &Self::KEY.to_string(),
-            &self,
-            false,
-        )?;
+        SettingDao::set::<String, Seo, Sodium>(db, enc, &Self::KEY.to_string(), &self, false)?;
         Ok(())
     }
 }
@@ -121,10 +113,10 @@ pub struct GetSeo {}
 impl Handler for GetSeo {
     type Item = Seo;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
+        let enc = c.encryptor.deref();
         s.administrator(db)?;
-        let it: Seo = match SettingDao::get(db, &c.encryptor, &Seo::KEY.to_string()) {
+        let it: Seo = match SettingDao::get(db, enc, &Seo::KEY.to_string()) {
             Ok(v) => v,
             Err(_) => Seo::default(),
         };
@@ -138,11 +130,9 @@ pub struct ClearCache {}
 impl Handler for ClearCache {
     type Item = ();
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         s.administrator(db)?;
-        let ch = c.cache()?;
-        ch.clear()?;
+        c.cache.clear()?;
         Ok(())
     }
 }

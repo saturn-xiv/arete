@@ -20,8 +20,7 @@ pub struct Create {
 impl Handler for Create {
     type Item = Option<String>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         LeaveWordDao::add(db, &s.client_ip, &self.body, &self.media_type.parse()?)?;
         Ok(None)
     }
@@ -56,8 +55,7 @@ pub struct Index {
 impl Handler for Index {
     type Item = Vec<LeaveWord>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         s.administrator(db)?;
         let items = LeaveWordDao::all(db, self.limit)?
             .into_iter()
@@ -75,8 +73,7 @@ pub struct Destroy {
 impl Handler for Destroy {
     type Item = ();
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         s.administrator(db)?;
         LeaveWordDao::delete(db, &self.id)?;
         Ok(())

@@ -1,7 +1,7 @@
 use std::ops::Deref;
 
 use chrono::NaiveDateTime;
-use rocket::http::hyper::StatusCode;
+use rocket::http::Status;
 use validator::Validate;
 
 use super::super::super::super::{
@@ -44,8 +44,7 @@ pub struct Show {
 impl Handler for Show {
     type Item = Attachment;
     fn handle(&self, c: &Context, _s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         let it = AttachmentDao::by_id(db, &self.id)?;
         Ok(it.into())
     }
@@ -57,8 +56,7 @@ pub struct Index {}
 impl Handler for Index {
     type Item = Vec<Attachment>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         let user = s.current_user()?;
         let items = if PolicyDao::can(db, &user.id, &Role::Admin, &None) {
             AttachmentDao::all(db)?
@@ -78,14 +76,13 @@ pub struct Destroy {
 impl Handler for Destroy {
     type Item = ();
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         let user = s.current_user()?;
         let it = AttachmentDao::by_id(db, &self.id)?;
         if it.user_id == self.id || PolicyDao::can(db, &user.id, &Role::Admin, &None) {
             AttachmentDao::delete(db, &self.id)?;
             return Ok(());
         }
-        Err(Error::Http(StatusCode::FORBIDDEN).into())
+        Err(Error::Http(Status::Forbidden).into())
     }
 }

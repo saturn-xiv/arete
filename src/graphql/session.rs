@@ -1,4 +1,3 @@
-use std::net::IpAddr;
 use std::ops::Deref;
 use std::sync::Arc;
 
@@ -11,7 +10,6 @@ use rocket::{
 
 use super::super::{
     errors::{Error, Result},
-    i18n::I18n,
     jwt::Jwt,
     orm::{Connection, Database},
     plugins::nut::{
@@ -23,7 +21,6 @@ use super::super::{
     },
     request::Token as Auth,
 };
-use super::context::Context;
 
 pub struct Session {
     pub lang: String,

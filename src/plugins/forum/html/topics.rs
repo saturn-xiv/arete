@@ -7,5 +7,6 @@ pub fn index() -> Index {
 
 #[get("/topics/<id>")]
 pub fn show(id: i64) -> Show {
+    debug!("show topic {}", id);
     Show {}
 }

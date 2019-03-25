@@ -26,8 +26,7 @@ pub struct Create {
 impl Handler for Create {
     type Item = ();
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         s.administrator(db)?;
         CategoryDao::create(
             db,
@@ -59,8 +58,7 @@ pub struct Update {
 impl Handler for Update {
     type Item = ();
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         s.administrator(db)?;
         CategoryDao::update(
             db,
@@ -114,8 +112,7 @@ pub struct Show {
 impl Handler for Show {
     type Item = Category;
     fn handle(&self, c: &Context, _s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         let it = CategoryDao::by_id(db, &self.id)?;
         Ok(it.into())
     }
@@ -127,8 +124,7 @@ pub struct Index {}
 impl Handler for Index {
     type Item = Vec<Category>;
     fn handle(&self, c: &Context, _s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         let items = CategoryDao::all(db)?
             .into_iter()
             .map(|x| x.into())
@@ -145,8 +141,7 @@ pub struct Destroy {
 impl Handler for Destroy {
     type Item = ();
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         s.administrator(db)?;
         db.transaction::<_, Error, _>(|| {
             CategoryDao::delete(db, &self.id)?;

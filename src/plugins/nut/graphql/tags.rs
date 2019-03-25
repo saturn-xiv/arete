@@ -24,8 +24,7 @@ pub struct Create {
 impl Handler for Create {
     type Item = ();
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         s.administrator(db)?;
         TagDao::create(db, &self.name, &self.icon, &self.color)?;
         Ok(())
@@ -46,8 +45,7 @@ pub struct Update {
 impl Handler for Update {
     type Item = ();
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         s.administrator(db)?;
         TagDao::update(db, &self.id.0, &self.name, &self.icon, &self.color)?;
         Ok(())
@@ -83,8 +81,7 @@ pub struct Show {
 impl Handler for Show {
     type Item = Tag;
     fn handle(&self, c: &Context, _s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         let it = TagDao::by_id(db, &self.id)?;
         Ok(it.into())
     }
@@ -96,8 +93,7 @@ pub struct Index {}
 impl Handler for Index {
     type Item = Vec<Tag>;
     fn handle(&self, c: &Context, _s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         let items = TagDao::all(db)?.into_iter().map(|x| x.into()).collect();
         Ok(items)
     }
@@ -111,8 +107,7 @@ pub struct Destroy {
 impl Handler for Destroy {
     type Item = ();
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         s.administrator(db)?;
         db.transaction::<_, Error, _>(|| {
             TagDao::delete(db, &self.id)?;

@@ -7,5 +7,6 @@ pub fn index() -> Index {
 
 #[get("/<name>")]
 pub fn show(name: String) -> Show {
+    debug!("show wiki {}", name);
     Show {}
 }

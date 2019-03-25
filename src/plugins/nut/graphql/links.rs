@@ -26,8 +26,7 @@ pub struct Create {
 impl Handler for Create {
     type Item = ();
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         s.administrator(db)?;
         LinkDao::create(
             db,
@@ -60,8 +59,7 @@ pub struct Update {
 impl Handler for Update {
     type Item = ();
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         s.administrator(db)?;
         LinkDao::update(
             db,
@@ -112,8 +110,7 @@ pub struct Show {
 impl Handler for Show {
     type Item = Link;
     fn handle(&self, c: &Context, _s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         let it = LinkDao::by_id(db, &self.id)?;
         Ok(it.into())
     }
@@ -125,8 +122,7 @@ pub struct Index {}
 impl Handler for Index {
     type Item = Vec<Link>;
     fn handle(&self, c: &Context, _s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         let items = LinkDao::all(db)?.into_iter().map(|x| x.into()).collect();
         Ok(items)
     }
@@ -140,8 +136,7 @@ pub struct Destroy {
 impl Handler for Destroy {
     type Item = ();
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         s.administrator(db)?;
         LinkDao::delete(db, &self.id)?;
         Ok(())

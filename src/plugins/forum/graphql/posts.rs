@@ -3,7 +3,7 @@ use std::ops::Deref;
 use chrono::NaiveDateTime;
 use diesel::Connection as DieselConnection;
 use failure::Error as FailueError;
-use rocket::http::hyper::StatusCode;
+use rocket::http::Status;
 use validator::Validate;
 
 use super::super::super::super::{
@@ -27,8 +27,7 @@ pub struct Create {
 impl Handler for Create {
     type Item = ();
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         let user = s.current_user()?;
         db.transaction::<_, FailueError, _>(|| {
             PostDao::add(
@@ -59,8 +58,7 @@ pub struct Update {
 impl Handler for Update {
     type Item = ();
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         let user = s.current_user()?;
         can_edit(db, user.id, self.id.0)?;
         db.transaction::<_, FailueError, _>(|| {
@@ -104,8 +102,7 @@ pub struct Show {
 impl Handler for Show {
     type Item = Post;
     fn handle(&self, c: &Context, _s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         let it = PostDao::get(db, &self.id)?;
         Ok(it.into())
     }
@@ -117,8 +114,7 @@ pub struct Index {}
 impl Handler for Index {
     type Item = Vec<Post>;
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         let user = s.current_user()?;
         let items = if PolicyDao::can(db, &user.id, &Role::Admin, &None) {
             PostDao::latest(db)?
@@ -138,8 +134,7 @@ pub struct Destroy {
 impl Handler for Destroy {
     type Item = ();
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db()?;
-        let db = db.deref();
+        let db = c.db.deref();
         let user = s.current_user()?;
         can_edit(db, user.id, self.id)?;
         db.transaction::<_, FailueError, _>(|| PostDao::delete(db, &self.id))?;
@@ -152,5 +147,5 @@ fn can_edit(db: &Connection, user: i64, id: i64) -> Result<()> {
     if it.user_id == user || PolicyDao::can(db, &user, &Role::Admin, &None) {
         return Ok(());
     }
-    Err(Error::Http(StatusCode::FORBIDDEN).into())
+    Err(Error::Http(Status::Forbidden).into())
 }

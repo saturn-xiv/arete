@@ -1,8 +1,6 @@
 use std::default::Default;
 use std::fmt;
 
-use rocket::config::Environment;
-
 use super::errors::Result;
 
 pub type Connection = r2d2_redis::redis::Connection;
