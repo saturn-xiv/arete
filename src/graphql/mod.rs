@@ -35,7 +35,7 @@ pub trait Handler {
 
 pub type Context = (context::Context, session::Session);
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 pub struct I64(pub i64);
 
 graphql_scalar!(I64 as "I64" where Scalar = <S> {
@@ -63,7 +63,7 @@ graphql_scalar!(I64 as "I64" where Scalar = <S> {
     }
 });
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 pub struct I16(pub i16);
 
 graphql_scalar!(I16 as "I16" where Scalar = <S> {

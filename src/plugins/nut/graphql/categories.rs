@@ -20,7 +20,7 @@ pub struct Create {
     #[validate(length(min = "1"))]
     pub color: String,
     pub position: I16,
-    pub parent_id: Option<I64>,
+    pub parent: Option<I64>,
 }
 
 impl Handler for Create {
@@ -30,7 +30,7 @@ impl Handler for Create {
         s.administrator(db)?;
         CategoryDao::create(
             db,
-            &match self.parent_id {
+            &match self.parent {
                 Some(ref v) => Some(v.0),
                 None => None,
             },
@@ -52,7 +52,7 @@ pub struct Update {
     #[validate(length(min = "1"))]
     pub color: String,
     pub position: I16,
-    pub parent_id: Option<I64>,
+    pub parent: Option<I64>,
 }
 
 impl Handler for Update {
@@ -63,7 +63,7 @@ impl Handler for Update {
         CategoryDao::update(
             db,
             &self.id.0,
-            &match self.parent_id {
+            &match self.parent {
                 Some(ref v) => Some(v.0),
                 None => None,
             },

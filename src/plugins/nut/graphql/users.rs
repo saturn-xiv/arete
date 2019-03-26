@@ -69,7 +69,7 @@ impl Handler for GetAuthority {
 pub struct SetAuthority {
     #[validate(length(min = "1"))]
     pub uid: String,
-    pub policies: Vec<Authority>,
+    pub authority: Authority,
 }
 
 impl Handler for SetAuthority {
@@ -82,16 +82,14 @@ impl Handler for SetAuthority {
         let user = UserDao::by_uid(db, &self.uid)?;
         db.transaction::<_, Error, _>(move || {
             PolicyDao::forbidden(db, &user.id)?;
-            for it in self.policies.iter() {
-                PolicyDao::apply(
-                    db,
-                    &user.id,
-                    &it.role.parse()?,
-                    &it.resource,
-                    &it.nbf,
-                    &it.exp,
-                )?;
-            }
+            PolicyDao::apply(
+                db,
+                &user.id,
+                &self.authority.role.parse()?,
+                &self.authority.resource,
+                &self.authority.nbf,
+                &self.authority.exp,
+            )?;
             Ok(())
         })?;
         Ok(None)
