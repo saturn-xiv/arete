@@ -56,11 +56,12 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh
 RUN mkdir $HOME/downloads
 
 # java sdk
-ARG JDK_VERSION="8.0.201-oracle"
+ARG JDK_VERSION=""
 RUN curl -s "https://get.sdkman.io" | zsh
 RUN sed -i -e 's/sdkman_auto_answer=false/sdkman_auto_answer=true/g' $HOME/.sdkman/etc/config
 RUN zsh -c "source $HOME/.zshrc \
-  && sdk install java $JDK_VERSION \
+  && sdk install java 8.0.201-oracle \
+  && sdk install java 12.0.0-open \
   && sdk install maven \
   && sdk install gradle"
 
