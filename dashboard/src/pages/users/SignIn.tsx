@@ -6,17 +6,22 @@ import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { Dispatch } from 'redux'
 
-import { ISiteState, siteRefresh, userSignIn } from '../../actions'
+import { ICurrentUser, ISiteState, siteRefresh, userSignIn } from '../../actions'
 import { formItemLayout } from '../../components/form'
 import Submit from '../../components/form/Submit'
 import { IApplicationState } from '../../reducers'
-import { httpPost } from '../../utils/request'
+import { graphql } from '../../utils/request'
 import Layout from './SharedLinks'
 
 interface IProps {
   signIn: typeof userSignIn,
   site: ISiteState,
   refresh: typeof siteRefresh,
+}
+
+interface ISignIn {
+  token: string,
+  info: ICurrentUser,
 }
 
 const FormItem = Form.Item
@@ -27,14 +32,22 @@ class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProp
   }
   public handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const { form, signIn, site, refresh, history } = this.props
+    const { form, intl, signIn, site, refresh, history } = this.props
     form.validateFields((err, values) => {
       if (!err) {
-        httpPost("/users/sign-in", values).then((rst) => {
-          signIn(rst.token)
-          refresh(Object.assign({}, site, { who: rst.info }))
-          history.push("/users/logs")
-        }).catch(message.error)
+        if (!err) {
+          graphql({
+            query: `mutation ($realName: String!, $nickName: String!, $email: String!, $password: String!) {
+              install(realName: $realName, nickName: $nickName, email: $email, password: $password)
+            }`,
+            variables: values
+          }, (rst: ISignIn) => {
+            message.success(intl.formatMessage({ id: "flashes.success" }))
+            signIn(rst.token)
+            refresh(Object.assign({}, site, { who: rst.info }))
+            history.push("/users/logs")
+          })
+        }
       }
     })
   }

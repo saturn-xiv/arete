@@ -7,7 +7,7 @@ import { RouteComponentProps, withRouter } from 'react-router'
 import { formItemLayout } from '../../components/form'
 import Submit from '../../components/form/Submit'
 import { HOME } from '../../utils'
-import { httpPost } from '../../utils/request'
+import { graphql } from '../../utils/request'
 import Layout from './SharedLinks'
 
 const FormItem = Form.Item
@@ -29,13 +29,15 @@ class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProp
     const { form, history, intl } = this.props
     form.validateFields((err, values) => {
       if (!err) {
-        httpPost(
-          "/users/sign-up",
-          Object.assign({}, values, { home: HOME }))
-          .then((_) => {
-            message.success(intl.formatMessage({ id: "nut.users.confirm.success" }))
-            history.push("/users/sign-in")
-          }).catch(message.error)
+        graphql({
+          query: `mutation ($realName: String!, $nickName: String!, $email: String!, $password: String!, $home: String!) {
+            userSignUp(realName: $realName, nickName: $nickName, email: $email, password: $password, home: $home)
+          }`,
+          variables: Object.assign({}, values, { home: HOME })
+        }, () => {
+          message.success(intl.formatMessage({ id: "nut.users.confirm.success" }))
+          history.push("/users/sign-in")
+        })
       }
     })
   }

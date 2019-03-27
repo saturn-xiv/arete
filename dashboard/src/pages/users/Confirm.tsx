@@ -4,7 +4,7 @@ import EmailForm from './EmailForm'
 
 class Widget extends React.Component {
   public render() {
-    return (<EmailForm action="confirm" />)
+    return (<EmailForm key="confirm" action="confirm" />)
   }
 }
 

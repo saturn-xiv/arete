@@ -7,10 +7,11 @@ import { RouteComponentProps, withRouter } from 'react-router'
 import { formItemLayout } from '../../components/form'
 import Submit from '../../components/form/Submit'
 import { HOME } from '../../utils'
-import { httpPost } from '../../utils/request'
+import { graphql } from '../../utils/request'
 import Layout from './SharedLinks'
 
 interface IProps {
+  key: String,
   action: string,
 }
 
@@ -20,18 +21,22 @@ class Widget extends React.Component<RouteComponentProps<any> & InjectedIntlProp
   public static propTypes: React.ValidationMap<any> = {
     intl: intlShape.isRequired,
   }
+
   public handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const { form, history, intl } = this.props
+    const { action, form, history, intl } = this.props
+
     form.validateFields((err, values) => {
       if (!err) {
-        httpPost(
-          `/users/${this.props.action}`,
-          Object.assign({}, values, { home: HOME })
-        ).then(() => {
-          message.success(intl.formatMessage({ id: `nut.users.${this.props.action}.success` }))
+        graphql({
+          query: `mutation ($email: String!, $home: String!) {
+            user${action}(email: $email, home: $home)
+          }`,
+          variables: Object.assign({}, values, { home: HOME })
+        }, () => {
+          message.success(intl.formatMessage({ id: `nut.users.${action}.success` }))
           history.push("/users/sign-in")
-        }).catch(message.error)
+        })
       }
     })
   }

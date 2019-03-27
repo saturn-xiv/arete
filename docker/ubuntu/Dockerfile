@@ -56,12 +56,13 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh
 RUN mkdir $HOME/downloads
 
 # java sdk
-ARG JDK_VERSION=""
+ARG ORACLE_JDK_VERSION="8.0.201-oracle"
+ARG OPEN_JDK_VERSION="12.0.0-open"
 RUN curl -s "https://get.sdkman.io" | zsh
 RUN sed -i -e 's/sdkman_auto_answer=false/sdkman_auto_answer=true/g' $HOME/.sdkman/etc/config
 RUN zsh -c "source $HOME/.zshrc \
-  && sdk install java 8.0.201-oracle \
-  && sdk install java 12.0.0-open \
+  && sdk install java $ORACLE_JDK_VERSION \
+  && sdk install java $OPEN_JDK_VERSION \
   && sdk install maven \
   && sdk install gradle"
 
@@ -71,6 +72,7 @@ RUN wget -P $HOME/downloads https://dl.google.com/android/repository/sdk-tools-l
 RUN mkdir -pv $HOME/local/android-sdk
 RUN unzip $HOME/downloads/sdk-tools-linux-$ANDROID_SDK_VERSION.zip -d $HOME/local/android-sdk
 RUN zsh -c "source $HOME/.zshrc \
+  && sdk use java $ORACLE_JDK_VERSION \
   && yes | $HOME/local/android-sdk/tools/bin/sdkmanager --licenses"
 
 # nodejs
@@ -80,20 +82,20 @@ RUN zsh -c "source $HOME/.zshrc \
   && npm install -g yarn"
 
 # ruby
-ARG RUBY_VERSION="2.6.1"
-ARG RAILS_VERSION="6.0.0.beta1"
-RUN git clone https://github.com/rbenv/rbenv.git $HOME/.rbenv
-RUN echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> $HOME/.zshrc
-RUN echo 'eval "$(rbenv init -)"' >> $HOME/.zshrc
-RUN echo 'alias rake="noglob rake"' >> $HOME/.zshrc
-RUN git clone https://github.com/rbenv/ruby-build.git $HOME/.rbenv/plugins/ruby-build
-RUN git clone https://github.com/rbenv/rbenv-vars.git $HOME/.rbenv/plugins/rbenv-vars
-RUN zsh -c "source $HOME/.zshrc \
-  && rbenv install ${RUBY_VERSION} \
-  && rbenv global ${RUBY_VERSION} \
-  && gem install bundler \
-  && gem install rubocop \
-  && gem install rails -v ${RAILS_VERSION}"
+# ARG RUBY_VERSION="2.6.1"
+# ARG RAILS_VERSION="6.0.0.beta1"
+# RUN git clone https://github.com/rbenv/rbenv.git $HOME/.rbenv
+# RUN echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> $HOME/.zshrc
+# RUN echo 'eval "$(rbenv init -)"' >> $HOME/.zshrc
+# RUN echo 'alias rake="noglob rake"' >> $HOME/.zshrc
+# RUN git clone https://github.com/rbenv/ruby-build.git $HOME/.rbenv/plugins/ruby-build
+# RUN git clone https://github.com/rbenv/rbenv-vars.git $HOME/.rbenv/plugins/rbenv-vars
+# RUN zsh -c "source $HOME/.zshrc \
+#   && rbenv install ${RUBY_VERSION} \
+#   && rbenv global ${RUBY_VERSION} \
+#   && gem install bundler \
+#   && gem install rubocop \
+#   && gem install rails -v ${RAILS_VERSION}"
 
 # rust
 # https://rust-lang.github.io/rustup-components-history/index.html
