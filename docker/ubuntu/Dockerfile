@@ -102,7 +102,7 @@ RUN zsh -c "source $HOME/.zshrc \
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 RUN echo 'source $HOME/.cargo/env' >> $HOME/.zshrc
 RUN zsh -c "source $HOME/.zshrc \
-  && rustup default nightly \
+  && rustup default nightly-2019-03-24 \
   && rustup target add x86_64-unknown-linux-musl \
   && rustup component add rls rust-analysis rust-src rustfmt clippy"
 
