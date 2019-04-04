@@ -9,9 +9,10 @@ fn main() {
     {
         let git_version = String::from_utf8(
             Command::new("git")
-                .arg("rev-parse")
-                .arg("--short")
-                .arg("HEAD")
+                .arg("describe")
+                .arg("--tags")
+                .arg("--always")
+                .arg("--first-parent")
                 .output()
                 .unwrap()
                 .stdout,
