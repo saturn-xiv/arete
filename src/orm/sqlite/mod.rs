@@ -5,6 +5,7 @@ use std::fmt;
 use std::path::Path;
 
 pub type Connection = diesel::sqlite::SqliteConnection;
+pub type ID = i32;
 
 pub const UP: &'static str = include_str!("up.sql");
 

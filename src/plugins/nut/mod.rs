@@ -1,4 +1,4 @@
-pub mod graphql;
+pub mod api;
 pub mod html;
 pub mod models;
 #[cfg(feature = "mysql")]

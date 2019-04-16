@@ -1,13 +1,16 @@
 use chrono::{NaiveDateTime, Utc};
 use diesel::{delete, insert_into, prelude::*, update};
 
-use super::super::super::super::{errors::Result, orm::Connection};
+use super::super::super::super::{
+    errors::Result,
+    orm::{Connection, ID},
+};
 use super::super::schema::{tag_resources, tags};
 
 #[derive(Queryable, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Item {
-    pub id: i64,
+    pub id: ID,
     pub name: String,
     pub icon: String,
     pub color: String,
@@ -16,18 +19,18 @@ pub struct Item {
 }
 
 pub trait Dao {
-    fn by_id(&self, id: &i64) -> Result<Item>;
+    fn by_id(&self, id: ID) -> Result<Item>;
     fn create(&self, name: &String, icon: &String, color: &String) -> Result<()>;
-    fn update(&self, id: &i64, name: &String, icon: &String, color: &String) -> Result<()>;
+    fn update(&self, id: ID, name: &String, icon: &String, color: &String) -> Result<()>;
     fn all(&self) -> Result<Vec<Item>>;
-    fn delete(&self, id: &i64) -> Result<()>;
-    fn bind(&self, tags: &[i64], rty: &String, rid: &i64) -> Result<()>;
-    fn unbind(&self, rty: &String, rid: &i64) -> Result<()>;
-    fn resources(&self, tag: &i64) -> Result<Vec<(String, i64)>>;
+    fn delete(&self, id: ID) -> Result<()>;
+    fn bind(&self, tags: &[ID], rty: &String, rid: ID) -> Result<()>;
+    fn unbind(&self, rty: &String, rid: ID) -> Result<()>;
+    fn resources(&self, tag: ID) -> Result<Vec<(String, ID)>>;
 }
 
 impl Dao for Connection {
-    fn by_id(&self, id: &i64) -> Result<Item> {
+    fn by_id(&self, id: ID) -> Result<Item> {
         let it = tags::dsl::tags
             .filter(tags::dsl::id.eq(id))
             .first::<Item>(self)?;
@@ -46,7 +49,7 @@ impl Dao for Connection {
         Ok(())
     }
 
-    fn update(&self, id: &i64, name: &String, icon: &String, color: &String) -> Result<()> {
+    fn update(&self, id: ID, name: &String, icon: &String, color: &String) -> Result<()> {
         let now = Utc::now().naive_utc();
         update(tags::dsl::tags.filter(tags::dsl::id.eq(id)))
             .set((
@@ -66,14 +69,14 @@ impl Dao for Connection {
         Ok(items)
     }
 
-    fn delete(&self, id: &i64) -> Result<()> {
+    fn delete(&self, id: ID) -> Result<()> {
         delete(tag_resources::dsl::tag_resources.filter(tag_resources::dsl::id.eq(id)))
             .execute(self)?;
         delete(tags::dsl::tags.filter(tags::dsl::id.eq(id))).execute(self)?;
         Ok(())
     }
 
-    fn bind(&self, tags: &[i64], rty: &String, rid: &i64) -> Result<()> {
+    fn bind(&self, tags: &[ID], rty: &String, rid: ID) -> Result<()> {
         let now = Utc::now().naive_utc();
         for it in tags {
             insert_into(tag_resources::dsl::tag_resources)
@@ -88,7 +91,7 @@ impl Dao for Connection {
         Ok(())
     }
 
-    fn unbind(&self, rty: &String, rid: &i64) -> Result<()> {
+    fn unbind(&self, rty: &String, rid: ID) -> Result<()> {
         delete(
             tag_resources::dsl::tag_resources
                 .filter(tag_resources::dsl::resource_type.eq(rty))
@@ -97,7 +100,7 @@ impl Dao for Connection {
         .execute(self)?;
         Ok(())
     }
-    fn resources(&self, tag: &i64) -> Result<Vec<(String, i64)>> {
+    fn resources(&self, tag: ID) -> Result<Vec<(String, ID)>> {
         let items = tag_resources::dsl::tag_resources
             .select((
                 tag_resources::dsl::resource_type,

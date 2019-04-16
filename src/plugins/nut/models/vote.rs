@@ -1,16 +1,19 @@
 use chrono::{NaiveDateTime, Utc};
 use diesel::{delete, insert_into, prelude::*, update};
 
-use super::super::super::super::{errors::Result, orm::Connection};
+use super::super::super::super::{
+    errors::Result,
+    orm::{Connection, ID},
+};
 use super::super::schema::votes;
 
 #[derive(Queryable, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Item {
-    pub id: i64,
+    pub id: ID,
     pub point: i64,
     pub resource_type: String,
-    pub resource_id: i64,
+    pub resource_id: ID,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
@@ -18,12 +21,12 @@ pub struct Item {
 pub trait Dao {
     fn all(&self) -> Result<Vec<Item>>;
     fn by_resource_type(&self, rty: &String) -> Result<Vec<Item>>;
-    fn like(&self, rty: &String, rid: &i64, is: bool) -> Result<()>;
-    fn delete(&self, id: &i64) -> Result<()>;
+    fn like(&self, rty: &String, rid: ID, is: bool) -> Result<()>;
+    fn delete(&self, id: ID) -> Result<()>;
 }
 
 impl Dao for Connection {
-    fn like(&self, rty: &String, rid: &i64, is: bool) -> Result<()> {
+    fn like(&self, rty: &String, rid: ID, is: bool) -> Result<()> {
         let now = Utc::now().naive_utc();
         match votes::dsl::votes
             .filter(votes::dsl::resource_type.eq(rty))
@@ -60,7 +63,7 @@ impl Dao for Connection {
         Ok(items)
     }
 
-    fn delete(&self, id: &i64) -> Result<()> {
+    fn delete(&self, id: ID) -> Result<()> {
         delete(votes::dsl::votes.filter(votes::dsl::id.eq(id))).execute(self)?;
         Ok(())
     }

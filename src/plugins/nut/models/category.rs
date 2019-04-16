@@ -1,14 +1,17 @@
 use chrono::{NaiveDateTime, Utc};
 use diesel::{delete, insert_into, prelude::*, update};
 
-use super::super::super::super::{errors::Result, orm::Connection};
+use super::super::super::super::{
+    errors::Result,
+    orm::{Connection, ID},
+};
 use super::super::schema::{categories, category_resources};
 
 #[derive(Queryable, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Item {
-    pub id: i64,
-    pub parent_id: Option<i64>,
+    pub id: ID,
+    pub parent_id: Option<ID>,
     pub name: String,
     pub icon: String,
     pub color: String,
@@ -18,10 +21,10 @@ pub struct Item {
 }
 
 pub trait Dao {
-    fn by_id(&self, id: &i64) -> Result<Item>;
+    fn by_id(&self, id: ID) -> Result<Item>;
     fn create(
         &self,
-        parent: &Option<i64>,
+        parent: Option<ID>,
         name: &String,
         icon: &String,
         color: &String,
@@ -29,23 +32,23 @@ pub trait Dao {
     ) -> Result<()>;
     fn update(
         &self,
-        id: &i64,
-        parent: &Option<i64>,
+        id: ID,
+        parent: Option<ID>,
         name: &String,
         icon: &String,
         color: &String,
         position: i16,
     ) -> Result<()>;
     fn all(&self) -> Result<Vec<Item>>;
-    fn delete(&self, id: &i64) -> Result<()>;
-    fn bind(&self, categories: &[i64], rty: &String, rid: &i64) -> Result<()>;
-    fn unbind(&self, rty: &String, rid: &i64) -> Result<()>;
-    fn resources(&self, category: &i64, rty: &String) -> Result<Vec<i64>>;
-    fn children(&self, category: &Option<i64>) -> Result<Vec<Item>>;
+    fn delete(&self, id: ID) -> Result<()>;
+    fn bind(&self, categories: &[ID], rty: &String, rid: ID) -> Result<()>;
+    fn unbind(&self, rty: &String, rid: ID) -> Result<()>;
+    fn resources(&self, category: ID, rty: &String) -> Result<Vec<i64>>;
+    fn children(&self, category: Option<ID>) -> Result<Vec<Item>>;
 }
 
 impl Dao for Connection {
-    fn by_id(&self, id: &i64) -> Result<Item> {
+    fn by_id(&self, id: ID) -> Result<Item> {
         let it = categories::dsl::categories
             .filter(categories::dsl::id.eq(id))
             .first::<Item>(self)?;
@@ -53,7 +56,7 @@ impl Dao for Connection {
     }
     fn create(
         &self,
-        parent: &Option<i64>,
+        parent: Option<ID>,
         name: &String,
         icon: &String,
         color: &String,
@@ -75,8 +78,8 @@ impl Dao for Connection {
 
     fn update(
         &self,
-        id: &i64,
-        parent: &Option<i64>,
+        id: ID,
+        parent: Option<ID>,
         name: &String,
         icon: &String,
         color: &String,
@@ -103,9 +106,9 @@ impl Dao for Connection {
         Ok(items)
     }
 
-    fn delete(&self, id: &i64) -> Result<()> {
+    fn delete(&self, id: ID) -> Result<()> {
         let now = Utc::now().naive_utc();
-        update(categories::dsl::categories.filter(categories::dsl::parent_id.eq(&Some(*id))))
+        update(categories::dsl::categories.filter(categories::dsl::parent_id.eq(&Some(id))))
             .set((
                 categories::dsl::parent_id.eq(&None::<i64>),
                 categories::dsl::updated_at.eq(&now),
@@ -119,7 +122,7 @@ impl Dao for Connection {
         Ok(())
     }
 
-    fn bind(&self, categories: &[i64], rty: &String, rid: &i64) -> Result<()> {
+    fn bind(&self, categories: &[ID], rty: &String, rid: ID) -> Result<()> {
         let now = Utc::now().naive_utc();
         for it in categories {
             insert_into(category_resources::dsl::category_resources)
@@ -133,7 +136,7 @@ impl Dao for Connection {
         }
         Ok(())
     }
-    fn unbind(&self, rty: &String, rid: &i64) -> Result<()> {
+    fn unbind(&self, rty: &String, rid: ID) -> Result<()> {
         delete(
             category_resources::dsl::category_resources
                 .filter(category_resources::dsl::resource_type.eq(rty))
@@ -142,7 +145,7 @@ impl Dao for Connection {
         .execute(self)?;
         Ok(())
     }
-    fn resources(&self, category: &i64, rty: &String) -> Result<Vec<i64>> {
+    fn resources(&self, category: ID, rty: &String) -> Result<Vec<i64>> {
         let items = category_resources::dsl::category_resources
             .select(category_resources::dsl::resource_id)
             .filter(category_resources::dsl::category_id.eq(category))
@@ -151,8 +154,8 @@ impl Dao for Connection {
             .load::<i64>(self)?;
         Ok(items)
     }
-    fn children(&self, parent: &Option<i64>) -> Result<Vec<Item>> {
-        let items = if *parent == None {
+    fn children(&self, parent: Option<ID>) -> Result<Vec<Item>> {
+        let items = if parent == None {
             categories::dsl::categories
                 .filter(categories::dsl::parent_id.is_null())
                 .order(categories::dsl::position.asc())

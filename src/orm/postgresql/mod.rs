@@ -6,6 +6,7 @@ use std::fmt;
 // https://www.postgresql.org/docs/current/runtime-config-logging.html
 // /var/lib/postgres/data/postgresql.conf: log_statement = 'all'
 pub type Connection = diesel::pg::PgConnection;
+pub type ID = i64;
 
 pub const UP: &'static str = include_str!("up.sql");
 

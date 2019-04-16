@@ -1,13 +1,16 @@
 use chrono::NaiveDateTime;
 use diesel::{delete, insert_into, prelude::*};
 
-use super::super::super::super::{errors::Result, orm::Connection};
+use super::super::super::super::{
+    errors::Result,
+    orm::{Connection, ID},
+};
 use super::super::{schema::leave_words, MediaType};
 
 #[derive(Queryable, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Item {
-    pub id: i64,
+    pub id: ID,
     pub ip: String,
     pub body: String,
     pub media_type: String,
@@ -17,7 +20,7 @@ pub struct Item {
 pub trait Dao {
     fn add(&self, ip: &String, body: &String, media_type: &MediaType) -> Result<()>;
     fn all(&self, limit: i64) -> Result<Vec<Item>>;
-    fn delete(&self, id: &i64) -> Result<()>;
+    fn delete(&self, id: ID) -> Result<()>;
 }
 
 impl Dao for Connection {
@@ -40,7 +43,7 @@ impl Dao for Connection {
         Ok(items)
     }
 
-    fn delete(&self, id: &i64) -> Result<()> {
+    fn delete(&self, id: ID) -> Result<()> {
         delete(leave_words::dsl::leave_words.filter(leave_words::dsl::id.eq(id))).execute(self)?;
         Ok(())
     }

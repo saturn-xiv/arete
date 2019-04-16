@@ -6,14 +6,17 @@ use chrono::{Duration, NaiveDate, NaiveDateTime, Utc};
 use diesel::{delete, insert_into, prelude::*, update};
 use failure::Error;
 
-use super::super::super::super::{errors::Result, orm::Connection};
+use super::super::super::super::{
+    errors::Result,
+    orm::{Connection, ID},
+};
 use super::super::schema::policies;
 
 #[derive(Queryable, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Item {
     pub id: i64,
-    pub user_id: i64,
+    pub user_id: ID,
     pub role: String,
     pub resource: Option<String>,
     pub nbf: NaiveDate,
@@ -37,7 +40,7 @@ impl Item {
 #[derive(Insertable)]
 #[table_name = "policies"]
 pub struct New<'a> {
-    pub user_id: &'a i64,
+    pub user_id: &'a ID,
     pub role: &'a str,
     pub resource: Option<&'a str>,
     pub nbf: &'a NaiveDate,
@@ -46,13 +49,14 @@ pub struct New<'a> {
 }
 
 pub trait Dao {
-    fn all(&self, user: &i64) -> Result<Vec<Item>>;
-    fn can(&self, user: &i64, role: &Role, resource: &Option<String>) -> bool;
-    fn deny(&self, user: &i64, role: &Role, resource: &Option<String>) -> Result<()>;
-    fn forbidden(&self, user: &i64) -> Result<()>;
+    fn all(&self, user: ID) -> Result<Vec<Item>>;
+    fn is(&self, user: ID, role: &Role) -> bool;
+    fn can(&self, user: ID, role: &Role, resource: &Option<String>) -> bool;
+    fn deny(&self, user: ID, role: &Role, resource: &Option<String>) -> Result<()>;
+    fn forbidden(&self, user: ID) -> Result<()>;
     fn apply(
         &self,
-        user: &i64,
+        user: ID,
         role: &Role,
         resource: &Option<String>,
         nbf: &NaiveDate,
@@ -61,13 +65,16 @@ pub trait Dao {
 }
 
 impl Dao for Connection {
-    fn all(&self, user: &i64) -> Result<Vec<Item>> {
+    fn all(&self, user: ID) -> Result<Vec<Item>> {
         let items = policies::dsl::policies
             .filter(policies::dsl::user_id.eq(user))
             .load::<Item>(self)?;
         Ok(items.into_iter().filter(|x| x.enable()).collect::<_>())
     }
-    fn can(&self, user: &i64, role: &Role, resource: &Option<String>) -> bool {
+    fn is(&self, user: ID, role: &Role) -> bool {
+        self.can(user, role, &None)
+    }
+    fn can(&self, user: ID, role: &Role, resource: &Option<String>) -> bool {
         let it = match resource {
             Some(_) => policies::dsl::policies
                 .filter(policies::dsl::user_id.eq(user))
@@ -86,7 +93,7 @@ impl Dao for Connection {
         false
     }
 
-    fn deny(&self, user: &i64, role: &Role, resource: &Option<String>) -> Result<()> {
+    fn deny(&self, user: ID, role: &Role, resource: &Option<String>) -> Result<()> {
         match resource {
             Some(_) => delete(
                 policies::dsl::policies
@@ -106,14 +113,14 @@ impl Dao for Connection {
         Ok(())
     }
 
-    fn forbidden(&self, user: &i64) -> Result<()> {
+    fn forbidden(&self, user: ID) -> Result<()> {
         delete(policies::dsl::policies.filter(policies::dsl::user_id.eq(user))).execute(self)?;
         Ok(())
     }
 
     fn apply(
         &self,
-        user: &i64,
+        user: ID,
         role: &Role,
         resource: &Option<String>,
         nbf: &NaiveDate,
@@ -148,7 +155,7 @@ impl Dao for Connection {
             Err(_) => {
                 insert_into(policies::dsl::policies)
                     .values(&New {
-                        user_id: user,
+                        user_id: &user,
                         role: &role.to_string(),
                         resource: match resource {
                             Some(ref v) => Some(v),

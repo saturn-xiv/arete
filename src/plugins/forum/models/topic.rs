@@ -1,7 +1,10 @@
 use chrono::{NaiveDateTime, Utc};
 use diesel::{delete, insert_into, prelude::*, update};
 
-use super::super::super::super::{errors::Result, orm::Connection};
+use super::super::super::super::{
+    errors::Result,
+    orm::{Connection, ID},
+};
 use super::super::super::nut::{
     models::{category::Dao as CategoryDao, tag::Dao as TagDao},
     MediaType,
@@ -11,8 +14,8 @@ use super::super::schema::forum_topics;
 #[derive(Queryable, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Item {
-    pub id: i64,
-    pub user_id: i64,
+    pub id: ID,
+    pub user_id: ID,
     pub title: String,
     pub body: String,
     pub media_type: String,
@@ -21,11 +24,19 @@ pub struct Item {
 }
 
 pub trait Dao {
-    fn add(&self, user: &i64, title: &String, body: &String, media_type: &MediaType) -> Result<()>;
-    fn get(&self, id: &i64) -> Result<Item>;
+    fn add(
+        &self,
+        user: ID,
+        title: &String,
+        body: &String,
+        media_type: &MediaType,
+        tags: &Vec<i64>,
+        categories: &Vec<i64>,
+    ) -> Result<()>;
+    fn get(&self, id: ID) -> Result<Item>;
     fn update(
         &self,
-        id: &i64,
+        id: ID,
         title: &String,
         body: &String,
         media_type: &MediaType,
@@ -33,12 +44,20 @@ pub trait Dao {
         categories: &Vec<i64>,
     ) -> Result<()>;
     fn latest(&self) -> Result<Vec<Item>>;
-    fn by_user(&self, id: &i64) -> Result<Vec<Item>>;
-    fn delete(&self, id: &i64) -> Result<()>;
+    fn by_user(&self, id: ID) -> Result<Vec<Item>>;
+    fn delete(&self, id: ID) -> Result<()>;
 }
 
 impl Dao for Connection {
-    fn add(&self, user: &i64, title: &String, body: &String, media_type: &MediaType) -> Result<()> {
+    fn add(
+        &self,
+        user: ID,
+        title: &String,
+        body: &String,
+        media_type: &MediaType,
+        _tags: &Vec<i64>,
+        _categories: &Vec<i64>,
+    ) -> Result<()> {
         let now = Utc::now().naive_utc();
         insert_into(forum_topics::dsl::forum_topics)
             .values((
@@ -49,10 +68,10 @@ impl Dao for Connection {
                 forum_topics::dsl::updated_at.eq(&now),
             ))
             .execute(self)?;
-
+        // TODO add tags & categories
         Ok(())
     }
-    fn get(&self, id: &i64) -> Result<Item> {
+    fn get(&self, id: ID) -> Result<Item> {
         let it = forum_topics::dsl::forum_topics
             .filter(forum_topics::dsl::id.eq(id))
             .first::<Item>(self)?;
@@ -60,7 +79,7 @@ impl Dao for Connection {
     }
     fn update(
         &self,
-        id: &i64,
+        id: ID,
         title: &String,
         body: &String,
         media_type: &MediaType,
@@ -91,14 +110,14 @@ impl Dao for Connection {
             .load::<Item>(self)?;
         Ok(items)
     }
-    fn by_user(&self, id: &i64) -> Result<Vec<Item>> {
+    fn by_user(&self, id: ID) -> Result<Vec<Item>> {
         let items = forum_topics::dsl::forum_topics
             .filter(forum_topics::dsl::user_id.eq(id))
             .order(forum_topics::dsl::updated_at.desc())
             .load::<Item>(self)?;
         Ok(items)
     }
-    fn delete(&self, id: &i64) -> Result<()> {
+    fn delete(&self, id: ID) -> Result<()> {
         CategoryDao::unbind(self, &RESOURCE_TYPE.to_string(), id)?;
         TagDao::unbind(self, &RESOURCE_TYPE.to_string(), id)?;
         delete(forum_topics::dsl::forum_topics.filter(forum_topics::dsl::id.eq(id)))

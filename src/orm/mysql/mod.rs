@@ -7,6 +7,7 @@ use std::fmt;
 /// show tables;
 /// desc TABLE-NAME;
 pub type Connection = diesel::mysql::MysqlConnection;
+pub type ID = i64;
 
 pub const UP: &'static str = include_str!("up.sql");
 

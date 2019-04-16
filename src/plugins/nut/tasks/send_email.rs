@@ -82,7 +82,7 @@ impl Handler for Test {
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         let user = s.administrator(db)?;
-        let user = UserDao::by_id(db, &user.id)?;
+        let user = UserDao::by_id(db, user.id)?;
         c.queue.publish(
             NAME.to_string(),
             Uuid::new_v4().to_string(),

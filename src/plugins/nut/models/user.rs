@@ -8,7 +8,7 @@ use uuid::Uuid;
 use super::super::super::super::{
     crypto::Password,
     errors::{Error, Result},
-    orm::Connection,
+    orm::{Connection, ID},
 };
 use super::super::schema::users;
 
@@ -38,7 +38,7 @@ impl fmt::Display for Type {
 #[derive(Queryable, Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Item {
-    pub id: i64,
+    pub id: ID,
     pub real_name: String,
     pub nick_name: String,
     pub email: String,
@@ -97,12 +97,12 @@ pub struct New<'a> {
 }
 
 pub trait Dao {
-    fn by_id(&self, id: &i64) -> Result<Item>;
+    fn by_id(&self, id: ID) -> Result<Item>;
     fn by_uid(&self, uid: &String) -> Result<Item>;
     fn by_email(&self, email: &String) -> Result<Item>;
     fn by_nick_name(&self, nick_name: &String) -> Result<Item>;
-    fn set_profile(&self, id: &i64, real_name: &String, logo: &String) -> Result<()>;
-    fn sign_in(&self, id: &i64, ip: &String) -> Result<()>;
+    fn set_profile(&self, id: ID, real_name: &String, logo: &String) -> Result<()>;
+    fn sign_in(&self, id: ID, ip: &String) -> Result<()>;
     fn sign_up<T: Password>(
         &self,
         real_name: &String,
@@ -110,16 +110,16 @@ pub trait Dao {
         email: &String,
         password: &String,
     ) -> Result<()>;
-    fn lock(&self, id: &i64, on: bool) -> Result<()>;
-    fn confirm(&self, id: &i64) -> Result<()>;
-    fn unlock(&self, id: &i64) -> Result<()>;
+    fn lock(&self, id: ID, on: bool) -> Result<()>;
+    fn confirm(&self, id: ID) -> Result<()>;
+    fn unlock(&self, id: ID) -> Result<()>;
     fn count(&self) -> Result<i64>;
     fn all(&self) -> Result<Vec<Item>>;
-    fn password<T: Password>(&self, id: &i64, password: &String) -> Result<()>;
+    fn password<T: Password>(&self, id: ID, password: &String) -> Result<()>;
 }
 
 impl Dao for Connection {
-    fn by_id(&self, id: &i64) -> Result<Item> {
+    fn by_id(&self, id: ID) -> Result<Item> {
         let it = users::dsl::users
             .filter(users::dsl::id.eq(id))
             .first(self)?;
@@ -147,7 +147,7 @@ impl Dao for Connection {
         Ok(it)
     }
 
-    fn sign_in(&self, id: &i64, ip: &String) -> Result<()> {
+    fn sign_in(&self, id: ID, ip: &String) -> Result<()> {
         let now = Utc::now().naive_utc();
         let it = users::dsl::users.filter(users::dsl::id.eq(id));
         let (current_sign_in_at, current_sign_in_ip, sign_in_count) = users::dsl::users
@@ -198,7 +198,7 @@ impl Dao for Connection {
         Ok(())
     }
 
-    fn lock(&self, id: &i64, on: bool) -> Result<()> {
+    fn lock(&self, id: ID, on: bool) -> Result<()> {
         let now = Utc::now().naive_utc();
         let it = users::dsl::users.filter(users::dsl::id.eq(id));
         update(it)
@@ -210,7 +210,7 @@ impl Dao for Connection {
         Ok(())
     }
 
-    fn set_profile(&self, id: &i64, real_name: &String, logo: &String) -> Result<()> {
+    fn set_profile(&self, id: ID, real_name: &String, logo: &String) -> Result<()> {
         let now = Utc::now().naive_utc();
         update(users::dsl::users.filter(users::dsl::id.eq(id)))
             .set((
@@ -222,7 +222,7 @@ impl Dao for Connection {
         Ok(())
     }
 
-    fn confirm(&self, id: &i64) -> Result<()> {
+    fn confirm(&self, id: ID) -> Result<()> {
         let now = Utc::now().naive_utc();
         let it = users::dsl::users.filter(users::dsl::id.eq(id));
         update(it)
@@ -234,7 +234,7 @@ impl Dao for Connection {
         Ok(())
     }
 
-    fn unlock(&self, id: &i64) -> Result<()> {
+    fn unlock(&self, id: ID) -> Result<()> {
         let now = Utc::now().naive_utc();
         let it = users::dsl::users.filter(users::dsl::id.eq(id));
         update(it)
@@ -258,7 +258,7 @@ impl Dao for Connection {
         Ok(items)
     }
 
-    fn password<T: Password>(&self, id: &i64, password: &String) -> Result<()> {
+    fn password<T: Password>(&self, id: ID, password: &String) -> Result<()> {
         let now = Utc::now().naive_utc();
         let password = T::sum(password.as_bytes())?;
         let it = users::dsl::users.filter(users::dsl::id.eq(id));

@@ -1,13 +1,16 @@
 use chrono::{NaiveDateTime, Utc};
 use diesel::{delete, insert_into, prelude::*, update};
 
-use super::super::super::super::{errors::Result, orm::Connection};
+use super::super::super::super::{
+    errors::Result,
+    orm::{Connection, ID},
+};
 use super::super::{schema::cards, MediaType};
 
 #[derive(Queryable, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Item {
-    pub id: i64,
+    pub id: ID,
     pub title: String,
     pub body: String,
     pub media_type: String,
@@ -22,7 +25,7 @@ pub struct Item {
 }
 
 pub trait Dao {
-    fn by_id(&self, id: &i64) -> Result<Item>;
+    fn by_id(&self, id: ID) -> Result<Item>;
     fn create(
         &self,
         lang: &String,
@@ -37,7 +40,7 @@ pub trait Dao {
     ) -> Result<()>;
     fn update(
         &self,
-        id: &i64,
+        id: ID,
         lang: &String,
         title: &String,
         logo: &String,
@@ -49,11 +52,11 @@ pub trait Dao {
         position: &i16,
     ) -> Result<()>;
     fn all(&self) -> Result<Vec<Item>>;
-    fn delete(&self, id: &i64) -> Result<()>;
+    fn delete(&self, id: ID) -> Result<()>;
 }
 
 impl Dao for Connection {
-    fn by_id(&self, id: &i64) -> Result<Item> {
+    fn by_id(&self, id: ID) -> Result<Item> {
         let it = cards::dsl::cards
             .filter(cards::dsl::id.eq(id))
             .first::<Item>(self)?;
@@ -91,7 +94,7 @@ impl Dao for Connection {
 
     fn update(
         &self,
-        id: &i64,
+        id: ID,
         lang: &String,
         title: &String,
         logo: &String,
@@ -127,7 +130,7 @@ impl Dao for Connection {
         Ok(items)
     }
 
-    fn delete(&self, id: &i64) -> Result<()> {
+    fn delete(&self, id: ID) -> Result<()> {
         delete(cards::dsl::cards.filter(cards::dsl::id.eq(id))).execute(self)?;
         Ok(())
     }
