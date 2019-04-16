@@ -1,8 +1,13 @@
 pub mod graphql;
 pub mod html;
 pub mod models;
-pub mod schema;
+#[cfg(feature = "mysql")]
+pub mod mysql;
+#[cfg(feature = "postgresql")]
+pub mod postgresql;
 pub mod seo;
+#[cfg(feature = "sqlite")]
+pub mod sqlite;
 pub mod tasks;
 pub mod themes;
 
@@ -11,10 +16,14 @@ use std::str::FromStr;
 
 use failure::Error as FailureError;
 
-use super::super::{
-    errors::{Error, Result},
-    orm::migration::New as Migration,
-};
+use super::super::errors::{Error, Result};
+
+#[cfg(feature = "mysql")]
+pub use self::mysql::*;
+#[cfg(feature = "postgresql")]
+pub use self::postgresql::*;
+#[cfg(feature = "sqlite")]
+pub use self::sqlite::*;
 
 pub enum MediaType {
     TEXT,
@@ -43,22 +52,4 @@ impl FromStr for MediaType {
             t => Err(Error::BadMediaType(t.to_string()).into()),
         }
     }
-}
-
-lazy_static! {
-    pub static ref AUTH: Migration<'static> = Migration {
-        name: "create-auth",
-        version: "20190101053052",
-        up: include_str!("auth-up.sql"),
-        down: include_str!("auth-down.sql"),
-    };
-}
-
-lazy_static! {
-    pub static ref SITE: Migration<'static> = Migration {
-        name: "create-site",
-        version: "20190101053059",
-        up: include_str!("site-up.sql"),
-        down: include_str!("site-down.sql"),
-    };
 }

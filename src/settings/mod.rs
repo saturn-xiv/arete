@@ -1,26 +1,24 @@
-pub mod schema;
+#[cfg(feature = "mysql")]
+pub mod mysql;
+#[cfg(feature = "postgresql")]
+pub mod postgresql;
+#[cfg(feature = "sqlite")]
+pub mod sqlite;
 
 use chrono::{NaiveDateTime, Utc};
 use diesel::{insert_into, prelude::*, update};
 use serde::{de::DeserializeOwned, ser::Serialize};
 use serde_json;
 
-use super::{
-    crypto::Secret,
-    errors::Result,
-    orm::{migration::New as Migration, Connection},
-};
+use super::{crypto::Secret, errors::Result, orm::Connection};
 
+#[cfg(feature = "mysql")]
+pub use self::mysql::*;
+#[cfg(feature = "postgresql")]
+pub use self::postgresql::*;
 use self::schema::settings;
-
-lazy_static! {
-    pub static ref MIGRATION: Migration<'static> = Migration {
-        name: "create-settings",
-        version: "20190101053042",
-        up: include_str!("up.sql"),
-        down: include_str!("down.sql"),
-    };
-}
+#[cfg(feature = "sqlite")]
+pub use self::sqlite::*;
 
 #[derive(Queryable)]
 pub struct Item {

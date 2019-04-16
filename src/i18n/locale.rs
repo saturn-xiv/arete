@@ -2,20 +2,8 @@ use chrono::{NaiveDateTime, Utc};
 use diesel::{delete, insert_into, prelude::*, update};
 use yaml_rust::{Yaml, YamlLoader};
 
-use super::super::{
-    errors::Result,
-    orm::{migration::New as Migration, Connection},
-};
+use super::super::{errors::Result, orm::Connection};
 use super::schema::locales;
-
-lazy_static! {
-    pub static ref MIGRATION: Migration<'static> = Migration {
-        name: "create-locales",
-        version: "20190101053014",
-        up: include_str!("up.sql"),
-        down: include_str!("down.sql"),
-    };
-}
 
 #[derive(Queryable, Serialize)]
 #[serde(rename_all = "camelCase")]

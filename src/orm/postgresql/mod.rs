@@ -5,6 +5,8 @@ use std::fmt;
 // /var/lib/postgres/data/postgresql.conf: log_statement = 'all'
 pub type Connection = diesel::pg::PgConnection;
 
+pub const UP: &'static str = include_str!("up.sql");
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Config {

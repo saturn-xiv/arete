@@ -7,8 +7,6 @@ use diesel::{connection::SimpleConnection, delete, insert_into, prelude::*, upda
 use super::super::{errors::Result, rfc::RFC822};
 use super::{schema::schema_migrations, Connection};
 
-pub const UP: &'static str = include_str!("up.sql");
-
 #[derive(Queryable)]
 pub struct Item {
     pub id: i64,
@@ -76,7 +74,7 @@ pub trait Dao {
 
 impl Dao for Connection {
     fn load(&self, items: &Vec<New>) -> Result<()> {
-        self.batch_execute(UP)?;
+        self.batch_execute(super::UP)?;
 
         for it in items {
             info!("find migration: {}", it);

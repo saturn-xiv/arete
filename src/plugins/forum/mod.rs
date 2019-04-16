@@ -1,16 +1,17 @@
 pub mod graphql;
 pub mod html;
 pub mod models;
-pub mod schema;
+#[cfg(feature = "mysql")]
+pub mod mysql;
+#[cfg(feature = "postgresql")]
+pub mod postgresql;
+#[cfg(feature = "sqlite")]
+pub mod sqlite;
 pub mod themes;
 
-use super::super::orm::migration::New as Migration;
-
-lazy_static! {
-    pub static ref MIGRATION: Migration<'static> = Migration {
-        name: "create-forum",
-        version: "20190101053108",
-        up: include_str!("up.sql"),
-        down: include_str!("down.sql"),
-    };
-}
+#[cfg(feature = "mysql")]
+pub use self::mysql::*;
+#[cfg(feature = "postgresql")]
+pub use self::postgresql::*;
+#[cfg(feature = "sqlite")]
+pub use self::sqlite::*;
