@@ -26,7 +26,7 @@ pub trait Dao {
         post: &Option<i64>,
         body: &String,
         media_type: &MediaType,
-    ) -> Result<i64>;
+    ) -> Result<()>;
     fn get(&self, id: &i64) -> Result<Item>;
     fn update(&self, id: &i64, body: &String, media_type: &MediaType) -> Result<()>;
     fn latest(&self) -> Result<Vec<Item>>;
@@ -43,9 +43,9 @@ impl Dao for Connection {
         post: &Option<i64>,
         body: &String,
         media_type: &MediaType,
-    ) -> Result<i64> {
+    ) -> Result<()> {
         let now = Utc::now().naive_utc();
-        let id = insert_into(forum_posts::dsl::forum_posts)
+        insert_into(forum_posts::dsl::forum_posts)
             .values((
                 forum_posts::dsl::user_id.eq(user),
                 forum_posts::dsl::topic_id.eq(topic),
@@ -54,9 +54,8 @@ impl Dao for Connection {
                 forum_posts::dsl::media_type.eq(&media_type.to_string()),
                 forum_posts::dsl::updated_at.eq(&now),
             ))
-            .returning(forum_posts::dsl::id)
-            .get_result(self)?;
-        Ok(id)
+            .execute(self)?;
+        Ok(())
     }
     fn get(&self, id: &i64) -> Result<Item> {
         let it = forum_posts::dsl::forum_posts

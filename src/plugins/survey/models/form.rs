@@ -39,7 +39,7 @@ pub trait Dao {
         nbf: &NaiveDate,
         exp: &NaiveDate,
         type_: &Type,
-    ) -> Result<i64>;
+    ) -> Result<()>;
 
     fn update(
         &self,
@@ -63,9 +63,9 @@ impl Dao for Connection {
         nbf: &NaiveDate,
         exp: &NaiveDate,
         type_: &Type,
-    ) -> Result<i64> {
+    ) -> Result<()> {
         let now = Utc::now().naive_utc();
-        let id = insert_into(survey_forms::dsl::survey_forms)
+        insert_into(survey_forms::dsl::survey_forms)
             .values((
                 survey_forms::dsl::user_id.eq(user),
                 survey_forms::dsl::title.eq(title),
@@ -75,9 +75,8 @@ impl Dao for Connection {
                 survey_forms::dsl::type_.eq(&serde_json::to_string(type_)?),
                 survey_forms::dsl::updated_at.eq(&now),
             ))
-            .returning(survey_forms::dsl::id)
-            .get_result(self)?;
-        Ok(id)
+            .execute(self)?;
+        Ok(())
     }
 
     fn update(

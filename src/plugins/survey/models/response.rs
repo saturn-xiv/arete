@@ -23,7 +23,7 @@ pub trait Dao {
         username: &String,
         ip: &String,
         content: &String,
-    ) -> Result<i64>;
+    ) -> Result<()>;
     fn by_form(&self, id: &i64) -> Result<Vec<Item>>;
 }
 
@@ -35,9 +35,9 @@ impl Dao for Connection {
         username: &String,
         ip: &String,
         content: &String,
-    ) -> Result<i64> {
+    ) -> Result<()> {
         let now = Utc::now().naive_utc();
-        let id = insert_into(survey_responses::dsl::survey_responses)
+        insert_into(survey_responses::dsl::survey_responses)
             .values((
                 survey_responses::dsl::form_id.eq(form),
                 survey_responses::dsl::ip.eq(ip),
@@ -46,9 +46,8 @@ impl Dao for Connection {
                 survey_responses::dsl::content.eq(content),
                 survey_responses::dsl::created_at.eq(&now),
             ))
-            .returning(survey_responses::dsl::id)
-            .get_result(self)?;
-        Ok(id)
+            .execute(self)?;
+        Ok(())
     }
     fn by_form(&self, id: &i64) -> Result<Vec<Item>> {
         let items = survey_responses::dsl::survey_responses

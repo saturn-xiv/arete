@@ -83,7 +83,7 @@ pub trait Dao {
         gender: &Gender,
         birthday: &NaiveDate,
         contact: &Contact,
-    ) -> Result<i64>;
+    ) -> Result<()>;
     fn get(&self, id: &i64) -> Result<Item>;
     fn update(
         &self,
@@ -105,9 +105,9 @@ impl Dao for Connection {
         gender: &Gender,
         birthday: &NaiveDate,
         contact: &Contact,
-    ) -> Result<i64> {
+    ) -> Result<()> {
         let now = Utc::now().naive_utc();
-        let id = insert_into(vip_members::dsl::vip_members)
+         insert_into(vip_members::dsl::vip_members)
             .values((
                 vip_members::dsl::nick_name.eq(nick_name),
                 vip_members::dsl::real_name.eq(real_name),
@@ -116,9 +116,8 @@ impl Dao for Connection {
                 vip_members::dsl::contact.eq(&serde_json::to_string(contact)?),
                 vip_members::dsl::updated_at.eq(&now),
             ))
-            .returning(vip_members::dsl::id)
-            .get_result(self)?;
-        Ok(id)
+            .execute(self)?;
+        Ok(())
     }
     fn get(&self, id: &i64) -> Result<Item> {
         let it = vip_members::dsl::vip_members

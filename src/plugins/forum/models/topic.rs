@@ -26,10 +26,8 @@ pub trait Dao {
         user: &i64,
         title: &String,
         body: &String,
-        media_type: &MediaType,
-        tags: &Vec<i64>,
-        categories: &Vec<i64>,
-    ) -> Result<i64>;
+        media_type: &MediaType,        
+    ) -> Result<()>;
     fn get(&self, id: &i64) -> Result<Item>;
     fn update(
         &self,
@@ -52,11 +50,10 @@ impl Dao for Connection {
         title: &String,
         body: &String,
         media_type: &MediaType,
-        tags: &Vec<i64>,
-        categories: &Vec<i64>,
-    ) -> Result<i64> {
+        
+    ) -> Result<()> {
         let now = Utc::now().naive_utc();
-        let id = insert_into(forum_topics::dsl::forum_topics)
+        insert_into(forum_topics::dsl::forum_topics)
             .values((
                 forum_topics::dsl::user_id.eq(user),
                 forum_topics::dsl::title.eq(title),
@@ -64,13 +61,12 @@ impl Dao for Connection {
                 forum_topics::dsl::media_type.eq(&media_type.to_string()),
                 forum_topics::dsl::updated_at.eq(&now),
             ))
-            .returning(forum_topics::dsl::id)
-            .get_result(self)?;
+            .execute(self)?;
+            
 
-        CategoryDao::bind(self, tags, &RESOURCE_TYPE.to_string(), &id)?;
-        TagDao::bind(self, categories, &RESOURCE_TYPE.to_string(), &id)?;
+        
 
-        Ok(id)
+        Ok(())
     }
     fn get(&self, id: &i64) -> Result<Item> {
         let it = forum_topics::dsl::forum_topics

@@ -41,7 +41,7 @@ pub trait Dao {
         required: &bool,
         type_: &Type,
         position: &i16,
-    ) -> Result<i64>;
+    ) -> Result<()>;
 
     fn update(
         &self,
@@ -68,9 +68,9 @@ impl Dao for Connection {
         required: &bool,
         type_: &Type,
         position: &i16,
-    ) -> Result<i64> {
+    ) -> Result<()> {
         let now = Utc::now().naive_utc();
-        let id = insert_into(survey_fields::dsl::survey_fields)
+        insert_into(survey_fields::dsl::survey_fields)
             .values((
                 survey_fields::dsl::form_id.eq(form),
                 survey_fields::dsl::key.eq(key),
@@ -81,9 +81,8 @@ impl Dao for Connection {
                 survey_fields::dsl::position.eq(position),
                 survey_fields::dsl::updated_at.eq(&now),
             ))
-            .returning(survey_fields::dsl::id)
-            .get_result(self)?;
-        Ok(id)
+            .execute(self)?;
+        Ok(())
     }
 
     fn update(

@@ -26,7 +26,7 @@ pub trait Dao {
         mime_type: &String,
         url: &String,
         size: &i64,
-    ) -> Result<Item>;
+    ) -> Result<()>;
     fn update(
         &self,
         id: &i64,
@@ -54,9 +54,9 @@ impl Dao for Connection {
         mime_type: &String,
         url: &String,
         size: &i64,
-    ) -> Result<Item> {
+    ) -> Result<()> {
         let now = Utc::now().naive_utc();
-        let it = insert_into(attachments::dsl::attachments)
+        insert_into(attachments::dsl::attachments)
             .values((
                 attachments::dsl::user_id.eq(user),
                 attachments::dsl::title.eq(title),
@@ -65,8 +65,8 @@ impl Dao for Connection {
                 attachments::dsl::size.eq(size),
                 attachments::dsl::updated_at.eq(&now),
             ))
-            .get_result(self)?;
-        Ok(it)
+            .execute(self)?;
+        Ok(())
     }
 
     fn update(

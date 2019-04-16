@@ -38,8 +38,8 @@ impl Handler for Create {
                 &self.title,
                 &self.body,
                 &self.media_type.parse()?,
-                &self.tags.iter().map(|x| x.0).collect(),
-                &self.categories.iter().map(|x| x.0).collect(),
+                // &self.tags.iter().map(|x| x.0).collect(),
+                // &self.categories.iter().map(|x| x.0).collect(),
             )
         })?;
         Ok(None)

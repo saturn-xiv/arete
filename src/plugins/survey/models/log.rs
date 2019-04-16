@@ -15,14 +15,14 @@ pub struct Item {
 }
 
 pub trait Dao {
-    fn add(&self, form: &i64, user: &Option<i64>, ip: &String, message: &String) -> Result<i64>;
+    fn add(&self, form: &i64, user: &Option<i64>, ip: &String, message: &String) -> Result<()>;
     fn by_form(&self, id: &i64) -> Result<Vec<Item>>;
 }
 
 impl Dao for Connection {
-    fn add(&self, form: &i64, user: &Option<i64>, ip: &String, message: &String) -> Result<i64> {
+    fn add(&self, form: &i64, user: &Option<i64>, ip: &String, message: &String) -> Result<()> {
         let now = Utc::now().naive_utc();
-        let id = insert_into(survey_logs::dsl::survey_logs)
+         insert_into(survey_logs::dsl::survey_logs)
             .values((
                 survey_logs::dsl::user_id.eq(user),
                 survey_logs::dsl::form_id.eq(form),
@@ -30,9 +30,8 @@ impl Dao for Connection {
                 survey_logs::dsl::message.eq(message),
                 survey_logs::dsl::created_at.eq(&now),
             ))
-            .returning(survey_logs::dsl::id)
-            .get_result(self)?;
-        Ok(id)
+            .execute(self)?;
+        Ok(())
     }
     fn by_form(&self, id: &i64) -> Result<Vec<Item>> {
         let items = survey_logs::dsl::survey_logs
