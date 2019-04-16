@@ -14,8 +14,8 @@ cargo build
 for i in "${features[@]}"
 do
     echo "check features: $i..."
-    cargo check --no-default-features --features $i
-    cargo check --no-default-features --features $i
+    cargo check --no-default-features --features "$i"
+    cargo check --no-default-features --features "$i"
 done
 
 exit 0

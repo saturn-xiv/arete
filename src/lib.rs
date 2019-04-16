@@ -33,7 +33,6 @@ extern crate futures;
 extern crate git2;
 extern crate hex;
 extern crate hyper;
-extern crate ipnetwork;
 extern crate jsonwebtoken;
 extern crate juniper_rocket;
 extern crate language_tags;

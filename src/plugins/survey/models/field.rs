@@ -1,6 +1,5 @@
 use chrono::{NaiveDateTime, Utc};
 use diesel::{delete, insert_into, prelude::*, update};
-use serde_json::{from_value, to_value, Value};
 
 use super::super::super::super::{errors::Result, orm::Connection};
 use super::super::schema::survey_fields;
@@ -13,15 +12,15 @@ pub struct Item {
     pub title: String,
     pub description: Option<String>,
     pub required: bool,
-    pub type_: Value,
+    pub type_: String,
     pub position: i16,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
 
 impl Item {
-    pub fn type_(self) -> Result<Type> {
-        let it = from_value(self.type_)?;
+    pub fn type_(&self) -> Result<Type> {
+        let it = serde_json::from_str(&self.type_)?;
         Ok(it)
     }
 }
@@ -78,7 +77,7 @@ impl Dao for Connection {
                 survey_fields::dsl::title.eq(title),
                 survey_fields::dsl::description.eq(description),
                 survey_fields::dsl::required.eq(required),
-                survey_fields::dsl::type_.eq(&to_value(type_)?),
+                survey_fields::dsl::type_.eq(&serde_json::to_string(type_)?),
                 survey_fields::dsl::position.eq(position),
                 survey_fields::dsl::updated_at.eq(&now),
             ))
@@ -105,7 +104,7 @@ impl Dao for Connection {
                 survey_fields::dsl::title.eq(title),
                 survey_fields::dsl::description.eq(description),
                 survey_fields::dsl::required.eq(required),
-                survey_fields::dsl::type_.eq(&to_value(type_)?),
+                survey_fields::dsl::type_.eq(&serde_json::to_string(type_)?),
                 survey_fields::dsl::position.eq(position),
                 survey_fields::dsl::updated_at.eq(&now),
             ))

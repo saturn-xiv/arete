@@ -66,7 +66,7 @@ table! {
 table! {
     leave_words (id) {
         id -> Int8,
-        ip -> Inet,
+        ip -> Varchar,
         body -> Text,
         media_type -> Varchar,
         created_at -> Timestamp,
@@ -91,7 +91,7 @@ table! {
     logs (id) {
         id -> Int8,
         user_id -> Int8,
-        ip -> Inet,
+        ip -> Varchar,
         message -> Varchar,
         created_at -> Timestamp,
     }
@@ -158,9 +158,9 @@ table! {
         logo -> Varchar,
         sign_in_count -> Int8,
         current_sign_in_at -> Nullable<Timestamp>,
-        current_sign_in_ip -> Nullable<Inet>,
+        current_sign_in_ip -> Nullable<Varchar>,
         last_sign_in_at -> Nullable<Timestamp>,
-        last_sign_in_ip -> Nullable<Inet>,
+        last_sign_in_ip -> Nullable<Varchar>,
         confirmed_at -> Nullable<Timestamp>,
         locked_at -> Nullable<Timestamp>,
         deleted_at -> Nullable<Timestamp>,

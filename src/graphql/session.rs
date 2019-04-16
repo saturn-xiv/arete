@@ -1,7 +1,6 @@
 use std::ops::Deref;
 use std::sync::Arc;
 
-use ipnetwork::IpNetwork;
 use rocket::{
     http::Status,
     request::{self, FromRequest},
@@ -25,7 +24,7 @@ use super::super::{
 pub struct Session {
     pub lang: String,
     pub user: Option<User>,
-    pub client_ip: IpNetwork,
+    pub client_ip: String,
 }
 
 impl Session {

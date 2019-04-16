@@ -7,7 +7,7 @@ table! {
         description -> Nullable<Text>,
         required -> Bool,
         #[sql_name = "type"]
-        type_ -> Json,
+        type_ -> Text,
         position -> Int2,
         created_at -> Timestamp,
         updated_at -> Timestamp,
@@ -21,7 +21,7 @@ table! {
         title -> Varchar,
         description -> Text,
         #[sql_name = "type"]
-        type_ -> Json,
+        type_ -> Text,
         nbf -> Date,
         exp -> Date,
         created_at -> Timestamp,
@@ -34,7 +34,7 @@ table! {
         id -> Int8,
         form_id -> Int8,
         user_id -> Nullable<Int8>,
-        ip -> Inet,
+        ip -> Varchar,
         message -> Varchar,
         created_at -> Timestamp,
     }
@@ -46,8 +46,8 @@ table! {
         form_id -> Int8,
         email -> Varchar,
         username -> Varchar,
-        ip -> Inet,
-        content -> Json,
+        ip -> Varchar,
+        content -> Text,
         created_at -> Timestamp,
     }
 }

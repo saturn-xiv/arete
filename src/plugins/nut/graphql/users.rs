@@ -154,9 +154,9 @@ impl From<User> for Info {
             provider_type: it.provider_type,
             sign_in_count: I64(it.sign_in_count),
             current_sign_in_at: it.current_sign_in_at,
-            current_sign_in_ip: it.current_sign_in_ip.map(|x| x.ip().to_string()),
+            current_sign_in_ip: it.current_sign_in_ip,
             last_sign_in_at: it.last_sign_in_at,
-            last_sign_in_ip: it.last_sign_in_ip.map(|x| x.ip().to_string()),
+            last_sign_in_ip: it.last_sign_in_ip,
             updated_at: it.updated_at,
         }
     }
@@ -534,7 +534,7 @@ impl Handler for Logs {
             .into_iter()
             .map(|it| Log {
                 id: I64(it.id),
-                ip: it.ip.ip().to_string(),
+                ip: it.ip,
                 message: it.message,
                 created_at: it.created_at,
             })

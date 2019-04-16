@@ -1,6 +1,5 @@
 use chrono::{NaiveDateTime, Utc};
 use diesel::{insert_into, prelude::*};
-use ipnetwork::IpNetwork;
 
 use super::super::super::super::{errors::Result, orm::Connection};
 use super::super::schema::survey_logs;
@@ -10,18 +9,18 @@ pub struct Item {
     pub id: i64,
     pub form_id: i64,
     pub user_id: Option<i64>,
-    pub ip: IpNetwork,
+    pub ip: String,
     pub message: String,
     pub created_at: NaiveDateTime,
 }
 
 pub trait Dao {
-    fn add(&self, form: &i64, user: &Option<i64>, ip: &IpNetwork, message: &String) -> Result<i64>;
+    fn add(&self, form: &i64, user: &Option<i64>, ip: &String, message: &String) -> Result<i64>;
     fn by_form(&self, id: &i64) -> Result<Vec<Item>>;
 }
 
 impl Dao for Connection {
-    fn add(&self, form: &i64, user: &Option<i64>, ip: &IpNetwork, message: &String) -> Result<i64> {
+    fn add(&self, form: &i64, user: &Option<i64>, ip: &String, message: &String) -> Result<i64> {
         let now = Utc::now().naive_utc();
         let id = insert_into(survey_logs::dsl::survey_logs)
             .values((

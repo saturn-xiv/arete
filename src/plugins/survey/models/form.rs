@@ -1,6 +1,5 @@
 use chrono::{NaiveDate, NaiveDateTime, Utc};
 use diesel::{delete, insert_into, prelude::*, update};
-use serde_json::{from_value, to_value, Value};
 
 use super::super::super::super::{errors::Result, orm::Connection};
 use super::super::schema::{survey_fields, survey_forms, survey_logs, survey_responses};
@@ -11,7 +10,7 @@ pub struct Item {
     pub user_id: i64,
     pub title: String,
     pub description: String,
-    pub type_: Value,
+    pub type_: String,
     pub nbf: NaiveDate,
     pub exp: NaiveDate,
     pub created_at: NaiveDateTime,
@@ -19,8 +18,8 @@ pub struct Item {
 }
 
 impl Item {
-    pub fn type_(self) -> Result<Type> {
-        let it = from_value(self.type_)?;
+    pub fn type_(&self) -> Result<Type> {
+        let it = serde_json::from_str(&self.type_)?;
         Ok(it)
     }
 }
@@ -73,7 +72,7 @@ impl Dao for Connection {
                 survey_forms::dsl::description.eq(description),
                 survey_forms::dsl::nbf.eq(nbf),
                 survey_forms::dsl::exp.eq(exp),
-                survey_forms::dsl::type_.eq(&to_value(type_)?),
+                survey_forms::dsl::type_.eq(&serde_json::to_string(type_)?),
                 survey_forms::dsl::updated_at.eq(&now),
             ))
             .returning(survey_forms::dsl::id)

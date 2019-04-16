@@ -124,7 +124,7 @@ pub fn post(
                 queue: queue.clone(),
             },
             session::Session {
-                client_ip: addr.ip().into(),
+                client_ip: addr.ip().to_string(),
                 lang: locale.0,
                 user: user,
             },

@@ -5,7 +5,7 @@ table! {
         real_name -> Varchar,
         gender -> Varchar,
         birthday -> Date,
-        contact -> Json,
+        contact -> Text,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }

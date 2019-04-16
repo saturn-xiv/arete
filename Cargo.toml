@@ -57,7 +57,6 @@ robots_txt = "0.6"
 sitemap = "0.3"
 lettre = "0.9"
 lettre_email = "0.9"
-ipnetwork = "0.13" # https://github.com/diesel-rs/diesel/blob/568d3e2420b44f5dffbd806a6c0e5e450f024394/diesel/Cargo.toml#L28 
 hyper = "0.10"
 rocket = "0.4"
 mustache = "*"
@@ -116,7 +115,7 @@ features = ["vendored"]
 
 [dependencies.diesel]
 version = "1"
-features = ["chrono", "serde_json", "uuid", "network-address", "numeric", "r2d2", "128-column-tables"]
+features = ["chrono", "serde_json", "uuid", "numeric", "r2d2", "128-column-tables"]
 
 [package.metadata.deb]
 depends = "$auto, nginx, nodejs, npm"

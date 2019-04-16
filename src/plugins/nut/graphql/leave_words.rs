@@ -39,7 +39,7 @@ impl From<Item> for LeaveWord {
     fn from(it: Item) -> Self {
         Self {
             id: I64(it.id),
-            ip: it.ip.ip().to_string(),
+            ip: it.ip,
             body: it.body,
             media_type: it.media_type,
             created_at: it.created_at,

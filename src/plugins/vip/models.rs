@@ -3,7 +3,6 @@ use std::str::FromStr;
 
 use chrono::{Datelike, NaiveDate, NaiveDateTime, Utc};
 use diesel::{delete, insert_into, prelude::*, update};
-use serde_json::{from_value, to_value, Value};
 
 use super::super::super::{
     errors::{Error, Result},
@@ -48,7 +47,7 @@ pub struct Item {
     pub real_name: String,
     pub gender: String,
     pub birthday: NaiveDate,
-    pub contact: Value,
+    pub contact: String,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
@@ -57,8 +56,8 @@ impl Item {
     pub fn age(&self) -> i32 {
         Utc::now().year() - self.birthday.year()
     }
-    pub fn contact(self) -> Result<Contact> {
-        let it = from_value(self.contact)?;
+    pub fn contact(&self) -> Result<Contact> {
+        let it = serde_json::from_str(&self.contact)?;
         Ok(it)
     }
 }
@@ -114,7 +113,7 @@ impl Dao for Connection {
                 vip_members::dsl::real_name.eq(real_name),
                 vip_members::dsl::birthday.eq(&birthday),
                 vip_members::dsl::gender.eq(&gender.to_string()),
-                vip_members::dsl::contact.eq(&to_value(contact)?),
+                vip_members::dsl::contact.eq(&serde_json::to_string(contact)?),
                 vip_members::dsl::updated_at.eq(&now),
             ))
             .returning(vip_members::dsl::id)
@@ -142,7 +141,7 @@ impl Dao for Connection {
                 vip_members::dsl::real_name.eq(real_name),
                 vip_members::dsl::birthday.eq(&birthday),
                 vip_members::dsl::gender.eq(&gender.to_string()),
-                vip_members::dsl::contact.eq(&to_value(contact)?),
+                vip_members::dsl::contact.eq(&serde_json::to_string(contact)?),
                 vip_members::dsl::updated_at.eq(&now),
             ))
             .execute(self)?;
