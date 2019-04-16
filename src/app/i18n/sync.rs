@@ -18,7 +18,7 @@ pub fn command<'a, 'b>() -> App<'a, 'b> {
 }
 
 pub fn run(cfg: Config) -> Result<()> {
-    let db = cfg.postgresql.open()?;
+    let db = cfg.database.open()?;
     let db = db.get()?;
     let db = db.deref();
     let (inserted, find) = db.transaction::<_, Error, _>(|| {

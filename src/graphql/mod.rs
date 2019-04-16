@@ -16,9 +16,8 @@ use rocket::{response::content::Html, State};
 use serde::Serialize;
 
 use super::{
-    crypto::sodium::Encryptor as Sodium, errors::Result, jwt::Jwt, orm::Database,
-    plugins::nut::models::user::Item as User, queue::rabbitmq::RabbitMQ, redis::Redis,
-    request::Locale,
+    cache::Cache, crypto::Crypto, errors::Result, jwt::Jwt, orm::Database,
+    plugins::nut::models::user::Item as User, queue::rabbitmq::RabbitMQ, request::Locale,
 };
 
 pub fn new() -> Schema {
@@ -101,10 +100,10 @@ pub fn get() -> Html<String> {
 #[post("/", data = "<request>")]
 pub fn post(
     db: Database,
-    cache: Redis,
+    cache: Cache,
     locale: Locale,
     jwt: State<Arc<Jwt>>,
-    encryptor: State<Arc<Sodium>>,
+    encryptor: State<Arc<Crypto>>,
     queue: State<Arc<RabbitMQ>>,
     user: Option<User>,
     addr: SocketAddr,

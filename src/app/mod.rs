@@ -67,17 +67,17 @@ pub fn launch() -> Result<()> {
     }
 
     if let Some(_) = matches.subcommand_matches(database::migrate::COMMAND_NAME) {
-        let db = cfg.postgresql.open()?;
+        let db = cfg.database.open()?;
         let db = db.get()?;
         return database::migrate::run(&db);
     }
     if let Some(_) = matches.subcommand_matches(database::rollback::COMMAND_NAME) {
-        let db = cfg.postgresql.open()?;
+        let db = cfg.database.open()?;
         let db = db.get()?;
         return database::rollback::run(&db);
     }
     if let Some(_) = matches.subcommand_matches(database::status::COMMAND_NAME) {
-        let db = cfg.postgresql.open()?;
+        let db = cfg.database.open()?;
         let db = db.get()?;
         return database::status::run(&db);
     }

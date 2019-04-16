@@ -7,7 +7,7 @@ use md5;
 use uuid::Uuid;
 
 use super::super::super::super::{
-    crypto::Encryptor,
+    crypto::Password,
     errors::{Error, Result},
     orm::Connection,
 };
@@ -73,7 +73,7 @@ impl Item {
         }
         Ok(())
     }
-    pub fn auth<E: Encryptor>(&self, password: &String) -> Result<()> {
+    pub fn auth<E: Password>(&self, password: &String) -> Result<()> {
         if let Some(ref v) = self.password {
             if E::verify(v, password.as_bytes()) {
                 return Ok(());
@@ -104,7 +104,7 @@ pub trait Dao {
     fn by_nick_name(&self, nick_name: &String) -> Result<Item>;
     fn set_profile(&self, id: &i64, real_name: &String, logo: &String) -> Result<()>;
     fn sign_in(&self, id: &i64, ip: &IpNetwork) -> Result<()>;
-    fn sign_up<T: Encryptor>(
+    fn sign_up<T: Password>(
         &self,
         real_name: &String,
         nick_name: &String,
@@ -116,7 +116,7 @@ pub trait Dao {
     fn unlock(&self, id: &i64) -> Result<()>;
     fn count(&self) -> Result<i64>;
     fn all(&self) -> Result<Vec<Item>>;
-    fn password<T: Encryptor>(&self, id: &i64, password: &String) -> Result<()>;
+    fn password<T: Password>(&self, id: &i64, password: &String) -> Result<()>;
 }
 
 impl Dao for Connection {
@@ -171,7 +171,7 @@ impl Dao for Connection {
             .execute(self)?;
         Ok(())
     }
-    fn sign_up<T: Encryptor>(
+    fn sign_up<T: Password>(
         &self,
         real_name: &String,
         nick_name: &String,
@@ -259,7 +259,7 @@ impl Dao for Connection {
         Ok(items)
     }
 
-    fn password<T: Encryptor>(&self, id: &i64, password: &String) -> Result<()> {
+    fn password<T: Password>(&self, id: &i64, password: &String) -> Result<()> {
         let now = Utc::now().naive_utc();
         let password = T::sum(password.as_bytes())?;
         let it = users::dsl::users.filter(users::dsl::id.eq(id));

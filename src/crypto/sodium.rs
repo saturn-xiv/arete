@@ -1,16 +1,20 @@
+use base64;
 use sodiumoxide::{
-    crypto::{pwhash, secretbox},
+    crypto::{
+        hash::sha512::{hash, DIGESTBYTES},
+        pwhash, secretbox,
+    },
     randombytes,
 };
 
 use super::super::errors::{Error, Result};
 use super::Key;
 
-pub struct Encryptor {
+pub struct Crypto {
     key: secretbox::Key,
 }
 
-impl Encryptor {
+impl Crypto {
     pub fn new(key: Key) -> Result<Self> {
         let key: Result<Vec<u8>> = key.into();
         match secretbox::Key::from_slice(&key?) {
@@ -19,11 +23,13 @@ impl Encryptor {
         }
     }
 }
-impl super::Encryptor for Encryptor {
-    fn random(l: usize) -> Vec<u8> {
+impl super::Random for Crypto {
+    fn bytes(l: usize) -> Vec<u8> {
         randombytes::randombytes(l)
     }
+}
 
+impl super::Password for Crypto {
     fn sum(plain: &[u8]) -> Result<Vec<u8>> {
         match pwhash::pwhash(
             plain,
@@ -41,6 +47,9 @@ impl super::Encryptor for Encryptor {
             None => false,
         }
     }
+}
+
+impl super::Secret for Crypto {
     fn encrypt(&self, plain: &[u8]) -> (Vec<u8>, Vec<u8>) {
         let nonce = secretbox::gen_nonce();
         let cipher = secretbox::seal(plain, &nonce, &self.key);
@@ -54,6 +63,19 @@ impl super::Encryptor for Encryptor {
                 Err(_) => Err(Error::SodiumDecrypt.into()),
             },
             None => Err(Error::SodiumBadNonce.into()),
+        }
+    }
+}
+
+impl super::SSha512 for Crypto {
+    fn sum(plain: &[u8], salt: &[u8]) -> String {
+        base64::encode(&[hash(&[plain, salt].concat()).as_ref(), salt].concat())
+    }
+
+    fn verify(cipher: String, plain: &[u8]) -> bool {
+        match base64::decode(&cipher) {
+            Ok(buf) => cipher == Self::sum(plain, &buf[DIGESTBYTES..]),
+            Err(_) => false,
         }
     }
 }

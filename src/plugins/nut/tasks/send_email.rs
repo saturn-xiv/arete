@@ -10,7 +10,7 @@ use uuid::Uuid;
 use validator::Validate;
 
 use super::super::super::super::{
-    crypto::sodium::Encryptor as Sodium,
+    crypto::Crypto,
     errors::Result,
     graphql::{context::Context, session::Session, Handler},
     orm::Pool as Db,
@@ -69,7 +69,7 @@ impl Handler for Config {
         let db = c.db.deref();
         let enc = c.encryptor.deref();
         s.administrator(db)?;
-        SettingsDao::set::<String, Config, Sodium>(db, enc, &Self::KEY.to_string(), &self, true)?;
+        SettingsDao::set::<String, Config, Crypto>(db, enc, &Self::KEY.to_string(), &self, true)?;
         Ok(None)
     }
 }
@@ -140,7 +140,7 @@ impl Into<Result<Email>> for Job {
 
 pub struct Printer {
     pub db: Db,
-    pub encryptor: Arc<Sodium>,
+    pub encryptor: Arc<Crypto>,
 }
 
 impl QueueHandler for Printer {
@@ -153,7 +153,7 @@ impl QueueHandler for Printer {
 
 pub struct SendEmail {
     pub db: Db,
-    pub encryptor: Arc<Sodium>,
+    pub encryptor: Arc<Crypto>,
 }
 
 impl QueueHandler for SendEmail {

@@ -8,7 +8,7 @@ use uuid::Uuid;
 use validator::Validate;
 
 use super::super::super::super::{
-    crypto::sodium::Encryptor as Sodium,
+    crypto::Crypto,
     errors::Result,
     graphql::{context::Context, session::Session, Handler, I64},
     i18n::I18n,
@@ -231,7 +231,7 @@ impl Handler for SignIn {
         };
         let user = user?;
 
-        if let Err(e) = user.auth::<Sodium>(&self.password) {
+        if let Err(e) = user.auth::<Crypto>(&self.password) {
             __i18n_l!(
                 db,
                 &user.id,
@@ -306,7 +306,7 @@ impl Handler for SignUp {
         }
 
         let user = db.transaction::<_, Error, _>(move || {
-            UserDao::sign_up::<Sodium>(
+            UserDao::sign_up::<Crypto>(
                 db,
                 &self.real_name,
                 &self.nick_name,
@@ -499,7 +499,7 @@ impl Handler for ResetPassword {
         let db = c.db.deref();
         let it = UserDao::by_uid(db, &token.uid)?;
 
-        UserDao::password::<Sodium>(db, &it.id, &self.password)?;
+        UserDao::password::<Crypto>(db, &it.id, &self.password)?;
         __i18n_l!(
             db,
             &it.id,
@@ -579,9 +579,9 @@ impl Handler for ChangePassword {
         let db = c.db.deref();
         let user = s.current_user()?;
 
-        user.auth::<Sodium>(&self.current_password)?;
+        user.auth::<Crypto>(&self.current_password)?;
         db.transaction::<_, Error, _>(move || {
-            UserDao::password::<Sodium>(db, &user.id, &self.new_password)?;
+            UserDao::password::<Crypto>(db, &user.id, &self.new_password)?;
             __i18n_l!(
                 db,
                 &user.id,

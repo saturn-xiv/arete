@@ -3,7 +3,8 @@ use std::thread;
 use std::time::Duration;
 
 use super::super::super::{
-    crypto::sodium::Encryptor as Sodium,
+    cache::Cache,
+    crypto::Crypto,
     env::{self, Config},
     errors::Result,
     graphql,
@@ -11,13 +12,12 @@ use super::super::super::{
     orm::Database,
     plugins::nut,
     queue::Queue,
-    redis::Redis,
 };
 
 pub fn launch(cfg: Config) -> Result<()> {
-    let db = cfg.postgresql.open()?;
+    let db = cfg.database.open()?;
     let jwt = Arc::new(Jwt::new(cfg.secrets.0.clone()));
-    let enc = Arc::new(Sodium::new(cfg.secrets.clone())?);
+    let enc = Arc::new(Crypto::new(cfg.secrets.clone())?);
     let qu = Arc::new(cfg.rabbitmq.clone().open()?);
 
     info!("start send email thread");
@@ -52,7 +52,7 @@ pub fn launch(cfg: Config) -> Result<()> {
         .manage(qu)
         .manage(enc)
         .attach(Database::fairing())
-        .attach(Redis::fairing())
+        .attach(Cache::fairing())
         .launch();
     Err(err.into())
 }

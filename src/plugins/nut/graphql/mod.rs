@@ -16,7 +16,7 @@ use failure::Error;
 use validator::Validate;
 
 use super::super::super::{
-    crypto::sodium::Encryptor as Sodium,
+    crypto::Crypto,
     errors::Result,
     graphql::{context::Context, session::Session, Handler},
     i18n::I18n,
@@ -46,7 +46,7 @@ impl Handler for Install {
             if UserDao::count(db)? > 0 {
                 return __i18n_e!(db, &s.lang, "nut.errors.database-is-not-empty");
             }
-            UserDao::sign_up::<Sodium>(
+            UserDao::sign_up::<Crypto>(
                 db,
                 &self.real_name,
                 &"admin".to_string(),

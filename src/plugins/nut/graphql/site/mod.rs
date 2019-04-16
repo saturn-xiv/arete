@@ -5,8 +5,8 @@ use std::ops::Deref;
 use validator::Validate;
 
 use super::super::super::super::{
-    cache::Cache,
-    crypto::sodium::Encryptor as Sodium,
+    cache::Provider,
+    crypto::Crypto,
     errors::Result,
     graphql::{context::Context, session::Session, Handler},
     settings::Dao as SettingDao,
@@ -38,7 +38,7 @@ impl Handler for Author {
     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
         let db = c.db.deref();
         s.administrator(db)?;
-        SettingDao::set::<String, Author, Sodium>(
+        SettingDao::set::<String, Author, Crypto>(
             db,
             &c.encryptor,
             &Self::KEY.to_string(),
@@ -102,7 +102,7 @@ impl Handler for Seo {
         let db = c.db.deref();
         let enc = c.encryptor.deref();
         s.administrator(db)?;
-        SettingDao::set::<String, Seo, Sodium>(db, enc, &Self::KEY.to_string(), &self, false)?;
+        SettingDao::set::<String, Seo, Crypto>(db, enc, &Self::KEY.to_string(), &self, false)?;
         Ok(None)
     }
 }

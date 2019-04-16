@@ -12,11 +12,16 @@ build = "build.rs"
 lto = true
 
 [features]
-default = ["theme-bootstrap"]
+default = ["theme-bootstrap", "sodium", "postgresql", "redis"]
 theme-bootstrap = []
 theme-semantic = []
 theme-bulma = []
 theme-materialize = []
+redis = ["rocket_contrib/redis_pool", "r2d2_redis"]
+postgresql = ["rocket_contrib/diesel_postgres_pool", "diesel/postgres"]
+mysql = ["rocket_contrib/diesel_mysql_pool", "diesel/mysql"]
+sqlite = ["rocket_contrib/diesel_sqlite_pool", "diesel/sqlite"]
+sodium = ["sodiumoxide"]
 
 [dependencies]
 r2d2 = "0.8"
@@ -40,11 +45,9 @@ failure = "0.1"
 language-tags = "0.2"
 juniper = "0.11"
 juniper_rocket = "0.2"
-r2d2_redis = "0.8"
 lapin-futures = "0.18"
 nix = "0.13"
 eui48 = "0.4"
-sodiumoxide = "0.2"
 hex = "0.3"
 md5 = "0.6"
 git2 = "0.8"
@@ -70,6 +73,14 @@ jsonwebtoken = "5"
 version = "0.11"
 features = ["secure", "percent-encode"]
 
+[dependencies.r2d2_redis]
+version = "0.8"
+optional = true
+
+[dependencies.sodiumoxide]
+version = "0.2"
+optional = true
+
 [dependencies.askama]
 version = "0.8"
 features = ["with-rocket"]
@@ -77,7 +88,7 @@ features = ["with-rocket"]
 [dependencies.rocket_contrib]
 version = "0.4"
 default-features = false
-features = ["json", "tera_templates", "handlebars_templates", "helmet", "uuid", "serve", "json", "diesel_postgres_pool", "redis_pool"]
+features = ["json", "tera_templates", "handlebars_templates", "helmet", "uuid", "serve", "json"]
 
 [dependencies.chrono]
 version = "0.4"
@@ -105,7 +116,7 @@ features = ["vendored"]
 
 [dependencies.diesel]
 version = "1"
-features = ["postgres", "chrono", "serde_json", "uuid", "network-address", "numeric", "r2d2", "128-column-tables"]
+features = ["chrono", "serde_json", "uuid", "network-address", "numeric", "r2d2", "128-column-tables"]
 
 [package.metadata.deb]
 depends = "$auto, nginx, nodejs, npm"

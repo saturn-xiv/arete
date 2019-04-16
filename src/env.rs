@@ -8,8 +8,8 @@ use rocket::config::{Config as RocketConfig, Environment, Limits, LoggingLevel, 
 use uuid::Uuid;
 
 use super::{
-    crypto::Key, errors::Result, orm::Config as PostgreSqlConfig,
-    queue::rabbitmq::Config as RabbitMQConfig, redis::Config as RedisConfig,
+    cache::Config as CacheConfig, crypto::Key, errors::Result, orm::Config as DatabaseConfig,
+    queue::rabbitmq::Config as RabbitMQConfig,
 };
 
 include!(concat!(env!("OUT_DIR"), "/env.rs"));
@@ -25,8 +25,8 @@ pub const BANNER: &'static str = include_str!("banner.txt");
 pub struct Config {
     pub env: String,
     pub secrets: Key,
-    pub postgresql: PostgreSqlConfig,
-    pub redis: RedisConfig,
+    pub database: DatabaseConfig,
+    pub cache: CacheConfig,
     pub rabbitmq: RabbitMQConfig,
     pub http: Http,
 }
@@ -36,8 +36,8 @@ impl Default for Config {
         Self {
             env: Environment::Development.to_string(),
             secrets: Key::default(),
-            postgresql: PostgreSqlConfig::default(),
-            redis: RedisConfig::default(),
+            database: DatabaseConfig::default(),
+            cache: CacheConfig::default(),
             rabbitmq: RabbitMQConfig::default(),
             http: Http::default(),
         }
@@ -59,13 +59,13 @@ impl Config {
         let mut databases = HashMap::new();
         {
             let mut it = HashMap::new();
-            it.insert("url", Value::from(self.postgresql.to_string()));
-            databases.insert("postgresql", Value::from(it));
+            it.insert("url", Value::from(self.database.to_string()));
+            databases.insert("orm", Value::from(it));
         }
         {
             let mut it = HashMap::new();
-            it.insert("url", Value::from(self.redis.to_string()));
-            databases.insert("redis", Value::from(it));
+            it.insert("url", Value::from(self.cache.to_string()));
+            databases.insert("cache", Value::from(it));
         }
 
         let it = RocketConfig::build(env)

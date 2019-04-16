@@ -1,3 +1,5 @@
+use std::default::Default;
+use std::fmt;
 use std::ops::Deref;
 use std::time::Duration;
 
@@ -5,9 +7,48 @@ use r2d2_redis::redis::cmd;
 use serde::{de::DeserializeOwned, ser::Serialize};
 use serde_json;
 
-use super::super::{errors::Result, redis::Connection};
+use super::super::errors::Result;
 
-impl super::Cache for Connection {
+pub type Connection = r2d2_redis::redis::Connection;
+pub type Pool = r2d2_redis::r2d2::Pool<r2d2_redis::RedisConnectionManager>;
+pub type PooledConnection = r2d2_redis::r2d2::PooledConnection<r2d2_redis::RedisConnectionManager>;
+
+#[database("cache")]
+pub struct Cache(pub Connection);
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct Config {
+    pub host: String,
+    pub port: u16,
+    pub db: u8,
+}
+
+impl Config {
+    pub fn open(&self) -> Result<Pool> {
+        let manager = r2d2_redis::RedisConnectionManager::new(&self.to_string()[..])?;
+        let pool = r2d2::Pool::builder().build(manager)?;
+        Ok(pool)
+    }
+}
+
+impl Default for Config {
+    fn default() -> Self {
+        Self {
+            host: "127.0.0.1".to_string(),
+            port: 6379,
+            db: 0,
+        }
+    }
+}
+
+impl fmt::Display for Config {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "redis://{}:{}/{}", self.host, self.port, self.db)
+    }
+}
+
+impl super::Provider for Connection {
     fn get<K, V, F>(&self, key: &K, ttl: Duration, fun: F) -> Result<V>
     where
         F: FnOnce() -> Result<V>,

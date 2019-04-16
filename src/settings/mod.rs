@@ -6,7 +6,7 @@ use serde::{de::DeserializeOwned, ser::Serialize};
 use serde_json;
 
 use super::{
-    crypto::Encryptor,
+    crypto::Secret,
     errors::Result,
     orm::{migration::New as Migration, Connection},
 };
@@ -42,8 +42,8 @@ pub struct New<'a> {
 }
 
 pub trait Dao {
-    fn get<K: Serialize, V: DeserializeOwned, E: Encryptor>(&self, e: &E, key: &K) -> Result<V>;
-    fn set<K: Serialize, V: Serialize, E: Encryptor>(
+    fn get<K: Serialize, V: DeserializeOwned, E: Secret>(&self, e: &E, key: &K) -> Result<V>;
+    fn set<K: Serialize, V: Serialize, E: Secret>(
         &self,
         e: &E,
         k: &K,
@@ -53,7 +53,7 @@ pub trait Dao {
 }
 
 impl Dao for Connection {
-    fn get<K: Serialize, V: DeserializeOwned, E: Encryptor>(&self, e: &E, k: &K) -> Result<V> {
+    fn get<K: Serialize, V: DeserializeOwned, E: Secret>(&self, e: &E, k: &K) -> Result<V> {
         let key = serde_json::to_string(k)?;
         let it = settings::dsl::settings
             .filter(settings::dsl::key.eq(&key))
@@ -66,7 +66,7 @@ impl Dao for Connection {
         Ok(serde_json::from_slice(val.as_slice())?)
     }
 
-    fn set<K: Serialize, V: Serialize, E: Encryptor>(
+    fn set<K: Serialize, V: Serialize, E: Secret>(
         &self,
         e: &E,
         k: &K,

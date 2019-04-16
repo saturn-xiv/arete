@@ -1,63 +1,31 @@
 pub mod migration;
+#[cfg(feature = "mysql")]
+pub mod mysql;
+#[cfg(feature = "postgresql")]
+pub mod postgresql;
 pub mod schema;
+#[cfg(feature = "sqlite")]
+pub mod sqlite;
 
-use std::default::Default;
-use std::fmt;
+#[cfg(feature = "mysql")]
+pub use self::mysql::*;
+#[cfg(feature = "postgresql")]
+pub use self::postgresql::*;
+#[cfg(feature = "sqlite")]
+pub use self::sqlite::*;
 
 use super::errors::Result;
 
-// https://www.postgresql.org/docs/current/runtime-config-logging.html
-// /var/lib/postgres/data/postgresql.conf: log_statement = 'all'
-pub type Connection = diesel::pg::PgConnection;
 pub type Pool = diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<Connection>>;
 pub type PooledConnection =
     diesel::r2d2::PooledConnection<diesel::r2d2::ConnectionManager<Connection>>;
 
-#[database("postgresql")]
+#[database("orm")]
 pub struct Database(pub Connection);
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct Config {
-    pub host: String,
-    pub port: u16,
-    pub name: String,
-    pub user: String,
-    pub password: Option<String>,
-}
 
 impl Config {
     pub fn open(&self) -> Result<Pool> {
         let manager = diesel::r2d2::ConnectionManager::<Connection>::new(&self.to_string()[..]);
         Ok(Pool::new(manager)?)
-    }
-}
-
-impl Default for Config {
-    fn default() -> Self {
-        Self {
-            host: "127.0.0.1".to_string(),
-            port: 5432,
-            user: "postgres".to_string(),
-            name: "dev".to_string(),
-            password: None,
-        }
-    }
-}
-
-impl fmt::Display for Config {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "postgres://{}:{}@{}:{}/{}",
-            self.user,
-            match self.password {
-                Some(ref v) => v,
-                None => "",
-            },
-            self.host,
-            self.port,
-            self.name
-        )
     }
 }

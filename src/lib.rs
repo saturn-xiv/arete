@@ -46,11 +46,13 @@ extern crate mime;
 extern crate mustache;
 extern crate nix;
 extern crate r2d2;
+#[cfg(feature = "redis")]
 extern crate r2d2_redis;
 extern crate rand;
 extern crate regex;
 extern crate serde;
 extern crate serde_xml_rs;
+#[cfg(feature = "sodium")]
 extern crate sodiumoxide;
 extern crate ssh2;
 extern crate tokio;
@@ -80,7 +82,6 @@ pub mod orm;
 pub mod parser;
 pub mod plugins;
 pub mod queue;
-pub mod redis;
 pub mod request;
 pub mod rfc;
 pub mod settings;

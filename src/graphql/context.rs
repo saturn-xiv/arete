@@ -1,16 +1,15 @@
 use std::sync::Arc;
 
 use super::super::{
-    crypto::sodium::Encryptor as Sodium, jwt::Jwt, orm::Database, queue::rabbitmq::RabbitMQ,
-    redis::Redis,
+    cache::Cache, crypto::Crypto, jwt::Jwt, orm::Database, queue::rabbitmq::RabbitMQ,
 };
 
 pub struct Context {
     pub db: Database,
-    pub cache: Redis,
+    pub cache: Cache,
     pub queue: Arc<RabbitMQ>,
     pub jwt: Arc<Jwt>,
-    pub encryptor: Arc<Sodium>,
+    pub encryptor: Arc<Crypto>,
 }
 
 impl juniper::Context for Context {}
