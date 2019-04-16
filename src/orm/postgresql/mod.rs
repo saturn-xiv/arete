@@ -1,3 +1,5 @@
+pub mod schema;
+
 use std::default::Default;
 use std::fmt;
 
