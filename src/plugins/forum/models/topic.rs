@@ -21,13 +21,7 @@ pub struct Item {
 }
 
 pub trait Dao {
-    fn add(
-        &self,
-        user: &i64,
-        title: &String,
-        body: &String,
-        media_type: &MediaType,        
-    ) -> Result<()>;
+    fn add(&self, user: &i64, title: &String, body: &String, media_type: &MediaType) -> Result<()>;
     fn get(&self, id: &i64) -> Result<Item>;
     fn update(
         &self,
@@ -44,14 +38,7 @@ pub trait Dao {
 }
 
 impl Dao for Connection {
-    fn add(
-        &self,
-        user: &i64,
-        title: &String,
-        body: &String,
-        media_type: &MediaType,
-        
-    ) -> Result<()> {
+    fn add(&self, user: &i64, title: &String, body: &String, media_type: &MediaType) -> Result<()> {
         let now = Utc::now().naive_utc();
         insert_into(forum_topics::dsl::forum_topics)
             .values((
@@ -62,9 +49,6 @@ impl Dao for Connection {
                 forum_topics::dsl::updated_at.eq(&now),
             ))
             .execute(self)?;
-            
-
-        
 
         Ok(())
     }

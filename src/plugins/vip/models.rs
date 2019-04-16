@@ -107,7 +107,7 @@ impl Dao for Connection {
         contact: &Contact,
     ) -> Result<()> {
         let now = Utc::now().naive_utc();
-         insert_into(vip_members::dsl::vip_members)
+        insert_into(vip_members::dsl::vip_members)
             .values((
                 vip_members::dsl::nick_name.eq(nick_name),
                 vip_members::dsl::real_name.eq(real_name),

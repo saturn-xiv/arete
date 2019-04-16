@@ -1,10 +1,10 @@
 table! {
     schema_migrations (id) {
-        id -> Int8,
-        version -> Varchar,
+        id -> Bigint,
+        version -> Char,
         name -> Varchar,
         up -> Text,
         down -> Text,
-        run_at -> Nullable<Timestamp>,
+        run_at -> Nullable<Datetime>,
     }
 }

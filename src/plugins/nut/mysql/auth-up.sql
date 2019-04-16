@@ -72,9 +72,9 @@ CREATE TABLE notifications(id BIGINT AUTO_INCREMENT PRIMARY KEY,
                                                                                              body TEXT NOT NULL,
                                                                                                        media_type VARCHAR(8) NOT NULL,
                                                                                                                              level VARCHAR(8) NOT NULL,
-                                                                                                                                              read BOOLEAN NOT NULL,
-                                                                                                                                                           created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                                                                                                                                                                updated_at DATETIME NOT NULL);
+                                                                                                                                              `read` BOOLEAN NOT NULL,
+                                                                                                                                                             created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                                                                                                                                                                  updated_at DATETIME NOT NULL);
 
 
 CREATE INDEX idx_notifications ON notifications(level);

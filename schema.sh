@@ -4,7 +4,7 @@ set -e
 
 declare -A db
 db["postgresql"]="postgres://postgres:@localhost:5432/arete"
-# db["mysql"]="mysql://root:@localhost:3306/arete"
+db["mysql"]="mysql://root:@localhost:3306/arete"
 # db["sqlite"]="tmp/db"
 
 for i in "${!db[@]}"

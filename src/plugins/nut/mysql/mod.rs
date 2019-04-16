@@ -1,4 +1,3 @@
-
 pub mod schema;
 
 pub const AUTH_UP: &'static str = include_str!("auth-up.sql");

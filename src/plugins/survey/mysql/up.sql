@@ -14,16 +14,16 @@ CREATE INDEX idx_survey_forms_title ON survey_forms(title);
 
 CREATE TABLE survey_fields(id BIGINT AUTO_INCREMENT PRIMARY KEY,
                                                             form_id BIGINT NOT NULL,
-                                                                           key VARCHAR(32) NOT NULL,
-                                                                                           title VARCHAR(255) NOT NULL,
-                                                                                                              description TEXT, required BOOLEAN NOT NULL,
-                                                                                                                                                 type TEXT NOT NULL,
-                                                                                                                                                           position SMALLINT NOT NULL,
-                                                                                                                                                                             created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                                                                                                                                                                                  updated_at DATETIME NOT NULL);
+                                                                           `key` VARCHAR(32) NOT NULL,
+                                                                                             title VARCHAR(255) NOT NULL,
+                                                                                                                description TEXT, required BOOLEAN NOT NULL,
+                                                                                                                                                   type TEXT NOT NULL,
+                                                                                                                                                             position SMALLINT NOT NULL,
+                                                                                                                                                                               created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                                                                                                                                                                                    updated_at DATETIME NOT NULL);
 
 
-CREATE UNIQUE INDEX idx_survey_fields_form_key ON survey_fields(form_id, key);
+CREATE UNIQUE INDEX idx_survey_fields_form_key ON survey_fields(form_id, `key`);
 
 
 CREATE TABLE survey_responses(id BIGINT AUTO_INCREMENT PRIMARY KEY,

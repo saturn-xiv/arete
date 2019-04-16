@@ -5,6 +5,7 @@ use std::fmt;
 
 /// use DB-NAME
 /// show tables;
+/// desc TABLE-NAME;
 pub type Connection = diesel::mysql::MysqlConnection;
 
 pub const UP: &'static str = include_str!("up.sql");

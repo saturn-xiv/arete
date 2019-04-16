@@ -5,6 +5,3 @@ CREATE TABLE IF NOT EXISTS schema_migrations(id BIGINT AUTO_INCREMENT PRIMARY KE
                                                                                                                          down TEXT NOT NULL,
                                                                                                                                    run_at DATETIME);
 
-
-CREATE UNIQUE INDEX IF NOT EXISTS idx_schema_migrations ON schema_migrations(version, name);
-

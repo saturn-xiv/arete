@@ -1,25 +1,25 @@
 table! {
     forum_posts (id) {
-        id -> Int8,
-        user_id -> Int8,
-        topic_id -> Int8,
-        post_id -> Nullable<Int8>,
+        id -> Bigint,
+        user_id -> Bigint,
+        topic_id -> Bigint,
+        post_id -> Nullable<Bigint>,
         body -> Text,
         media_type -> Varchar,
-        created_at -> Timestamp,
-        updated_at -> Timestamp,
+        created_at -> Datetime,
+        updated_at -> Datetime,
     }
 }
 
 table! {
     forum_topics (id) {
-        id -> Int8,
-        user_id -> Int8,
+        id -> Bigint,
+        user_id -> Bigint,
         title -> Varchar,
         body -> Text,
         media_type -> Varchar,
-        created_at -> Timestamp,
-        updated_at -> Timestamp,
+        created_at -> Datetime,
+        updated_at -> Datetime,
     }
 }
 

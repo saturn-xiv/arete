@@ -1,64 +1,64 @@
 table! {
     survey_fields (id) {
-        id -> Int8,
-        form_id -> Int8,
+        id -> Bigint,
+        form_id -> Bigint,
         key -> Varchar,
         title -> Varchar,
         description -> Nullable<Text>,
         required -> Bool,
         #[sql_name = "type"]
         type_ -> Text,
-        position -> Int2,
-        created_at -> Timestamp,
-        updated_at -> Timestamp,
+        position -> Smallint,
+        created_at -> Datetime,
+        updated_at -> Datetime,
     }
 }
 
 table! {
     survey_forms (id) {
-        id -> Int8,
-        user_id -> Int8,
+        id -> Bigint,
+        user_id -> Bigint,
         title -> Varchar,
         description -> Text,
         #[sql_name = "type"]
         type_ -> Text,
         nbf -> Date,
         exp -> Date,
-        created_at -> Timestamp,
-        updated_at -> Timestamp,
+        created_at -> Datetime,
+        updated_at -> Datetime,
     }
 }
 
 table! {
     survey_logs (id) {
-        id -> Int8,
-        form_id -> Int8,
-        user_id -> Nullable<Int8>,
+        id -> Bigint,
+        form_id -> Bigint,
+        user_id -> Nullable<Bigint>,
         ip -> Varchar,
         message -> Varchar,
-        created_at -> Timestamp,
+        created_at -> Datetime,
     }
 }
 
 table! {
     survey_responses (id) {
-        id -> Int8,
-        form_id -> Int8,
+        id -> Bigint,
+        form_id -> Bigint,
         email -> Varchar,
         username -> Varchar,
         ip -> Varchar,
         content -> Text,
-        created_at -> Timestamp,
+        created_at -> Datetime,
     }
 }
 
 table! {
     survey_subscribers (id) {
-        id -> Int8,
-        form_id -> Int8,
+        id -> Bigint,
+        form_id -> Bigint,
         email -> Varchar,
         username -> Varchar,
-        created_at -> Timestamp,
+        created_at -> Datetime,
     }
 }
 

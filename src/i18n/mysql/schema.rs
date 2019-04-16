@@ -1,10 +1,10 @@
 table! {
     locales (id) {
-        id -> Int8,
+        id -> Bigint,
         lang -> Varchar,
         code -> Varchar,
         message -> Text,
-        created_at -> Timestamp,
-        updated_at -> Timestamp,
+        created_at -> Datetime,
+        updated_at -> Datetime,
     }
 }

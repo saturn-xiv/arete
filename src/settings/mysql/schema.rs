@@ -1,10 +1,10 @@
 table! {
     settings (id) {
-        id -> Int8,
+        id -> Bigint,
         key -> Varchar,
-        value -> Binary,
-        salt -> Nullable<Binary>,
-        created_at -> Timestamp,
-        updated_at -> Timestamp,
+        value -> Blob,
+        salt -> Nullable<Blob>,
+        created_at -> Datetime,
+        updated_at -> Datetime,
     }
 }
