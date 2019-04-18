@@ -4,8 +4,16 @@ use std::default::Default;
 use std::fmt;
 use std::path::Path;
 
+/// .show 	Displays current settings for various parameters
+/// .databases 	Provides database names and files
+/// .quit 	Quit sqlite3 program
+/// .tables 	Show current tables
+/// .schema 	Display schema of table
+/// .header 	Display or hide the output table header
+/// .mode 	Select mode for the output table
+/// .dump 	Dump database in SQL text format
 pub type Connection = diesel::sqlite::SqliteConnection;
-pub type ID = i32;
+pub type ID = i64;
 
 pub const UP: &'static str = include_str!("up.sql");
 
@@ -18,7 +26,7 @@ pub struct Config {
 impl Default for Config {
     fn default() -> Self {
         Self {
-            file: Path::new("tmp").join("db").display(),
+            file: format!("{}", Path::new("tmp").join("db").display()),
         }
     }
 }
