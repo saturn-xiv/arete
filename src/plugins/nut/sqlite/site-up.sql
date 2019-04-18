@@ -58,8 +58,8 @@ CREATE TABLE votes(id INTEGER PRIMARY KEY NOT NULL,
                                           point BIGINT NOT NULL,
                                                        resource_type VARCHAR(255) NOT NULL,
                                                                                   resource_id INTEGER NOT NULL,
-                                                                                                     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                                                                                                           updated_at TIMESTAMP NOT NULL);
+                                                                                                      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                                                                                                            updated_at TIMESTAMP NOT NULL);
 
 
 CREATE INDEX idx_votes_resource_type ON votes(resource_type);
@@ -81,21 +81,21 @@ CREATE UNIQUE INDEX idx_tags_name ON tags(name);
 
 CREATE TABLE tag_resources(id INTEGER PRIMARY KEY NOT NULL,
                                                   tag_id INTEGER NOT NULL,
-                                                                resource_type VARCHAR(255) NOT NULL,
-                                                                                           resource_id INTEGER NOT NULL,
-                                                                                                              created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP);
+                                                                 resource_type VARCHAR(255) NOT NULL,
+                                                                                            resource_id INTEGER NOT NULL,
+                                                                                                                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP);
 
 
 CREATE UNIQUE INDEX idx_tag_resources ON tag_resources(tag_id, resource_type, resource_id);
 
 
 CREATE TABLE categories(id INTEGER PRIMARY KEY NOT NULL,
-                                               parent_id BIGINT, name VARCHAR(255) NOT NULL,
-                                                                                   icon VARCHAR(16) NOT NULL,
-                                                                                                    color VARCHAR(16) NOT NULL,
-                                                                                                                      position SMALLINT NOT NULL,
-                                                                                                                                        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                                                                                                                                              updated_at TIMESTAMP NOT NULL);
+                                               parent_id INTEGER, name VARCHAR(255) NOT NULL,
+                                                                                    icon VARCHAR(16) NOT NULL,
+                                                                                                     color VARCHAR(16) NOT NULL,
+                                                                                                                       position SMALLINT NOT NULL,
+                                                                                                                                         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                                                                                                                                               updated_at TIMESTAMP NOT NULL);
 
 
 CREATE INDEX idx_categories_name ON categories(name);
@@ -103,9 +103,9 @@ CREATE INDEX idx_categories_name ON categories(name);
 
 CREATE TABLE category_resources(id INTEGER PRIMARY KEY NOT NULL,
                                                        category_id INTEGER NOT NULL,
-                                                                          resource_type VARCHAR(255) NOT NULL,
-                                                                                                     resource_id INTEGER NOT NULL,
-                                                                                                                        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP);
+                                                                           resource_type VARCHAR(255) NOT NULL,
+                                                                                                      resource_id INTEGER NOT NULL,
+                                                                                                                          created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP);
 
 
 CREATE UNIQUE INDEX idx_category_resources ON category_resources(category_id, resource_type, resource_id);

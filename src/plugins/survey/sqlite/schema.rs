@@ -1,14 +1,14 @@
 table! {
     survey_fields (id) {
-        id -> Int8,
-        form_id -> Int8,
-        key -> Varchar,
-        title -> Varchar,
+        id -> Integer,
+        form_id -> Integer,
+        key -> Text,
+        title -> Text,
         description -> Nullable<Text>,
         required -> Bool,
         #[sql_name = "type"]
         type_ -> Text,
-        position -> Int2,
+        position -> SmallInt,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -16,9 +16,9 @@ table! {
 
 table! {
     survey_forms (id) {
-        id -> Int8,
-        user_id -> Int8,
-        title -> Varchar,
+        id -> Integer,
+        user_id -> Integer,
+        title -> Text,
         description -> Text,
         #[sql_name = "type"]
         type_ -> Text,
@@ -31,22 +31,22 @@ table! {
 
 table! {
     survey_logs (id) {
-        id -> Int8,
-        form_id -> Int8,
-        user_id -> Nullable<Int8>,
-        ip -> Varchar,
-        message -> Varchar,
+        id -> Integer,
+        form_id -> Integer,
+        user_id -> Nullable<Integer>,
+        ip -> Text,
+        message -> Text,
         created_at -> Timestamp,
     }
 }
 
 table! {
     survey_responses (id) {
-        id -> Int8,
-        form_id -> Int8,
-        email -> Varchar,
-        username -> Varchar,
-        ip -> Varchar,
+        id -> Integer,
+        form_id -> Integer,
+        email -> Text,
+        username -> Text,
+        ip -> Text,
         content -> Text,
         created_at -> Timestamp,
     }
@@ -54,10 +54,10 @@ table! {
 
 table! {
     survey_subscribers (id) {
-        id -> Int8,
-        form_id -> Int8,
-        email -> Varchar,
-        username -> Varchar,
+        id -> Integer,
+        form_id -> Integer,
+        email -> Text,
+        username -> Text,
         created_at -> Timestamp,
     }
 }

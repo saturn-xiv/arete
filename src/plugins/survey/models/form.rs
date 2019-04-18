@@ -1,13 +1,16 @@
 use chrono::{NaiveDate, NaiveDateTime, Utc};
 use diesel::{delete, insert_into, prelude::*, update};
 
-use super::super::super::super::{errors::Result, orm::Connection};
+use super::super::super::super::{
+    errors::Result,
+    orm::{Connection, ID},
+};
 use super::super::schema::{survey_fields, survey_forms, survey_logs, survey_responses};
 
 #[derive(Queryable)]
 pub struct Item {
-    pub id: i64,
-    pub user_id: i64,
+    pub id: ID,
+    pub user_id: ID,
     pub title: String,
     pub description: String,
     pub type_: String,
@@ -33,7 +36,7 @@ pub struct Type {
 pub trait Dao {
     fn add(
         &self,
-        user: &i64,
+        user: ID,
         title: &String,
         description: &String,
         nbf: &NaiveDate,
@@ -43,21 +46,21 @@ pub trait Dao {
 
     fn update(
         &self,
-        id: &i64,
+        id: ID,
         title: &String,
         description: &String,
         nbf: &NaiveDate,
         exp: &NaiveDate,
     ) -> Result<()>;
-    fn get(&self, id: &i64) -> Result<Item>;
-    fn delete(&self, id: &i64) -> Result<()>;
+    fn get(&self, id: ID) -> Result<Item>;
+    fn delete(&self, id: ID) -> Result<()>;
     fn latest(&self) -> Result<Vec<Item>>;
 }
 
 impl Dao for Connection {
     fn add(
         &self,
-        user: &i64,
+        user: ID,
         title: &String,
         description: &String,
         nbf: &NaiveDate,
@@ -81,7 +84,7 @@ impl Dao for Connection {
 
     fn update(
         &self,
-        id: &i64,
+        id: ID,
         title: &String,
         description: &String,
         nbf: &NaiveDate,
@@ -101,14 +104,14 @@ impl Dao for Connection {
         Ok(())
     }
 
-    fn get(&self, id: &i64) -> Result<Item> {
+    fn get(&self, id: ID) -> Result<Item> {
         let it = survey_forms::dsl::survey_forms
             .filter(survey_forms::dsl::id.eq(id))
             .first::<Item>(self)?;
         Ok(it)
     }
 
-    fn delete(&self, id: &i64) -> Result<()> {
+    fn delete(&self, id: ID) -> Result<()> {
         delete(survey_fields::dsl::survey_fields.filter(survey_fields::dsl::form_id.eq(id)))
             .execute(self)?;
         delete(

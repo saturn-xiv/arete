@@ -1,13 +1,16 @@
 use chrono::{NaiveDateTime, Utc};
 use diesel::{delete, insert_into, prelude::*, update};
 
-use super::super::super::super::{errors::Result, orm::Connection};
+use super::super::super::super::{
+    errors::Result,
+    orm::{Connection, ID},
+};
 use super::super::schema::survey_fields;
 
 #[derive(Queryable)]
 pub struct Item {
-    pub id: i64,
-    pub form_id: i64,
+    pub id: ID,
+    pub form_id: ID,
     pub key: String,
     pub title: String,
     pub description: Option<String>,
@@ -34,40 +37,40 @@ pub enum Type {
 pub trait Dao {
     fn add(
         &self,
-        form: &i64,
+        form: ID,
         key: &String,
         title: &String,
         description: &Option<String>,
-        required: &bool,
+        required: bool,
         type_: &Type,
-        position: &i16,
+        position: i16,
     ) -> Result<()>;
 
     fn update(
         &self,
-        id: &i64,
+        id: ID,
         key: &String,
         title: &String,
         description: &Option<String>,
-        required: &bool,
+        required: bool,
         type_: &Type,
-        position: &i16,
+        position: i16,
     ) -> Result<()>;
-    fn get(&self, id: &i64) -> Result<Item>;
-    fn delete(&self, id: &i64) -> Result<()>;
-    fn by_form(&self, id: &i64) -> Result<Vec<Item>>;
+    fn get(&self, id: ID) -> Result<Item>;
+    fn delete(&self, id: ID) -> Result<()>;
+    fn by_form(&self, id: ID) -> Result<Vec<Item>>;
 }
 
 impl Dao for Connection {
     fn add(
         &self,
-        form: &i64,
+        form: ID,
         key: &String,
         title: &String,
         description: &Option<String>,
-        required: &bool,
+        required: bool,
         type_: &Type,
-        position: &i16,
+        position: i16,
     ) -> Result<()> {
         let now = Utc::now().naive_utc();
         insert_into(survey_fields::dsl::survey_fields)
@@ -87,13 +90,13 @@ impl Dao for Connection {
 
     fn update(
         &self,
-        id: &i64,
+        id: ID,
         key: &String,
         title: &String,
         description: &Option<String>,
-        required: &bool,
+        required: bool,
         type_: &Type,
-        position: &i16,
+        position: i16,
     ) -> Result<()> {
         let now = Utc::now().naive_utc();
         let it = survey_fields::dsl::survey_fields.filter(survey_fields::dsl::id.eq(id));
@@ -110,18 +113,18 @@ impl Dao for Connection {
             .execute(self)?;
         Ok(())
     }
-    fn get(&self, id: &i64) -> Result<Item> {
+    fn get(&self, id: ID) -> Result<Item> {
         let it = survey_fields::dsl::survey_fields
             .filter(survey_fields::dsl::id.eq(id))
             .first::<Item>(self)?;
         Ok(it)
     }
-    fn delete(&self, id: &i64) -> Result<()> {
+    fn delete(&self, id: ID) -> Result<()> {
         delete(survey_fields::dsl::survey_fields.filter(survey_fields::dsl::id.eq(id)))
             .execute(self)?;
         Ok(())
     }
-    fn by_form(&self, id: &i64) -> Result<Vec<Item>> {
+    fn by_form(&self, id: ID) -> Result<Vec<Item>> {
         let items = survey_fields::dsl::survey_fields
             .filter(survey_fields::dsl::id.eq(id))
             .order(survey_fields::dsl::position.asc())

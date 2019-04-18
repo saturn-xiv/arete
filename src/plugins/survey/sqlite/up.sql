@@ -46,9 +46,9 @@ CREATE INDEX idx_survey_responses_username ON survey_responses(username);
 
 CREATE TABLE survey_logs(id INTEGER PRIMARY KEY NOT NULL,
                                                 form_id INTEGER NOT NULL,
-                                                                user_id BIGINT, ip VARCHAR(45) NOT NULL,
-                                                                                               message VARCHAR(255) NOT NULL,
-                                                                                                                    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP);
+                                                                user_id INTEGER, ip VARCHAR(45) NOT NULL,
+                                                                                                message VARCHAR(255) NOT NULL,
+                                                                                                                     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP);
 
 
 CREATE TABLE survey_subscribers(id INTEGER PRIMARY KEY NOT NULL,

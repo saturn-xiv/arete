@@ -10,7 +10,11 @@ use diesel::{insert_into, prelude::*, update};
 use serde::{de::DeserializeOwned, ser::Serialize};
 use serde_json;
 
-use super::{crypto::Secret, errors::Result, orm::Connection};
+use super::{
+    crypto::Secret,
+    errors::Result,
+    orm::{Connection, ID},
+};
 
 #[cfg(feature = "mysql")]
 pub use self::mysql::*;
@@ -22,7 +26,7 @@ pub use self::sqlite::*;
 
 #[derive(Queryable)]
 pub struct Item {
-    pub id: i64,
+    pub id: ID,
     pub key: String,
     pub value: Vec<u8>,
     pub salt: Option<Vec<u8>>,

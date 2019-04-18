@@ -1,9 +1,9 @@
 table! {
     vip_members (id) {
-        id -> Int8,
-        nick_name -> Varchar,
-        real_name -> Varchar,
-        gender -> Varchar,
+        id -> Integer,
+        nick_name -> Text,
+        real_name -> Text,
+        gender -> Text,
         birthday -> Date,
         contact -> Text,
         created_at -> Timestamp,

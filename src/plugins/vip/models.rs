@@ -6,7 +6,7 @@ use diesel::{delete, insert_into, prelude::*, update};
 
 use super::super::super::{
     errors::{Error, Result},
-    orm::Connection,
+    orm::{Connection, ID},
 };
 use super::schema::vip_members;
 
@@ -42,7 +42,7 @@ impl FromStr for Gender {
 
 #[derive(Queryable)]
 pub struct Item {
-    pub id: i64,
+    pub id: ID,
     pub nick_name: String,
     pub real_name: String,
     pub gender: String,
@@ -84,17 +84,17 @@ pub trait Dao {
         birthday: &NaiveDate,
         contact: &Contact,
     ) -> Result<()>;
-    fn get(&self, id: &i64) -> Result<Item>;
+    fn get(&self, id: ID) -> Result<Item>;
     fn update(
         &self,
-        id: &i64,
+        id: ID,
         real_name: &String,
         gender: &Gender,
         birthday: &NaiveDate,
         contact: &Contact,
     ) -> Result<()>;
     fn list(&self) -> Result<Vec<Item>>;
-    fn delete(&self, id: &i64) -> Result<()>;
+    fn delete(&self, id: ID) -> Result<()>;
 }
 
 impl Dao for Connection {
@@ -119,7 +119,7 @@ impl Dao for Connection {
             .execute(self)?;
         Ok(())
     }
-    fn get(&self, id: &i64) -> Result<Item> {
+    fn get(&self, id: ID) -> Result<Item> {
         let it = vip_members::dsl::vip_members
             .filter(vip_members::dsl::id.eq(id))
             .first::<Item>(self)?;
@@ -127,7 +127,7 @@ impl Dao for Connection {
     }
     fn update(
         &self,
-        id: &i64,
+        id: ID,
         real_name: &String,
         gender: &Gender,
         birthday: &NaiveDate,
@@ -153,7 +153,7 @@ impl Dao for Connection {
             .load::<Item>(self)?;
         Ok(items)
     }
-    fn delete(&self, id: &i64) -> Result<()> {
+    fn delete(&self, id: ID) -> Result<()> {
         delete(vip_members::dsl::vip_members.filter(vip_members::dsl::id.eq(id))).execute(self)?;
         Ok(())
     }

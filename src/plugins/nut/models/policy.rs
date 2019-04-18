@@ -15,7 +15,7 @@ use super::super::schema::policies;
 #[derive(Queryable, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Item {
-    pub id: i64,
+    pub id: ID,
     pub user_id: ID,
     pub role: String,
     pub resource: Option<String>,

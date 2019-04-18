@@ -30,8 +30,8 @@ pub trait Dao {
         title: &String,
         body: &String,
         media_type: &MediaType,
-        tags: &Vec<i64>,
-        categories: &Vec<i64>,
+        tags: &Vec<ID>,
+        categories: &Vec<ID>,
     ) -> Result<()>;
     fn get(&self, id: ID) -> Result<Item>;
     fn update(
@@ -40,8 +40,8 @@ pub trait Dao {
         title: &String,
         body: &String,
         media_type: &MediaType,
-        tags: &Vec<i64>,
-        categories: &Vec<i64>,
+        tags: &Vec<ID>,
+        categories: &Vec<ID>,
     ) -> Result<()>;
     fn latest(&self) -> Result<Vec<Item>>;
     fn by_user(&self, id: ID) -> Result<Vec<Item>>;
@@ -55,8 +55,8 @@ impl Dao for Connection {
         title: &String,
         body: &String,
         media_type: &MediaType,
-        _tags: &Vec<i64>,
-        _categories: &Vec<i64>,
+        _tags: &Vec<ID>,
+        _categories: &Vec<ID>,
     ) -> Result<()> {
         let now = Utc::now().naive_utc();
         insert_into(forum_topics::dsl::forum_topics)
@@ -83,8 +83,8 @@ impl Dao for Connection {
         title: &String,
         body: &String,
         media_type: &MediaType,
-        tags: &Vec<i64>,
-        categories: &Vec<i64>,
+        tags: &Vec<ID>,
+        categories: &Vec<ID>,
     ) -> Result<()> {
         let now = Utc::now().naive_utc();
         let it = forum_topics::dsl::forum_topics.filter(forum_topics::dsl::id.eq(id));

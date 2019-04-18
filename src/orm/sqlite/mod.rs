@@ -13,7 +13,7 @@ use std::path::Path;
 /// .mode 	Select mode for the output table
 /// .dump 	Dump database in SQL text format
 pub type Connection = diesel::sqlite::SqliteConnection;
-pub type ID = i64;
+pub type ID = i32;
 
 pub const UP: &'static str = include_str!("up.sql");
 

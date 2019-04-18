@@ -1,13 +1,16 @@
 use chrono::{NaiveDateTime, Utc};
 use diesel::{insert_into, prelude::*};
 
-use super::super::super::super::{errors::Result, orm::Connection};
+use super::super::super::super::{
+    errors::Result,
+    orm::{Connection, ID},
+};
 use super::super::schema::survey_responses;
 
 #[derive(Queryable)]
 pub struct Item {
-    pub id: i64,
-    pub form_id: i64,
+    pub id: ID,
+    pub form_id: ID,
     pub email: String,
     pub username: String,
     pub ip: String,
@@ -18,19 +21,19 @@ pub struct Item {
 pub trait Dao {
     fn add(
         &self,
-        form: &i64,
+        form: ID,
         email: &String,
         username: &String,
         ip: &String,
         content: &String,
     ) -> Result<()>;
-    fn by_form(&self, id: &i64) -> Result<Vec<Item>>;
+    fn by_form(&self, id: ID) -> Result<Vec<Item>>;
 }
 
 impl Dao for Connection {
     fn add(
         &self,
-        form: &i64,
+        form: ID,
         email: &String,
         username: &String,
         ip: &String,
@@ -49,7 +52,7 @@ impl Dao for Connection {
             .execute(self)?;
         Ok(())
     }
-    fn by_form(&self, id: &i64) -> Result<Vec<Item>> {
+    fn by_form(&self, id: ID) -> Result<Vec<Item>> {
         let items = survey_responses::dsl::survey_responses
             .filter(survey_responses::dsl::form_id.eq(id))
             .order(survey_responses::dsl::created_at.desc())

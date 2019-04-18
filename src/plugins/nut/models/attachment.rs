@@ -36,7 +36,7 @@ pub trait Dao {
         title: &String,
         mime_type: &String,
         url: &String,
-        size: ID,
+        size: i64,
     ) -> Result<()>;
     fn all(&self) -> Result<Vec<Item>>;
     fn by_user(&self, user: ID) -> Result<Vec<Item>>;
@@ -78,7 +78,7 @@ impl Dao for Connection {
         title: &String,
         mime_type: &String,
         url: &String,
-        size: ID,
+        size: i64,
     ) -> Result<()> {
         let now = Utc::now().naive_utc();
         update(attachments::dsl::attachments.filter(attachments::dsl::id.eq(id)))

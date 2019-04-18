@@ -19,7 +19,7 @@ use super::users::Administrator;
 pub struct Form {
     #[validate(length(min = "1"))]
     pub resource_type: String,
-    pub resource_id: i64,
+    pub resource_id: ID,
     pub like: bool,
 }
 

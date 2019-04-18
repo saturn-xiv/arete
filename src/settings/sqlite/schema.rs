@@ -1,7 +1,7 @@
 table! {
     settings (id) {
-        id -> Int8,
-        key -> Varchar,
+        id -> Integer,
+        key -> Text,
         value -> Binary,
         salt -> Nullable<Binary>,
         created_at -> Timestamp,

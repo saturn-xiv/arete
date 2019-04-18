@@ -1,11 +1,11 @@
 table! {
     attachments (id) {
-        id -> Int8,
-        user_id -> Int8,
-        title -> Varchar,
-        size -> Int8,
-        mime_type -> Varchar,
-        url -> Varchar,
+        id -> Integer,
+        user_id -> Integer,
+        title -> Text,
+        size -> BigInt,
+        mime_type -> Text,
+        url -> Text,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -13,16 +13,16 @@ table! {
 
 table! {
     cards (id) {
-        id -> Int8,
-        title -> Varchar,
+        id -> Integer,
+        title -> Text,
         body -> Text,
-        media_type -> Varchar,
-        action -> Varchar,
-        href -> Varchar,
-        logo -> Varchar,
-        loc -> Varchar,
-        lang -> Varchar,
-        position -> Int2,
+        media_type -> Text,
+        action -> Text,
+        href -> Text,
+        logo -> Text,
+        loc -> Text,
+        lang -> Text,
+        position -> SmallInt,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -30,12 +30,12 @@ table! {
 
 table! {
     categories (id) {
-        id -> Int8,
-        parent_id -> Nullable<Int8>,
-        name -> Varchar,
-        icon -> Varchar,
-        color -> Varchar,
-        position -> Int2,
+        id -> Integer,
+        parent_id -> Nullable<Integer>,
+        name -> Text,
+        icon -> Text,
+        color -> Text,
+        position -> SmallInt,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -43,21 +43,21 @@ table! {
 
 table! {
     category_resources (id) {
-        id -> Int8,
-        category_id -> Int8,
-        resource_type -> Varchar,
-        resource_id -> Int8,
+        id -> Integer,
+        category_id -> Integer,
+        resource_type -> Text,
+        resource_id -> Integer,
         created_at -> Timestamp,
     }
 }
 
 table! {
     friend_links (id) {
-        id -> Int8,
-        title -> Varchar,
-        home -> Varchar,
-        logo -> Varchar,
-        position -> Int2,
+        id -> Integer,
+        title -> Text,
+        home -> Text,
+        logo -> Text,
+        position -> SmallInt,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -65,23 +65,23 @@ table! {
 
 table! {
     leave_words (id) {
-        id -> Int8,
-        ip -> Varchar,
+        id -> Integer,
+        ip -> Text,
         body -> Text,
-        media_type -> Varchar,
+        media_type -> Text,
         created_at -> Timestamp,
     }
 }
 
 table! {
     links (id) {
-        id -> Int8,
-        href -> Varchar,
-        label -> Varchar,
-        loc -> Varchar,
-        lang -> Varchar,
-        x -> Int2,
-        y -> Int2,
+        id -> Integer,
+        href -> Text,
+        label -> Text,
+        loc -> Text,
+        lang -> Text,
+        x -> SmallInt,
+        y -> SmallInt,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -89,22 +89,22 @@ table! {
 
 table! {
     logs (id) {
-        id -> Int8,
-        user_id -> Int8,
-        ip -> Varchar,
-        message -> Varchar,
+        id -> Integer,
+        user_id -> Integer,
+        ip -> Text,
+        message -> Text,
         created_at -> Timestamp,
     }
 }
 
 table! {
     notifications (id) {
-        id -> Int8,
-        user_id -> Int4,
-        url -> Varchar,
+        id -> Integer,
+        user_id -> Integer,
+        url -> Text,
         body -> Text,
-        media_type -> Varchar,
-        level -> Varchar,
+        media_type -> Text,
+        level -> Text,
         read -> Bool,
         created_at -> Timestamp,
         updated_at -> Timestamp,
@@ -113,10 +113,10 @@ table! {
 
 table! {
     policies (id) {
-        id -> Int8,
-        user_id -> Int8,
-        role -> Varchar,
-        resource -> Nullable<Varchar>,
+        id -> Integer,
+        user_id -> Integer,
+        role -> Text,
+        resource -> Nullable<Text>,
         nbf -> Date,
         exp -> Date,
         created_at -> Timestamp,
@@ -126,20 +126,20 @@ table! {
 
 table! {
     tag_resources (id) {
-        id -> Int8,
-        tag_id -> Int8,
-        resource_type -> Varchar,
-        resource_id -> Int8,
+        id -> Integer,
+        tag_id -> Integer,
+        resource_type -> Text,
+        resource_id -> Integer,
         created_at -> Timestamp,
     }
 }
 
 table! {
     tags (id) {
-        id -> Int8,
-        name -> Varchar,
-        icon -> Varchar,
-        color -> Varchar,
+        id -> Integer,
+        name -> Text,
+        icon -> Text,
+        color -> Text,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -147,20 +147,20 @@ table! {
 
 table! {
     users (id) {
-        id -> Int8,
-        real_name -> Varchar,
-        nick_name -> Varchar,
-        email -> Varchar,
+        id -> Integer,
+        real_name -> Text,
+        nick_name -> Text,
+        email -> Text,
         password -> Nullable<Binary>,
-        uid -> Varchar,
-        provider_type -> Varchar,
-        provider_id -> Varchar,
-        logo -> Varchar,
-        sign_in_count -> Int8,
+        uid -> Text,
+        provider_type -> Text,
+        provider_id -> Text,
+        logo -> Text,
+        sign_in_count -> BigInt,
         current_sign_in_at -> Nullable<Timestamp>,
-        current_sign_in_ip -> Nullable<Varchar>,
+        current_sign_in_ip -> Nullable<Text>,
         last_sign_in_at -> Nullable<Timestamp>,
-        last_sign_in_ip -> Nullable<Varchar>,
+        last_sign_in_ip -> Nullable<Text>,
         confirmed_at -> Nullable<Timestamp>,
         locked_at -> Nullable<Timestamp>,
         deleted_at -> Nullable<Timestamp>,
@@ -171,10 +171,10 @@ table! {
 
 table! {
     votes (id) {
-        id -> Int8,
-        point -> Int8,
-        resource_type -> Varchar,
-        resource_id -> Int8,
+        id -> Integer,
+        point -> BigInt,
+        resource_type -> Text,
+        resource_id -> Integer,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }

@@ -2,13 +2,16 @@ use chrono::{NaiveDateTime, Utc};
 use diesel::{delete, insert_into, prelude::*, update};
 use yaml_rust::{Yaml, YamlLoader};
 
-use super::super::{errors::Result, orm::Connection};
+use super::super::{
+    errors::Result,
+    orm::{Connection, ID},
+};
 use super::schema::locales;
 
 #[derive(Queryable, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Item {
-    pub id: i64,
+    pub id: ID,
     pub lang: String,
     pub code: String,
     pub message: String,
@@ -36,11 +39,11 @@ pub trait Dao {
     fn count(&self, lang: &String) -> Result<i64>;
     fn all(&self) -> Result<Vec<Item>>;
     fn by_lang(&self, lang: &String) -> Result<Vec<Item>>;
-    fn by_id(&self, id: i64) -> Result<Item>;
+    fn by_id(&self, id: ID) -> Result<Item>;
     fn by_lang_and_code(&self, lang: &String, code: &String) -> Result<Item>;
-    fn delete(&self, id: i64) -> Result<()>;
+    fn delete(&self, id: ID) -> Result<()>;
     fn create(&self, lang: &String, code: &String, message: &String) -> Result<()>;
-    fn update(&self, id: i64, code: &String, message: &String) -> Result<()>;
+    fn update(&self, id: ID, code: &String, message: &String) -> Result<()>;
 }
 
 fn loop_yaml(
@@ -151,7 +154,7 @@ impl Dao for Connection {
             .load::<Item>(self)?;
         Ok(items)
     }
-    fn by_id(&self, id: i64) -> Result<Item> {
+    fn by_id(&self, id: ID) -> Result<Item> {
         let it = locales::dsl::locales
             .filter(locales::dsl::id.eq(id))
             .first::<Item>(self)?;
@@ -164,7 +167,7 @@ impl Dao for Connection {
             .first::<Item>(self)?;
         Ok(it)
     }
-    fn update(&self, id: i64, code: &String, message: &String) -> Result<()> {
+    fn update(&self, id: ID, code: &String, message: &String) -> Result<()> {
         let now = Utc::now().naive_utc();
         let it = locales::dsl::locales.filter(locales::dsl::id.eq(id));
         update(it)
@@ -188,7 +191,7 @@ impl Dao for Connection {
             .execute(self)?;
         Ok(())
     }
-    fn delete(&self, id: i64) -> Result<()> {
+    fn delete(&self, id: ID) -> Result<()> {
         delete(locales::dsl::locales.filter(locales::dsl::id.eq(id))).execute(self)?;
         Ok(())
     }

@@ -1,11 +1,11 @@
 table! {
     forum_posts (id) {
-        id -> Int8,
-        user_id -> Int8,
-        topic_id -> Int8,
-        post_id -> Nullable<Int8>,
+        id -> Integer,
+        user_id -> Integer,
+        topic_id -> Integer,
+        post_id -> Nullable<Integer>,
         body -> Text,
-        media_type -> Varchar,
+        media_type -> Text,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -13,14 +13,17 @@ table! {
 
 table! {
     forum_topics (id) {
-        id -> Int8,
-        user_id -> Int8,
-        title -> Varchar,
+        id -> Integer,
+        user_id -> Integer,
+        title -> Text,
         body -> Text,
-        media_type -> Varchar,
+        media_type -> Text,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
 }
 
-allow_tables_to_appear_in_same_query!(forum_posts, forum_topics,);
+allow_tables_to_appear_in_same_query!(
+    forum_posts,
+    forum_topics,
+);

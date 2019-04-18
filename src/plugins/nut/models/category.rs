@@ -43,7 +43,7 @@ pub trait Dao {
     fn delete(&self, id: ID) -> Result<()>;
     fn bind(&self, categories: &[ID], rty: &String, rid: ID) -> Result<()>;
     fn unbind(&self, rty: &String, rid: ID) -> Result<()>;
-    fn resources(&self, category: ID, rty: &String) -> Result<Vec<i64>>;
+    fn resources(&self, category: ID, rty: &String) -> Result<Vec<ID>>;
     fn children(&self, category: Option<ID>) -> Result<Vec<Item>>;
 }
 
@@ -110,7 +110,7 @@ impl Dao for Connection {
         let now = Utc::now().naive_utc();
         update(categories::dsl::categories.filter(categories::dsl::parent_id.eq(&Some(id))))
             .set((
-                categories::dsl::parent_id.eq(&None::<i64>),
+                categories::dsl::parent_id.eq(&None::<ID>),
                 categories::dsl::updated_at.eq(&now),
             ))
             .execute(self)?;
@@ -145,13 +145,13 @@ impl Dao for Connection {
         .execute(self)?;
         Ok(())
     }
-    fn resources(&self, category: ID, rty: &String) -> Result<Vec<i64>> {
+    fn resources(&self, category: ID, rty: &String) -> Result<Vec<ID>> {
         let items = category_resources::dsl::category_resources
             .select(category_resources::dsl::resource_id)
             .filter(category_resources::dsl::category_id.eq(category))
             .filter(category_resources::dsl::resource_type.eq(rty))
             .order(category_resources::dsl::created_at.desc())
-            .load::<i64>(self)?;
+            .load::<ID>(self)?;
         Ok(items)
     }
     fn children(&self, parent: Option<ID>) -> Result<Vec<Item>> {

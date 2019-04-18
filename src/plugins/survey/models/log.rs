@@ -1,26 +1,29 @@
 use chrono::{NaiveDateTime, Utc};
 use diesel::{insert_into, prelude::*};
 
-use super::super::super::super::{errors::Result, orm::Connection};
+use super::super::super::super::{
+    errors::Result,
+    orm::{Connection, ID},
+};
 use super::super::schema::survey_logs;
 
 #[derive(Queryable)]
 pub struct Item {
-    pub id: i64,
-    pub form_id: i64,
-    pub user_id: Option<i64>,
+    pub id: ID,
+    pub form_id: ID,
+    pub user_id: Option<ID>,
     pub ip: String,
     pub message: String,
     pub created_at: NaiveDateTime,
 }
 
 pub trait Dao {
-    fn add(&self, form: &i64, user: &Option<i64>, ip: &String, message: &String) -> Result<()>;
-    fn by_form(&self, id: &i64) -> Result<Vec<Item>>;
+    fn add(&self, form: ID, user: Option<ID>, ip: &String, message: &String) -> Result<()>;
+    fn by_form(&self, id: ID) -> Result<Vec<Item>>;
 }
 
 impl Dao for Connection {
-    fn add(&self, form: &i64, user: &Option<i64>, ip: &String, message: &String) -> Result<()> {
+    fn add(&self, form: ID, user: Option<ID>, ip: &String, message: &String) -> Result<()> {
         let now = Utc::now().naive_utc();
         insert_into(survey_logs::dsl::survey_logs)
             .values((
@@ -33,7 +36,7 @@ impl Dao for Connection {
             .execute(self)?;
         Ok(())
     }
-    fn by_form(&self, id: &i64) -> Result<Vec<Item>> {
+    fn by_form(&self, id: ID) -> Result<Vec<Item>> {
         let items = survey_logs::dsl::survey_logs
             .filter(survey_logs::dsl::form_id.eq(id))
             .order(survey_logs::dsl::created_at.desc())

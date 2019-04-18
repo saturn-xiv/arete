@@ -21,7 +21,7 @@ pub struct Form {
     #[validate(length(min = "1"))]
     pub color: String,
     pub position: i16,
-    pub parent: Option<i64>,
+    pub parent: Option<ID>,
 }
 
 #[post("/categories", data = "<form>")]

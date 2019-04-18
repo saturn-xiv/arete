@@ -108,7 +108,7 @@ impl Dao for Connection {
             ))
             .filter(tag_resources::dsl::tag_id.eq(tag))
             .order(tag_resources::dsl::created_at.desc())
-            .load::<(String, i64)>(self)?;
+            .load::<(String, ID)>(self)?;
         Ok(items)
     }
 }

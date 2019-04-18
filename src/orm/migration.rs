@@ -5,11 +5,11 @@ use chrono::{NaiveDateTime, Utc};
 use diesel::{connection::SimpleConnection, delete, insert_into, prelude::*, update};
 
 use super::super::{errors::Result, rfc::RFC822};
-use super::{schema::schema_migrations, Connection};
+use super::{schema::schema_migrations, Connection, ID};
 
 #[derive(Queryable)]
 pub struct Item {
-    pub id: i64,
+    pub id: ID,
     pub version: String,
     pub name: String,
     pub up: String,
