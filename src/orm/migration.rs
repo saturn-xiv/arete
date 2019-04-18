@@ -2,10 +2,13 @@ use std::cmp::Ordering;
 use std::fmt;
 
 use chrono::{NaiveDateTime, Utc};
-use diesel::{connection::SimpleConnection, delete, insert_into, prelude::*, update};
+use diesel::{
+    connection::SimpleConnection, delete, insert_into, prelude::*, sql_query, sql_types::Text,
+    update,
+};
 
 use super::super::{errors::Result, rfc::RFC822};
-use super::{schema::schema_migrations, Connection, ID};
+use super::{schema::schema_migrations, schema_migrations_exists, Connection, ID};
 
 #[derive(Queryable)]
 pub struct Item {
@@ -70,11 +73,26 @@ pub trait Dao {
     fn migrate(&self) -> Result<()>;
     fn rollback(&self) -> Result<()>;
     fn versions(&self) -> Result<Vec<Item>>;
+    fn check(&self) -> Result<()>;
+}
+
+#[derive(QueryableByName)]
+pub struct Table {
+    #[sql_type = "Text"]
+    pub name: String,
 }
 
 impl Dao for Connection {
+    fn check(&self) -> Result<()> {
+        let rst = sql_query(schema_migrations_exists("schema_migrations")).load::<Table>(self)?;
+        if rst.len() == 0 {
+            info!("database is empty");
+            self.batch_execute(super::UP)?;
+        }
+        Ok(())
+    }
     fn load(&self, items: &Vec<New>) -> Result<()> {
-        self.batch_execute(super::UP)?;
+        self.check()?;
 
         for it in items {
             info!("find migration: {}", it);
@@ -113,6 +131,7 @@ impl Dao for Connection {
         Ok(())
     }
     fn rollback(&self) -> Result<()> {
+        self.check()?;
         match schema_migrations::dsl::schema_migrations
             .filter(schema_migrations::dsl::run_at.is_not_null())
             .order(schema_migrations::dsl::version.desc())
@@ -133,6 +152,7 @@ impl Dao for Connection {
         Ok(())
     }
     fn versions(&self) -> Result<Vec<Item>> {
+        self.check()?;
         let items = schema_migrations::dsl::schema_migrations
             .order(schema_migrations::dsl::version.asc())
             .load(self)?;

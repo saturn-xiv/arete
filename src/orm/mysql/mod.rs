@@ -6,6 +6,8 @@ use std::fmt;
 /// use DB-NAME
 /// show tables;
 /// desc TABLE-NAME;
+/// SELECT table_name FROM information_schema.tables WHERE table_schema = 'databasename' AND table_name = 'testtable';
+/// SHOW TABLES LIKE 'tablename';
 pub type Connection = diesel::mysql::MysqlConnection;
 pub type ID = i64;
 
@@ -48,4 +50,11 @@ impl fmt::Display for Config {
             self.name
         )
     }
+}
+
+pub fn schema_migrations_exists(name: &str) -> String {
+    format!(
+        "SELECT table_name AS name FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = '{}'",
+    name
+    )
 }

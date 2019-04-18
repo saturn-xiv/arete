@@ -48,3 +48,10 @@ impl fmt::Display for Config {
         )
     }
 }
+
+pub fn schema_migrations_exists(name: &str) -> String {
+    format!(
+        "SELECT table_name AS name FROM information_schema.tables WHERE table_name = '{}'",
+        name
+    )
+}

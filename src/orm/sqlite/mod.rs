@@ -12,6 +12,7 @@ use std::path::Path;
 /// .header 	Display or hide the output table header
 /// .mode 	Select mode for the output table
 /// .dump 	Dump database in SQL text format
+/// SELECT name FROM sqlite_master WHERE type='table' AND name='TABLE_NAME'
 pub type Connection = diesel::sqlite::SqliteConnection;
 pub type ID = i32;
 
@@ -35,4 +36,11 @@ impl fmt::Display for Config {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.file)
     }
+}
+
+pub fn schema_migrations_exists(name: &str) -> String {
+    format!(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='{}'",
+        name
+    )
 }
