@@ -21,14 +21,14 @@ pub struct Item {
 
 pub trait Dao {
     fn by_id(&self, id: ID) -> Result<Item>;
-    fn create(&self, title: &String, home: &String, logo: &String, position: &i16) -> Result<()>;
+    fn create(&self, title: &String, home: &String, logo: &String, position: i16) -> Result<()>;
     fn update(
         &self,
         id: ID,
         title: &String,
         home: &String,
         logo: &String,
-        position: &i16,
+        position: i16,
     ) -> Result<()>;
     fn all(&self) -> Result<Vec<Item>>;
     fn delete(&self, id: ID) -> Result<()>;
@@ -41,7 +41,7 @@ impl Dao for Connection {
             .first::<Item>(self)?;
         Ok(it)
     }
-    fn create(&self, title: &String, home: &String, logo: &String, position: &i16) -> Result<()> {
+    fn create(&self, title: &String, home: &String, logo: &String, position: i16) -> Result<()> {
         let now = Utc::now().naive_utc();
         insert_into(friend_links::dsl::friend_links)
             .values((
@@ -61,7 +61,7 @@ impl Dao for Connection {
         title: &String,
         home: &String,
         logo: &String,
-        position: &i16,
+        position: i16,
     ) -> Result<()> {
         let now = Utc::now().naive_utc();
         update(friend_links::dsl::friend_links.filter(friend_links::dsl::id.eq(id)))

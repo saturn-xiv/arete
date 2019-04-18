@@ -1,88 +1,54 @@
 use std::ops::Deref;
 
-use chrono::NaiveDateTime;
+use diesel::Connection as DieselConnection;
+use failure::Error as FailueError;
 use rocket::http::Status;
-use validator::Validate;
+use rocket_contrib::json::Json;
 
 use super::super::super::super::{
-    errors::{Error, Result},
-    graphql::{context::Context, session::Session, Handler, I64},
+    errors::{Error, JsonResult, Result},
+    orm::{Connection, Database, ID},
 };
 use super::super::models::{
-    attachment::{Dao as AttachmentDao, Item},
+    attachment::{Dao as AttachmentDao, Item as Attachment},
     policy::{Dao as PolicyDao, Role},
+    user::Item as User,
 };
+use super::users::Administrator;
 
-#[derive(GraphQLObject)]
-pub struct Attachment {
-    pub id: I64,
-    pub title: String,
-    pub mime_type: String,
-    pub url: String,
-    pub size: I64,
-    pub updated_at: NaiveDateTime,
+#[get("/attachments/<id>")]
+pub fn show(id: ID, db: Database) -> JsonResult<Attachment> {
+    let db = db.deref();
+    let it = AttachmentDao::by_id(db, id)?;
+    Ok(Json(it))
 }
 
-impl From<Item> for Attachment {
-    fn from(it: Item) -> Self {
-        Self {
-            id: I64(it.id),
-            title: it.title,
-            mime_type: it.mime_type,
-            url: it.url,
-            size: I64(it.size),
-            updated_at: it.updated_at,
-        }
+#[get("/attachments", rank = 1)]
+pub fn index_by_administrator(_user: Administrator, db: Database) -> JsonResult<Vec<Attachment>> {
+    let db = db.deref();
+    let items = AttachmentDao::all(db)?;
+    Ok(Json(items))
+}
+
+#[get("/attachments", rank = 2)]
+pub fn index_by_owner(user: User, db: Database) -> JsonResult<Vec<Attachment>> {
+    let db = db.deref();
+    let items = AttachmentDao::by_user(db, user.id)?;
+    Ok(Json(items))
+}
+
+#[delete("/attachments/<id>")]
+pub fn destroy(user: User, id: ID, db: Database) -> JsonResult<()> {
+    let db = db.deref();
+    can_edit(db, user.id, id)?;
+    db.transaction::<_, FailueError, _>(|| AttachmentDao::delete(db, id))?;
+    Ok(Json(()))
+}
+
+fn can_edit(db: &Connection, user: ID, id: ID) -> Result<()> {
+    let it = AttachmentDao::by_id(db, id)?;
+    if it.user_id == user || PolicyDao::is(db, user, &Role::Admin) {
+        return Ok(());
     }
-}
-
-#[derive(Validate)]
-pub struct Show {
-    pub id: i64,
-}
-
-impl Handler for Show {
-    type Item = Attachment;
-    fn handle(&self, c: &Context, _s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        let it = AttachmentDao::by_id(db, &self.id)?;
-        Ok(it.into())
-    }
-}
-
-#[derive(Validate)]
-pub struct Index {}
-
-impl Handler for Index {
-    type Item = Vec<Attachment>;
-    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        let user = s.current_user()?;
-        let items = if PolicyDao::can(db, &user.id, &Role::Admin, &None) {
-            AttachmentDao::all(db)?
-        } else {
-            AttachmentDao::by_user(db, &user.id)?
-        };
-
-        Ok(items.into_iter().map(|x| x.into()).collect())
-    }
-}
-
-#[derive(Validate)]
-pub struct Destroy {
-    pub id: i64,
-}
-
-impl Handler for Destroy {
-    type Item = Option<String>;
-    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        let user = s.current_user()?;
-        let it = AttachmentDao::by_id(db, &self.id)?;
-        if it.user_id == self.id || PolicyDao::can(db, &user.id, &Role::Admin, &None) {
-            AttachmentDao::delete(db, &self.id)?;
-            return Ok(None);
-        }
-        Err(Error::Http(Status::Forbidden).into())
-    }
+    Err(Error::Http(Status::Forbidden).into())
 }

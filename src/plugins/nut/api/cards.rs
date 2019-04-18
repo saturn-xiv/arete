@@ -1,16 +1,17 @@
 use std::ops::Deref;
 
-use chrono::NaiveDateTime;
+use rocket_contrib::json::Json;
 use validator::Validate;
 
 use super::super::super::super::{
-    errors::Result,
-    graphql::{context::Context, session::Session, Handler, I16, I64},
+    errors::JsonResult,
+    orm::{Database, ID},
 };
-use super::super::models::card::{Dao as CardDao, Item};
+use super::super::models::card::{Dao as CardDao, Item as Card};
+use super::users::Administrator;
 
-#[derive(GraphQLInputObject, Validate)]
-pub struct Create {
+#[derive(Validate, Deserialize)]
+pub struct Form {
     #[validate(length(min = "1"))]
     pub lang: String,
     #[validate(length(min = "1"))]
@@ -27,144 +28,65 @@ pub struct Create {
     pub action: String,
     #[validate(length(min = "1"))]
     pub loc: String,
-    pub position: I16,
+    pub position: i16,
 }
 
-impl Handler for Create {
-    type Item = Option<String>;
-    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        s.administrator(db)?;
-        CardDao::create(
-            db,
-            &self.lang,
-            &self.title,
-            &self.logo,
-            &self.body,
-            &self.media_type.parse()?,
-            &self.href,
-            &self.action,
-            &self.loc,
-            &self.position.0,
-        )?;
-        Ok(None)
-    }
+#[post("/cards", data = "<form>")]
+pub fn create(_user: Administrator, db: Database, form: Json<Form>) -> JsonResult<()> {
+    form.validate()?;
+    let db = db.deref();
+    CardDao::create(
+        db,
+        &form.lang,
+        &form.title,
+        &form.logo,
+        &form.body,
+        &form.media_type.parse()?,
+        &form.href,
+        &form.action,
+        &form.loc,
+        form.position,
+    )?;
+    Ok(Json(()))
 }
 
-#[derive(GraphQLInputObject, Validate)]
-pub struct Update {
-    pub id: I64,
-    #[validate(length(min = "1"))]
-    pub lang: String,
-    #[validate(length(min = "1"))]
-    pub title: String,
-    #[validate(length(min = "1"))]
-    pub logo: String,
-    #[validate(length(min = "1"))]
-    pub body: String,
-    #[validate(length(min = "1"))]
-    pub media_type: String,
-    #[validate(length(min = "1"))]
-    pub href: String,
-    #[validate(length(min = "1"))]
-    pub action: String,
-    #[validate(length(min = "1"))]
-    pub loc: String,
-    pub position: I16,
+#[post("/cards/<id>", data = "<form>")]
+pub fn update(_user: Administrator, id: ID, db: Database, form: Json<Form>) -> JsonResult<()> {
+    form.validate()?;
+    let db = db.deref();
+    CardDao::update(
+        db,
+        id,
+        &form.lang,
+        &form.title,
+        &form.logo,
+        &form.body,
+        &form.media_type.parse()?,
+        &form.href,
+        &form.action,
+        &form.loc,
+        form.position,
+    )?;
+    Ok(Json(()))
 }
 
-impl Handler for Update {
-    type Item = Option<String>;
-    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        s.administrator(db)?;
-        CardDao::update(
-            db,
-            &self.id.0,
-            &self.lang,
-            &self.title,
-            &self.logo,
-            &self.body,
-            &self.media_type.parse()?,
-            &self.href,
-            &self.action,
-            &self.loc,
-            &self.position.0,
-        )?;
-        Ok(None)
-    }
+#[get("/cards/<id>")]
+pub fn show(id: ID, _user: Administrator, db: Database) -> JsonResult<Card> {
+    let db = db.deref();
+    let it = CardDao::by_id(db, id)?;
+    Ok(Json(it))
 }
 
-#[derive(Validate)]
-pub struct Show {
-    pub id: i64,
+#[get("/cards")]
+pub fn index(_user: Administrator, db: Database) -> JsonResult<Vec<Card>> {
+    let db = db.deref();
+    let items = CardDao::all(db)?;
+    Ok(Json(items))
 }
 
-impl Handler for Show {
-    type Item = Card;
-    fn handle(&self, c: &Context, _s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        let it = CardDao::by_id(db, &self.id)?;
-        Ok(it.into())
-    }
-}
-
-#[derive(GraphQLObject)]
-pub struct Card {
-    pub id: I64,
-    pub title: String,
-    pub body: String,
-    pub media_type: String,
-    pub action: String,
-    pub href: String,
-    pub logo: String,
-    pub loc: String,
-    pub lang: String,
-    pub position: I16,
-    pub updated_at: NaiveDateTime,
-}
-
-impl From<Item> for Card {
-    fn from(it: Item) -> Self {
-        Self {
-            id: I64(it.id),
-            title: it.title,
-            body: it.body,
-            media_type: it.media_type,
-            action: it.action,
-            href: it.href,
-            logo: it.logo,
-            loc: it.loc,
-            lang: it.lang,
-            position: I16(it.position),
-            updated_at: it.updated_at,
-        }
-    }
-}
-
-#[derive(Validate)]
-pub struct Index {}
-
-impl Handler for Index {
-    type Item = Vec<Card>;
-    fn handle(&self, c: &Context, _s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        let items = CardDao::all(db)?.into_iter().map(|x| x.into()).collect();
-        Ok(items)
-    }
-}
-
-#[derive(Validate)]
-pub struct Destroy {
-    pub id: i64,
-}
-
-impl Handler for Destroy {
-    type Item = Option<String>;
-    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        s.administrator(db)?;
-        CardDao::delete(db, &self.id)?;
-        Ok(None)
-    }
+#[delete("/cards/<id>")]
+pub fn destroy(_user: Administrator, id: ID, db: Database) -> JsonResult<()> {
+    let db = db.deref();
+    CardDao::delete(db, id)?;
+    Ok(Json(()))
 }

@@ -1,127 +1,59 @@
 use std::ops::Deref;
 
-use chrono::NaiveDateTime;
+use rocket_contrib::json::Json;
 use validator::Validate;
 
 use super::super::super::super::{
-    errors::Result,
-    graphql::{context::Context, session::Session, Handler, I16, I64},
+    errors::JsonResult,
+    orm::{Database, ID},
 };
-use super::super::models::friend_link::{Dao as FriendLinkDao, Item};
+use super::super::models::friend_link::{Dao as FriendLinkDao, Item as FriendLink};
+use super::users::Administrator;
 
-#[derive(GraphQLInputObject, Validate)]
-pub struct Create {
+#[derive(Deserialize, Validate)]
+pub struct Form {
     #[validate(length(min = "1"))]
     pub home: String,
     #[validate(length(min = "1"))]
     pub title: String,
     #[validate(length(min = "1"))]
     pub logo: String,
-    pub position: I16,
+    pub position: i16,
 }
 
-impl Handler for Create {
-    type Item = Option<String>;
-    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        s.administrator(db)?;
-        FriendLinkDao::create(db, &self.title, &self.home, &self.logo, &self.position.0)?;
-        Ok(None)
-    }
+#[post("/friend-links", data = "<form>")]
+pub fn create(_user: Administrator, db: Database, form: Json<Form>) -> JsonResult<()> {
+    form.validate()?;
+    let db = db.deref();
+    FriendLinkDao::create(db, &form.title, &form.home, &form.logo, form.position)?;
+    Ok(Json(()))
 }
 
-#[derive(GraphQLInputObject, Validate)]
-pub struct Update {
-    pub id: I64,
-    #[validate(length(min = "1"))]
-    pub home: String,
-    #[validate(length(min = "1"))]
-    pub title: String,
-    #[validate(length(min = "1"))]
-    pub logo: String,
-    pub position: I16,
+#[post("/friend-links/<id>", data = "<form>")]
+pub fn update(_user: Administrator, id: ID, db: Database, form: Json<Form>) -> JsonResult<()> {
+    form.validate()?;
+    let db = db.deref();
+    FriendLinkDao::update(db, id, &form.title, &form.home, &form.logo, form.position)?;
+    Ok(Json(()))
 }
 
-impl Handler for Update {
-    type Item = Option<String>;
-    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        s.administrator(db)?;
-        FriendLinkDao::update(
-            db,
-            &self.id.0,
-            &self.title,
-            &self.home,
-            &self.logo,
-            &self.position.0,
-        )?;
-        Ok(None)
-    }
+#[get("/friend-links/<id>")]
+pub fn show(id: ID, _user: Administrator, db: Database) -> JsonResult<FriendLink> {
+    let db = db.deref();
+    let it = FriendLinkDao::by_id(db, id)?;
+    Ok(Json(it))
 }
 
-#[derive(GraphQLObject)]
-pub struct FriendLink {
-    pub id: I64,
-    pub title: String,
-    pub home: String,
-    pub logo: String,
-    pub position: I16,
-    pub updated_at: NaiveDateTime,
+#[get("/friend-links")]
+pub fn index(db: Database) -> JsonResult<Vec<FriendLink>> {
+    let db = db.deref();
+    let items = FriendLinkDao::all(db)?;
+    Ok(Json(items))
 }
 
-impl From<Item> for FriendLink {
-    fn from(it: Item) -> Self {
-        Self {
-            id: I64(it.id),
-            home: it.home,
-            title: it.title,
-            logo: it.logo,
-            position: I16(it.position),
-            updated_at: it.updated_at,
-        }
-    }
-}
-
-#[derive(Validate)]
-pub struct Show {
-    pub id: i64,
-}
-
-impl Handler for Show {
-    type Item = FriendLink;
-    fn handle(&self, c: &Context, _s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        let it = FriendLinkDao::by_id(db, &self.id)?;
-        Ok(it.into())
-    }
-}
-
-#[derive(Validate)]
-pub struct Index {}
-
-impl Handler for Index {
-    type Item = Vec<FriendLink>;
-    fn handle(&self, c: &Context, _s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        let items = FriendLinkDao::all(db)?
-            .into_iter()
-            .map(|x| x.into())
-            .collect();
-        Ok(items)
-    }
-}
-
-#[derive(Validate)]
-pub struct Destroy {
-    pub id: i64,
-}
-
-impl Handler for Destroy {
-    type Item = Option<String>;
-    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        s.administrator(db)?;
-        FriendLinkDao::delete(db, &self.id)?;
-        Ok(None)
-    }
+#[delete("/friend-links/<id>")]
+pub fn destroy(_user: Administrator, id: ID, db: Database) -> JsonResult<()> {
+    let db = db.deref();
+    FriendLinkDao::delete(db, id)?;
+    Ok(Json(()))
 }

@@ -7,33 +7,27 @@ use diesel::{
     sql_types::{BigInt, Text, Timestamp},
 };
 use r2d2_redis::redis::cmd;
-use validator::Validate;
+use rocket_contrib::json::Json;
 
 use super::super::super::super::super::{
-    errors::Result,
-    graphql::{context::Context, session::Session, Handler, I64},
-    orm::Connection as DbConnection,
+    cache::Cache,
+    errors::{JsonResult, Result},
+    orm::{Connection as DbConnection, Database},
     sys,
 };
+use super::super::users::Administrator;
 
 const MB: u64 = 1024 * 1024;
 
-#[derive(GraphQLObject)]
+#[derive(Serialize)]
 pub struct Status {
     os: Os,
     redis: String,
-    postgresql: PostgreSql,
+    database: Db,
     network: Vec<Network>,
-    routes: Vec<Route>,
 }
 
-#[derive(GraphQLObject)]
-pub struct Route {
-    pub path: String,
-    pub method: String,
-}
-
-#[derive(GraphQLObject)]
+#[derive(Serialize)]
 pub struct Os {
     pub uts: Uts,
     pub uptime: String,
@@ -44,13 +38,13 @@ pub struct Os {
     pub pid: i32,
 }
 
-#[derive(GraphQLObject)]
+#[derive(Serialize)]
 pub struct LoadAverage {
     pub l1: f64,
     pub l2: f64,
     pub l3: f64,
 }
-#[derive(GraphQLObject)]
+#[derive(Serialize)]
 pub struct Uts {
     pub machine: String,
     pub node_name: String,
@@ -58,12 +52,12 @@ pub struct Uts {
     pub sys_name: String,
     pub version: String,
 }
-#[derive(GraphQLObject)]
+#[derive(Serialize)]
 pub struct Ram {
     pub unused: i32,
     pub total: i32,
 }
-#[derive(GraphQLObject)]
+#[derive(Serialize)]
 pub struct Swap {
     pub unused: i32,
     pub total: i32,
@@ -109,7 +103,7 @@ impl Os {
     }
 }
 
-#[derive(GraphQLObject)]
+#[derive(Serialize)]
 pub struct Network {
     pub name: String,
     pub ip4: Option<String>,
@@ -141,26 +135,30 @@ impl Network {
     }
 }
 
-#[derive(GraphQLObject)]
-pub struct PostgreSql {
+#[cfg(feature = "mysql")]
+#[derive(Serialize)]
+pub struct Db {}
+
+#[cfg(feature = "sqlite")]
+#[derive(Serialize)]
+pub struct Db {}
+
+#[cfg(feature = "postgresql")]
+#[derive(Serialize)]
+pub struct Db {
     pub status: Option<PgStatus>,
-    pub databases: Vec<PgDatabaseM>,
+    pub databases: Vec<PgDatabase>,
 }
 
-#[derive(GraphQLObject, QueryableByName)]
+#[derive(Serialize, QueryableByName)]
 pub struct PgStatus {
     #[sql_type = "Text"]
     pub version: String,
     #[sql_type = "Timestamp"]
     pub timestamp: NaiveDateTime,
 }
-#[derive(GraphQLObject)]
-pub struct PgDatabaseM {
-    pub name: String,
-    pub size: I64,
-}
 
-#[derive(QueryableByName)]
+#[derive(Serialize, QueryableByName)]
 pub struct PgDatabase {
     #[sql_type = "Text"]
     pub name: String,
@@ -168,7 +166,16 @@ pub struct PgDatabase {
     pub size: i64,
 }
 
-impl PostgreSql {
+impl Db {
+    #[cfg(feature = "mysql")]
+    pub fn new(_db: &DbConnection) -> Result<Self> {
+        Ok(Self {})
+    }
+    #[cfg(feature = "sqlite")]
+    pub fn new(_db: &DbConnection) -> Result<Self> {
+        Ok(Self {})
+    }
+    #[cfg(feature = "postgresql")]
     pub fn new(db: &DbConnection) -> Result<Self> {
         let status = match sql_query(r###"SELECT version() as "version", now() as "timestamp""###)
             .load::<PgStatus>(db)?
@@ -182,39 +189,18 @@ impl PostgreSql {
         };
         Ok(Self {
             status: status,
-            databases: sql_query(r###"SELECT pg_database.datname as "name", pg_database_size(pg_database.datname)/1024/1024 AS "size" FROM pg_database ORDER by "size" DESC"###).load::<PgDatabase>(db)?.into_iter().map(|x|{
-                PgDatabaseM{
-                    name:x.name,
-                    size: I64(x.size)
-                }
-            }).collect(),
+            databases: sql_query(r###"SELECT pg_database.datname as "name", pg_database_size(pg_database.datname)/1024/1024 AS "size" FROM pg_database ORDER by "size" DESC"###).load::<PgDatabase>(db)?,
         })
     }
 }
 
-#[derive(Validate)]
-pub struct Get {}
-
-impl Handler for Get {
-    type Item = Status;
-    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        s.administrator(db)?;
-
-        Ok(Status {
-            os: Os::new()?,
-            network: Network::new()?,
-            redis: cmd("info").query::<String>(c.cache.deref())?,
-            postgresql: PostgreSql::new(db.deref())?,
-            routes: Vec::new(),
-            // routes: ROUTER
-            //     .routes
-            //     .iter()
-            //     .map(|(m, p, _)| Route {
-            //         path: p.to_string(),
-            //         method: m.to_string(),
-            //     })
-            //     .collect(),
-        })
-    }
+#[get("/site/status")]
+pub fn get(db: Database, _user: Administrator, cache: Cache) -> JsonResult<Status> {
+    Ok(Json(Status {
+        os: Os::new()?,
+        network: Network::new()?,
+        redis: cmd("info").query::<String>(cache.deref())?,
+        #[cfg(feature = "postgresql")]
+        database: Db::new(db.deref())?,
+    }))
 }

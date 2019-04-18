@@ -1,76 +1,49 @@
 use std::ops::Deref;
 
-use chrono::NaiveDateTime;
+use diesel::Connection as DieselConnection;
+use failure::Error;
+use rocket_contrib::json::Json;
 use validator::Validate;
 
 use super::super::super::super::{
-    errors::Result,
-    graphql::{context::Context, session::Session, Handler, I64},
+    errors::JsonResult,
+    orm::{Database, ID},
 };
-use super::super::models::vote::{Dao as VoteDao, Item};
+use super::super::models::{
+    user::Item as User,
+    vote::{Dao as VoteDao, Item as Vote},
+};
+use super::users::Administrator;
 
-#[derive(GraphQLInputObject, Validate)]
-pub struct Update {
+#[derive(Deserialize, Validate)]
+pub struct Form {
     #[validate(length(min = "1"))]
     pub resource_type: String,
-    pub resource_id: I64,
+    pub resource_id: i64,
     pub like: bool,
 }
 
-impl Handler for Update {
-    type Item = Option<String>;
-    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        s.current_user()?;
-        VoteDao::like(db, &self.resource_type, &self.resource_id.0, self.like)?;
-        Ok(None)
-    }
+#[post("/votes", data = "<form>")]
+pub fn create(_user: User, db: Database, form: Json<Form>) -> JsonResult<()> {
+    form.validate()?;
+    let db = db.deref();
+    VoteDao::like(db, &form.resource_type, form.resource_id, form.like)?;
+    Ok(Json(()))
 }
 
-#[derive(GraphQLObject)]
-pub struct Vote {
-    pub id: I64,
-    pub point: I64,
-    pub resource_type: String,
-    pub resource_id: I64,
-    pub updated_at: NaiveDateTime,
+#[get("/votes")]
+pub fn index(db: Database) -> JsonResult<Vec<Vote>> {
+    let db = db.deref();
+    let items = VoteDao::all(db)?;
+    Ok(Json(items))
 }
 
-impl From<Item> for Vote {
-    fn from(it: Item) -> Self {
-        Self {
-            id: I64(it.id),
-            point: I64(it.id),
-            resource_id: I64(it.resource_id),
-            resource_type: it.resource_type,
-            updated_at: it.updated_at,
-        }
-    }
-}
-
-#[derive(Validate)]
-pub struct Index {}
-
-impl Handler for Index {
-    type Item = Vec<Vote>;
-    fn handle(&self, c: &Context, _s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        let items = VoteDao::all(db)?.into_iter().map(|x| x.into()).collect();
-        Ok(items)
-    }
-}
-
-#[derive(Validate)]
-pub struct Destroy {
-    pub id: i64,
-}
-
-impl Handler for Destroy {
-    type Item = Option<String>;
-    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        s.administrator(db)?;
-        VoteDao::delete(db, &self.id)?;
-        Ok(None)
-    }
+#[delete("/votes/<id>")]
+pub fn destroy(_user: Administrator, id: ID, db: Database) -> JsonResult<()> {
+    let db = db.deref();
+    db.transaction::<_, Error, _>(|| {
+        VoteDao::delete(db, id)?;
+        Ok(())
+    })?;
+    Ok(Json(()))
 }

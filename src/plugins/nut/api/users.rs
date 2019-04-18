@@ -1,186 +1,142 @@
 use std::fmt;
+use std::net::SocketAddr;
 use std::ops::Deref;
 use std::sync::Arc;
 
-use chrono::{Duration, NaiveDate, NaiveDateTime};
+use chrono::{Duration, NaiveDate};
 use diesel::prelude::*;
-use failure::Error;
+use failure::Error as FailueError;
 use rocket::{
     http::Status,
     request::{self, FromRequest},
     Outcome, Request, State,
 };
+use rocket_contrib::json::Json;
 use uuid::Uuid;
 use validator::Validate;
 
 use super::super::super::super::{
     crypto::Crypto,
-    errors::Result,
-    graphql::{context::Context, session::Session, Handler, I64},
+    errors::{JsonResult, Result},
     i18n::I18n,
     jwt::Jwt,
-    orm::{Connection as Db, Database},
+    orm::{Connection as Db, Database, ID},
     queue::{rabbitmq::RabbitMQ, Queue},
-    request::Token as Auth,
+    request::{Locale, Token as Auth},
 };
 use super::super::{
     models::{
-        log::Dao as LogDao,
-        policy::{Dao as PolicyDao, Item as Policy},
+        log::{Dao as LogDao, Item as Log},
+        policy::{Dao as PolicyDao, Item as Policy, Role},
         user::{Dao as UserDao, Item as User},
     },
     tasks::send_email,
 };
 
-// #[derive(GraphQLInputObject)]
-// pub struct Authority {
-//     pub role: String,
-//     pub resource: Option<String>,
-//     pub nbf: NaiveDate,
-//     pub exp: NaiveDate,
-// }
+#[derive(Validate, Serialize, Deserialize)]
+pub struct Apply {
+    #[validate(length(min = "1"))]
+    pub role: String,
+    pub resource: Option<String>,
+    pub nbf: NaiveDate,
+    pub exp: NaiveDate,
+}
 
-// impl From<Policy> for Authority {
-//     fn from(it: Policy) -> Self {
-//         Self {
-//             role: it.role,
-//             resource: it.resource,
-//             nbf: it.nbf,
-//             exp: it.exp,
-//         }
-//     }
-// }
+#[post("/users/authorities/<id>", data = "<form>")]
+pub fn apply_authority(
+    _user: Administrator,
+    id: ID,
+    db: Database,
+    remote: SocketAddr,
+    lang: Locale,
+    form: Json<Apply>,
+) -> JsonResult<()> {
+    form.validate()?;
+    let form = form.deref();
+    let ip = remote.ip().to_string();
+    let db = db.deref();
 
-// #[derive(Validate)]
-// pub struct GetAuthority {
-//     #[validate(length(min = "1"))]
-//     pub uid: String,
-// }
+    let user = UserDao::by_id(db, id)?;
+    db.transaction::<_, FailueError, _>(move || {
+        PolicyDao::apply(
+            db,
+            user.id,
+            &form.role.parse()?,
+            &form.resource,
+            &form.nbf,
+            &form.exp,
+        )?;
+        __i18n_l!(
+            db,
+            user.id,
+            &ip,
+            &lang.0,
+            "nut.logs.user.authority.apply",
+            form
+        )?;
+        Ok(())
+    })?;
 
-// impl Handler for GetAuthority {
-//     type Item = Vec<Authority>;
-//     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-//         let db = c.db.deref();
+    Ok(Json(()))
+}
 
-//         s.administrator(db)?;
-//         let user = UserDao::by_uid(db, &self.uid)?;
-//         let items = PolicyDao::all(db, &user.id)?
-//             .into_iter()
-//             .map(|x| x.into())
-//             .collect();
-//         Ok(items)
-//     }
-// }
+#[get("/users/authorities/<id>")]
+pub fn index_authority(_user: Administrator, id: ID, db: Database) -> JsonResult<Vec<Policy>> {
+    let db = db.deref();
+    let user = UserDao::by_id(db, id)?;
+    let items = PolicyDao::all(db, user.id)?;
+    Ok(Json(items))
+}
 
-// #[derive(GraphQLInputObject, Validate)]
-// pub struct SetAuthority {
-//     #[validate(length(min = "1"))]
-//     pub uid: String,
-//     pub authority: Authority,
-// }
+#[derive(Validate, Serialize, Deserialize)]
+pub struct Deny {
+    #[validate(length(min = "1"))]
+    pub role: String,
+    pub resource: Option<String>,
+}
 
-// impl Handler for SetAuthority {
-//     type Item = Option<String>;
-//     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-//         let db = c.db.deref();
+#[patch("/users/authorities/<id>", data = "<form>")]
+pub fn deny_authority(
+    _user: Administrator,
+    id: ID,
+    db: Database,
+    lang: Locale,
+    remote: SocketAddr,
+    form: Json<Deny>,
+) -> JsonResult<()> {
+    form.validate()?;
+    let form = form.deref();
+    let db = db.deref();
+    let ip = remote.ip().to_string();
+    let user = UserDao::by_id(db, id)?;
+    db.transaction::<_, FailueError, _>(move || {
+        PolicyDao::deny(db, user.id, &form.role.parse()?, &form.resource)?;
+        __i18n_l!(
+            db,
+            user.id,
+            &ip,
+            &lang.0,
+            "nut.logs.user.authority.deny",
+            form
+        )?;
+        Ok(())
+    })?;
+    Ok(Json(()))
+}
 
-//         s.administrator(db)?;
+#[get("/users/<id>")]
+pub fn show(_user: Administrator, id: ID, db: Database) -> JsonResult<User> {
+    let db = db.deref();
+    let it = UserDao::by_id(db, id)?;
+    Ok(Json(it))
+}
 
-//         let user = UserDao::by_uid(db, &self.uid)?;
-//         db.transaction::<_, Error, _>(move || {
-//             PolicyDao::forbidden(db, &user.id)?;
-//             PolicyDao::apply(
-//                 db,
-//                 &user.id,
-//                 &self.authority.role.parse()?,
-//                 &self.authority.resource,
-//                 &self.authority.nbf,
-//                 &self.authority.exp,
-//             )?;
-//             Ok(())
-//         })?;
-//         Ok(None)
-//     }
-// }
-
-// #[derive(Validate)]
-// pub struct Show {
-//     #[validate(length(min = "1"))]
-//     pub uid: String,
-// }
-
-// impl Handler for Show {
-//     type Item = Info;
-//     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-//         let db = c.db.deref();
-
-//         s.administrator(db)?;
-//         let it = UserDao::by_uid(db, &self.uid)?;
-//         Ok(it.into())
-//     }
-// }
-
-// #[derive(Validate)]
-// pub struct Index;
-
-// impl Handler for Index {
-//     type Item = Vec<Info>;
-//     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-//         let db = c.db.deref();
-
-//         s.administrator(db)?;
-//         let items = UserDao::all(db)?.into_iter().map(|x| x.into()).collect();
-//         Ok(items)
-//     }
-// }
-
-// #[derive(GraphQLObject)]
-// pub struct Info {
-//     pub real_name: String,
-//     pub nick_name: String,
-//     pub email: String,
-//     pub logo: String,
-//     pub uid: String,
-//     pub provider_type: String,
-//     pub sign_in_count: I64,
-//     pub current_sign_in_at: Option<NaiveDateTime>,
-//     pub current_sign_in_ip: Option<String>,
-//     pub last_sign_in_at: Option<NaiveDateTime>,
-//     pub last_sign_in_ip: Option<String>,
-//     pub updated_at: NaiveDateTime,
-// }
-
-// impl From<User> for Info {
-//     fn from(it: User) -> Self {
-//         Self {
-//             real_name: it.real_name,
-//             nick_name: it.nick_name,
-//             logo: it.logo,
-//             email: it.email,
-//             uid: it.uid,
-//             provider_type: it.provider_type,
-//             sign_in_count: I64(it.sign_in_count),
-//             current_sign_in_at: it.current_sign_in_at,
-//             current_sign_in_ip: it.current_sign_in_ip,
-//             last_sign_in_at: it.last_sign_in_at,
-//             last_sign_in_ip: it.last_sign_in_ip,
-//             updated_at: it.updated_at,
-//         }
-//     }
-// }
-
-// #[derive(Validate)]
-// pub struct Current;
-
-// impl Handler for Current {
-//     type Item = Option<Info>;
-//     fn handle(&self, _: &Context, s: &Session) -> Result<Self::Item> {
-//         if let Some(ref v) = s.user {
-//             return Ok(Some((*v).clone().into()));
-//         }
-//         Ok(None)
-//     }
-// }
+#[get("/users")]
+pub fn index(_user: Administrator, db: Database) -> JsonResult<Vec<User>> {
+    let db = db.deref();
+    let items = UserDao::all(db)?;
+    Ok(Json(items))
+}
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -202,7 +158,7 @@ impl fmt::Display for Action {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Token {
     pub uid: String,
@@ -211,457 +167,408 @@ pub struct Token {
     pub exp: i64,
 }
 
-// #[derive(GraphQLInputObject, Validate)]
-// pub struct SignIn {
-//     #[validate(length(min = "1"))]
-//     pub login: String,
-//     #[validate(length(min = "1"))]
-//     pub password: String,
-// }
+#[derive(Deserialize, Validate)]
+pub struct SignIn {
+    #[validate(length(min = "1"))]
+    pub login: String,
+    #[validate(length(min = "1"))]
+    pub password: String,
+}
 
-// impl Handler for SignIn {
-//     type Item = String;
-//     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-//         let db = c.db.deref();
+#[post("/users/sign-in", data = "<form>")]
+pub fn sign_in(
+    db: Database,
+    lang: Locale,
+    jwt: State<Arc<Jwt>>,
+    remote: SocketAddr,
+    form: Json<SignIn>,
+) -> JsonResult<String> {
+    form.validate()?;
+    let ip = remote.ip().to_string();
+    let db = db.deref();
+    let user: Result<User> = match UserDao::by_email(db, &form.login) {
+        Ok(v) => Ok(v),
+        Err(_) => match UserDao::by_nick_name(db, &form.login) {
+            Ok(v) => Ok(v),
+            Err(_) => __i18n_e!(
+                db,
+                &lang.0,
+                "nut.errors.user.is-not-exist",
+                &json!({"login": form.login})
+            ),
+        },
+    };
+    let user = user?;
 
-//         let user: Result<User> = match UserDao::by_email(db, &self.login) {
-//             Ok(v) => Ok(v),
-//             Err(_) => match UserDao::by_nick_name(db, &self.login) {
-//                 Ok(v) => Ok(v),
-//                 Err(_) => __i18n_e!(
-//                     db,
-//                     &s.lang,
-//                     "nut.errors.user.is-not-exist",
-//                     &Some(json!({"login": self.login}))
-//                 ),
-//             },
-//         };
-//         let user = user?;
+    if let Err(e) = user.auth::<Crypto>(&form.password) {
+        __i18n_l!(db, user.id, &ip, &lang.0, "nut.logs.user.sign-in.failed")?;
+        return Err(e.into());
+    }
+    user.available()?;
 
-//         if let Err(e) = user.auth::<Crypto>(&self.password) {
-//             __i18n_l!(
-//                 db,
-//                 &user.id,
-//                 &s.client_ip,
-//                 &s.lang,
-//                 "nut.logs.user.sign-in.failed"
-//             )?;
-//             return Err(e.into());
-//         }
-//         user.available()?;
+    let uid = user.uid.clone();
+    db.transaction::<_, FailueError, _>(move || {
+        UserDao::sign_in(db, user.id, &ip)?;
+        __i18n_l!(db, user.id, &ip, &lang.0, "nut.logs.user.sign-in.success")?;
+        Ok(())
+    })?;
+    let (nbf, exp) = Jwt::timestamps(Duration::weeks(1));
+    let token = jwt.sum(
+        None,
+        &Token {
+            uid: uid,
+            act: Action::SignIn,
+            nbf: nbf,
+            exp: exp,
+        },
+    )?;
+    Ok(Json(token))
+}
 
-//         let uid = user.uid.clone();
-//         db.transaction::<_, Error, _>(move || {
-//             UserDao::sign_in(db, &user.id, &s.client_ip)?;
-//             __i18n_l!(
-//                 db,
-//                 &user.id,
-//                 &s.client_ip,
-//                 &s.lang,
-//                 "nut.logs.user.sign-in.success"
-//             )?;
-//             Ok(())
-//         })?;
-//         let (nbf, exp) = Jwt::timestamps(Duration::weeks(1));
-//         let token = c.jwt.sum(
-//             None,
-//             &Token {
-//                 uid: uid,
-//                 act: Action::SignIn,
-//                 nbf: nbf,
-//                 exp: exp,
-//             },
-//         )?;
-//         Ok(token)
-//     }
-// }
+#[derive(Deserialize, Validate)]
+pub struct SignUp {
+    #[validate(length(min = "1", max = "32"))]
+    pub real_name: String,
+    #[validate(length(min = "1", max = "32"))]
+    pub nick_name: String,
+    #[validate(email, length(min = "2", max = "64"))]
+    pub email: String,
+    #[validate(length(min = "6", max = "32"))]
+    pub password: String,
+    #[validate(length(min = "1"))]
+    pub home: String,
+}
 
-// #[derive(GraphQLInputObject, Validate)]
-// pub struct SignUp {
-//     #[validate(length(min = "1", max = "32"))]
-//     pub real_name: String,
-//     #[validate(length(min = "1", max = "32"))]
-//     pub nick_name: String,
-//     #[validate(email, length(min = "2", max = "64"))]
-//     pub email: String,
-//     #[validate(length(min = "6", max = "32"))]
-//     pub password: String,
-//     #[validate(length(min = "1"))]
-//     pub home: String,
-// }
+#[post("/users/sign-up", data = "<form>")]
+pub fn sign_up(
+    db: Database,
+    lang: Locale,
+    jwt: State<Arc<Jwt>>,
+    queue: State<Arc<RabbitMQ>>,
+    remote: SocketAddr,
+    form: Json<SignUp>,
+) -> JsonResult<()> {
+    form.validate()?;
+    let ip = remote.ip().to_string();
+    let db = db.deref();
+    let jwt = jwt.deref();
+    let queue = queue.deref();
 
-// impl Handler for SignUp {
-//     type Item = Option<String>;
-//     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-//         let db = c.db.deref();
+    if let Ok(_) = UserDao::by_email(db, &form.email) {
+        return __i18n_e!(
+            db,
+            &lang.0,
+            "nut.errors.already-exist.email",
+            &json!({"email": form.email})
+        );
+    }
+    if let Ok(_) = UserDao::by_nick_name(db, &form.nick_name) {
+        return __i18n_e!(
+            db,
+            &lang.0,
+            "nut.errors.already-exist.nick-name",
+            &json!({"name": &form.nick_name})
+        );
+    }
 
-//         if let Ok(_) = UserDao::by_email(db, &self.email) {
-//             return __i18n_e!(
-//                 db,
-//                 &s.lang,
-//                 "nut.errors.already-exist.email",
-//                 &Some(json!({"email": self.email}))
-//             );
-//         }
-//         if let Ok(_) = UserDao::by_nick_name(db, &self.nick_name) {
-//             return __i18n_e!(
-//                 db,
-//                 &s.lang,
-//                 "nut.errors.already-exist.nick-name",
-//                 &Some(json!({"name": &self.nick_name}))
-//             );
-//         }
+    let lng = lang.0.clone();
+    let home = form.home.clone();
+    let user = db.transaction::<_, FailueError, _>(move || {
+        UserDao::sign_up::<Crypto>(
+            db,
+            &form.real_name,
+            &form.nick_name,
+            &form.email,
+            &form.password,
+        )?;
+        let it = UserDao::by_email(db, &form.email)?;
+        __i18n_l!(db, it.id, &ip, &lang.0, "nut.logs.user.sign-up")?;
+        Ok(it)
+    })?;
 
-//         let user = db.transaction::<_, Error, _>(move || {
-//             UserDao::sign_up::<Crypto>(
-//                 db,
-//                 &self.real_name,
-//                 &self.nick_name,
-//                 &self.email,
-//                 &self.password,
-//             )?;
-//             let it = UserDao::by_email(db, &self.email)?;
-//             __i18n_l!(db, &it.id, &s.client_ip, &s.lang, "nut.logs.user.sign-up")?;
-//             Ok(it)
-//         })?;
+    send_email(db, &lng, jwt, queue, &user, &Action::Confirm, &home)?;
+    Ok(Json(()))
+}
 
-//         send_email(
-//             db,
-//             &s.lang,
-//             &c.jwt,
-//             &c.queue,
-//             &user,
-//             &Action::Confirm,
-//             &self.home,
-//         )?;
-//         Ok(None)
-//     }
-// }
+#[derive(Deserialize, Validate)]
+pub struct Email {
+    #[validate(email)]
+    pub email: String,
+    #[validate(length(min = "1"))]
+    pub home: String,
+}
 
-// #[derive(GraphQLInputObject, Validate)]
-// pub struct Confirm {
-//     #[validate(email)]
-//     pub email: String,
-//     #[validate(length(min = "1"))]
-//     pub home: String,
-// }
+#[post("/users/confirm", data = "<form>")]
+pub fn confirm(
+    db: Database,
+    lang: Locale,
+    jwt: State<Arc<Jwt>>,
+    queue: State<Arc<RabbitMQ>>,
+    form: Json<Email>,
+) -> JsonResult<()> {
+    form.validate()?;
+    let db = db.deref();
+    let queue = queue.deref();
+    let jwt = jwt.deref();
 
-// impl Handler for Confirm {
-//     type Item = Option<String>;
-//     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-//         let db = c.db.deref();
+    let it = UserDao::by_email(db, &form.email)?;
+    if let Some(_) = it.confirmed_at {
+        return __i18n_e!(db, &lang.0, "nut.errors.user.already-confirm");
+    }
+    send_email(db, &lang.0, &jwt, &queue, &it, &Action::Confirm, &form.home)?;
+    Ok(Json(()))
+}
 
-//         let it = UserDao::by_email(db, &self.email)?;
-//         if let Some(_) = it.confirmed_at {
-//             return __i18n_e!(db, &s.lang, "nut.errors.user.already-confirm");
-//         }
-//         send_email(
-//             db,
-//             &s.lang,
-//             &c.jwt,
-//             &c.queue,
-//             &it,
-//             &Action::Confirm,
-//             &self.home,
-//         )?;
-//         Ok(None)
-//     }
-// }
+#[patch("/users/confirm/<token>")]
+pub fn confirm_token(
+    db: Database,
+    remote: SocketAddr,
+    lang: Locale,
+    token: String,
+    jwt: State<Arc<Jwt>>,
+) -> JsonResult<()> {
+    let db = db.deref();
+    let jwt = jwt.deref();
+    let ip = remote.ip().to_string();
 
-// #[derive(GraphQLInputObject, Validate)]
-// pub struct ConfirmToken {
-//     #[validate(length(min = "1"))]
-//     pub token: String,
-// }
+    let token = jwt.parse::<Token>(&token)?.claims;
+    if token.act != Action::Confirm {
+        return __i18n_e!(db, &lang.0, "flashes.bad-action");
+    }
 
-// impl Handler for ConfirmToken {
-//     type Item = Option<String>;
-//     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-//         let db = c.db.deref();
+    let it = UserDao::by_uid(db, &token.uid)?;
+    if let Some(_) = it.confirmed_at {
+        return __i18n_e!(db, &lang.0, "nut.errors.user.already-confirm");
+    }
 
-//         let token = c.jwt.parse::<Token>(&self.token)?.claims;
-//         if token.act != Action::Confirm {
-//             return __i18n_e!(db, &s.lang, "flashes.bad-action");
-//         }
+    db.transaction::<_, FailueError, _>(move || {
+        UserDao::confirm(db, it.id)?;
+        __i18n_l!(db, it.id, &ip, &lang.0, "nut.logs.user.confirm")?;
+        Ok(())
+    })?;
+    Ok(Json(()))
+}
 
-//         let it = UserDao::by_uid(db, &token.uid)?;
-//         if let Some(_) = it.confirmed_at {
-//             return __i18n_e!(db, &s.lang, "nut.errors.user.already-confirm");
-//         }
+#[post("/users/unlock", data = "<form>")]
+pub fn unlock(
+    db: Database,
+    lang: Locale,
+    jwt: State<Arc<Jwt>>,
+    queue: State<Arc<RabbitMQ>>,
+    form: Json<Email>,
+) -> JsonResult<()> {
+    form.validate()?;
+    let db = db.deref();
+    let queue = queue.deref();
+    let jwt = jwt.deref();
 
-//         db.transaction::<_, Error, _>(move || {
-//             UserDao::confirm(db, &it.id)?;
-//             __i18n_l!(db, &it.id, &s.client_ip, &s.lang, "nut.logs.user.confirm")?;
-//             Ok(())
-//         })?;
-//         Ok(None)
-//     }
-// }
+    let it = UserDao::by_email(db, &form.email)?;
+    if None == it.locked_at {
+        return __i18n_e!(db, &lang.0, "nut.errors.user.is-not-lock");
+    }
+    send_email(&db, &lang.0, jwt, queue, &it, &Action::Unlock, &form.home)?;
+    Ok(Json(()))
+}
 
-// #[derive(GraphQLInputObject, Validate)]
-// pub struct Unlock {
-//     #[validate(email)]
-//     pub email: String,
-//     #[validate(length(min = "1"))]
-//     pub home: String,
-// }
+#[patch("/users/unlock/<token>")]
+pub fn unlock_token(
+    db: Database,
+    remote: SocketAddr,
+    lang: Locale,
+    token: String,
+    jwt: State<Arc<Jwt>>,
+) -> JsonResult<()> {
+    let db = db.deref();
+    let jwt = jwt.deref();
+    let ip = remote.ip().to_string();
 
-// impl Handler for Unlock {
-//     type Item = Option<String>;
-//     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-//         let db = c.db.deref();
+    let token = jwt.parse::<Token>(&token)?.claims;
+    if token.act != Action::Unlock {
+        return __i18n_e!(db, &lang.0, "flashes.bad-action");
+    }
 
-//         let it = UserDao::by_email(db, &self.email)?;
-//         if None == it.locked_at {
-//             return __i18n_e!(db, &s.lang, "nut.errors.user.is-not-lock");
-//         }
-//         send_email(
-//             &db,
-//             &s.lang,
-//             &c.jwt,
-//             &c.queue,
-//             &it,
-//             &Action::Unlock,
-//             &self.home,
-//         )?;
-//         Ok(None)
-//     }
-// }
+    let it = UserDao::by_uid(db, &token.uid)?;
+    if None == it.locked_at {
+        return __i18n_e!(db, &lang.0, "nut.errors.user.is-not-lock");
+    }
+    db.transaction::<_, FailueError, _>(move || {
+        UserDao::unlock(db, it.id)?;
+        __i18n_l!(db, it.id, &ip, &lang.0, "nut.logs.user.unlock")?;
+        Ok(())
+    })?;
 
-// #[derive(GraphQLInputObject, Validate)]
-// pub struct UnlockToken {
-//     #[validate(length(min = "1"))]
-//     pub token: String,
-// }
+    Ok(Json(()))
+}
 
-// impl Handler for UnlockToken {
-//     type Item = Option<String>;
-//     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-//         let db = c.db.deref();
+#[post("/users/forgot-password", data = "<form>")]
+pub fn forgot_password(
+    db: Database,
+    lang: Locale,
+    jwt: State<Arc<Jwt>>,
+    queue: State<Arc<RabbitMQ>>,
+    form: Json<Email>,
+) -> JsonResult<()> {
+    form.validate()?;
+    let db = db.deref();
+    let queue = queue.deref();
+    let jwt = jwt.deref();
 
-//         let token = c.jwt.parse::<Token>(&self.token)?.claims;
-//         if token.act != Action::Unlock {
-//             return __i18n_e!(db, &s.lang, "flashes.bad-action");
-//         }
+    let it = UserDao::by_email(db, &form.email)?;
+    send_email(
+        db,
+        &lang.0,
+        &jwt,
+        &queue,
+        &it,
+        &Action::ResetPassword,
+        &form.home,
+    )?;
+    Ok(Json(()))
+}
 
-//         let it = UserDao::by_uid(db, &token.uid)?;
-//         if None == it.locked_at {
-//             return __i18n_e!(db, &s.lang, "nut.errors.user.is-not-lock");
-//         }
-//         db.transaction::<_, Error, _>(move || {
-//             UserDao::unlock(db, &it.id)?;
-//             __i18n_l!(db, &it.id, &s.client_ip, &s.lang, "nut.logs.user.unlock")?;
-//             Ok(())
-//         })?;
+#[derive(Deserialize, Validate)]
+pub struct ResetPassword {
+    #[validate(length(min = "1"))]
+    pub token: String,
+    #[validate(length(min = "6", max = "32"))]
+    pub password: String,
+}
 
-//         Ok(None)
-//     }
-// }
+#[post("/users/reset-password", data = "<form>")]
+pub fn reset_password(
+    db: Database,
+    lang: Locale,
+    jwt: State<Arc<Jwt>>,
+    remote: SocketAddr,
+    form: Json<ResetPassword>,
+) -> JsonResult<()> {
+    form.validate()?;
+    let db = db.deref();
+    let jwt = jwt.deref();
+    let ip = remote.ip().to_string();
 
-// #[derive(GraphQLInputObject, Validate)]
-// pub struct ForgotPassword {
-//     #[validate(email)]
-//     pub email: String,
-//     #[validate(length(min = "1"))]
-//     pub home: String,
-// }
+    let token = jwt.parse::<Token>(&form.token)?.claims;
+    if token.act != Action::ResetPassword {
+        return __i18n_e!(db, &lang.0, "flashes.bad-action");
+    }
 
-// impl Handler for ForgotPassword {
-//     type Item = Option<String>;
-//     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-//         let db = c.db.deref();
+    let it = UserDao::by_uid(db, &token.uid)?;
 
-//         let it = UserDao::by_email(db, &self.email)?;
-//         send_email(
-//             db,
-//             &s.lang,
-//             &c.jwt,
-//             &c.queue,
-//             &it,
-//             &Action::ResetPassword,
-//             &self.home,
-//         )?;
-//         Ok(None)
-//     }
-// }
+    UserDao::password::<Crypto>(db, it.id, &form.password)?;
+    __i18n_l!(db, it.id, &ip, &lang.0, "nut.logs.user.reset-password")?;
+    Ok(Json(()))
+}
 
-// #[derive(GraphQLInputObject, Validate)]
-// pub struct ResetPassword {
-//     #[validate(length(min = "1"))]
-//     pub token: String,
-//     #[validate(length(min = "6", max = "32"))]
-//     pub password: String,
-// }
+#[get("/users/logs?<limit>")]
+pub fn logs(db: Database, limit: i64, user: User) -> JsonResult<Vec<Log>> {
+    let db = db.deref();
+    let items = LogDao::all(db, user.id, limit)?;
+    Ok(Json(items))
+}
 
-// impl Handler for ResetPassword {
-//     type Item = Option<String>;
-//     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-//         let db = c.db.deref();
+#[get("/users/profile")]
+pub fn get_profile(user: User) -> JsonResult<User> {
+    Ok(Json(user))
+}
 
-//         let token = c.jwt.parse::<Token>(&self.token)?.claims;
-//         if token.act != Action::ResetPassword {
-//             return __i18n_e!(db, &s.lang, "flashes.bad-action");
-//         }
+#[derive(Deserialize, Validate)]
+pub struct Profile {
+    #[validate(email, length(min = "2", max = "64"))]
+    pub email: String,
+    #[validate(length(min = "2", max = "32"))]
+    pub nick_name: String,
+    #[validate(length(min = "2", max = "32"))]
+    pub real_name: String,
+    #[validate(length(min = "1"))]
+    pub logo: String,
+}
 
-//         let db = c.db.deref();
-//         let it = UserDao::by_uid(db, &token.uid)?;
+#[post("/users/profile", data = "<form>")]
+pub fn set_profile(db: Database, user: User, form: Json<Profile>) -> JsonResult<()> {
+    form.validate()?;
+    let db = db.deref();
+    UserDao::set_profile(db, user.id, &form.real_name, &form.logo)?;
+    Ok(Json(()))
+}
 
-//         UserDao::password::<Crypto>(db, &it.id, &self.password)?;
-//         __i18n_l!(
-//             db,
-//             &it.id,
-//             &s.client_ip,
-//             &s.lang,
-//             "nut.logs.user.reset-password"
-//         )?;
-//         Ok(None)
-//     }
-// }
+#[derive(Deserialize, Validate)]
+pub struct ChangePassword {
+    #[validate(length(min = "1"))]
+    pub current_password: String,
+    #[validate(length(min = "6", max = "32"))]
+    pub new_password: String,
+}
 
-// #[derive(GraphQLObject)]
-// pub struct Log {
-//     pub id: I64,
-//     pub ip: String,
-//     pub message: String,
-//     pub created_at: NaiveDateTime,
-// }
+#[post("/users/change-password", data = "<form>")]
+pub fn change_password(
+    db: Database,
+    lang: Locale,
+    remote: SocketAddr,
+    user: User,
+    form: Json<ChangePassword>,
+) -> JsonResult<()> {
+    form.validate()?;
+    let db = db.deref();
+    let ip = remote.ip().to_string();
 
-// #[derive(Validate)]
-// pub struct Logs {
-//     #[validate(range(min = "1", max = "10240"))]
-//     pub limit: i64,
-// }
+    user.auth::<Crypto>(&form.current_password)?;
+    db.transaction::<_, FailueError, _>(move || {
+        UserDao::password::<Crypto>(db, user.id, &form.new_password)?;
+        __i18n_l!(db, user.id, &ip, &lang.0, "nut.logs.user.change-password")?;
+        Ok(())
+    })?;
 
-// impl Handler for Logs {
-//     type Item = Vec<Log>;
-//     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-//         let db = c.db.deref();
-//         let user = s.current_user()?;
-//         let items = LogDao::all(db, &user.id, self.limit)?
-//             .into_iter()
-//             .map(|it| Log {
-//                 id: I64(it.id),
-//                 ip: it.ip,
-//                 message: it.message,
-//                 created_at: it.created_at,
-//             })
-//             .collect();
-//         Ok(items)
-//     }
-// }
+    Ok(Json(()))
+}
 
-// #[derive(GraphQLInputObject, Validate)]
-// pub struct Profile {
-//     #[validate(email, length(min = "2", max = "64"))]
-//     pub email: String,
-//     #[validate(length(min = "2", max = "32"))]
-//     pub nick_name: String,
-//     #[validate(length(min = "2", max = "32"))]
-//     pub real_name: String,
-//     #[validate(length(min = "1"))]
-//     pub logo: String,
-// }
+#[delete("/users/sign-out")]
+pub fn sign_out(db: Database, lang: Locale, remote: SocketAddr, user: User) -> JsonResult<()> {
+    let db = db.deref();
 
-// impl Handler for Profile {
-//     type Item = Option<String>;
-//     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-//         let db = c.db.deref();
-//         let user = s.current_user()?;
-//         UserDao::set_profile(db, &user.id, &self.real_name, &self.logo)?;
-//         Ok(None)
-//     }
-// }
+    let ip = remote.ip().to_string();
+    __i18n_l!(db, user.id, &ip, &lang.0, "nut.logs.user.sign-out")?;
 
-// #[derive(GraphQLInputObject, Validate)]
-// pub struct ChangePassword {
-//     #[validate(length(min = "1"))]
-//     pub current_password: String,
-//     #[validate(length(min = "6", max = "32"))]
-//     pub new_password: String,
-// }
+    Ok(Json(()))
+}
 
-// impl Handler for ChangePassword {
-//     type Item = Option<String>;
-//     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-//         let db = c.db.deref();
-//         let user = s.current_user()?;
+fn send_email(
+    db: &Db,
+    lang: &String,
+    jwt: &Jwt,
+    queue: &RabbitMQ,
+    user: &User,
+    act: &Action,
+    home: &String,
+) -> Result<()> {
+    let expire = 1;
+    let (nbf, exp) = Jwt::timestamps(Duration::hours(expire));
+    let token = jwt.sum(
+        None,
+        &Token {
+            uid: user.uid.clone(),
+            act: act.clone(),
+            nbf: nbf,
+            exp: exp,
+        },
+    )?;
 
-//         user.auth::<Crypto>(&self.current_password)?;
-//         db.transaction::<_, Error, _>(move || {
-//             UserDao::password::<Crypto>(db, &user.id, &self.new_password)?;
-//             __i18n_l!(
-//                 db,
-//                 &user.id,
-//                 &s.client_ip,
-//                 &s.lang,
-//                 "nut.logs.user.change-password"
-//             )?;
-//             Ok(())
-//         })?;
+    let args =
+        Some(json!({ "name": user.real_name, "home": home, "expire":expire, "token":token }));
+    let subject = I18n::t(db, lang, format!("nut.mailer.users.{}.subject", act), &args);
+    let body = I18n::t(db, lang, format!("nut.mailer.users.{}.body", act), &args);
 
-//         Ok(None)
-//     }
-// }
-
-// #[derive(Validate)]
-// pub struct SignOut {}
-
-// impl Handler for SignOut {
-//     type Item = Option<String>;
-//     fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-//         let db = c.db.deref();
-//         let user = s.current_user()?;
-
-//         __i18n_l!(
-//             db,
-//             &user.id,
-//             &s.client_ip,
-//             &s.lang,
-//             "nut.logs.user.sign-out"
-//         )?;
-
-//         Ok(None)
-//     }
-// }
-
-// fn send_email(
-//     db: &Db,
-//     lang: &String,
-//     jwt: &Jwt,
-//     queue: &RabbitMQ,
-//     user: &User,
-//     act: &Action,
-//     home: &String,
-// ) -> Result<()> {
-//     let expire = 1;
-//     let (nbf, exp) = Jwt::timestamps(Duration::hours(expire));
-//     let token = jwt.sum(
-//         None,
-//         &Token {
-//             uid: user.uid.clone(),
-//             act: act.clone(),
-//             nbf: nbf,
-//             exp: exp,
-//         },
-//     )?;
-
-//     let args =
-//         Some(json!({ "name": user.real_name, "home": home, "expire":expire, "token":token }));
-//     let subject = I18n::t(db, lang, format!("nut.mailer.users.{}.subject", act), &args);
-//     let body = I18n::t(db, lang, format!("nut.mailer.users.{}.body", act), &args);
-
-//     queue.publish(
-//         send_email::NAME.to_string(),
-//         Uuid::new_v4().to_string(),
-//         send_email::Task {
-//             email: user.email.clone(),
-//             name: user.real_name.clone(),
-//             subject: subject,
-//             body: body,
-//         },
-//     )?;
-//     Ok(())
-// }
+    queue.publish(
+        send_email::NAME.to_string(),
+        Uuid::new_v4().to_string(),
+        send_email::Task {
+            email: user.email.clone(),
+            name: user.real_name.clone(),
+            subject: subject,
+            body: body,
+        },
+    )?;
+    Ok(())
+}
 
 impl<'a, 'r> FromRequest<'a, 'r> for User {
     type Error = ();
@@ -683,5 +590,22 @@ impl<'a, 'r> FromRequest<'a, 'r> for User {
         }
 
         Outcome::Failure((Status::NonAuthoritativeInformation, ()))
+    }
+}
+
+pub struct Administrator(pub User);
+
+impl<'a, 'r> FromRequest<'a, 'r> for Administrator {
+    type Error = ();
+
+    fn from_request(req: &'a Request<'r>) -> request::Outcome<Self, Self::Error> {
+        let user = req.guard::<User>()?;
+        let Database(db) = req.guard::<Database>()?;
+        let db = db.deref();
+        if PolicyDao::is(db, user.id, &Role::Admin) {
+            return Outcome::Success(Self(user));
+        }
+
+        Outcome::Failure((Status::Forbidden, ()))
     }
 }

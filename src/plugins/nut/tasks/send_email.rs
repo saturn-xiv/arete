@@ -6,21 +6,14 @@ use std::time::Duration;
 use lettre::{smtp::authentication::Credentials, SmtpClient, Transport};
 use lettre_email::{Email, EmailBuilder};
 use serde_json;
-use uuid::Uuid;
 use validator::Validate;
 
 use super::super::super::super::{
-    crypto::Crypto,
-    errors::Result,
-    graphql::{context::Context, session::Session, Handler},
-    orm::Pool as Db,
-    queue::Handler as QueueHandler,
-    queue::Queue,
+    crypto::Crypto, errors::Result, orm::Pool as Db, queue::Handler as QueueHandler,
     settings::Dao as SettingsDao,
 };
-use super::super::models::user::Dao as UserDao;
 
-#[derive(Debug, GraphQLInputObject, Validate, Serialize, Deserialize)]
+#[derive(Validate, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Config {
     #[validate(length(min = "1"))]
@@ -42,59 +35,7 @@ impl Default for Config {
 }
 
 impl Config {
-    const KEY: &'static str = "site.smtp";
-}
-
-#[derive(Validate)]
-pub struct Get {}
-
-impl Handler for Get {
-    type Item = Config;
-    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        let enc = c.encryptor.deref();
-        s.administrator(db)?;
-
-        let it: Config = match SettingsDao::get(db, enc, &Config::KEY.to_string()) {
-            Ok(v) => v,
-            Err(_) => Config::default(),
-        };
-        Ok(it)
-    }
-}
-
-impl Handler for Config {
-    type Item = Option<String>;
-    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        let enc = c.encryptor.deref();
-        s.administrator(db)?;
-        SettingsDao::set::<String, Config, Crypto>(db, enc, &Self::KEY.to_string(), &self, true)?;
-        Ok(None)
-    }
-}
-
-#[derive(Validate)]
-pub struct Test {}
-
-impl Handler for Test {
-    type Item = Option<String>;
-    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        let user = s.administrator(db)?;
-        let user = UserDao::by_id(db, user.id)?;
-        c.queue.publish(
-            NAME.to_string(),
-            Uuid::new_v4().to_string(),
-            Task {
-                email: user.email.clone(),
-                name: user.real_name.clone(),
-                subject: format!("Hi, {}", user.real_name),
-                body: "This is a test email.".to_string(),
-            },
-        )?;
-        Ok(None)
-    }
+    pub const KEY: &'static str = "site.smtp";
 }
 
 #[cfg(debug_assertions)]

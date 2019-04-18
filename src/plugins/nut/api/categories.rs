@@ -1,152 +1,80 @@
 use std::ops::Deref;
 
-use chrono::NaiveDateTime;
-use diesel::prelude::*;
+use diesel::Connection as DieselConnection;
 use failure::Error;
+use rocket_contrib::json::Json;
 use validator::Validate;
 
 use super::super::super::super::{
-    errors::Result,
-    graphql::{context::Context, session::Session, Handler, I16, I64},
+    errors::JsonResult,
+    orm::{Database, ID},
 };
-use super::super::models::category::{Dao as CategoryDao, Item};
+use super::super::models::category::{Dao as CategoryDao, Item as Category};
+use super::users::Administrator;
 
-#[derive(GraphQLInputObject, Validate)]
-pub struct Create {
+#[derive(Deserialize, Validate)]
+pub struct Form {
     #[validate(length(min = "1"))]
     pub name: String,
     #[validate(length(min = "1"))]
     pub icon: String,
     #[validate(length(min = "1"))]
     pub color: String,
-    pub position: I16,
-    pub parent: Option<I64>,
+    pub position: i16,
+    pub parent: Option<i64>,
 }
 
-impl Handler for Create {
-    type Item = Option<String>;
-    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        s.administrator(db)?;
-        CategoryDao::create(
-            db,
-            &match self.parent {
-                Some(ref v) => Some(v.0),
-                None => None,
-            },
-            &self.name,
-            &self.icon,
-            &self.color,
-            self.position.0,
-        )?;
-        Ok(None)
-    }
-}
-#[derive(GraphQLInputObject, Validate)]
-pub struct Update {
-    pub id: I64,
-    #[validate(length(min = "1"))]
-    pub name: String,
-    #[validate(length(min = "1"))]
-    pub icon: String,
-    #[validate(length(min = "1"))]
-    pub color: String,
-    pub position: I16,
-    pub parent: Option<I64>,
+#[post("/categories", data = "<form>")]
+pub fn create(_user: Administrator, db: Database, form: Json<Form>) -> JsonResult<()> {
+    form.validate()?;
+    let db = db.deref();
+    CategoryDao::create(
+        db,
+        form.parent,
+        &form.name,
+        &form.icon,
+        &form.color,
+        form.position,
+    )?;
+    Ok(Json(()))
 }
 
-impl Handler for Update {
-    type Item = Option<String>;
-    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        s.administrator(db)?;
-        CategoryDao::update(
-            db,
-            &self.id.0,
-            &match self.parent {
-                Some(ref v) => Some(v.0),
-                None => None,
-            },
-            &self.name,
-            &self.icon,
-            &self.color,
-            self.position.0,
-        )?;
-        Ok(None)
-    }
+#[post("/categories/<id>", data = "<form>")]
+pub fn update(_user: Administrator, id: ID, db: Database, form: Json<Form>) -> JsonResult<()> {
+    form.validate()?;
+    let db = db.deref();
+    CategoryDao::update(
+        db,
+        id,
+        form.parent,
+        &form.name,
+        &form.icon,
+        &form.color,
+        form.position,
+    )?;
+    Ok(Json(()))
 }
 
-#[derive(GraphQLObject)]
-pub struct Category {
-    pub id: I64,
-    pub parent: Option<I64>,
-    pub name: String,
-    pub icon: String,
-    pub color: String,
-    pub position: I16,
-    pub updated_at: NaiveDateTime,
+#[get("/categories/<id>")]
+pub fn show(id: ID, _user: Administrator, db: Database) -> JsonResult<Category> {
+    let db = db.deref();
+    let it = CategoryDao::by_id(db, id)?;
+    Ok(Json(it))
 }
 
-impl From<Item> for Category {
-    fn from(it: Item) -> Self {
-        Self {
-            id: I64(it.id),
-            name: it.name,
-            icon: it.icon,
-            color: it.color,
-            parent: match it.parent_id {
-                Some(v) => Some(I64(v)),
-                None => None,
-            },
-            position: I16(it.position),
-            updated_at: it.updated_at,
-        }
-    }
+#[get("/categories")]
+pub fn index(db: Database) -> JsonResult<Vec<Category>> {
+    let db = db.deref();
+    let items = CategoryDao::all(db)?;
+    Ok(Json(items))
 }
 
-#[derive(Validate)]
-pub struct Show {
-    pub id: i64,
-}
-
-impl Handler for Show {
-    type Item = Category;
-    fn handle(&self, c: &Context, _s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        let it = CategoryDao::by_id(db, &self.id)?;
-        Ok(it.into())
-    }
-}
-
-#[derive(Validate)]
-pub struct Index {}
-
-impl Handler for Index {
-    type Item = Vec<Category>;
-    fn handle(&self, c: &Context, _s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        let items = CategoryDao::all(db)?
-            .into_iter()
-            .map(|x| x.into())
-            .collect();
-        Ok(items)
-    }
-}
-
-#[derive(Validate)]
-pub struct Destroy {
-    pub id: i64,
-}
-
-impl Handler for Destroy {
-    type Item = Option<String>;
-    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        s.administrator(db)?;
-        db.transaction::<_, Error, _>(|| {
-            CategoryDao::delete(db, &self.id)?;
-            Ok(())
-        })?;
-        Ok(None)
-    }
+#[delete("/categories/<id>")]
+pub fn destroy(_user: Administrator, id: ID, db: Database) -> JsonResult<()> {
+    let db = db.deref();
+    db.transaction::<_, Error, _>(|| {
+        CategoryDao::delete(db, id)?;
+        Ok(())
+    })?;
+    Ok(Json(()))
 }

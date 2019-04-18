@@ -7,7 +7,6 @@ use super::super::super::{
     crypto::Crypto,
     env::{self, Config},
     errors::Result,
-    graphql,
     jwt::Jwt,
     orm::Database,
     plugins::nut,
@@ -47,7 +46,6 @@ pub fn launch(cfg: Config) -> Result<()> {
     }
 
     let err = super::rocket(cfg.rocket()?)
-        .manage(graphql::new())
         .manage(jwt)
         .manage(qu)
         .manage(enc)

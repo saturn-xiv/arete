@@ -29,8 +29,8 @@ pub trait Dao {
         label: &String,
         href: &String,
         loc: &String,
-        x: &i16,
-        y: &i16,
+        x: i16,
+        y: i16,
     ) -> Result<()>;
     fn update(
         &self,
@@ -39,8 +39,8 @@ pub trait Dao {
         label: &String,
         href: &String,
         loc: &String,
-        x: &i16,
-        y: &i16,
+        x: i16,
+        y: i16,
     ) -> Result<()>;
     fn all(&self) -> Result<Vec<Item>>;
     fn delete(&self, id: ID) -> Result<()>;
@@ -59,8 +59,8 @@ impl Dao for Connection {
         label: &String,
         href: &String,
         loc: &String,
-        x: &i16,
-        y: &i16,
+        x: i16,
+        y: i16,
     ) -> Result<()> {
         let now = Utc::now().naive_utc();
         insert_into(links::dsl::links)
@@ -84,8 +84,8 @@ impl Dao for Connection {
         label: &String,
         href: &String,
         loc: &String,
-        x: &i16,
-        y: &i16,
+        x: i16,
+        y: i16,
     ) -> Result<()> {
         let now = Utc::now().naive_utc();
         update(links::dsl::links.filter(links::dsl::id.eq(id)))

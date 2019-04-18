@@ -1,6 +1,5 @@
 use std::ops::Deref;
 
-use chrono::NaiveDateTime;
 use diesel::Connection as DieselConnection;
 use failure::Error as FailueError;
 use rocket::http::Status;
@@ -11,9 +10,12 @@ use super::super::super::super::{
     errors::{Error, JsonResult, Result},
     orm::{Connection, Database, ID},
 };
-use super::super::super::nut::models::{
-    policy::{Dao as PolicyDao, Role},
-    user::Item as User,
+use super::super::super::nut::{
+    api::users::Administrator,
+    models::{
+        policy::{Dao as PolicyDao, Role},
+        user::Item as User,
+    },
 };
 use super::super::models::post::{Dao as PostDao, Item as Post};
 
@@ -29,6 +31,7 @@ pub struct Form {
 
 #[post("/posts", data = "<form>")]
 pub fn create(user: User, db: Database, form: Json<Form>) -> JsonResult<()> {
+    form.validate()?;
     let db = db.deref();
     db.transaction::<_, FailueError, _>(|| {
         PostDao::add(
@@ -45,6 +48,7 @@ pub fn create(user: User, db: Database, form: Json<Form>) -> JsonResult<()> {
 
 #[post("/posts/<id>", data = "<form>")]
 pub fn update(user: User, id: ID, db: Database, form: Json<Form>) -> JsonResult<()> {
+    form.validate()?;
     let db = db.deref();
     can_edit(db, user.id, id)?;
     db.transaction::<_, FailueError, _>(|| {
@@ -61,14 +65,17 @@ pub fn show(id: ID, db: Database) -> JsonResult<Post> {
     Ok(Json(it))
 }
 
-#[get("/posts")]
-pub fn index(user: User, db: Database) -> JsonResult<Vec<Post>> {
+#[get("/posts", rank = 1)]
+pub fn index_by_administrator(_user: Administrator, db: Database) -> JsonResult<Vec<Post>> {
     let db = db.deref();
-    let items = if PolicyDao::is(db, user.id, &Role::Admin) {
-        PostDao::latest(db)?
-    } else {
-        PostDao::by_user(db, user.id)?
-    };
+    let items = PostDao::latest(db)?;
+    Ok(Json(items))
+}
+
+#[get("/posts", rank = 2)]
+pub fn index_by_owner(user: User, db: Database) -> JsonResult<Vec<Post>> {
+    let db = db.deref();
+    let items = PostDao::by_user(db, user.id)?;
     Ok(Json(items))
 }
 

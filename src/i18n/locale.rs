@@ -36,11 +36,11 @@ pub trait Dao {
     fn count(&self, lang: &String) -> Result<i64>;
     fn all(&self) -> Result<Vec<Item>>;
     fn by_lang(&self, lang: &String) -> Result<Vec<Item>>;
-    fn by_id(&self, id: &i64) -> Result<Item>;
+    fn by_id(&self, id: i64) -> Result<Item>;
     fn by_lang_and_code(&self, lang: &String, code: &String) -> Result<Item>;
-    fn delete(&self, id: &i64) -> Result<()>;
+    fn delete(&self, id: i64) -> Result<()>;
     fn create(&self, lang: &String, code: &String, message: &String) -> Result<()>;
-    fn update(&self, id: &i64, code: &String, message: &String) -> Result<()>;
+    fn update(&self, id: i64, code: &String, message: &String) -> Result<()>;
 }
 
 fn loop_yaml(
@@ -151,7 +151,7 @@ impl Dao for Connection {
             .load::<Item>(self)?;
         Ok(items)
     }
-    fn by_id(&self, id: &i64) -> Result<Item> {
+    fn by_id(&self, id: i64) -> Result<Item> {
         let it = locales::dsl::locales
             .filter(locales::dsl::id.eq(id))
             .first::<Item>(self)?;
@@ -164,7 +164,7 @@ impl Dao for Connection {
             .first::<Item>(self)?;
         Ok(it)
     }
-    fn update(&self, id: &i64, code: &String, message: &String) -> Result<()> {
+    fn update(&self, id: i64, code: &String, message: &String) -> Result<()> {
         let now = Utc::now().naive_utc();
         let it = locales::dsl::locales.filter(locales::dsl::id.eq(id));
         update(it)
@@ -188,7 +188,7 @@ impl Dao for Connection {
             .execute(self)?;
         Ok(())
     }
-    fn delete(&self, id: &i64) -> Result<()> {
+    fn delete(&self, id: i64) -> Result<()> {
         delete(locales::dsl::locales.filter(locales::dsl::id.eq(id))).execute(self)?;
         Ok(())
     }

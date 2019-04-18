@@ -1,18 +1,19 @@
 use std::ops::Deref;
 
-use chrono::NaiveDateTime;
-use diesel::prelude::*;
+use diesel::Connection as DieselConnection;
 use failure::Error;
+use rocket_contrib::json::Json;
 use validator::Validate;
 
 use super::super::super::super::{
-    errors::Result,
-    graphql::{context::Context, session::Session, Handler, I64},
+    errors::JsonResult,
+    orm::{Database, ID},
 };
-use super::super::models::tag::{Dao as TagDao, Item};
+use super::super::models::tag::{Dao as TagDao, Item as Tag};
+use super::users::Administrator;
 
-#[derive(GraphQLInputObject, Validate)]
-pub struct Create {
+#[derive(Deserialize, Validate)]
+pub struct Form {
     #[validate(length(min = "1"))]
     pub name: String,
     #[validate(length(min = "1"))]
@@ -21,98 +22,42 @@ pub struct Create {
     pub color: String,
 }
 
-impl Handler for Create {
-    type Item = Option<String>;
-    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        s.administrator(db)?;
-        TagDao::create(db, &self.name, &self.icon, &self.color)?;
-        Ok(None)
-    }
+#[post("/tags", data = "<form>")]
+pub fn create(_user: Administrator, db: Database, form: Json<Form>) -> JsonResult<()> {
+    form.validate()?;
+    let db = db.deref();
+    TagDao::create(db, &form.name, &form.icon, &form.color)?;
+    Ok(Json(()))
 }
 
-#[derive(GraphQLInputObject, Validate)]
-pub struct Update {
-    pub id: I64,
-    #[validate(length(min = "1"))]
-    pub name: String,
-    #[validate(length(min = "1"))]
-    pub icon: String,
-    #[validate(length(min = "1"))]
-    pub color: String,
+#[post("/tags/<id>", data = "<form>")]
+pub fn update(_user: Administrator, id: ID, db: Database, form: Json<Form>) -> JsonResult<()> {
+    form.validate()?;
+    let db = db.deref();
+    TagDao::update(db, id, &form.name, &form.icon, &form.color)?;
+    Ok(Json(()))
 }
 
-impl Handler for Update {
-    type Item = Option<String>;
-    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        s.administrator(db)?;
-        TagDao::update(db, &self.id.0, &self.name, &self.icon, &self.color)?;
-        Ok(None)
-    }
+#[get("/tags/<id>")]
+pub fn show(id: ID, _user: Administrator, db: Database) -> JsonResult<Tag> {
+    let db = db.deref();
+    let it = TagDao::by_id(db, id)?;
+    Ok(Json(it))
 }
 
-#[derive(GraphQLObject)]
-pub struct Tag {
-    pub id: I64,
-    pub name: String,
-    pub icon: String,
-    pub color: String,
-    pub updated_at: NaiveDateTime,
+#[get("/tags")]
+pub fn index(db: Database) -> JsonResult<Vec<Tag>> {
+    let db = db.deref();
+    let items = TagDao::all(db)?;
+    Ok(Json(items))
 }
 
-impl From<Item> for Tag {
-    fn from(it: Item) -> Self {
-        Self {
-            id: I64(it.id),
-            name: it.name,
-            icon: it.icon,
-            color: it.color,
-            updated_at: it.updated_at,
-        }
-    }
-}
-
-#[derive(Validate)]
-pub struct Show {
-    pub id: i64,
-}
-
-impl Handler for Show {
-    type Item = Tag;
-    fn handle(&self, c: &Context, _s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        let it = TagDao::by_id(db, &self.id)?;
-        Ok(it.into())
-    }
-}
-
-#[derive(Validate)]
-pub struct Index {}
-
-impl Handler for Index {
-    type Item = Vec<Tag>;
-    fn handle(&self, c: &Context, _s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        let items = TagDao::all(db)?.into_iter().map(|x| x.into()).collect();
-        Ok(items)
-    }
-}
-
-#[derive(Validate)]
-pub struct Destroy {
-    pub id: i64,
-}
-
-impl Handler for Destroy {
-    type Item = Option<String>;
-    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        s.administrator(db)?;
-        db.transaction::<_, Error, _>(|| {
-            TagDao::delete(db, &self.id)?;
-            Ok(())
-        })?;
-        Ok(None)
-    }
+#[delete("/tags/<id>")]
+pub fn destroy(_user: Administrator, id: ID, db: Database) -> JsonResult<()> {
+    let db = db.deref();
+    db.transaction::<_, Error, _>(|| {
+        TagDao::delete(db, id)?;
+        Ok(())
+    })?;
+    Ok(Json(()))
 }

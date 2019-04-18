@@ -16,26 +16,25 @@ pub use self::postgresql::*;
 #[cfg(feature = "sqlite")]
 pub use self::sqlite::*;
 
-use rocket::Rocket;
+use rocket::Route;
 
-pub fn mount(rt: Rocket) -> Rocket {
-    rt.mount(
-        "/api/forum",
+pub fn routes() -> (&'static str, Vec<Route>, Vec<Route>) {
+    (
+        "forum",
         routes![
             api::posts::create,
             api::posts::update,
             api::posts::destroy,
             api::posts::show,
-            api::posts::index,
+            api::posts::index_by_administrator,
+            api::posts::index_by_owner,
             api::topics::create,
             api::topics::update,
             api::topics::destroy,
             api::topics::show,
-            api::topics::index,
+            api::topics::index_by_administrator,
+            api::topics::index_by_owner,
         ],
-    )
-    .mount(
-        "/forum",
         routes![
             html::index,
             html::posts::index,

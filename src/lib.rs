@@ -17,8 +17,6 @@ extern crate diesel;
 #[macro_use]
 extern crate failure;
 #[macro_use]
-extern crate juniper;
-#[macro_use]
 extern crate serde_json;
 
 extern crate askama;
@@ -34,7 +32,6 @@ extern crate git2;
 extern crate hex;
 extern crate hyper;
 extern crate jsonwebtoken;
-extern crate juniper_rocket;
 extern crate language_tags;
 extern crate lapin_futures as lapin;
 extern crate lettre;
@@ -73,7 +70,6 @@ pub mod catchers;
 pub mod crypto;
 pub mod env;
 pub mod errors;
-pub mod graphql;
 pub mod i18n;
 pub mod jwt;
 pub mod oauth;

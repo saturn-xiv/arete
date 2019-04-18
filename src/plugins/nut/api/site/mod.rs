@@ -1,18 +1,28 @@
 pub mod status;
 
 use std::ops::Deref;
+use std::sync::Arc;
 
+use rocket::State;
+use rocket_contrib::json::Json;
+use uuid::Uuid;
 use validator::Validate;
 
 use super::super::super::super::{
+    cache::Cache,
     cache::Provider,
     crypto::Crypto,
-    errors::Result,
-    graphql::{context::Context, session::Session, Handler},
+    errors::JsonResult,
+    orm::Database,
+    queue::{rabbitmq::RabbitMQ, Queue},
     settings::Dao as SettingDao,
 };
+use super::super::tasks::send_email::{
+    Config as Smtp, Task as SendEmailTask, NAME as SendEmailQueueName,
+};
+use super::users::Administrator;
 
-#[derive(GraphQLInputObject, Validate, Serialize, Deserialize)]
+#[derive(Validate, Serialize, Deserialize)]
 pub struct Author {
     #[validate(length(min = "1"))]
     pub name: String,
@@ -33,51 +43,51 @@ impl Default for Author {
     }
 }
 
-impl Handler for Author {
-    type Item = Option<String>;
-    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        s.administrator(db)?;
-        SettingDao::set::<String, Author, Crypto>(
-            db,
-            &c.encryptor,
-            &Self::KEY.to_string(),
-            &self,
-            false,
-        )?;
-        Ok(None)
-    }
+#[get("/site/author")]
+pub fn get_author(
+    db: Database,
+    _user: Administrator,
+    enc: State<Arc<Crypto>>,
+) -> JsonResult<Author> {
+    let db = db.deref();
+    let enc = enc.deref();
+    let enc = enc.deref();
+    let it: Author = match SettingDao::get(db, enc, &Author::KEY.to_string()) {
+        Ok(v) => v,
+        Err(_) => Author::default(),
+    };
+    Ok(Json(it))
 }
 
-#[derive(Validate)]
-pub struct GetAuthor {}
+#[post("/site/author", data = "<form>")]
+pub fn set_author(
+    db: Database,
+    _user: Administrator,
+    form: Json<Author>,
+    enc: State<Arc<Crypto>>,
+) -> JsonResult<()> {
+    form.validate()?;
+    let form = form.deref();
+    let db = db.deref();
+    let enc = enc.deref();
 
-impl Handler for GetAuthor {
-    type Item = Author;
-    fn handle(&self, c: &Context, _s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        let enc = c.encryptor.deref();
-        let it: Author = match SettingDao::get(db, enc, &Author::KEY.to_string()) {
-            Ok(v) => v,
-            Err(_) => Author::default(),
-        };
-        Ok(it)
-    }
+    SettingDao::set::<String, Author, Crypto>(db, enc, &Author::KEY.to_string(), form, false)?;
+    Ok(Json(()))
 }
 
-#[derive(GraphQLInputObject, Validate, Serialize, Deserialize)]
+#[derive(Validate, Serialize, Deserialize)]
 pub struct Seo {
     pub google: Option<Google>,
     pub baidu: Option<Baidu>,
 }
 
-#[derive(GraphQLInputObject, Validate, Serialize, Deserialize)]
+#[derive(Validate, Serialize, Deserialize)]
 pub struct Google {
     #[validate(length(min = "1"))]
     pub verify_id: String,
 }
 
-#[derive(GraphQLInputObject, Validate, Serialize, Deserialize)]
+#[derive(Validate, Serialize, Deserialize)]
 pub struct Baidu {
     #[validate(length(min = "1"))]
     pub verify_id: String,
@@ -96,43 +106,83 @@ impl Default for Seo {
     }
 }
 
-impl Handler for Seo {
-    type Item = Option<String>;
-    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        let enc = c.encryptor.deref();
-        s.administrator(db)?;
-        SettingDao::set::<String, Seo, Crypto>(db, enc, &Self::KEY.to_string(), &self, false)?;
-        Ok(None)
-    }
+#[get("/site/seo")]
+pub fn get_seo(db: Database, _user: Administrator, enc: State<Arc<Crypto>>) -> JsonResult<Seo> {
+    let db = db.deref();
+    let enc = enc.deref();
+    let enc = enc.deref();
+
+    let it: Seo = match SettingDao::get(db, enc, &Seo::KEY.to_string()) {
+        Ok(v) => v,
+        Err(_) => Seo::default(),
+    };
+    Ok(Json(it))
 }
 
-#[derive(Validate)]
-pub struct GetSeo {}
+#[post("/site/seo", data = "<form>")]
+pub fn set_seo(
+    db: Database,
+    _user: Administrator,
+    form: Json<Seo>,
+    enc: State<Arc<Crypto>>,
+) -> JsonResult<()> {
+    form.validate()?;
+    let form = form.deref();
+    let db = db.deref();
+    let enc = enc.deref();
+    SettingDao::set::<String, Seo, Crypto>(db, enc, &Seo::KEY.to_string(), form, false)?;
 
-impl Handler for GetSeo {
-    type Item = Seo;
-    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        let enc = c.encryptor.deref();
-        s.administrator(db)?;
-        let it: Seo = match SettingDao::get(db, enc, &Seo::KEY.to_string()) {
-            Ok(v) => v,
-            Err(_) => Seo::default(),
-        };
-        Ok(it)
-    }
+    Ok(Json(()))
 }
 
-#[derive(Validate)]
-pub struct ClearCache {}
+#[get("/site/smtp")]
+pub fn get_smtp(db: Database, _user: Administrator, enc: State<Arc<Crypto>>) -> JsonResult<Smtp> {
+    let db = db.deref();
+    let enc = enc.deref();
+    let enc = enc.deref();
 
-impl Handler for ClearCache {
-    type Item = Option<String>;
-    fn handle(&self, c: &Context, s: &Session) -> Result<Self::Item> {
-        let db = c.db.deref();
-        s.administrator(db)?;
-        c.cache.clear()?;
-        Ok(None)
-    }
+    let it: Smtp = match SettingDao::get(db, enc, &Smtp::KEY.to_string()) {
+        Ok(v) => v,
+        Err(_) => Smtp::default(),
+    };
+    Ok(Json(it))
+}
+
+#[post("/site/smtp", data = "<form>")]
+pub fn set_smtp(
+    db: Database,
+    _user: Administrator,
+    form: Json<Smtp>,
+    enc: State<Arc<Crypto>>,
+) -> JsonResult<()> {
+    form.validate()?;
+    let form = form.deref();
+    let db = db.deref();
+    let enc = enc.deref();
+    SettingDao::set::<String, Smtp, Crypto>(db, enc, &Smtp::KEY.to_string(), &form, true)?;
+
+    Ok(Json(()))
+}
+
+#[patch("/site/smtp")]
+pub fn test_smtp(user: Administrator, queue: State<Arc<RabbitMQ>>) -> JsonResult<()> {
+    let queue = queue.deref();
+    let user = user.0;
+    queue.publish(
+        SendEmailQueueName.to_string(),
+        Uuid::new_v4().to_string(),
+        SendEmailTask {
+            email: user.email.clone(),
+            name: user.real_name.clone(),
+            subject: format!("Hi, {}", user.real_name),
+            body: "This is a test email.".to_string(),
+        },
+    )?;
+    Ok(Json(()))
+}
+
+#[delete("/site/cache")]
+pub fn clear_cache(_user: Administrator, cache: Cache) -> JsonResult<()> {
+    cache.clear()?;
+    Ok(Json(()))
 }

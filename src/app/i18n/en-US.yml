@@ -270,6 +270,9 @@ nut:
     database-is-not-empty: Database isn't empty.
   logs:
     user:
+      authority:
+        apply: Apply {{role}}@{{resource_type}}.
+        deny: Deny {{role}}@{{resource_type}}.
       unlock: Unlock.
       confirm: Confirm.
       sign-in:

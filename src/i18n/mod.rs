@@ -1,4 +1,3 @@
-pub mod graphql;
 pub mod locale;
 #[cfg(feature = "mysql")]
 pub mod mysql;
