@@ -57,7 +57,7 @@ RUN mkdir $HOME/downloads
 
 # java sdk
 ARG ORACLE_JDK_VERSION="8.0.212-zulu"
-ARG OPEN_JDK_VERSION="12.0.0-open"
+ARG OPEN_JDK_VERSION="12.0.1-open"
 RUN curl -s "https://get.sdkman.io" | zsh
 RUN sed -i -e 's/sdkman_auto_answer=false/sdkman_auto_answer=true/g' $HOME/.sdkman/etc/config
 RUN zsh -c "source $HOME/.zshrc \
@@ -102,7 +102,7 @@ RUN zsh -c "source $HOME/.zshrc \
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 RUN echo 'source $HOME/.cargo/env' >> $HOME/.zshrc
 RUN zsh -c "source $HOME/.zshrc \
-  && rustup default nightly-2019-03-23 \
+  && rustup default nightly \
   && rustup target add x86_64-unknown-linux-musl \
   && rustup component add rls rust-analysis rust-src rustfmt clippy"
 
