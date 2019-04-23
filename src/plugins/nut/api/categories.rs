@@ -13,6 +13,7 @@ use super::super::models::category::{Dao as CategoryDao, Item as Category};
 use super::users::Administrator;
 
 #[derive(Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
 pub struct Form {
     #[validate(length(min = "1"))]
     pub name: String,

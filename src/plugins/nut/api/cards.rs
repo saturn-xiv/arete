@@ -11,6 +11,7 @@ use super::super::models::card::{Dao as CardDao, Item as Card};
 use super::users::Administrator;
 
 #[derive(Validate, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Form {
     #[validate(length(min = "1"))]
     pub lang: String,

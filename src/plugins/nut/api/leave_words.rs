@@ -12,6 +12,7 @@ use super::super::models::leave_word::{Dao as LeaveWordDao, Item as LeaveWord};
 use super::users::Administrator;
 
 #[derive(Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
 pub struct Form {
     #[validate(length(min = "1"))]
     pub body: String,

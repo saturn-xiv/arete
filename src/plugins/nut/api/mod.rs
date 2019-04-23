@@ -28,6 +28,7 @@ use super::models::{
 };
 
 #[derive(Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
 pub struct Install {
     #[validate(length(min = "1", max = "32"))]
     pub real_name: String,

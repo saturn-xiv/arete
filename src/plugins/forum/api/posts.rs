@@ -20,6 +20,7 @@ use super::super::super::nut::{
 use super::super::models::post::{Dao as PostDao, Item as Post};
 
 #[derive(Validate, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Form {
     pub topic: ID,
     pub post: Option<ID>,

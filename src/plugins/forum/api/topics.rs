@@ -20,6 +20,7 @@ use super::super::super::nut::{
 use super::super::models::topic::{Dao as TopicDao, Item as Topic};
 
 #[derive(Validate, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Form {
     #[validate(length(min = "1"))]
     pub title: String,

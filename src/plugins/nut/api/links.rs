@@ -11,6 +11,7 @@ use super::super::models::link::{Dao as LinkDao, Item as Link};
 use super::users::Administrator;
 
 #[derive(Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
 pub struct Form {
     #[validate(length(min = "1"))]
     pub lang: String,

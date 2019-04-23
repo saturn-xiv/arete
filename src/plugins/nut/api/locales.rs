@@ -12,6 +12,7 @@ use super::super::super::super::{
 use super::users::Administrator;
 
 #[derive(Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
 pub struct Form {
     pub code: String,
     pub message: String,

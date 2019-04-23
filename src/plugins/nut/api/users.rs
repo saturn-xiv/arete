@@ -34,6 +34,7 @@ use super::super::{
 };
 
 #[derive(Validate, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Apply {
     #[validate(length(min = "1"))]
     pub role: String,
@@ -89,6 +90,7 @@ pub fn index_authority(_user: Administrator, id: ID, db: Database) -> JsonResult
 }
 
 #[derive(Validate, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Deny {
     #[validate(length(min = "1"))]
     pub role: String,
@@ -168,6 +170,7 @@ pub struct Token {
 }
 
 #[derive(Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
 pub struct SignIn {
     #[validate(length(min = "1"))]
     pub login: String,
@@ -226,6 +229,7 @@ pub fn sign_in(
 }
 
 #[derive(Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
 pub struct SignUp {
     #[validate(length(min = "1", max = "32"))]
     pub real_name: String,
@@ -291,6 +295,7 @@ pub fn sign_up(
 }
 
 #[derive(Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
 pub struct Email {
     #[validate(email)]
     pub email: String,
@@ -427,6 +432,7 @@ pub fn forgot_password(
 }
 
 #[derive(Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
 pub struct ResetPassword {
     #[validate(length(min = "1"))]
     pub token: String,
@@ -472,6 +478,7 @@ pub fn get_profile(user: User) -> JsonResult<User> {
 }
 
 #[derive(Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
 pub struct Profile {
     #[validate(email, length(min = "2", max = "64"))]
     pub email: String,
@@ -492,6 +499,7 @@ pub fn set_profile(db: Database, user: User, form: Json<Profile>) -> JsonResult<
 }
 
 #[derive(Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
 pub struct ChangePassword {
     #[validate(length(min = "1"))]
     pub current_password: String,

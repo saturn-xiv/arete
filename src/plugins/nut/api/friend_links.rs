@@ -11,6 +11,7 @@ use super::super::models::friend_link::{Dao as FriendLinkDao, Item as FriendLink
 use super::users::Administrator;
 
 #[derive(Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
 pub struct Form {
     #[validate(length(min = "1"))]
     pub home: String,

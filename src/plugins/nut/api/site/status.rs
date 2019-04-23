@@ -20,6 +20,7 @@ use super::super::users::Administrator;
 const MB: u64 = 1024 * 1024;
 
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Status {
     os: Os,
     redis: String,
@@ -28,6 +29,7 @@ pub struct Status {
 }
 
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Os {
     pub uts: Uts,
     pub uptime: String,
@@ -39,12 +41,14 @@ pub struct Os {
 }
 
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct LoadAverage {
     pub l1: f64,
     pub l2: f64,
     pub l3: f64,
 }
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Uts {
     pub machine: String,
     pub node_name: String,
@@ -53,11 +57,13 @@ pub struct Uts {
     pub version: String,
 }
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Ram {
     pub unused: i32,
     pub total: i32,
 }
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Swap {
     pub unused: i32,
     pub total: i32,
@@ -104,6 +110,7 @@ impl Os {
 }
 
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Network {
     pub name: String,
     pub ip4: Option<String>,
@@ -137,20 +144,24 @@ impl Network {
 
 #[cfg(feature = "mysql")]
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Db {}
 
 #[cfg(feature = "sqlite")]
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Db {}
 
 #[cfg(feature = "postgresql")]
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Db {
     pub status: Option<PgStatus>,
     pub databases: Vec<PgDatabase>,
 }
 
 #[derive(Serialize, QueryableByName)]
+#[serde(rename_all = "camelCase")]
 pub struct PgStatus {
     #[sql_type = "Text"]
     pub version: String,
@@ -159,6 +170,7 @@ pub struct PgStatus {
 }
 
 #[derive(Serialize, QueryableByName)]
+#[serde(rename_all = "camelCase")]
 pub struct PgDatabase {
     #[sql_type = "Text"]
     pub name: String,
