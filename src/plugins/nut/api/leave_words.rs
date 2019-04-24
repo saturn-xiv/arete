@@ -1,4 +1,3 @@
-use std::net::SocketAddr;
 use std::ops::Deref;
 
 use rocket_contrib::json::Json;
@@ -7,6 +6,7 @@ use validator::Validate;
 use super::super::super::super::{
     errors::JsonResult,
     orm::{Database, ID},
+    request::ClientIp,
 };
 use super::super::models::leave_word::{Dao as LeaveWordDao, Item as LeaveWord};
 use super::users::Administrator;
@@ -23,14 +23,13 @@ pub struct Form {
 #[post("/leave-words", data = "<form>")]
 pub fn create(
     _user: Administrator,
-    remote: SocketAddr,
+    remote: ClientIp,
     db: Database,
     form: Json<Form>,
 ) -> JsonResult<()> {
     form.validate()?;
     let db = db.deref();
-    let ip = remote.ip().to_string();
-    LeaveWordDao::add(db, &ip, &form.body, &form.media_type.parse()?)?;
+    LeaveWordDao::add(db, &remote.0, &form.body, &form.media_type.parse()?)?;
     Ok(Json(()))
 }
 

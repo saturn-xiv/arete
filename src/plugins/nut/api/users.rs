@@ -1,5 +1,4 @@
 use std::fmt;
-use std::net::SocketAddr;
 use std::ops::Deref;
 use std::sync::Arc;
 
@@ -22,7 +21,7 @@ use super::super::super::super::{
     jwt::Jwt,
     orm::{Connection as Db, Database, ID},
     queue::{rabbitmq::RabbitMQ, Queue},
-    request::{Locale, Token as Auth},
+    request::{ClientIp, Locale, Token as Auth},
 };
 use super::super::{
     models::{
@@ -48,13 +47,12 @@ pub fn apply_authority(
     _user: Administrator,
     id: ID,
     db: Database,
-    remote: SocketAddr,
+    remote: ClientIp,
     lang: Locale,
     form: Json<Apply>,
 ) -> JsonResult<()> {
     form.validate()?;
     let form = form.deref();
-    let ip = remote.ip().to_string();
     let db = db.deref();
 
     let user = UserDao::by_id(db, id)?;
@@ -70,7 +68,7 @@ pub fn apply_authority(
         __i18n_l!(
             db,
             user.id,
-            &ip,
+            &remote.0,
             &lang.0,
             "nut.logs.user.authority.apply",
             form
@@ -103,20 +101,20 @@ pub fn deny_authority(
     id: ID,
     db: Database,
     lang: Locale,
-    remote: SocketAddr,
+    remote: ClientIp,
     form: Json<Deny>,
 ) -> JsonResult<()> {
     form.validate()?;
     let form = form.deref();
     let db = db.deref();
-    let ip = remote.ip().to_string();
+
     let user = UserDao::by_id(db, id)?;
     db.transaction::<_, FailueError, _>(move || {
         PolicyDao::deny(db, user.id, &form.role.parse()?, &form.resource)?;
         __i18n_l!(
             db,
             user.id,
-            &ip,
+            &remote.0,
             &lang.0,
             "nut.logs.user.authority.deny",
             form
@@ -183,11 +181,11 @@ pub fn sign_in(
     db: Database,
     lang: Locale,
     jwt: State<Arc<Jwt>>,
-    remote: SocketAddr,
+    remote: ClientIp,
     form: Json<SignIn>,
 ) -> JsonResult<String> {
     form.validate()?;
-    let ip = remote.ip().to_string();
+
     let db = db.deref();
     let user: Result<User> = match UserDao::by_email(db, &form.login) {
         Ok(v) => Ok(v),
@@ -204,15 +202,27 @@ pub fn sign_in(
     let user = user?;
 
     if let Err(e) = user.auth::<Crypto>(&form.password) {
-        __i18n_l!(db, user.id, &ip, &lang.0, "nut.logs.user.sign-in.failed")?;
+        __i18n_l!(
+            db,
+            user.id,
+            &remote.0,
+            &lang.0,
+            "nut.logs.user.sign-in.failed"
+        )?;
         return Err(e.into());
     }
     user.available()?;
 
     let uid = user.uid.clone();
     db.transaction::<_, FailueError, _>(move || {
-        UserDao::sign_in(db, user.id, &ip)?;
-        __i18n_l!(db, user.id, &ip, &lang.0, "nut.logs.user.sign-in.success")?;
+        UserDao::sign_in(db, user.id, &remote.0)?;
+        __i18n_l!(
+            db,
+            user.id,
+            &remote.0,
+            &lang.0,
+            "nut.logs.user.sign-in.success"
+        )?;
         Ok(())
     })?;
     let (nbf, exp) = Jwt::timestamps(Duration::weeks(1));
@@ -249,11 +259,11 @@ pub fn sign_up(
     lang: Locale,
     jwt: State<Arc<Jwt>>,
     queue: State<Arc<RabbitMQ>>,
-    remote: SocketAddr,
+    remote: ClientIp,
     form: Json<SignUp>,
 ) -> JsonResult<()> {
     form.validate()?;
-    let ip = remote.ip().to_string();
+
     let db = db.deref();
     let jwt = jwt.deref();
     let queue = queue.deref();
@@ -286,7 +296,7 @@ pub fn sign_up(
             &form.password,
         )?;
         let it = UserDao::by_email(db, &form.email)?;
-        __i18n_l!(db, it.id, &ip, &lang.0, "nut.logs.user.sign-up")?;
+        __i18n_l!(db, it.id, &remote.0, &lang.0, "nut.logs.user.sign-up")?;
         Ok(it)
     })?;
 
@@ -327,14 +337,13 @@ pub fn confirm(
 #[patch("/users/confirm/<token>")]
 pub fn confirm_token(
     db: Database,
-    remote: SocketAddr,
+    remote: ClientIp,
     lang: Locale,
     token: String,
     jwt: State<Arc<Jwt>>,
 ) -> JsonResult<()> {
     let db = db.deref();
     let jwt = jwt.deref();
-    let ip = remote.ip().to_string();
 
     let token = jwt.parse::<Token>(&token)?.claims;
     if token.act != Action::Confirm {
@@ -348,7 +357,7 @@ pub fn confirm_token(
 
     db.transaction::<_, FailueError, _>(move || {
         UserDao::confirm(db, it.id)?;
-        __i18n_l!(db, it.id, &ip, &lang.0, "nut.logs.user.confirm")?;
+        __i18n_l!(db, it.id, &remote.0, &lang.0, "nut.logs.user.confirm")?;
         Ok(())
     })?;
     Ok(Json(()))
@@ -378,14 +387,13 @@ pub fn unlock(
 #[patch("/users/unlock/<token>")]
 pub fn unlock_token(
     db: Database,
-    remote: SocketAddr,
+    remote: ClientIp,
     lang: Locale,
     token: String,
     jwt: State<Arc<Jwt>>,
 ) -> JsonResult<()> {
     let db = db.deref();
     let jwt = jwt.deref();
-    let ip = remote.ip().to_string();
 
     let token = jwt.parse::<Token>(&token)?.claims;
     if token.act != Action::Unlock {
@@ -398,7 +406,7 @@ pub fn unlock_token(
     }
     db.transaction::<_, FailueError, _>(move || {
         UserDao::unlock(db, it.id)?;
-        __i18n_l!(db, it.id, &ip, &lang.0, "nut.logs.user.unlock")?;
+        __i18n_l!(db, it.id, &remote.0, &lang.0, "nut.logs.user.unlock")?;
         Ok(())
     })?;
 
@@ -445,13 +453,12 @@ pub fn reset_password(
     db: Database,
     lang: Locale,
     jwt: State<Arc<Jwt>>,
-    remote: SocketAddr,
+    remote: ClientIp,
     form: Json<ResetPassword>,
 ) -> JsonResult<()> {
     form.validate()?;
     let db = db.deref();
     let jwt = jwt.deref();
-    let ip = remote.ip().to_string();
 
     let token = jwt.parse::<Token>(&form.token)?.claims;
     if token.act != Action::ResetPassword {
@@ -461,7 +468,13 @@ pub fn reset_password(
     let it = UserDao::by_uid(db, &token.uid)?;
 
     UserDao::password::<Crypto>(db, it.id, &form.password)?;
-    __i18n_l!(db, it.id, &ip, &lang.0, "nut.logs.user.reset-password")?;
+    __i18n_l!(
+        db,
+        it.id,
+        &remote.0,
+        &lang.0,
+        "nut.logs.user.reset-password"
+    )?;
     Ok(Json(()))
 }
 
@@ -511,18 +524,23 @@ pub struct ChangePassword {
 pub fn change_password(
     db: Database,
     lang: Locale,
-    remote: SocketAddr,
+    remote: ClientIp,
     user: User,
     form: Json<ChangePassword>,
 ) -> JsonResult<()> {
     form.validate()?;
     let db = db.deref();
-    let ip = remote.ip().to_string();
 
     user.auth::<Crypto>(&form.current_password)?;
     db.transaction::<_, FailueError, _>(move || {
         UserDao::password::<Crypto>(db, user.id, &form.new_password)?;
-        __i18n_l!(db, user.id, &ip, &lang.0, "nut.logs.user.change-password")?;
+        __i18n_l!(
+            db,
+            user.id,
+            &remote.0,
+            &lang.0,
+            "nut.logs.user.change-password"
+        )?;
         Ok(())
     })?;
 
@@ -530,11 +548,10 @@ pub fn change_password(
 }
 
 #[delete("/users/sign-out")]
-pub fn sign_out(db: Database, lang: Locale, remote: SocketAddr, user: User) -> JsonResult<()> {
+pub fn sign_out(db: Database, lang: Locale, remote: ClientIp, user: User) -> JsonResult<()> {
     let db = db.deref();
 
-    let ip = remote.ip().to_string();
-    __i18n_l!(db, user.id, &ip, &lang.0, "nut.logs.user.sign-out")?;
+    __i18n_l!(db, user.id, &remote.0, &lang.0, "nut.logs.user.sign-out")?;
 
     Ok(Json(()))
 }
