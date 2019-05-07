@@ -83,14 +83,14 @@ impl Default for Lease {
 impl Lease {
     pub fn new() -> Result<Self> {
         let mut items = Vec::new();
-        {
-            // check for ubuntu 18.04
-            for entry in read_dir(
-                Path::new(&Component::RootDir)
-                    .join("var")
-                    .join("lib")
-                    .join("NetworkManager"),
-            )? {
+
+        // check for ubuntu 18.04
+        let root = Path::new(&Component::RootDir)
+            .join("var")
+            .join("lib")
+            .join("NetworkManager");
+        if root.exists() {
+            for entry in read_dir(root)? {
                 let entry = entry?;
                 let path = entry.path();
                 if path.is_file() {
@@ -110,55 +110,7 @@ impl Lease {
 
         Err(format_err!("can't find dhcp lease file"))
     }
-    // pub fn wifi(name: &str, ssid: &str) -> Option<(PathBuf, Client)> {
-    //     if let Some(it) = Self::ether(name) {
-    //         return Some(it);
-    //     }
-    //     let it = Path::new(&Component::RootDir)
-    //         .join("var")
-    //         .join("lib")
-    //         .join("dhcpcd")
-    //         .join(format!(
-    //             "{}-{}.leases",
-    //             name,
-    //             ssid.escape_default().to_string()
-    //         ));
-    //     debug!("check {}", it.display());
-    //     if it.exists() {
-    //         return Some((it, Client::Dhcpcd));
-    //     }
-    //     None
-    // }
-    // pub fn ether(name: &str) -> Option<(PathBuf, Client)> {
-    //     let it = Path::new(&Component::RootDir)
-    //         .join("var")
-    //         .join("lib")
-    //         .join("dhcp")
-    //         .join(format!("dhclient.{}.leases", name));
-    //     debug!("check {}", it.display());
-    //     if it.exists() {
-    //         return Some((it, Client::Dhclient));
-    //     }
-    //     let it = Path::new(&Component::RootDir)
-    //         .join("var")
-    //         .join("lib")
-    //         .join("dhcpcd")
-    //         .join(format!("{}.leases", name));
-    //     debug!("check {}", it.display());
-    //     if it.exists() {
-    //         return Some((it, Client::Dhclient));
-    //     }
-    //     let it = Path::new(&Component::RootDir)
-    //         .join("var")
-    //         .join("lib")
-    //         .join("dhcp")
-    //         .join(format!("dhclient.leases"));
-    //     debug!("check {}", it.display());
-    //     if it.exists() {
-    //         return Some((it, Client::Dhcpcd));
-    //     }
-    //     None
-    // }
+
     pub fn isc<P: AsRef<Path>>(file: P) -> Result<Vec<Lease>> {
         let file = file.as_ref();
         debug!("load leases from {}", file.display());
