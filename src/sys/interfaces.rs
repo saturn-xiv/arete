@@ -42,7 +42,7 @@ pub fn mac(n: &str) -> Result<String> {
     Ok(it.trim().to_string())
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Interface {
     pub wifi: Option<(String, Wifi)>,
@@ -255,7 +255,7 @@ network={{
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub enum Ether {
     Dhcp,
@@ -268,7 +268,7 @@ pub enum Ether {
     },
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub enum Wifi {
     Open {
