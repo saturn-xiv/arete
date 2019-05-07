@@ -1,4 +1,6 @@
+pub mod dhcp;
 pub mod git;
+pub mod interfaces;
 pub mod network;
 pub mod timezone;
 
