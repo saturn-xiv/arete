@@ -95,7 +95,7 @@ impl Lease {
                 let path = entry.path();
                 if path.is_file() {
                     if let Some(ext) = path.extension() {
-                        if ext == OsStr::new("leases") {
+                        if ext == OsStr::new("lease") {
                             items.append(&mut Self::isc(&path)?);
                         }
                     }
