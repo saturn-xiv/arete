@@ -37,6 +37,53 @@ pub struct Interface {
     pub ether: Option<(String, Ether)>,
 }
 
+impl Default for Interface {
+    fn default() -> Self {
+        Self {
+            wifi: Some((
+                "wlan0".to_string(),
+                Wifi::Open {
+                    ssid: "open".to_string(),
+                },
+            )),
+            ether: Some(("eth0".to_string(), Ether::Dhcp)),
+        }
+    }
+}
+
+impl Interface {
+    pub fn escape(mut self) {
+        if let Some((n, w)) = self.wifi {
+            match w {
+                Wifi::Psk { ssid, password: _ } => {
+                    self.wifi = Some((
+                        n.clone(),
+                        Wifi::Psk {
+                            ssid: ssid.clone(),
+                            password: "".to_string(),
+                        },
+                    ))
+                }
+                Wifi::Eap {
+                    ssid,
+                    identity,
+                    password: _,
+                } => {
+                    self.wifi = Some((
+                        n.clone(),
+                        Wifi::Eap {
+                            ssid: ssid.clone(),
+                            identity: identity.clone(),
+                            password: "".to_string(),
+                        },
+                    ))
+                }
+                _ => {}
+            }
+        }
+    }
+}
+
 impl Interface {
     pub fn save(&self) -> Result<()> {
         let mut ifs = File::create(&INTERFACES.as_path())?;
