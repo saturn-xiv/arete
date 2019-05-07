@@ -1,5 +1,3 @@
-use std::fs::File;
-use std::io::prelude::*;
 /// https://wiki.debian.org/NetworkConfiguration
 /// https://wiki.debian.org/WiFi/HowToUse
 /// http://jorisvr.nl/wpapsk.html
@@ -15,6 +13,8 @@ use std::io::prelude::*;
 /// SHA1 is a function that computes a 160-bit hash from an arbitrary amount of input data. It is clearly explained in RFC3174. HMAC is a standardized method to turn a cryptographic hash function into a keyed message authentication function. It is specified in RFC2104.
 ///
 /// To summarize, the key derivation process involves iterating a HMAC-SHA1 function 4096 times, and then doing that again to produce more key bits.
+use std::fs::{read_to_string, File};
+use std::io::prelude::*;
 use std::path::{Component, Path, PathBuf};
 
 use super::super::errors::Result;
@@ -28,6 +28,18 @@ lazy_static! {
         .join("etc")
         .join("wpa_supplicant")
         .join("wpa_supplicant.conf");
+}
+
+pub fn mac(n: &str) -> Result<String> {
+    let it = read_to_string(
+        Path::new(&Component::RootDir)
+            .join("sys")
+            .join("class")
+            .join("net")
+            .join(n)
+            .join("address"),
+    )?;
+    Ok(it.trim().to_string())
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -52,6 +64,30 @@ impl Default for Interface {
 }
 
 impl Interface {
+    pub fn mac(&self) -> Result<String> {
+        if let Some((ref n, _)) = self.ether {
+            return mac(n);
+        }
+        if let Some((ref n, _)) = self.wifi {
+            return mac(n);
+        }
+        Err(format_err!("network isn't enable"))
+    }
+
+    pub fn ip4(&self) -> Result<String> {
+        if let Some((ref n, _)) = self.ether {
+            if let Some(v) = super::network::ip4(&n)? {
+                return Ok(format!("{}", v));
+            }
+        }
+        if let Some((ref n, _)) = self.wifi {
+            if let Some(v) = super::network::ip4(&n)? {
+                return Ok(format!("{}", v));
+            }
+        }
+        Err(format_err!("network isn't enable"))
+    }
+
     pub fn escape(mut self) {
         if let Some((n, w)) = self.wifi {
             match w {
