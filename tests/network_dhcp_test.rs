@@ -2,7 +2,7 @@ extern crate arete;
 
 use std::path::PathBuf;
 
-use arete::sys::dhcp::Lease;
+use arete::sys::network::dhcp::Lease;
 
 #[test]
 fn isc() {

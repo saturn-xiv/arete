@@ -1,3 +1,6 @@
+pub mod dhcp;
+pub mod setup;
+
 use std::net::{Ipv4Addr, Ipv6Addr, SocketAddr};
 
 use eui48::MacAddress;

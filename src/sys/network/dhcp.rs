@@ -8,7 +8,7 @@ use std::str::FromStr;
 use chrono::{NaiveDateTime, Utc};
 use failure::Error;
 
-use super::super::errors::Result;
+use super::super::super::errors::Result;
 
 /// https://man.openbsd.org/dhclient.leases.5
 /// http://manpages.ubuntu.com/manpages/trusty/man5/dhclient.conf.5.html
