@@ -3,6 +3,7 @@ pub mod git;
 pub mod interfaces;
 pub mod network;
 pub mod timezone;
+pub mod vpn;
 
 use std::process;
 

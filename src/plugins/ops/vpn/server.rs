@@ -15,10 +15,22 @@ lazy_static! {
 #[template(path = "openvpn/server.conf", escape = "none")]
 pub struct Config<'a> {
     pub port: u16,
-    pub tcp: bool,
+    pub server: &'a ServerConfig<'a>,
+    pub client: &'a ClientConfig<'a>,
+}
+
+pub struct ServerConfig<'a> {
     pub network: &'a str,
     pub netmask: &'a str,
 }
+
+pub struct ClientConfig<'a> {
+    pub network: &'a str,
+    pub netmask: &'a str,
+    pub dns1: &'a str,
+    pub dns2: &'a str,
+}
+
 impl<'a> Config<'a> {
     pub fn setup(&self) -> Result<()> {
         let cfg = self.render()?;
