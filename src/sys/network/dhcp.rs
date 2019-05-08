@@ -50,7 +50,7 @@ impl PartialOrd for Lease {
 }
 impl PartialEq for Lease {
     fn eq(&self, other: &Lease) -> bool {
-        self.renew == other.renew
+        self.renew == other.renew && self.interface == other.interface
     }
 }
 
@@ -81,8 +81,10 @@ impl Default for Lease {
 }
 
 impl Lease {
-    pub fn new() -> Result<Self> {
+    pub fn new() -> Result<Vec<Self>> {
         let mut items = Vec::new();
+
+        let ext = OsStr::new("lease");
 
         // check for ubuntu 18.04
         let root = Path::new(&Component::RootDir)
@@ -94,8 +96,8 @@ impl Lease {
                 let entry = entry?;
                 let path = entry.path();
                 if path.is_file() {
-                    if let Some(ext) = path.extension() {
-                        if ext == OsStr::new("lease") {
+                    if let Some(v) = path.extension() {
+                        if v == ext {
                             items.append(&mut Self::isc(&path)?);
                         }
                     }
@@ -103,12 +105,8 @@ impl Lease {
             }
         }
 
-        items.sort();
-        if let Some(it) = items.last() {
-            return Ok(it.clone());
-        }
-
-        Err(format_err!("can't find dhcp lease file"))
+        items.sort_by(|a, b| b.cmp(a));
+        Ok(items)
     }
 
     pub fn isc<P: AsRef<Path>>(file: P) -> Result<Vec<Lease>> {
