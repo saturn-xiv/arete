@@ -1,0 +1,30 @@
+auto lo
+iface lo inet loopback
+
+{% match ether -%}
+{% when Some with (item) -%}
+{% let (name, eth) = item -%}
+auto {{ name }}
+allow-hotplug {{ name }}
+{% match eth -%}
+{% when Ether::Dhcp -%}
+iface {{ name }} inet dhcp
+{% when Ether::Static with {address, netmask, gateway, dns1, dns2} -%}
+iface {{ name }} inet static
+  address {{ address }}
+  netmask {{ netmask }}
+  gateway {{ gateway }}
+  dns-nameservers {{ dns1 }} {{ dns2 }}
+{% endmatch -%}
+{% when None -%}
+{% endmatch -%}
+
+
+{% match wifi -%}
+{% when Some with (name) -%}
+auto {{ name }}
+allow-hotplug {{ name }}
+iface {{ name }} inet dhcp
+  wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
+{% when None -%}
+{% endmatch -%}

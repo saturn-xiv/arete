@@ -17,6 +17,8 @@ use std::fs::{read_to_string, File};
 use std::io::prelude::*;
 use std::path::{Component, Path, PathBuf};
 
+use askama::Template;
+
 use super::super::errors::Result;
 
 lazy_static! {
@@ -40,6 +42,19 @@ pub fn mac(n: &str) -> Result<String> {
             .join("address"),
     )?;
     Ok(it.trim().to_string())
+}
+
+#[derive(Template, Debug)]
+#[template(path = "ubuntu/interfaces", escape = "none")]
+pub struct Interfaces {
+    pub ether: Option<(String, Ether)>,
+    pub wifi: Option<String>,
+}
+
+#[derive(Template, Debug)]
+#[template(path = "ubuntu/wpa_supplicant.conf", escape = "none")]
+pub struct WpaSupplicant {
+    pub wifi: Wifi,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -122,135 +137,23 @@ impl Interface {
 
 impl Interface {
     pub fn save(&self) -> Result<()> {
-        let mut ifs = File::create(&INTERFACES.as_path())?;
+        let mut fd = File::create(&INTERFACES.as_path())?;
         write!(
-            &mut ifs,
-            r#"
-auto lo
-iface lo inet loopback
-"#
+            &mut fd,
+            "{}",
+            Interfaces {
+                ether: self.ether.clone(),
+                wifi: match self.wifi {
+                    Some((ref n, _)) => Some(n.clone()),
+                    None => None,
+                },
+            }
+            .render()?
         )?;
-
-        if let Some((ref name, ref ether)) = self.ether {
-            match ether {
-                Ether::Dhcp => {
-                    write!(
-                        &mut ifs,
-                        r#"
-auto {name}
-allow-hotplug {name}
-iface {name} inet dhcp
-"#,
-                        name = name
-                    )?;
-                }
-                Ether::Static {
-                    address,
-                    netmask,
-                    gateway,
-                    dns1,
-                    dns2,
-                } => {
-                    write!(
-                        &mut ifs,
-                        r#"
-auto {name}
-allow-hotplug {name}
-iface {name} inet static
-  address {address}
-  netmask {netmask}
-  gateway {gateway}
-  dns-nameservers {dns1} {dns2}
-"#,
-                        name = name,
-                        address = address,
-                        netmask = netmask,
-                        gateway = gateway,
-                        dns1 = dns1,
-                        dns2 = dns2,
-                    )?;
-                }
-            }
+        if let Some((_, ref w)) = self.wifi {
+            let mut fd = File::create(&WPA_SUPPLICANT.as_path())?;
+            write!(&mut fd, "{}", WpaSupplicant { wifi: w.clone() }.render()?)?;
         }
-
-        if let Some((ref name, ref wifi)) = self.wifi {
-            let mut wpa = File::create(&WPA_SUPPLICANT.as_path())?;
-            write!(
-                &mut ifs,
-                r#"
-auto {name}
-allow-hotplug {name}
-iface {name} inet dhcp
-  wpa-conf {wpa}
-"#,
-                name = name,
-                wpa = WPA_SUPPLICANT.display(),
-            )?;
-
-            write!(
-                &mut wpa,
-                r#"
-ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=wheel
-"#
-            )?;
-
-            match wifi {
-                Wifi::Open { ssid } => {
-                    write!(
-                        &mut wpa,
-                        r#"
-network={{
-  ssid = "{ssid}"
-  scan_ssid=1
-}}
-"#,
-                        ssid = ssid,
-                    )?;
-                }
-                Wifi::Psk { ssid, password } => {
-                    write!(
-                        &mut wpa,
-                        r#"
-network={{
-  ssid = "{ssid}"
-  scan_ssid=1
-  key_mgmt=WPA-PSK
-  psk = "{password}"
-}}
-"#,
-                        ssid = ssid,
-                        password = password,
-                    )?;
-                }
-                Wifi::Eap {
-                    ssid,
-                    identity,
-                    password,
-                } => {
-                    write!(
-                        &mut wpa,
-                        r#"
-network={{
-  ssid = "{ssid}"
-  key_mgmt=WPA-EAP
-  pairwise=CCMP TKIP
-  group=CCMP TKIP
-  eap=TLS
-  identity="{identity}"
-  ca_cert="/etc/cert/ca.pem"
-  client_cert="/etc/cert/user.pem"
-  private_key="/etc/cert/user.prv"
-  private_key_passwd="{password}"
-}}
-"#,
-                        ssid = ssid,
-                        identity = identity,
-                        password = password,
-                    )?;
-                }
-            }
-        }
-
         Ok(())
     }
 }

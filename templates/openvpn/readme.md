@@ -8,18 +8,20 @@ $ apt install -y openvpn easy-rsa dnsmasq
 $ mkdir -p /etc/openvpn/easy-rsa
 $ cp -r /usr/share/easy-rsa/* /etc/openvpn/easy-rsa
 $ cd /etc/openvpn/easy-rsa
-$ cat <<EOF > var
-KEY_COUNTRY="US"
-KEY_PROVINCE="CA"
-KEY_CITY="Goleta"
-KEY_ORG="hour.com"
-KEY_EMAIL="no-reply@gmail.com"
-KEY_CN="www.change-me.com"
-KEY_NAME="who-am-i"
-KEY_OU="ops"
-
-export KEY_COUNTRY KEY_PROVINCE KEY_CITY KEY_ORG KEY_EMAIL KEY_CN KEY_NAME KEY_OU
+$ cat <<EOF >> vars
+export KEY_COUNTRY="US"
+export KEY_PROVINCE="CA"
+export KEY_CITY="Goleta"
+export KEY_ORG="honor"
+export KEY_EMAIL="no-reply@gmail.com"
+export KEY_CN="www.change-me.com"
+export KEY_NAME="who-am-i"
+export KEY_OU="ops"
+export KEY_ALTNAMES="EasyRSA"
 EOF
+$ openssl version
+$ openvpn --version
+$ ln -s openssl-1.0.0.cnf openssl.cnf
 ```
 
 * Generate server certs
@@ -53,5 +55,4 @@ $ ./revoke-full client
 ```bash
 $ source vars
 $ ./build-key client
-$ ls keys/tpl.ovpn
 ```

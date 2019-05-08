@@ -1,8 +1,8 @@
 pub mod dhcp;
 pub mod git;
-pub mod interfaces;
 pub mod network;
 pub mod timezone;
+pub mod ubuntu;
 pub mod vpn;
 
 use std::process;
