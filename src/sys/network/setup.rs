@@ -125,13 +125,10 @@ impl Interface {
 }
 
 impl Interface {
-    pub fn netplan(&self) -> Result<String> {
+    pub fn netplan(&self, renderer: String) -> Result<String> {
         let mut network = Hash::new();
         network.insert(Yaml::String("version".to_string()), Yaml::Integer(2));
-        network.insert(
-            Yaml::String("renderer".to_string()),
-            Yaml::String("networkd".to_string()),
-        );
+        network.insert(Yaml::String("renderer".to_string()), Yaml::String(renderer));
 
         if let Some((ref n, ref e)) = self.ether {
             let mut ethernets = Hash::new();
@@ -224,7 +221,7 @@ impl Interface {
                         auth.insert(
                             Yaml::String("password".to_string()),
                             Yaml::String(password.clone()),
-                        );                                                
+                        );
                         it.insert(Yaml::String("auth".to_string()), Yaml::Hash(auth));
                     }
                     access_points.insert(Yaml::String(ssid.clone()), Yaml::Hash(it));

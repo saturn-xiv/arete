@@ -57,7 +57,7 @@ fn interfaces() {
         println!("---- model ----\n{:?}\n--------", it);
         println!(
             "---- netplan.yaml  ----\n{}\n--------",
-            it.netplan().unwrap()
+            it.netplan("networkd".to_string()).unwrap()
         );
         println!("---- network.sh  ----\n{}\n--------", it.render().unwrap());
     }
