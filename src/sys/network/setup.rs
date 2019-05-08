@@ -137,14 +137,16 @@ impl Interface {
             match e {
                 Ether::Static {
                     address,
-                    netmask,
+                    netmask: _,
                     gateway,
                     dns1,
                     dns2,
                 } => {
                     eth.insert(
                         Yaml::String("addresses".to_string()),
-                        Yaml::Array(vec![Yaml::String(format!("{}/{}", address, netmask))]),
+                        // Yaml::Array(vec![Yaml::String(format!("{}/{}", address, netmask))]),
+                        // FIXME
+                        Yaml::Array(vec![Yaml::String(format!("{}/24", address))]),
                     );
                     eth.insert(
                         Yaml::String("gateway4".to_string()),
