@@ -112,7 +112,6 @@ pub trait Dao {
     ) -> Result<()>;
     fn lock(&self, id: ID, on: bool) -> Result<()>;
     fn confirm(&self, id: ID) -> Result<()>;
-    fn unlock(&self, id: ID) -> Result<()>;
     fn count(&self) -> Result<i64>;
     fn all(&self) -> Result<Vec<Item>>;
     fn password<T: Password>(&self, id: ID, password: &String) -> Result<()>;
@@ -228,18 +227,6 @@ impl Dao for Connection {
         update(it)
             .set((
                 users::dsl::confirmed_at.eq(&Some(now)),
-                users::dsl::updated_at.eq(&now),
-            ))
-            .execute(self)?;
-        Ok(())
-    }
-
-    fn unlock(&self, id: ID) -> Result<()> {
-        let now = Utc::now().naive_utc();
-        let it = users::dsl::users.filter(users::dsl::id.eq(id));
-        update(it)
-            .set((
-                users::dsl::locked_at.eq(&None::<NaiveDateTime>),
                 users::dsl::updated_at.eq(&now),
             ))
             .execute(self)?;

@@ -405,7 +405,7 @@ pub fn unlock_token(
         return __i18n_e!(db, &lang.0, "nut.errors.user.is-not-lock");
     }
     db.transaction::<_, FailueError, _>(move || {
-        UserDao::unlock(db, it.id)?;
+        UserDao::lock(db, it.id, false)?;
         __i18n_l!(db, it.id, &remote.0, &lang.0, "nut.logs.user.unlock")?;
         Ok(())
     })?;
