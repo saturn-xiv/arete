@@ -15,7 +15,6 @@ pub mod sqlite;
 
 use std::path::{Component, Path, PathBuf};
 
-
 #[cfg(feature = "mysql")]
 pub use self::mysql::*;
 #[cfg(feature = "postgresql")]
