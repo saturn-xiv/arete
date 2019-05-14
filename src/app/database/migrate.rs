@@ -9,7 +9,7 @@ use super::super::super::{
         migration::{Dao, New as Migration},
         Connection,
     },
-    plugins::{forum, nut, survey, vip},
+    plugins::{forum, nut, ops::vpn, survey, vip},
     settings,
 };
 
@@ -19,6 +19,7 @@ pub fn command<'a, 'b>() -> App<'a, 'b> {
     SubCommand::with_name(COMMAND_NAME).about("Migrate database to latest migration")
 }
 
+/// date +"%Y%m%d%H%M%S"
 pub fn run(db: &Connection) -> Result<()> {
     db.transaction::<_, Error, _>(|| {
         db.load(&vec![
@@ -63,6 +64,12 @@ pub fn run(db: &Connection) -> Result<()> {
                 version: "20190101053657",
                 up: vip::UP,
                 down: vip::DOWN,
+            },
+            Migration {
+                name: "create-ops-vpn",
+                version: "20190514084629",
+                up: vpn::UP,
+                down: vpn::DOWN,
             },
         ])?;
         db.migrate()

@@ -18,6 +18,7 @@ do
     diesel print-schema -o forum_topics forum_posts > src/plugins/forum/$i/schema.rs
     diesel print-schema -o survey_forms survey_fields survey_responses survey_logs survey_subscribers > src/plugins/survey/$i/schema.rs
     diesel print-schema -o vip_members > src/plugins/vip/$i/schema.rs
+    diesel print-schema -o vpn_users vpn_logs > src/plugins/ops/vpn/$i/schema.rs
 done
 
 exit 0
