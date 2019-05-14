@@ -11,14 +11,14 @@ use super::super::schema::vpn_logs;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum Type {
-    Connection,
+    Connect,
     Disconnect,
 }
 
 impl fmt::Display for Type {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Type::Connection => fmt.write_str("Connect"),
+            Type::Connect => fmt.write_str("Connect"),
             Type::Disconnect => fmt.write_str("Disconnect"),
         }
     }

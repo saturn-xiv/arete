@@ -3,7 +3,7 @@ use diesel::{insert_into, prelude::*, update};
 
 use super::super::super::super::super::{
     crypto::Password,
-    errors::Result,
+    errors::{Error, Result},
     orm::{Connection, ID},
 };
 use super::super::schema::vpn_users;
@@ -23,6 +23,15 @@ pub struct Item {
     pub updated_at: NaiveDateTime,
 }
 
+impl Item {
+    pub fn auth<E: Password>(&self, password: &String) -> Result<()> {
+        if E::verify(&self.password, password.as_bytes()) {
+            return Ok(());
+        }
+        return Err(Error::UserBadPassword.into());
+    }
+}
+
 #[derive(Insertable)]
 #[table_name = "vpn_users"]
 pub struct New<'a> {
@@ -33,6 +42,7 @@ pub struct New<'a> {
     pub shutdown: &'a NaiveDate,
     pub updated_at: &'a NaiveDateTime,
 }
+
 pub trait Dao {
     fn by_id(&self, id: ID) -> Result<Item>;
     fn by_email(&self, email: &String) -> Result<Item>;
@@ -48,6 +58,14 @@ pub trait Dao {
     ) -> Result<()>;
     fn lock(&self, id: ID, on: bool) -> Result<()>;
     fn all(&self) -> Result<Vec<Item>>;
+    fn update<T: Password>(
+        &self,
+        id: ID,
+        name: &String,
+        password: &String,
+        startup: &NaiveDate,
+        shutdown: &NaiveDate,
+    ) -> Result<()>;
     fn password<T: Password>(&self, id: ID, password: &String) -> Result<()>;
 }
 
@@ -75,7 +93,6 @@ impl Dao for Connection {
         shutdown: &NaiveDate,
     ) -> Result<()> {
         let email = email.trim().to_lowercase();
-        let name = name.trim();
         insert_into(vpn_users::dsl::vpn_users)
             .values(&New {
                 name: name,
@@ -85,6 +102,27 @@ impl Dao for Connection {
                 password: &T::sum(password.as_bytes())?,
                 updated_at: &Utc::now().naive_utc(),
             })
+            .execute(self)?;
+        Ok(())
+    }
+
+    fn update<T: Password>(
+        &self,
+        id: ID,
+        name: &String,
+        password: &String,
+        startup: &NaiveDate,
+        shutdown: &NaiveDate,
+    ) -> Result<()> {
+        let it = vpn_users::dsl::vpn_users.filter(vpn_users::dsl::id.eq(id));
+        update(it)
+            .set((
+                vpn_users::dsl::name.eq(name),
+                vpn_users::dsl::startup.eq(startup),
+                vpn_users::dsl::shutdown.eq(shutdown),
+                vpn_users::dsl::password.eq(&T::sum(password.as_bytes())?),
+                vpn_users::dsl::updated_at.eq(&Utc::now().naive_utc()),
+            ))
             .execute(self)?;
         Ok(())
     }

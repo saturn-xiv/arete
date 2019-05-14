@@ -25,3 +25,21 @@ pub use self::sqlite::*;
 lazy_static! {
     pub static ref ROOT: PathBuf = Path::new(&Component::RootDir).join("etc").join("openvpn");
 }
+
+use rocket::Route;
+
+pub fn routes() -> (&'static str, Vec<Route>, Vec<Route>) {
+    (
+        "ops/vpn",
+        routes![
+            api::users::create,
+            api::users::update,
+            api::users::change_password,
+            api::users::sign_in,
+            api::users::connect,
+            api::users::disconnect,
+            api::logs::index,
+        ],
+        routes![],
+    )
+}
