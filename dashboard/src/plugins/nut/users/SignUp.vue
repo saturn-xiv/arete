@@ -1,11 +1,11 @@
 <template>
-  <application-layout v-bind:onSubmit="submit" v-bind:title="this.$t('nut.users.sign-in.title')">
+  <application-layout v-bind:onSubmit="submit" v-bind:title="this.$t('nut.users.sign-up.title')">
     <v-form>
       <v-text-field
         prepend-icon="person"
-        name="login"
-        v-model="login"
-        :label="this.$t('nut.users.sign-in.login')"
+        name="nickname"
+        v-model="nickname"
+        :label="this.$t('form.labels.nickname')"
         type="text"
       />
       <v-text-field
@@ -22,9 +22,9 @@
 
 <script>
 export default {
-  name: "users-sign-in",
+  name: "users-sign-up",
   data() {
-    return { login: null, password: null };
+    return { nickname: null, password: null };
   },
   methods: {
     submit(e) {
