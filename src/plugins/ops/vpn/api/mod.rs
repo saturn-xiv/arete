@@ -11,6 +11,7 @@ use rocket::{
 };
 use rocket_contrib::json::Json;
 use uuid::Uuid;
+use validator::Validate;
 
 use super::super::super::super::{
     crypto::Crypto, errors::JsonResult, orm::Database, request::Token as Bearer,
@@ -32,6 +33,71 @@ pub fn token(db: Database, enc: State<Arc<Crypto>>, _user: Administrator) -> Jso
         }
     };
     Ok(Json(it))
+}
+
+#[derive(Deserialize, Serialize, Validate)]
+#[serde(rename_all = "camelCase")]
+pub struct Form {
+    pub port: u16,
+    #[validate(length(min = "1", max = "16"))]
+    pub lan: String,
+    #[validate(length(min = "1", max = "32"))]
+    pub dns1: String,
+    #[validate(length(min = "1", max = "32"))]
+    pub dns2: String,
+}
+
+impl Form {
+    const KEY: &'static str = "site.author";
+}
+
+impl Default for Form {
+    fn default() -> Self {
+        Self {
+            port: 1194,
+            lan: "192.168.0.0".to_string(),
+            dns1: "8.8.8.8".to_string(),
+            dns2: "8.8.4.4".to_string(),
+        }
+    }
+}
+
+#[get("/")]
+pub fn get(db: Database, _user: Administrator, enc: State<Arc<Crypto>>) -> JsonResult<Form> {
+    let db = db.deref();
+    let enc = enc.deref();
+    let enc = enc.deref();
+    let it: Form = match SettingDao::get(db, enc, &Form::KEY.to_string()) {
+        Ok(v) => v,
+        Err(_) => Form::default(),
+    };
+    Ok(Json(it))
+}
+
+#[post("/", data = "<form>")]
+pub fn post(
+    _user: Administrator,
+    enc: State<Arc<Crypto>>,
+    db: Database,
+    form: Json<Form>,
+) -> JsonResult<()> {
+    form.validate()?;
+    let db = db.deref();
+    let enc = enc.deref();
+    let enc = enc.deref();
+    let form = form.deref();
+    SettingDao::set::<String, Form, Crypto>(db, enc, &Form::KEY.to_string(), form, false)?;
+    Ok(Json(()))
+}
+
+#[get("/download")]
+pub fn download(_user: Administrator, enc: State<Arc<Crypto>>, db: Database) -> JsonResult<()> {
+    let db = db.deref();
+    let enc = enc.deref();
+    let enc = enc.deref();
+    let it: Form = SettingDao::get(db, enc, &Form::KEY.to_string())?;
+    // TODO
+    Ok(Json(()))
 }
 
 pub struct Token;

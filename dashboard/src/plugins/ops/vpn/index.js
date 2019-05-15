@@ -3,6 +3,7 @@ import UsersNew from './users/New'
 import UsersChangePassword from './users/ChangePassword'
 import UsersIndex from './users/Index'
 import LogsIndex from './logs/Index'
+import Settings from './Settings'
 
 export default {
     routes: [{
@@ -25,5 +26,9 @@ export default {
         path: '/ops/vpn/logs',
         name: 'ops.vpn.logs.index',
         component: LogsIndex,
+    }, {
+        path: '/ops/vpn/settings',
+        name: 'ops.vpn.settings',
+        component: Settings,
     }]
 }

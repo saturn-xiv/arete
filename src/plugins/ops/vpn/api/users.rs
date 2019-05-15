@@ -32,6 +32,14 @@ pub fn show(_user: Administrator, id: ID, db: Database) -> JsonResult<User> {
     Ok(Json(it))
 }
 
+#[get("/users/<id>/download")]
+pub fn download(_user: Administrator, id: ID, db: Database) -> JsonResult<()> {
+    let db = db.deref();
+    let it = UserDao::by_id(db, id)?;
+    // TODO
+    Ok(Json(()))
+}
+
 #[derive(Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Create {

@@ -118,6 +118,11 @@ export default {
           model: false,
           children: [
             {
+              icon: "settings",
+              to: { name: "ops.vpn.settings" },
+              text: this.$i18n.t("ops.vpn.settings.title")
+            },
+            {
               icon: "format_list_bulleted",
               to: { name: "ops.vpn.logs.index" },
               text: this.$i18n.t("ops.vpn.logs.index.title")

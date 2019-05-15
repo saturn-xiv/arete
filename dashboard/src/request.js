@@ -6,7 +6,7 @@ import {
 
 export default axios.create({
     baseURL: '/api/',
-    timeout: 1000,
+    timeout: 5000,
     withCredentials: true,
     headers: {
         'Accept': 'application/json',

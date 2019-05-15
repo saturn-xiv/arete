@@ -79,7 +79,7 @@ export default {
                     },
                     user: {
                         online: 'Online'
-                    }
+                    },
                 }
             },
             dashboard: {
@@ -98,6 +98,12 @@ export default {
                 'change-password': {
                     title: 'Change vpn password'
                 }
+            },
+            settings: {
+                title: 'Settings',
+                network: 'Network',
+                dns1: 'DNS server 1',
+                dns2: 'DNS server 2',
             },
             logs: {
                 index: {
