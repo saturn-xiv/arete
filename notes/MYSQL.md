@@ -10,6 +10,23 @@ $ mysql -u root -p
 > FLUSH PRIVILEGES;
 ```
 
+
+- change user password
+
+```bash
+> USE mysql;
+> UPDATE user SET password=PASSWORD('YourPasswordHere') WHERE User='root' AND Host = 'localhost';
+> FLUSH PRIVILEGES;
+```
+
+- backup & restore
+
+```bash
+$ mysqldump -u root -p --all-databases > all.sql 
+$ mysqldump -u root -p --opt --skip-extended-insert one > one.sql
+$ mysql -u root -p one < one.sql
+```
+
 -   usage
 
 ```bash
