@@ -59,24 +59,23 @@ export default {
       realName: null,
       password: null,
       passwordConfirmation: null,
-      alert: null
+      alert: {}
     };
   },
   methods: {
     async submit(e) {
       e.preventDefault();
-      this.alert = null;
+      this.alert = {};
       const isValid = await this.$validator.validate();
       if (isValid) {
         client
           .post("/install", {
             email: this.email,
             realName: this.realName,
-            password: this.password,
-            passwordConfirmation: this.passwordConfirmation
+            password: this.password
           })
           .catch(error => {
-            this.alert = error.response.data;
+            this.alert = { ok: false, message: error.response.data };
           });
       }
     }

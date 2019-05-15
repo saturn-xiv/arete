@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 
 import nut from './nut'
 import ops_vpn from './ops/vpn'
+import NotFound from './NotFound'
 
 Vue.use(VueRouter)
 
@@ -11,5 +12,8 @@ const plugins = [ops_vpn, nut]
 export const router = new VueRouter({
     base: '/my/',
     mode: 'history',
-    routes: plugins.reduce((a, i) => a.concat(i.routes), [])
+    routes: plugins.reduce((a, i) => a.concat(i.routes), []).concat([{
+        path: '*',
+        component: NotFound,
+    }])
 })

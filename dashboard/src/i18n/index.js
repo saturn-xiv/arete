@@ -24,8 +24,11 @@ export const get = () => {
     return it
 }
 
+export const languages = ['en-US', 'zh-Hans', 'zh-Hant']
+
 export default new VueI18n({
     locale: get(),
+    fallbackLocale: 'en-US',
     messages: {
         'en-US': enUS,
         'zh-Hans': zhHans,

@@ -493,10 +493,6 @@ pub fn get_profile(user: User) -> JsonResult<User> {
 #[derive(Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Profile {
-    #[validate(email, length(min = "2", max = "64"))]
-    pub email: String,
-    #[validate(length(min = "2", max = "32"))]
-    pub nick_name: String,
     #[validate(length(min = "2", max = "32"))]
     pub real_name: String,
     #[validate(length(min = "1"))]

@@ -7,18 +7,27 @@ export default {
     buttons: {
         submit: 'Submit'
     },
+    flashes: {
+        success: "Success"
+    },
     form: {
         labels: {
             password: 'Password',
             'password-confirmation': 'Password confirmation',
             'nickname': 'Nickname',
             'real-name': 'Real name',
-            email: 'Email'
+            'new-password': 'New password',
+            'current-password': 'Current password',
+            email: 'Email',
+            logo: 'Logo',
         }
     },
     nut: {
         install: {
             title: 'Install'
+        },
+        personal: {
+            title: 'Personal'
         },
         users: {
             'sign-in': {
@@ -27,6 +36,32 @@ export default {
             },
             'sign-up': {
                 title: 'Sign up'
+            },
+            'profile': {
+                title: 'Profile'
+            },
+            'logs': {
+                title: 'Logs'
+            },
+            'change-password': {
+                title: 'Change password'
+            }
+        }
+    },
+    ops: {
+        vpn: {
+            dashboard: {
+                title: "VPN",
+            },
+            users: {
+                index: {
+                    title: 'Users'
+                }
+            },
+            logs: {
+                index: {
+                    title: 'Logs'
+                }
             }
         }
     }

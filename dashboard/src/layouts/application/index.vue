@@ -18,7 +18,6 @@
                 </v-toolbar-items>
               </v-toolbar>
               <v-card-text>
-                <v-alert dismissible :value="alert!=null" color="error">{{alert}}</v-alert>
                 <slot/>
                 <v-chip v-on:click="goto(it.to)" :key="it.to" v-for="it in links">
                   <v-avatar>
@@ -32,6 +31,7 @@
                 <v-btn v-on:click="onSubmit" color="primary">{{$t('buttons.submit')}}</v-btn>
               </v-card-actions>
             </v-card>
+            <notification-bar :alert="alert"/>
           </v-flex>
         </v-layout>
       </v-container>
@@ -52,7 +52,7 @@ export default {
   },
   props: {
     title: String,
-    alert: String,
+    alert: Object,
     onSubmit: Function
   },
   methods: {
