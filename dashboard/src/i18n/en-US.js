@@ -5,7 +5,8 @@ export default {
         'zh-Hant': '繁體中文',
     },
     buttons: {
-        submit: 'Submit'
+        submit: 'Submit',
+        actions: 'Actions'
     },
     flashes: {
         success: "Success"
@@ -26,6 +27,18 @@ export default {
             ip: 'IP',
             id: 'ID',
             port: 'Port',
+            startup: 'Startup',
+            shutdown: 'Shutdown',
+            enable: 'Enable',
+            yes: 'Y',
+            no: 'N',
+            true: 'T',
+            false: 'F',
+            range: {
+                date: 'Date range',
+                time: 'Time range',
+                timestamp: 'Timestamp range'
+            }
         }
     },
     nut: {
@@ -56,12 +69,34 @@ export default {
     },
     ops: {
         vpn: {
+            form: {
+                labels: {
+                    log: {
+                        remote: 'Remove',
+                        trusted: 'Trusted',
+                        received: 'Received',
+                        send: 'Send',
+                    },
+                    user: {
+                        online: 'Online'
+                    }
+                }
+            },
             dashboard: {
                 title: "VPN",
             },
             users: {
                 index: {
                     title: 'Users'
+                },
+                new: {
+                    title: 'Create a new user'
+                },
+                edit: {
+                    title: 'Edit user {name}'
+                },
+                'change-password': {
+                    title: 'Change vpn password'
                 }
             },
             logs: {

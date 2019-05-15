@@ -40,7 +40,7 @@ pub struct Item {
 }
 
 pub trait Dao {
-    fn all(&self) -> Result<Vec<Item>>;
+    fn all(&self, limit: i64) -> Result<Vec<Item>>;
     fn add(
         &self,
         user: ID,
@@ -55,9 +55,10 @@ pub trait Dao {
 }
 
 impl Dao for Connection {
-    fn all(&self) -> Result<Vec<Item>> {
+    fn all(&self, limit: i64) -> Result<Vec<Item>> {
         let items = vpn_logs::dsl::vpn_logs
             .order(vpn_logs::dsl::created_at.desc())
+            .limit(limit)
             .load::<Item>(self)?;
         Ok(items)
     }

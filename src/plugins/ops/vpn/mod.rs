@@ -32,6 +32,8 @@ pub fn routes() -> (&'static str, Vec<Route>, Vec<Route>) {
     (
         "ops/vpn",
         routes![
+            api::users::index,
+            api::users::show,
             api::users::create,
             api::users::update,
             api::users::change_password,

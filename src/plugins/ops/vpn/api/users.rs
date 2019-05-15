@@ -25,6 +25,13 @@ pub fn index(_user: Administrator, db: Database) -> JsonResult<Vec<User>> {
     Ok(Json(items))
 }
 
+#[get("/users/<id>")]
+pub fn show(_user: Administrator, id: ID, db: Database) -> JsonResult<User> {
+    let db = db.deref();
+    let it = UserDao::by_id(db, id)?;
+    Ok(Json(it))
+}
+
 #[derive(Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Create {
@@ -89,7 +96,7 @@ pub struct ChangePassword {
     pub new_password: String,
 }
 
-#[post("/change-password", data = "<form>")]
+#[post("/users/change-password", data = "<form>")]
 pub fn change_password(db: Database, form: Json<ChangePassword>) -> JsonResult<()> {
     form.validate()?;
     let db = db.deref();
@@ -108,7 +115,7 @@ pub struct SignIn {
     pub password: String,
 }
 
-#[post("/sign-in", data = "<form>")]
+#[post("/users/sign-in", data = "<form>")]
 pub fn sign_in(_token: Token, db: Database, form: Json<SignIn>) -> JsonResult<User> {
     form.validate()?;
     let db = db.deref();
@@ -129,7 +136,7 @@ pub struct Report {
     pub send: f64,
 }
 
-#[post("/connect", data = "<form>")]
+#[post("/users/connect", data = "<form>")]
 pub fn connect(_token: Token, db: Database, form: Json<Report>) -> JsonResult<()> {
     let db = db.deref();
     let user = UserDao::by_email(db, &form.email)?;
@@ -152,7 +159,7 @@ pub fn connect(_token: Token, db: Database, form: Json<Report>) -> JsonResult<()
     Ok(Json(()))
 }
 
-#[post("/disconnect", data = "<form>")]
+#[post("/users/disconnect", data = "<form>")]
 pub fn disconnect(_token: Token, db: Database, form: Json<Report>) -> JsonResult<()> {
     let db = db.deref();
     let user = UserDao::by_email(db, &form.email)?;

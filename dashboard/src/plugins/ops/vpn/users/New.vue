@@ -22,7 +22,6 @@
             v-model="email"
             v-validate="'required|email'"
             :label="this.$t('form.labels.email')"
-            disabled
             type="email"
           />
           <v-text-field
@@ -63,10 +62,10 @@
 import client from "@/request";
 
 export default {
-  name: "vpn-user-edit",
+  name: "vpn-user-new",
   computed: {
     title() {
-      return this.$i18n.t("ops.vpn.users.edit.title", { name: this.name });
+      return this.$i18n.t("ops.vpn.users.new.title");
     }
   },
   data() {
@@ -80,14 +79,6 @@ export default {
       alert: {}
     };
   },
-  created() {
-    client.get(`/ops/vpn/users/${this.$route.params.id}`).then(rst => {
-      this.email = rst.data.email;
-      this.name = rst.data.name;
-      this.startup = rst.data.startup;
-      this.shutdown = rst.data.shutdown;
-    });
-  },
   methods: {
     async submit(e) {
       e.preventDefault();
@@ -95,7 +86,8 @@ export default {
       const isValid = await this.$validator.validate();
       if (isValid) {
         client
-          .post(`/ops/vpn/users/${this.$route.params.id}`, {
+          .post("/ops/vpn/users", {
+            email: this.email,
             name: this.name,
             password: this.password,
             startup: this.startup,
