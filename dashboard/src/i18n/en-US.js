@@ -20,6 +20,12 @@ export default {
             'current-password': 'Current password',
             email: 'Email',
             logo: 'Logo',
+            'created-at': 'Created at',
+            'updated-at': 'Updated at',
+            message: 'Message',
+            ip: 'IP',
+            id: 'ID',
+            port: 'Port',
         }
     },
     nut: {

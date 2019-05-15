@@ -1,5 +1,5 @@
 <template>
-  <v-snackbar :color="color" v-model="show">{{alert.message}} {{new Date()|moment}}</v-snackbar>
+  <v-snackbar :color="color" v-model="show">{{alert.message}} {{new Date()|moment('llll')}}</v-snackbar>
 </template>
 
 <script>
