@@ -26,6 +26,7 @@ export default {
             message: 'Message',
             ip: 'IP',
             id: 'ID',
+            host: 'Host',
             port: 'Port',
             startup: 'Startup',
             shutdown: 'Shutdown',

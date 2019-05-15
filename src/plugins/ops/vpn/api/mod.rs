@@ -38,6 +38,8 @@ pub fn token(db: Database, enc: State<Arc<Crypto>>, _user: Administrator) -> Jso
 #[derive(Deserialize, Serialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Form {
+    #[validate(length(min = "1", max = "255"))]
+    pub host: String,
     pub port: u16,
     #[validate(length(min = "1", max = "16"))]
     pub lan: String,
@@ -54,6 +56,7 @@ impl Form {
 impl Default for Form {
     fn default() -> Self {
         Self {
+            host: "vpn.change-me.com".to_string(),
             port: 1194,
             lan: "192.168.0.0".to_string(),
             dns1: "8.8.8.8".to_string(),

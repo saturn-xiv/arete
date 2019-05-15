@@ -7,11 +7,11 @@
         </v-card-title>
         <v-form>
           <v-text-field
-            name="lan"
-            v-model="lan"
-            :error-messages="errors.collect('lan')"
+            name="host"
+            v-model="host"
+            :error-messages="errors.collect('host')"
             v-validate="'required'"
-            :label="this.$t('ops.vpn.settings.network')"
+            :label="this.$t('form.labels.host')"
             type="text"
           />
           <v-text-field
@@ -20,6 +20,14 @@
             v-model="port"
             v-validate="'required'"
             :label="this.$t('form.labels.port')"
+            type="text"
+          />
+          <v-text-field
+            name="lan"
+            v-model="lan"
+            :error-messages="errors.collect('lan')"
+            v-validate="'required'"
+            :label="this.$t('ops.vpn.settings.network')"
             type="text"
           />
           <v-text-field
@@ -61,6 +69,7 @@ export default {
   },
   data() {
     return {
+      host: null,
       lan: null,
       dns1: null,
       dns2: null,
@@ -70,6 +79,7 @@ export default {
   },
   created() {
     client.get(`/ops/vpn/`).then(rst => {
+      this.host = rst.data.host;
       this.lan = rst.data.lan;
       this.dns1 = rst.data.dns1;
       this.dns2 = rst.data.dns2;
@@ -84,6 +94,7 @@ export default {
       if (isValid) {
         client
           .post(`/ops/vpn`, {
+            host: this.host,
             lan: this.lan,
             dns1: this.dns1,
             dns2: this.dns2,
