@@ -1,9 +1,5 @@
 <template>
-  <application-layout
-    v-bind:alert="alert"
-    v-bind:onSubmit="submit"
-    v-bind:title="this.$t('nut.install.title')"
-  >
+  <application-layout v-bind:onSubmit="submit" v-bind:title="this.$t('nut.install.title')">
     <v-form>
       <v-text-field
         prepend-icon="person"
@@ -50,6 +46,7 @@
 
 <script>
 import { post as httpPost } from "@/request";
+import { NOTIFICATION_ERROR } from "@/store";
 
 export default {
   name: "install",
@@ -58,14 +55,12 @@ export default {
       email: null,
       realName: null,
       password: null,
-      passwordConfirmation: null,
-      alert: {}
+      passwordConfirmation: null
     };
   },
   methods: {
     async submit(e) {
       e.preventDefault();
-      this.alert = {};
       const isValid = await this.$validator.validate();
       if (isValid) {
         httpPost("/install", {
@@ -77,7 +72,7 @@ export default {
             this.$router.push({ name: "install" });
           })
           .catch(err => {
-            this.alert = { ok: false, message: err };
+            this.$store.commit(NOTIFICATION_ERROR, err);
           });
       }
     }

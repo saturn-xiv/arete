@@ -47,12 +47,12 @@
         </v-card-actions>
       </v-card>
     </v-flex>
-    <notification-bar :alert="alert"/>
   </dashboard-layout>
 </template>
 
 <script>
 import { get as httpGet, post as httpPost } from "@/request";
+import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from "@/store";
 
 export default {
   name: "users-profile",
@@ -66,8 +66,7 @@ export default {
       email: null,
       nickName: null,
       realName: null,
-      logo: null,
-      alert: {}
+      logo: null
     };
   },
   created() {
@@ -81,7 +80,7 @@ export default {
   methods: {
     async submit(e) {
       e.preventDefault();
-      this.alert = {};
+
       const isValid = await this.$validator.validate();
       if (isValid) {
         httpPost("/users/profile", {
@@ -89,10 +88,13 @@ export default {
           realName: this.realName
         })
           .then(() => {
-            this.alert = { ok: true, message: this.$i18n.t("flashes.success") };
+            this.$store.commit(
+              NOTIFICATION_SUCCESS,
+              this.$i18n.t("flashes.success")
+            );
           })
           .catch(err => {
-            this.alert = { ok: false, message: err };
+            this.$store.commit(NOTIFICATION_ERROR, err);
           });
       }
     }

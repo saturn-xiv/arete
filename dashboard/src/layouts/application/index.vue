@@ -31,7 +31,6 @@
                 <v-btn v-on:click="onSubmit" color="primary">{{$t('buttons.submit')}}</v-btn>
               </v-card-actions>
             </v-card>
-            <notification-bar :alert="alert"/>
           </v-flex>
         </v-layout>
       </v-container>
@@ -52,7 +51,6 @@ export default {
   },
   props: {
     title: String,
-    alert: Object,
     onSubmit: Function
   },
   methods: {

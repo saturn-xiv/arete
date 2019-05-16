@@ -1,9 +1,5 @@
 <template>
-  <application-layout
-    v-bind:alert="alert"
-    v-bind:onSubmit="submit"
-    v-bind:title="this.$t('nut.users.sign-in.title')"
-  >
+  <application-layout v-bind:onSubmit="submit" v-bind:title="this.$t('nut.users.sign-in.title')">
     <v-form>
       <v-text-field
         prepend-icon="person"
@@ -31,17 +27,17 @@
 <script>
 import { post as httpPost } from "@/request";
 import { set as setToken } from "@/token";
-import { USERS_SIGN_IN } from "@/store";
+import { USERS_SIGN_IN, NOTIFICATION_ERROR } from "@/store";
 
 export default {
   name: "users-sign-in",
   data() {
-    return { login: null, password: null, alert: {} };
+    return { login: null, password: null };
   },
   methods: {
     async submit(e) {
       e.preventDefault();
-      this.alert = {};
+
       const isValid = await this.$validator.validate();
       if (isValid) {
         httpPost("/users/sign-in", {
@@ -49,12 +45,12 @@ export default {
           password: this.password
         })
           .then(res => {
-            setToken(res.data);
-            this.$store.commit(USERS_SIGN_IN, res.data);
+            setToken(res);
+            this.$store.commit(USERS_SIGN_IN, res);
             this.$router.push({ name: "home" });
           })
           .catch(err => {
-            this.alert = { ok: false, message: err };
+            this.$store.commit(NOTIFICATION_ERROR, err);
           });
       }
     }

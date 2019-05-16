@@ -1,5 +1,11 @@
 <template>
-  <router-view/>
+  <div>
+    <router-view/>
+    <v-snackbar
+      :color="notification.color"
+      v-model="show"
+    >{{notification.message}} {{new Date()|moment('llll')}}</v-snackbar>
+  </div>
 </template>
 
 <script>
@@ -11,6 +17,15 @@ export default {
   computed: {
     isSignIn() {
       return this.$store.getters.isSignIn;
+    },
+    notification() {
+      return this.$store.getters.notification;
+    },
+    show: {
+      get() {
+        return this.$store.getters.notification.message != null;
+      },
+      set() {}
     }
   },
   created() {

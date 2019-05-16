@@ -100,12 +100,12 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <notification-bar :alert="alert"/>
   </dashboard-layout>
 </template>
 
 <script>
 import { get as httpGet, post as httpPost } from "@/request";
+import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from "@/store";
 
 export default {
   name: "vpn-settings",
@@ -126,7 +126,6 @@ export default {
       serverNetwork: null,
       serverNetmask: null,
       files: [],
-      alert: {},
       dialog: false
     };
   },
@@ -151,12 +150,12 @@ export default {
           this.dialog = true;
         })
         .catch(err => {
-          this.alert = { ok: false, message: err };
+          this.$store.commit(NOTIFICATION_ERROR, err);
         });
     },
     async submit(e) {
       e.preventDefault();
-      this.alert = {};
+
       const isValid = await this.$validator.validate();
       if (isValid) {
         httpPost(`/ops/vpn`, {
@@ -175,10 +174,13 @@ export default {
           }
         })
           .then(() => {
-            this.alert = { ok: true, message: this.$i18n.t("flashes.success") };
+            this.$store.commit(
+              NOTIFICATION_SUCCESS,
+              this.$i18n.t("flashes.success")
+            );
           })
           .catch(err => {
-            this.alert = { ok: false, message: err };
+            this.$store.commit(NOTIFICATION_ERROR, err);
           });
       }
     }

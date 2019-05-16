@@ -31,7 +31,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <notification-bar :alert="alert"/>
     <v-btn
       fab
       bottom
@@ -48,6 +47,7 @@
 
 <script>
 import { get as httpGet } from "@/request";
+import { NOTIFICATION_ERROR } from "@/store";
 
 export default {
   name: "ops-vpn-users",
@@ -55,8 +55,7 @@ export default {
     return {
       items: [],
       files: [],
-      dialog: false,
-      alert: {}
+      dialog: false
     };
   },
   created() {
@@ -72,7 +71,7 @@ export default {
           this.dialog = true;
         })
         .catch(err => {
-          this.alert = { ok: false, message: err };
+          this.$store.commit(NOTIFICATION_ERROR, err);
         });
     }
   },

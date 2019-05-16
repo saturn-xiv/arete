@@ -1,5 +1,5 @@
 <template>
-  <application-layout v-bind:alert="alert" v-bind:onSubmit="submit" v-bind:title="title">
+  <application-layout v-bind:onSubmit="submit" v-bind:title="title">
     <v-form>
       <v-text-field
         prepend-icon="email"
@@ -46,6 +46,7 @@
 
 <script>
 import { post as httpPost } from "@/request";
+import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from "@/store";
 
 export default {
   name: "ops-vpn-users-change-password",
@@ -59,14 +60,13 @@ export default {
       currentPassword: null,
       newPassword: null,
       passwordConfirmation: null,
-      email: null,
-      alert: {}
+      email: null
     };
   },
   methods: {
     async submit(e) {
       e.preventDefault();
-      this.alert = {};
+
       const isValid = await this.$validator.validate();
       if (isValid) {
         httpPost("/ops/vpn/users/change-password", {
@@ -75,10 +75,13 @@ export default {
           newPassword: this.newPassword
         })
           .then(() => {
-            this.alert = { ok: true, message: this.$i18n.t("flashes.success") };
+            this.$store.commit(
+              NOTIFICATION_SUCCESS,
+              this.$i18n.t("flashes.success")
+            );
           })
           .catch(err => {
-            this.alert = { ok: false, message: err };
+            this.$store.commit(NOTIFICATION_ERROR, err);
           });
       }
     }
