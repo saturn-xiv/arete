@@ -1,6 +1,6 @@
 # ARETE
 
-A web application by Rust and React.
+A web application by Rust and Vue.js.
 
 ## Build
 
