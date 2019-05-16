@@ -8,8 +8,8 @@
         <v-form>
           <v-text-field
             prepend-icon="perm_identity"
-            name="nickname"
-            v-model="nickname"
+            name="nickName"
+            v-model="nickName"
             disabled
             :label="this.$t('form.labels.nickname')"
             type="text"
@@ -64,7 +64,7 @@ export default {
   data() {
     return {
       email: null,
-      nickname: null,
+      nickName: null,
       realName: null,
       logo: null,
       alert: {}
@@ -75,7 +75,7 @@ export default {
       this.email = rst.data.email;
       this.realName = rst.data.realName;
       this.logo = rst.data.logo;
-      this.nickname = rst.data.nickname;
+      this.nickName = rst.data.nickName;
     });
   },
   methods: {
