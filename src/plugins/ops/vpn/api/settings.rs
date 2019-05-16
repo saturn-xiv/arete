@@ -1,4 +1,3 @@
-use std::collections::BTreeMap;
 use std::ops::Deref;
 use std::path::{Component, Path, PathBuf};
 use std::sync::Arc;
@@ -19,106 +18,131 @@ use super::super::super::super::nut::api::users::Administrator;
 use super::super::{client, models::user::Dao as UserDao, server, ROOT};
 use super::Token;
 
+#[derive(Serialize)]
+pub struct File {
+    pub path: PathBuf,
+    pub mode: u32,
+    pub content: String,
+}
+
 #[derive(Deserialize, Serialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Form {
     pub port: u16,
+    #[validate(length(min = "1", max = "32"))]
+    pub dns: String,
+    #[validate(length(min = "1", max = "255"))]
+    pub host: String,
+    #[validate(length(min = "1", max = "16"))]
+    pub ip: String,
+    #[validate(length(min = "1", max = "16"))]
+    pub interface: String,
     pub server: Server,
     pub client: Client,
 }
 impl Form {
     const KEY: &'static str = "site.author";
 
-    pub fn server(&self, token: &String) -> Result<BTreeMap<PathBuf, String>> {
-        let mut items = BTreeMap::new();
+    pub fn server(&self, token: &String) -> Result<Vec<File>> {
+        let mut items = Vec::new();
 
-        items.insert(
-            Path::new(&Component::RootDir)
+        items.push(File {
+            path: Path::new(&Component::RootDir)
                 .join("etc")
                 .join("sysctl.d")
                 .join("openvpn.conf"),
-            server::Sysctl.render()?,
-        );
-        items.insert(
-            Path::new(&Component::RootDir)
+            mode: 0600,
+            content: server::Sysctl.render()?,
+        });
+        items.push(File {
+            path: Path::new(&Component::RootDir)
                 .join("etc")
                 .join("dnsmasq.conf"),
-            server::Dnsmasq {
-                ip: &self.server.ip,
-            }
-            .render()?,
-        );
-        items.insert(ROOT.join("readme.me"), server::Readme.render()?);
-        items.insert(
-            ROOT.join("server.conf"),
-            server::Config {
+            mode: 0600,
+            content: server::Dnsmasq { ip: &self.ip }.render()?,
+        });
+        items.push(File {
+            path: ROOT.join("readme.me"),
+            mode: 0600,
+            content: server::Readme.render()?,
+        });
+        items.push(File {
+            path: ROOT.join("server.conf"),
+            mode: 0600,
+            content: server::Config {
                 port: self.port,
                 server: &server::Server {
                     network: &self.server.network,
                     netmask: &self.server.netmask,
-                    ip: &self.server.ip,
+                    ip: &self.ip,
                 },
                 client: &server::Client {
                     netmask: &self.client.netmask,
                     network: &self.client.network,
-                    dns1: &self.server.ip,
-                    dns2: &self.client.dns,
+                    dns1: &self.ip,
+                    dns2: &self.dns,
                 },
             }
             .render()?,
-        );
-        items.insert(
-            ROOT.join("script").join("firewall.sh"),
-            server::Firewall {
+        });
+        items.push(File {
+            path: ROOT.join("script").join("firewall.sh"),
+            mode: 0700,
+            content: server::Firewall {
                 network: &self.client.network,
-                interface: &self.server.interface,
+                interface: &self.interface,
             }
             .render()?,
-        );
-        items.insert(
-            ROOT.join("script").join("auth.sh"),
-            server::Auth {
-                host: &self.server.host,
+        });
+        items.push(File {
+            path: ROOT.join("script").join("auth.sh"),
+            mode: 0700,
+            content: server::Auth {
+                host: &self.host,
                 token: token,
             }
             .render()?,
-        );
-        items.insert(
-            ROOT.join("script").join("connect.sh"),
-            server::Connect {
-                host: &self.server.host,
+        });
+        items.push(File {
+            path: ROOT.join("script").join("connect.sh"),
+            mode: 0700,
+            content: server::Connect {
+                host: &self.host,
                 token: token,
             }
             .render()?,
-        );
-        items.insert(
-            ROOT.join("script").join("disconnect.sh"),
-            server::Disconnect {
-                host: &self.server.host,
+        });
+        items.push(File {
+            path: ROOT.join("script").join("disconnect.sh"),
+            mode: 0700,
+            content: server::Disconnect {
+                host: &self.host,
                 token: token,
             }
             .render()?,
-        );
+        });
         Ok(items)
     }
-    pub fn client(&self, user: &String, password: &String) -> Result<BTreeMap<PathBuf, String>> {
-        let mut items = BTreeMap::new();
-        items.insert(
-            ROOT.join("client.conf"),
-            client::Config {
-                host: &self.server.host,
+    pub fn client(&self, user: &String, password: &String) -> Result<Vec<File>> {
+        let mut items = Vec::new();
+        items.push(File {
+            path: ROOT.join("client.conf"),
+            mode: 0600,
+            content: client::Config {
+                host: &self.host,
                 port: self.port,
             }
             .render()?,
-        );
-        items.insert(
-            ROOT.join("auth.txt"),
-            client::Auth {
+        });
+        items.push(File {
+            path: ROOT.join("auth.txt"),
+            mode: 0600,
+            content: client::Auth {
                 user: user,
                 password: password,
             }
             .render()?,
-        );
+        });
         Ok(items)
     }
 }
@@ -129,6 +153,10 @@ impl Default for Form {
             port: 1194,
             server: Server::default(),
             client: Client::default(),
+            host: "vpn.change-me.com".to_string(),
+            ip: "10.1.1.2".to_string(),
+            interface: "eth0".to_string(),
+            dns: "8.8.8.8".to_string(),
         }
     }
 }
@@ -136,26 +164,17 @@ impl Default for Form {
 #[derive(Deserialize, Serialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Server {
-    #[validate(length(min = "1", max = "255"))]
-    pub host: String,
-    #[validate(length(min = "1", max = "16"))]
-    pub ip: String,
     #[validate(length(min = "1", max = "16"))]
     pub network: String,
     #[validate(length(min = "1", max = "16"))]
     pub netmask: String,
-    #[validate(length(min = "1", max = "16"))]
-    pub interface: String,
 }
 
 impl Default for Server {
     fn default() -> Self {
         Self {
-            host: "vpn.change-me.com".to_string(),
-            ip: "10.1.1.2".to_string(),
             network: "10.1.1.0".to_string(),
             netmask: "255.255.255.0".to_string(),
-            interface: "eth0".to_string(),
         }
     }
 }
@@ -166,8 +185,6 @@ pub struct Client {
     pub network: String,
     #[validate(length(min = "1", max = "16"))]
     pub netmask: String,
-    #[validate(length(min = "1", max = "32"))]
-    pub dns: String,
 }
 
 impl Default for Client {
@@ -175,7 +192,6 @@ impl Default for Client {
         Self {
             network: "192.168.6.0".to_string(),
             netmask: "255.255.255.0".to_string(),
-            dns: "8.8.8.8".to_string(),
         }
     }
 }
@@ -213,7 +229,7 @@ pub fn server(
     _user: Administrator,
     enc: State<Arc<Crypto>>,
     db: Database,
-) -> JsonResult<BTreeMap<PathBuf, String>> {
+) -> JsonResult<Vec<File>> {
     let db = db.deref();
     let enc = enc.deref();
     let enc = enc.deref();
@@ -235,7 +251,7 @@ pub fn client(
     enc: State<Arc<Crypto>>,
     id: ID,
     db: Database,
-) -> JsonResult<BTreeMap<PathBuf, String>> {
+) -> JsonResult<Vec<File>> {
     let db = db.deref();
     let enc = enc.deref();
     let enc = enc.deref();

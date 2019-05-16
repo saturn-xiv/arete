@@ -11,7 +11,15 @@
             v-model="host"
             :error-messages="errors.collect('host')"
             v-validate="'required'"
-            :label="this.$t('form.labels.host')"
+            :label="this.$t('ops.vpn.settings.host')"
+            type="text"
+          />
+          <v-text-field
+            name="ip"
+            v-model="ip"
+            :error-messages="errors.collect('ip')"
+            v-validate="'required'"
+            :label="this.$t('ops.vpn.settings.ip')"
             type="text"
           />
           <v-text-field
@@ -23,36 +31,75 @@
             type="text"
           />
           <v-text-field
-            name="lan"
-            v-model="lan"
-            :error-messages="errors.collect('lan')"
+            name="interface"
+            v-model="interface"
+            :error-messages="errors.collect('interface')"
             v-validate="'required'"
-            :label="this.$t('ops.vpn.settings.network')"
+            :label="this.$t('ops.vpn.settings.interface')"
             type="text"
           />
           <v-text-field
-            name="dns1"
-            :error-messages="errors.collect('dns1')"
-            v-model="dns1"
+            name="dns"
+            :error-messages="errors.collect('dns')"
+            v-model="dns"
             v-validate="'required'"
-            :label="this.$t('ops.vpn.settings.dns1')"
+            :label="this.$t('ops.vpn.settings.dns')"
             type="text"
           />
           <v-text-field
-            name="dns2"
-            :error-messages="errors.collect('dns2')"
-            v-model="dns2"
+            name="serverNetwork"
+            v-model="serverNetwork"
+            :error-messages="errors.collect('serverNetwork')"
             v-validate="'required'"
-            :label="this.$t('ops.vpn.settings.dns2')"
+            :label="this.$t('ops.vpn.settings.server.network')"
+            type="text"
+          />
+          <v-text-field
+            name="serverNetmask"
+            v-model="serverNetmask"
+            :error-messages="errors.collect('serverNetmask')"
+            v-validate="'required'"
+            :label="this.$t('ops.vpn.settings.server.netmask')"
+            type="text"
+          />
+          <v-text-field
+            name="clientNetwork"
+            :error-messages="errors.collect('clientNetwork')"
+            v-model="clientNetwork"
+            v-validate="'required'"
+            :label="this.$t('ops.vpn.settings.client.network')"
+            type="text"
+          />
+          <v-text-field
+            name="clientNetmask"
+            :error-messages="errors.collect('clientNetmask')"
+            v-model="clientNetmask"
+            v-validate="'required'"
+            :label="this.$t('ops.vpn.settings.client.netmask')"
             type="text"
           />
         </v-form>
         <v-card-actions>
           <v-spacer/>
+          <v-icon class="mr-2" @click="fetch_files()">attach_file</v-icon>
           <v-btn v-on:click="submit" color="primary">{{$t('buttons.submit')}}</v-btn>
         </v-card-actions>
       </v-card>
     </v-flex>
+    <v-dialog v-model="dialog">
+      <v-card>
+        <v-card-title>
+          <span class="headline">{{$t('ops.vpn.dashboard.files')}}</span>
+        </v-card-title>
+        <v-card-text>
+          <file-list :items="files"/>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer/>
+          <v-btn color="green darken-1" flat="flat" @click="dialog = false">{{$t('buttons.close')}}</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <notification-bar :alert="alert"/>
   </dashboard-layout>
 </template>
@@ -69,24 +116,45 @@ export default {
   },
   data() {
     return {
+      dns: null,
       host: null,
-      lan: null,
-      dns1: null,
-      dns2: null,
+      ip: null,
+      interface: null,
       port: null,
-      alert: {}
+      clientNetwork: null,
+      clientNetmask: null,
+      serverNetwork: null,
+      serverNetmask: null,
+      files: [],
+      alert: {},
+      dialog: false
     };
   },
   created() {
     client.get(`/ops/vpn/`).then(rst => {
-      this.host = rst.data.host;
-      this.lan = rst.data.lan;
-      this.dns1 = rst.data.dns1;
-      this.dns2 = rst.data.dns2;
+      this.serverNetwork = rst.data.server.network;
+      this.serverNetmask = rst.data.server.netmask;
+      this.clientNetmask = rst.data.client.netmask;
+      this.clientNetwork = rst.data.client.network;
+      this.dns = rst.data.dns;
       this.port = rst.data.port.toString();
+      this.host = rst.data.host;
+      this.ip = rst.data.ip;
+      this.interface = rst.data.interface;
     });
   },
   methods: {
+    fetch_files() {
+      client
+        .get(`/ops/vpn/server`)
+        .then(rst => {
+          this.files = rst.data;
+          this.dialog = true;
+        })
+        .catch(error => {
+          this.alert = { ok: false, message: error.response.data };
+        });
+    },
     async submit(e) {
       e.preventDefault();
       this.alert = {};
@@ -94,11 +162,19 @@ export default {
       if (isValid) {
         client
           .post(`/ops/vpn`, {
+            port: parseInt(this.port),
+            dns: this.dns,
             host: this.host,
-            lan: this.lan,
-            dns1: this.dns1,
-            dns2: this.dns2,
-            port: parseInt(this.port)
+            ip: this.ip,
+            interface: this.interface,
+            server: {
+              network: this.serverNetwork,
+              netmask: this.serverNetmask
+            },
+            client: {
+              network: this.clientNetwork,
+              netmask: this.clientNetmask
+            }
           })
           .then(() => {
             this.alert = { ok: true, message: this.$i18n.t("flashes.success") };

@@ -6,7 +6,8 @@ export default {
     },
     buttons: {
         submit: 'Submit',
-        actions: 'Actions'
+        actions: 'Actions',
+        close: 'Close',
     },
     flashes: {
         success: "Success"
@@ -39,6 +40,11 @@ export default {
                 date: 'Date range',
                 time: 'Time range',
                 timestamp: 'Timestamp range'
+            },
+            file: {
+                path: 'Path',
+                mode: 'Mode',
+                content: 'Content'
             }
         }
     },
@@ -87,10 +93,11 @@ export default {
             },
             dashboard: {
                 title: "VPN",
+                files: 'OpenVpn config files'
             },
             users: {
                 index: {
-                    title: 'Users'
+                    title: 'Users',
                 },
                 new: {
                     title: 'Create a new user'
@@ -104,9 +111,18 @@ export default {
             },
             settings: {
                 title: 'Settings',
-                network: 'Network',
-                dns1: 'DNS server 1',
-                dns2: 'DNS server 2',
+                host: 'Domain/Public ip address',
+                interface: 'Network device',
+                ip: 'Listen ip address',
+                dns: 'Fallback DNS server',
+                server: {
+                    netmask: 'Local netmask',
+                    network: 'Local network',
+                },
+                client: {
+                    netmask: 'VPN netmask',
+                    network: 'VPN network',
+                }
             },
             logs: {
                 index: {
