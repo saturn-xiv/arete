@@ -29,7 +29,6 @@ export default {
   methods: {
     submit(e) {
       e.preventDefault();
-      console.log("submit" + this.password);
     }
   }
 };

@@ -45,7 +45,7 @@
 </template>
 
 <script>
-import client from "@/request";
+import { post as httpPost } from "@/request";
 
 export default {
   name: "ops-vpn-users-change-password",
@@ -69,17 +69,16 @@ export default {
       this.alert = {};
       const isValid = await this.$validator.validate();
       if (isValid) {
-        client
-          .post("/ops/vpn/users/change-password", {
-            email: this.email,
-            currentPassword: this.currentPassword,
-            newPassword: this.newPassword
-          })
+        httpPost("/ops/vpn/users/change-password", {
+          email: this.email,
+          currentPassword: this.currentPassword,
+          newPassword: this.newPassword
+        })
           .then(() => {
             this.alert = { ok: true, message: this.$i18n.t("flashes.success") };
           })
-          .catch(error => {
-            this.alert = { ok: false, message: error.response.data };
+          .catch(err => {
+            this.alert = { ok: false, message: err };
           });
       }
     }

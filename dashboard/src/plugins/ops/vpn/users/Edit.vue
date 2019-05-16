@@ -60,7 +60,7 @@
 </template>
 
 <script>
-import client from "@/request";
+import { get as httpGet, post as httpPost } from "@/request";
 
 export default {
   name: "vpn-user-edit",
@@ -81,11 +81,11 @@ export default {
     };
   },
   created() {
-    client.get(`/ops/vpn/users/${this.$route.params.id}`).then(rst => {
-      this.email = rst.data.email;
-      this.name = rst.data.name;
-      this.startup = rst.data.startup;
-      this.shutdown = rst.data.shutdown;
+    httpGet(`/ops/vpn/users/${this.$route.params.id}`).then(rst => {
+      this.email = rst.email;
+      this.name = rst.name;
+      this.startup = rst.startup;
+      this.shutdown = rst.shutdown;
     });
   },
   methods: {
@@ -94,18 +94,17 @@ export default {
       this.alert = {};
       const isValid = await this.$validator.validate();
       if (isValid) {
-        client
-          .post(`/ops/vpn/users/${this.$route.params.id}`, {
-            name: this.name,
-            password: this.password,
-            startup: this.startup,
-            shutdown: this.shutdown
-          })
+        httpPost(`/ops/vpn/users/${this.$route.params.id}`, {
+          name: this.name,
+          password: this.password,
+          startup: this.startup,
+          shutdown: this.shutdown
+        })
           .then(() => {
             this.alert = { ok: true, message: this.$i18n.t("flashes.success") };
           })
-          .catch(error => {
-            this.alert = { ok: false, message: error.response.data };
+          .catch(err => {
+            this.alert = { ok: false, message: err };
           });
       }
     }

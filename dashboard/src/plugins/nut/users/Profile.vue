@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import client from "@/request";
+import { get as httpGet, post as httpPost } from "@/request";
 
 export default {
   name: "users-profile",
@@ -71,11 +71,11 @@ export default {
     };
   },
   created() {
-    client.get("/users/profile").then(rst => {
-      this.email = rst.data.email;
-      this.realName = rst.data.realName;
-      this.logo = rst.data.logo;
-      this.nickName = rst.data.nickName;
+    httpGet("/users/profile").then(rst => {
+      this.email = rst.email;
+      this.realName = rst.realName;
+      this.logo = rst.logo;
+      this.nickName = rst.nickName;
     });
   },
   methods: {
@@ -84,16 +84,15 @@ export default {
       this.alert = {};
       const isValid = await this.$validator.validate();
       if (isValid) {
-        client
-          .post("/users/profile", {
-            logo: this.logo,
-            realName: this.realName
-          })
+        httpPost("/users/profile", {
+          logo: this.logo,
+          realName: this.realName
+        })
           .then(() => {
             this.alert = { ok: true, message: this.$i18n.t("flashes.success") };
           })
-          .catch(error => {
-            this.alert = { ok: false, message: error.response.data };
+          .catch(err => {
+            this.alert = { ok: false, message: err };
           });
       }
     }

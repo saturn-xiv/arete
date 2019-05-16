@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import client from "@/request";
+import { post as httpPost } from "@/request";
 
 export default {
   name: "install",
@@ -68,17 +68,16 @@ export default {
       this.alert = {};
       const isValid = await this.$validator.validate();
       if (isValid) {
-        client
-          .post("/install", {
-            email: this.email,
-            realName: this.realName,
-            password: this.password
-          })
+        httpPost("/install", {
+          email: this.email,
+          realName: this.realName,
+          password: this.password
+        })
           .then(() => {
             this.$router.push({ name: "install" });
           })
-          .catch(error => {
-            this.alert = { ok: false, message: error.response.data };
+          .catch(err => {
+            this.alert = { ok: false, message: err };
           });
       }
     }

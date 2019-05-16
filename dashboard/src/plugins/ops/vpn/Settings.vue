@@ -105,7 +105,7 @@
 </template>
 
 <script>
-import client from "@/request";
+import { get as httpGet, post as httpPost } from "@/request";
 
 export default {
   name: "vpn-settings",
@@ -131,28 +131,27 @@ export default {
     };
   },
   created() {
-    client.get(`/ops/vpn/`).then(rst => {
-      this.serverNetwork = rst.data.server.network;
-      this.serverNetmask = rst.data.server.netmask;
-      this.clientNetmask = rst.data.client.netmask;
-      this.clientNetwork = rst.data.client.network;
-      this.dns = rst.data.dns;
-      this.port = rst.data.port.toString();
-      this.host = rst.data.host;
-      this.ip = rst.data.ip;
-      this.device = rst.data.interface;
+    httpGet(`/ops/vpn/`).then(rst => {
+      this.serverNetwork = rst.server.network;
+      this.serverNetmask = rst.server.netmask;
+      this.clientNetmask = rst.client.netmask;
+      this.clientNetwork = rst.client.network;
+      this.dns = rst.dns;
+      this.port = rst.port.toString();
+      this.host = rst.host;
+      this.ip = rst.ip;
+      this.device = rst.interface;
     });
   },
   methods: {
     fetch_files() {
-      client
-        .get(`/ops/vpn/server`)
+      httpGet(`/ops/vpn/server`)
         .then(rst => {
-          this.files = rst.data;
+          this.files = rst;
           this.dialog = true;
         })
-        .catch(error => {
-          this.alert = { ok: false, message: error.response.data };
+        .catch(err => {
+          this.alert = { ok: false, message: err };
         });
     },
     async submit(e) {
@@ -160,27 +159,26 @@ export default {
       this.alert = {};
       const isValid = await this.$validator.validate();
       if (isValid) {
-        client
-          .post(`/ops/vpn`, {
-            port: parseInt(this.port),
-            dns: this.dns,
-            host: this.host,
-            ip: this.ip,
-            interface: this.device,
-            server: {
-              network: this.serverNetwork,
-              netmask: this.serverNetmask
-            },
-            client: {
-              network: this.clientNetwork,
-              netmask: this.clientNetmask
-            }
-          })
+        httpPost(`/ops/vpn`, {
+          port: parseInt(this.port),
+          dns: this.dns,
+          host: this.host,
+          ip: this.ip,
+          interface: this.device,
+          server: {
+            network: this.serverNetwork,
+            netmask: this.serverNetmask
+          },
+          client: {
+            network: this.clientNetwork,
+            netmask: this.clientNetmask
+          }
+        })
           .then(() => {
             this.alert = { ok: true, message: this.$i18n.t("flashes.success") };
           })
-          .catch(error => {
-            this.alert = { ok: false, message: error.response.data };
+          .catch(err => {
+            this.alert = { ok: false, message: err };
           });
       }
     }

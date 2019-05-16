@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import client from "@/request";
+import { get as httpGet } from "@/request";
 
 export default {
   name: "users-logs",
@@ -21,8 +21,8 @@ export default {
     };
   },
   created() {
-    client.get(`/users/logs?limit=${1 << 10}`).then(rst => {
-      this.items = rst.data;
+    httpGet(`/users/logs?limit=${1 << 10}`).then(rst => {
+      this.items = rst;
     });
   },
   computed: {

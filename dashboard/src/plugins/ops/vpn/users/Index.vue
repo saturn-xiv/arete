@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import client from "@/request";
+import { get as httpGet } from "@/request";
 
 export default {
   name: "ops-vpn-users",
@@ -60,20 +60,19 @@ export default {
     };
   },
   created() {
-    client.get(`/ops/vpn/users`).then(rst => {
-      this.items = rst.data;
+    httpGet(`/ops/vpn/users`).then(rst => {
+      this.items = rst;
     });
   },
   methods: {
     fetch_files(id) {
-      client
-        .get(`/ops/vpn/client/${id}`)
+      httpGet(`/ops/vpn/client/${id}`)
         .then(rst => {
-          this.files = rst.data;
+          this.files = rst;
           this.dialog = true;
         })
-        .catch(error => {
-          this.alert = { ok: false, message: error.response.data };
+        .catch(err => {
+          this.alert = { ok: false, message: err };
         });
     }
   },

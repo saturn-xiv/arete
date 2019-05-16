@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import client from "@/request";
+import { get as httpGet } from "@/request";
 
 export default {
   name: "ops-vpn-logs",
@@ -24,8 +24,8 @@ export default {
     };
   },
   created() {
-    client.get(`/ops/vpn/logs?limit=${1 << 10}`).then(rst => {
-      this.items = rst.data;
+    httpGet(`/ops/vpn/logs?limit=${1 << 10}`).then(rst => {
+      this.items = rst;
     });
   },
   computed: {

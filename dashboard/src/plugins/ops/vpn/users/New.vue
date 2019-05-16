@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import client from "@/request";
+import { post as httpPost } from "@/request";
 
 export default {
   name: "vpn-user-new",
@@ -85,19 +85,18 @@ export default {
       this.alert = {};
       const isValid = await this.$validator.validate();
       if (isValid) {
-        client
-          .post("/ops/vpn/users", {
-            email: this.email,
-            name: this.name,
-            password: this.password,
-            startup: this.startup,
-            shutdown: this.shutdown
-          })
+        httpPost("/ops/vpn/users", {
+          email: this.email,
+          name: this.name,
+          password: this.password,
+          startup: this.startup,
+          shutdown: this.shutdown
+        })
           .then(() => {
             this.alert = { ok: true, message: this.$i18n.t("flashes.success") };
           })
-          .catch(error => {
-            this.alert = { ok: false, message: error.response.data };
+          .catch(err => {
+            this.alert = { ok: false, message: err };
           });
       }
     }

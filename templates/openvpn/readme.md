@@ -34,13 +34,6 @@ $ ./build-key-server server
 $ ./build-dh
 ```
 
-* Revoke user
-
-```bash
-$ source var
-$ ./revoke-full client
-```
-
 ## Client
 
 * Generate client certs
@@ -48,4 +41,11 @@ $ ./revoke-full client
 ```bash
 $ source vars
 $ ./build-key client
+```
+
+* Revoke user
+
+```bash
+$ source var
+$ ./revoke-full client
 ```

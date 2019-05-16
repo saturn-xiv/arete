@@ -29,7 +29,8 @@
 </template>
 
 <script>
-import client from "@/request";
+import { post as httpPost } from "@/request";
+import { set as setToken } from "@/token";
 import { USERS_SIGN_IN } from "@/store";
 
 export default {
@@ -43,17 +44,17 @@ export default {
       this.alert = {};
       const isValid = await this.$validator.validate();
       if (isValid) {
-        client
-          .post("/users/sign-in", {
-            login: this.login,
-            password: this.password
-          })
+        httpPost("/users/sign-in", {
+          login: this.login,
+          password: this.password
+        })
           .then(res => {
+            setToken(res.data);
             this.$store.commit(USERS_SIGN_IN, res.data);
             this.$router.push({ name: "home" });
           })
-          .catch(error => {
-            this.alert = { ok: false, message: error.response.data };
+          .catch(err => {
+            this.alert = { ok: false, message: err };
           });
       }
     }

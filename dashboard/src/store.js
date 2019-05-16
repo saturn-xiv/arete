@@ -3,7 +3,6 @@ import Vuex from 'vuex'
 import * as jwtDecode from 'jwt-decode'
 
 import {
-    set as setToken,
     remove as remoteToken
 } from './token'
 
@@ -22,16 +21,17 @@ export default new Vuex.Store({
                 const it = jwtDecode(token)
                 const now = new Date().getTime() / 1000
                 if (it.act === "signIn" && it.nbf < now && it.exp > now) {
-                    setToken(token)
                     state.user = it.uid
+                    return
                 }
             } catch (e) {
-                console.error(e)
-                remoteToken()
-                state.user = null
+                window.console.error(e)
             }
+            remoteToken()
+            state.user = null
         },
         [USERS_SIGN_OUT](state) {
+            remoteToken()
             state.user = null
         }
     },
