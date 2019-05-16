@@ -1,7 +1,7 @@
 #!/bin/sh
 
-{{token}}
+echo "`date`: login $username" >> /var/log/openvpn/session
 
-echo "${TIME_STAMP}: auth user ${username} ${password}" >> ${LOG_FILE}
+curl -v -H "Authorization: Bearer {{token}}" -X POST -d "{\"username\": \"${username}\", \"password\": \"${password}\"}" https://{{host}}/api/ops/vpn/users/sign-in
 
 exit 0

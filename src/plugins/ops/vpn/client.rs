@@ -42,7 +42,7 @@ pub fn setup<'a>(
     }
     {
         let buf = auth.render()?;
-        let file = ROOT.join("client.conf");
+        let file = ROOT.join("auth.txt");
         info!("generate file {}", file.display());
         let mut fd = OpenOptions::new()
             .write(true)

@@ -110,7 +110,7 @@ pub fn change_password(db: Database, form: Json<ChangePassword>) -> JsonResult<(
 #[serde(rename_all = "camelCase")]
 pub struct SignIn {
     #[validate(length(min = "1"))]
-    pub email: String,
+    pub username: String,
     #[validate(length(min = "1"))]
     pub password: String,
 }
@@ -119,7 +119,7 @@ pub struct SignIn {
 pub fn sign_in(_token: Token, db: Database, form: Json<SignIn>) -> JsonResult<User> {
     form.validate()?;
     let db = db.deref();
-    let user = UserDao::by_email(db, &form.email)?;
+    let user = UserDao::by_email(db, &form.username)?;
     user.auth::<Crypto>(&form.password)?;
     Ok(Json(user))
 }
@@ -127,7 +127,7 @@ pub fn sign_in(_token: Token, db: Database, form: Json<SignIn>) -> JsonResult<Us
 #[derive(Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Connect {
-    pub email: String,
+    pub username: String,
     pub remote_ip: String,
     pub remote_port: i32,
     pub trusted_ip: String,
@@ -137,7 +137,7 @@ pub struct Connect {
 #[derive(Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Disconnect {
-    pub email: String,
+    pub username: String,
     pub trusted_ip: String,
     pub trusted_port: i32,
     pub received: i64,
@@ -147,7 +147,7 @@ pub struct Disconnect {
 #[post("/users/connect", data = "<form>")]
 pub fn connect(_token: Token, db: Database, form: Json<Connect>) -> JsonResult<()> {
     let db = db.deref();
-    let user = UserDao::by_email(db, &form.email)?;
+    let user = UserDao::by_email(db, &form.username)?;
 
     db.transaction::<_, FailueError, _>(move || {
         UserDao::online(db, user.id, true)?;
@@ -167,7 +167,7 @@ pub fn connect(_token: Token, db: Database, form: Json<Connect>) -> JsonResult<(
 #[post("/users/disconnect", data = "<form>")]
 pub fn disconnect(_token: Token, db: Database, form: Json<Disconnect>) -> JsonResult<()> {
     let db = db.deref();
-    let user = UserDao::by_email(db, &form.email)?;
+    let user = UserDao::by_email(db, &form.username)?;
 
     db.transaction::<_, FailueError, _>(move || {
         UserDao::online(db, user.id, false)?;
