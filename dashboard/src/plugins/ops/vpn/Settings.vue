@@ -31,9 +31,9 @@
             type="text"
           />
           <v-text-field
-            name="interface"
-            v-model="interface"
-            :error-messages="errors.collect('interface')"
+            name="device"
+            v-model="device"
+            :error-messages="errors.collect('device')"
             v-validate="'required'"
             :label="this.$t('ops.vpn.settings.interface')"
             type="text"
@@ -119,7 +119,7 @@ export default {
       dns: null,
       host: null,
       ip: null,
-      interface: null,
+      device: null,
       port: null,
       clientNetwork: null,
       clientNetmask: null,
@@ -140,7 +140,7 @@ export default {
       this.port = rst.data.port.toString();
       this.host = rst.data.host;
       this.ip = rst.data.ip;
-      this.interface = rst.data.interface;
+      this.device = rst.data.interface;
     });
   },
   methods: {
@@ -166,7 +166,7 @@ export default {
             dns: this.dns,
             host: this.host,
             ip: this.ip,
-            interface: this.interface,
+            interface: this.device,
             server: {
               network: this.serverNetwork,
               netmask: this.serverNetmask
