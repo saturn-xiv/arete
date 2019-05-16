@@ -123,7 +123,7 @@ section = "admin"
 priority = "optional"
 maintainer-scripts = "scripts"
 assets = [
-    ["log4rs.yml", "etc/arete/", "644"],
+    ["log4rs.yml", "usr/share/arete/", "644"],
     ["LICENSE", "usr/share/arete/", "644"],
     ["README.md", "usr/share/arete/", "644"],
     ["package.json", "usr/share/arete/", "644"],

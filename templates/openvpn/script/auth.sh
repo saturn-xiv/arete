@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. /etc/openvpn/script/config.sh
+{{token}}
 
 echo "${TIME_STAMP}: auth user ${username} ${password}" >> ${LOG_FILE}
 

@@ -43,11 +43,8 @@ pub fn launch() -> Result<()> {
     if let Some(_) = matches.subcommand_matches(generate::config::NAME) {
         return generate::config::run::<&'static str, env::Config>(cfg);
     }
-    if let Some(matches) = matches.subcommand_matches(generate::systemd::COMMAND_NAME) {
-        let name = matches
-            .value_of(generate::systemd::ARG_SERVICE_NAME)
-            .unwrap();
-        return generate::systemd::run(name.to_string(), env::HOMEPAGE.to_string());
+    if let Some(_) = matches.subcommand_matches(generate::systemd::COMMAND_NAME) {
+        return generate::systemd::run();
     }
 
     info!("load configuration from {}", cfg);
