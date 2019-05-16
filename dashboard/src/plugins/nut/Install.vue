@@ -74,6 +74,9 @@ export default {
             realName: this.realName,
             password: this.password
           })
+          .then(() => {
+            this.$router.push({ name: "install" });
+          })
           .catch(error => {
             this.alert = { ok: false, message: error.response.data };
           });
