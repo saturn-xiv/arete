@@ -1,5 +1,5 @@
 
-## [Server](https://help.ubuntu.com/lts/serverguide/openvpn.html.en)
+## Server
 
 * Install 
   
@@ -32,13 +32,6 @@ $ ./clean-all
 $ ./build-ca
 $ ./build-key-server server
 $ ./build-dh
-```
-
-* Enable port forwarding
-
-```bash
-$ echo 'net.ipv4.ip_forward=1' > /etc/sysctl.d/ip_forward.conf
-$ sysctl -p
 ```
 
 * Revoke user

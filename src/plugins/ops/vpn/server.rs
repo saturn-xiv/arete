@@ -1,65 +1,64 @@
-use std::fs::OpenOptions;
-use std::io::prelude::*;
-use std::os::unix::fs::OpenOptionsExt;
-use std::path::{Path, PathBuf};
-
 use askama::Template;
-
-use super::super::super::super::errors::Result;
-
-lazy_static! {
-    static ref ROOT: PathBuf = Path::new("/etc").join("openvpn").join("server");
-}
 
 #[derive(Template)]
 #[template(path = "openvpn/server.conf", escape = "none")]
 pub struct Config<'a> {
     pub port: u16,
-    pub server: &'a ServerConfig<'a>,
-    pub client: &'a ClientConfig<'a>,
+    pub server: &'a Server<'a>,
+    pub client: &'a Client<'a>,
 }
 
-pub struct ServerConfig<'a> {
+pub struct Server<'a> {
     pub network: &'a str,
+    pub netmask: &'a str,
     pub ip: &'a str,
 }
 
-pub struct ClientConfig<'a> {
+pub struct Client<'a> {
     pub network: &'a str,
+    pub netmask: &'a str,
     pub dns1: &'a str,
     pub dns2: &'a str,
 }
 
-impl<'a> Config<'a> {
-    pub fn setup(&self) -> Result<()> {
-        let cfg = self.render()?;
-        {
-            let file = ROOT.join("server.conf");
-            info!("generate file {}", file.display());
-            let mut fd = OpenOptions::new()
-                .write(true)
-                .create(true)
-                .truncate(true)
-                .mode(0o600)
-                .open(file)?;
-            fd.write_all(cfg.as_bytes())?;
-        }
-        Ok(())
-    }
+#[derive(Template)]
+#[template(path = "openvpn/dnsmasq.conf", escape = "none")]
+pub struct Dnsmasq<'a> {
+    pub ip: &'a str,
 }
 
-pub fn create() -> Result<()> {
-    Ok(())
+#[derive(Template)]
+#[template(path = "openvpn/firewall.sh", escape = "none")]
+pub struct Firewall<'a> {
+    pub network: &'a str,
+    pub interface: &'a str,
 }
 
-pub fn update() -> Result<()> {
-    Ok(())
+#[derive(Template)]
+#[template(path = "openvpn/sysctl.conf", escape = "none")]
+pub struct Sysctl;
+
+#[derive(Template)]
+#[template(path = "openvpn/readme.md", escape = "none")]
+pub struct Readme;
+
+#[derive(Template)]
+#[template(path = "openvpn/script/auth.sh", escape = "none")]
+pub struct Auth<'a> {
+    pub token: &'a str,
+    pub host: &'a str,
 }
 
-pub fn delete() -> Result<()> {
-    Ok(())
+#[derive(Template)]
+#[template(path = "openvpn/script/connect.sh", escape = "none")]
+pub struct Connect<'a> {
+    pub token: &'a str,
+    pub host: &'a str,
 }
 
-pub fn list() -> Result<()> {
-    Ok(())
+#[derive(Template)]
+#[template(path = "openvpn/script/disconnect.sh", escape = "none")]
+pub struct Disconnect<'a> {
+    pub token: &'a str,
+    pub host: &'a str,
 }
