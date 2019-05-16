@@ -1,6 +1,6 @@
 [package]
 name = "arete"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Jeremy Zheng <jitang.zheng@gmail.com>"]
 description = "A web application by Rust and React."
 homepage = "https://github.com/saturn-xiv/arete"
