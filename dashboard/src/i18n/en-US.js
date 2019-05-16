@@ -77,6 +77,8 @@ export default {
                         trusted: 'Trusted',
                         received: 'Received',
                         send: 'Send',
+                        'opened-at': 'Opened at',
+                        'closed-at': 'Closed at',
                     },
                     user: {
                         online: 'Online'

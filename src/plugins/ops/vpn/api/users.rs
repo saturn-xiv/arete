@@ -13,7 +13,7 @@ use super::super::super::super::super::{
 };
 use super::super::super::super::nut::api::users::Administrator;
 use super::super::models::{
-    log::{Dao as LogDao, Type as LogType},
+    log::Dao as LogDao,
     user::{Dao as UserDao, Item as User},
 };
 use super::Token;
@@ -134,33 +134,38 @@ pub fn sign_in(_token: Token, db: Database, form: Json<SignIn>) -> JsonResult<Us
 
 #[derive(Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
-pub struct Report {
+pub struct Connect {
     pub email: String,
     pub remote_ip: String,
     pub remote_port: i32,
     pub trusted_ip: String,
     pub trusted_port: i32,
-    pub received: f64,
-    pub send: f64,
+}
+
+#[derive(Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
+pub struct Disconnect {
+    pub email: String,
+    pub trusted_ip: String,
+    pub trusted_port: i32,
+    pub received: i64,
+    pub send: i64,
 }
 
 #[post("/users/connect", data = "<form>")]
-pub fn connect(_token: Token, db: Database, form: Json<Report>) -> JsonResult<()> {
+pub fn connect(_token: Token, db: Database, form: Json<Connect>) -> JsonResult<()> {
     let db = db.deref();
     let user = UserDao::by_email(db, &form.email)?;
 
     db.transaction::<_, FailueError, _>(move || {
         UserDao::online(db, user.id, true)?;
-        LogDao::add(
+        LogDao::connect(
             db,
             user.id,
-            &LogType::Connect,
             &form.trusted_ip,
             form.trusted_port,
             &form.remote_ip,
             form.remote_port,
-            form.received,
-            form.send,
         )?;
         Ok(())
     })?;
@@ -168,20 +173,17 @@ pub fn connect(_token: Token, db: Database, form: Json<Report>) -> JsonResult<()
 }
 
 #[post("/users/disconnect", data = "<form>")]
-pub fn disconnect(_token: Token, db: Database, form: Json<Report>) -> JsonResult<()> {
+pub fn disconnect(_token: Token, db: Database, form: Json<Disconnect>) -> JsonResult<()> {
     let db = db.deref();
     let user = UserDao::by_email(db, &form.email)?;
 
     db.transaction::<_, FailueError, _>(move || {
         UserDao::online(db, user.id, false)?;
-        LogDao::add(
+        LogDao::disconnect(
             db,
             user.id,
-            &LogType::Disconnect,
             &form.trusted_ip,
             form.trusted_port,
-            &form.remote_ip,
-            form.remote_port,
             form.received,
             form.send,
         )?;

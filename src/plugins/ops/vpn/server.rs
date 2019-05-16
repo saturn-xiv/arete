@@ -21,12 +21,11 @@ pub struct Config<'a> {
 
 pub struct ServerConfig<'a> {
     pub network: &'a str,
-    pub netmask: &'a str,
+    pub ip: &'a str,
 }
 
 pub struct ClientConfig<'a> {
     pub network: &'a str,
-    pub netmask: &'a str,
     pub dns1: &'a str,
     pub dns2: &'a str,
 }

@@ -18,12 +18,10 @@ CREATE UNIQUE INDEX idx_vpn_users_email ON vpn_users(email);
 
 CREATE TABLE vpn_logs(id INTEGER PRIMARY KEY NOT NULL,
                                              user_id INTEGER NOT NULL,
-                                                             type VARCHAR(16) NOT NULL,
-                                                                              trusted_ip VARCHAR(45) NOT NULL,
-                                                                                                     trusted_port INTEGER NOT NULL,
-                                                                                                                          remote_ip VARCHAR(45) NOT NULL,
-                                                                                                                                                remote_port INTEGER NOT NULL,
-                                                                                                                                                                    received DOUBLE PRECISION NOT NULL,
-                                                                                                                                                                                              send DOUBLE PRECISION NOT NULL,
-                                                                                                                                                                                                                    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP);
+                                                             trusted_ip VARCHAR(45) NOT NULL,
+                                                                                    trusted_port INTEGER NOT NULL,
+                                                                                                         remote_ip VARCHAR(45) NOT NULL,
+                                                                                                                               remote_port INTEGER NOT NULL,
+                                                                                                                                                   received BIGINT, send BIGINT, opened_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                                                                                                                                                                                      closed_at TIMESTAMP);
 

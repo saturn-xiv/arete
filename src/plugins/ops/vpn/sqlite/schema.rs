@@ -2,15 +2,14 @@ table! {
     vpn_logs (id) {
         id -> Integer,
         user_id -> Integer,
-        #[sql_name = "type"]
-        type_ -> Text,
         trusted_ip -> Text,
         trusted_port -> Integer,
         remote_ip -> Text,
         remote_port -> Integer,
-        received -> Double,
-        send -> Double,
-        created_at -> Timestamp,
+        received -> Nullable<BigInt>,
+        send -> Nullable<BigInt>,
+        opened_at -> Timestamp,
+        closed_at -> Nullable<Timestamp>,
     }
 }
 

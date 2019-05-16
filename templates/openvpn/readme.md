@@ -1,5 +1,5 @@
 
-## Server
+## [Server](https://help.ubuntu.com/lts/serverguide/openvpn.html.en)
 
 * Install 
   
@@ -12,7 +12,7 @@ $ cat <<EOF >> vars
 export KEY_COUNTRY="US"
 export KEY_PROVINCE="CA"
 export KEY_CITY="Goleta"
-export KEY_ORG="honor"
+export KEY_ORG="Honor"
 export KEY_EMAIL="no-reply@gmail.com"
 export KEY_CN="www.change-me.com"
 export KEY_NAME="who-am-i"

@@ -2,7 +2,8 @@
   <dashboard-layout v-bind:title="title">
     <v-data-table :headers="headers" :items="items" class="elevation-1">
       <template v-slot:items="props">
-        <td>{{ props.item.createdAt|moment('llll') }}</td>
+        <td>{{ props.item.openedAt|moment('llll') }}</td>
+        <td>{{ props.item.closedAt|moment('llll') }}</td>
         <td>{{ props.item.remoteIp }}{{ props.item.remotePort }}</td>
         <td>{{ props.item.trustedIp }}{{ props.item.trustedPort }}</td>
         <td>{{ props.item.received }}</td>
@@ -31,8 +32,12 @@ export default {
     headers() {
       return [
         {
-          text: this.$i18n.t("form.labels.updated-at"),
-          value: "updatedAt"
+          text: this.$i18n.t("ops.vpn.form.labels.log.opened-at"),
+          value: "opened_at"
+        },
+        {
+          text: this.$i18n.t("ops.vpn.form.labels.log.closed-at"),
+          value: "closed_at"
         },
         {
           text: this.$i18n.t("ops.vpn.form.labels.log.remote"),
