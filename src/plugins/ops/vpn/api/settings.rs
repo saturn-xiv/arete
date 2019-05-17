@@ -1,11 +1,13 @@
+use std::fs::{read_to_string, OpenOptions};
+use std::io::prelude::*;
 use std::ops::Deref;
+use std::os::unix::fs::OpenOptionsExt;
 use std::path::{Component, Path, PathBuf};
 use std::sync::Arc;
 
 use askama::Template;
 use rocket::State;
 use rocket_contrib::json::Json;
-use uuid::Uuid;
 use validator::Validate;
 
 use super::super::super::super::super::{
@@ -126,15 +128,21 @@ impl Form {
     }
     pub fn client(&self, user: &String, password: &String) -> Result<Vec<File>> {
         let mut items = Vec::new();
-        items.push(File {
-            path: ROOT.join("client.conf"),
-            mode: 0600,
-            content: client::Config {
-                host: &self.host,
-                port: self.port,
-            }
-            .render()?,
-        });
+        {
+            let root = ROOT.join("easy-rsa").join("keys");
+            items.push(File {
+                path: ROOT.join("client.conf"),
+                mode: 0600,
+                content: client::Config {
+                    host: &self.host,
+                    port: self.port,
+                    ca: &read_to_string(root.join("ca.crt"))?,
+                    cert: &read_to_string(root.join("client.crt"))?,
+                    key: &read_to_string(root.join("client.key"))?,
+                }
+                .render()?,
+            });
+        }
         items.push(File {
             path: ROOT.join("auth.txt"),
             mode: 0600,
@@ -237,6 +245,17 @@ pub fn post(
     let enc = enc.deref();
     let form = form.deref();
     SettingDao::set::<String, Form, Crypto>(db, enc, &Form::KEY.to_string(), form, false)?;
+    let token = Token::new(db, enc)?;
+    for it in form.server(&token)? {
+        info!("write to file {}", it.path.display());
+        let mut fd = OpenOptions::new()
+            .write(true)
+            .create(true)
+            .truncate(true)
+            .mode(it.mode)
+            .open(it.path)?;
+        fd.write_all(it.content.as_bytes())?;
+    }
     Ok(Json(()))
 }
 
@@ -264,14 +283,7 @@ pub fn server(
     let enc = enc.deref();
     let enc = enc.deref();
     let cfg: Form = SettingDao::get(db, enc, &Form::KEY.to_string())?;
-    let token: String = match SettingDao::get(db, enc, &Token::KEY.to_string()) {
-        Ok(v) => v,
-        Err(_) => {
-            let v = Uuid::new_v4().to_string();
-            SettingDao::set::<String, String, Crypto>(db, enc, &Token::KEY.to_string(), &v, true)?;
-            v
-        }
-    };
+    let token = Token::new(db, enc)?;
     Ok(Json(cfg.server(&token)?))
 }
 

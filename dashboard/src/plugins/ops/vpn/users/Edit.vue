@@ -25,27 +25,6 @@
             disabled
             type="email"
           />
-          <v-text-field
-            id="password"
-            prepend-icon="lock"
-            :error-messages="errors.collect('password')"
-            v-model="password"
-            ref="password"
-            name="password"
-            v-validate="'required|min:6|max:32'"
-            :label="this.$t('form.labels.password')"
-            type="password"
-          />
-          <v-text-field
-            id="passwordConfirmation"
-            :error-messages="errors.collect('passwordConfirmation')"
-            prepend-icon="lock"
-            v-validate="'required|confirmed:password'"
-            v-model="passwordConfirmation"
-            name="passwordConfirmation"
-            :label="this.$t('form.labels.password-confirmation')"
-            type="password"
-          />
         </v-form>
         <v-date-picker v-model="startup"/>
         <v-date-picker v-model="shutdown"/>
@@ -73,8 +52,6 @@ export default {
     return {
       email: null,
       name: null,
-      password: null,
-      passwordConfirmation: null,
       startup: null,
       shutdown: null
     };
@@ -95,7 +72,6 @@ export default {
       if (isValid) {
         httpPost(`/ops/vpn/users/${this.$route.params.id}`, {
           name: this.name,
-          password: this.password,
           startup: this.startup,
           shutdown: this.shutdown
         })

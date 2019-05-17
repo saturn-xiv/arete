@@ -118,6 +118,11 @@ export default {
           model: false,
           children: [
             {
+              icon: "group",
+              to: { name: "ops.vpn.status" },
+              text: this.$i18n.t("ops.vpn.status.title")
+            },
+            {
               icon: "settings",
               to: { name: "ops.vpn.settings" },
               text: this.$i18n.t("ops.vpn.settings.title")

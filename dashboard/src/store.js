@@ -13,6 +13,7 @@ export const USERS_SIGN_OUT = 'users.sign-out'
 export const NOTIFICATION_SUCCESS = 'notification.success'
 export const NOTIFICATION_ERROR = 'notification.error'
 export const NOTIFICATION_INFO = 'notification.info'
+export const CLEAR_NOTIFICATION = 'notification.clear'
 
 export default new Vuex.Store({
     state: {
@@ -58,6 +59,9 @@ export default new Vuex.Store({
                 color: 'info',
                 message
             }
+        },
+        [CLEAR_NOTIFICATION](state) {
+            state.notification = {}
         }
     },
     getters: {

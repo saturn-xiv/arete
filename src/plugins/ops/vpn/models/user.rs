@@ -1,12 +1,12 @@
 use chrono::{NaiveDate, NaiveDateTime, Utc};
-use diesel::{insert_into, prelude::*, update};
+use diesel::{delete, insert_into, prelude::*, update};
 
 use super::super::super::super::super::{
     crypto::Password,
     errors::{Error, Result},
     orm::{Connection, ID},
 };
-use super::super::schema::vpn_users;
+use super::super::schema::{vpn_logs, vpn_users};
 
 #[derive(Queryable, Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -26,10 +26,20 @@ pub struct Item {
 
 impl Item {
     pub fn auth<E: Password>(&self, password: &String) -> Result<()> {
-        if E::verify(&self.password, password.as_bytes()) {
-            return Ok(());
+        if !E::verify(&self.password, password.as_bytes()) {
+            return Err(Error::UserBadPassword.into());
         }
-        return Err(Error::UserBadPassword.into());
+        Ok(())
+    }
+    pub fn enable(&self) -> Result<()> {
+        if self.locked_at != None {
+            return Err(Error::UserBadPassword.into());
+        }
+        let now = Utc::now().naive_utc().date();
+        if now < self.startup && now > self.shutdown {
+            return Err(Error::UserIsNotConfirmed.into());
+        }
+        Ok(())
     }
 }
 
@@ -59,16 +69,16 @@ pub trait Dao {
     ) -> Result<()>;
     fn lock(&self, id: ID, on: bool) -> Result<()>;
     fn all(&self) -> Result<Vec<Item>>;
-    fn update<T: Password>(
+    fn update(
         &self,
         id: ID,
         name: &String,
-        password: &String,
         startup: &NaiveDate,
         shutdown: &NaiveDate,
     ) -> Result<()>;
     fn password<T: Password>(&self, id: ID, password: &String) -> Result<()>;
     fn bind(&self, id: ID, ip: &Option<String>) -> Result<()>;
+    fn delete(&self, id: ID) -> Result<()>;
 }
 
 impl Dao for Connection {
@@ -108,11 +118,10 @@ impl Dao for Connection {
         Ok(())
     }
 
-    fn update<T: Password>(
+    fn update(
         &self,
         id: ID,
         name: &String,
-        password: &String,
         startup: &NaiveDate,
         shutdown: &NaiveDate,
     ) -> Result<()> {
@@ -122,7 +131,6 @@ impl Dao for Connection {
                 vpn_users::dsl::name.eq(name),
                 vpn_users::dsl::startup.eq(startup),
                 vpn_users::dsl::shutdown.eq(shutdown),
-                vpn_users::dsl::password.eq(&T::sum(password.as_bytes())?),
                 vpn_users::dsl::updated_at.eq(&Utc::now().naive_utc()),
             ))
             .execute(self)?;
@@ -195,6 +203,12 @@ impl Dao for Connection {
                 vpn_users::dsl::updated_at.eq(&now),
             ))
             .execute(self)?;
+        Ok(())
+    }
+
+    fn delete(&self, id: ID) -> Result<()> {
+        delete(vpn_logs::dsl::vpn_logs.filter(vpn_logs::dsl::user_id.eq(id))).execute(self)?;
+        delete(vpn_users::dsl::vpn_users.filter(vpn_users::dsl::id.eq(id))).execute(self)?;
         Ok(())
     }
 }

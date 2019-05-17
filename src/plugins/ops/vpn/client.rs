@@ -5,6 +5,9 @@ use askama::Template;
 pub struct Config<'a> {
     pub port: u16,
     pub host: &'a str,
+    pub ca: &'a str,
+    pub cert: &'a str,
+    pub key: &'a str,
 }
 
 #[derive(Template)]

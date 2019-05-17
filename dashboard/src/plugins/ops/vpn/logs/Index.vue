@@ -2,8 +2,12 @@
   <dashboard-layout v-bind:title="title">
     <v-data-table :headers="headers" :items="items" class="elevation-1">
       <template v-slot:items="props">
-        <td>{{ props.item.openedAt|moment('llll') }}</td>
-        <td>{{ props.item.closedAt|moment('llll') }}</td>
+        <td>
+          <timestamp :value="props.item.openedAt"/>
+        </td>
+        <td>
+          <timestamp :value="props.item.closedAt"/>
+        </td>
         <td>{{ props.item.remoteIp }}{{ props.item.remotePort }}</td>
         <td>{{ props.item.trustedIp }}{{ props.item.trustedPort }}</td>
         <td>{{ props.item.received }}</td>

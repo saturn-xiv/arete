@@ -10,7 +10,8 @@ export default {
         close: 'Close',
     },
     flashes: {
-        success: "Success"
+        success: "Success",
+        'are-you-sure': 'Are you sure?'
     },
     form: {
         labels: {
@@ -98,12 +99,13 @@ export default {
             users: {
                 index: {
                     title: 'Users',
+                    confirm: 'Are you sure to delete user {name} <{email}>?'
                 },
                 new: {
-                    title: 'Create a new user'
+                    title: 'Create a new vpn user'
                 },
                 edit: {
-                    title: 'Edit user {name}'
+                    title: 'Edit user vpn {name}'
                 },
                 'change-password': {
                     title: 'Change vpn password'
@@ -128,6 +130,11 @@ export default {
                 index: {
                     title: 'Logs'
                 }
+            },
+            status: {
+                title: 'Status',
+                addresses: 'Addresses',
+                status: 'Status',
             }
         }
     }

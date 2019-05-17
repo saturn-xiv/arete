@@ -4,6 +4,7 @@ import UsersChangePassword from './users/ChangePassword'
 import UsersIndex from './users/Index'
 import LogsIndex from './logs/Index'
 import Settings from './Settings'
+import Status from './Status'
 
 export default {
     routes: [{
@@ -30,5 +31,9 @@ export default {
         path: '/ops/vpn/settings',
         name: 'ops.vpn.settings',
         component: Settings,
+    }, {
+        path: '/ops/vpn/status',
+        name: 'ops.vpn.status',
+        component: Status,
     }]
 }

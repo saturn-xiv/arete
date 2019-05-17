@@ -2,7 +2,9 @@
   <dashboard-layout v-bind:title="title">
     <v-data-table :headers="headers" :items="items" class="elevation-1">
       <template v-slot:items="props">
-        <td>{{ props.item.updatedAt|moment('llll') }}</td>
+        <td>
+          <timestamp :value="props.item.updatedAt"/>
+        </td>
         <td>{{ props.item.name }}</td>
         <td>{{ props.item.email }}</td>
         <td>{{ $t(`form.labels.${props.item.online}`) }}</td>
@@ -14,6 +16,7 @@
             @click="$router.push({name:'ops.vpn.users.edit', params:{id: props.item.id}})"
           >edit</v-icon>
           <v-icon small class="mr-2" @click="fetch_files(props.item.id)">attach_file</v-icon>
+          <v-icon small class="mr-2" @click="destroy_user(props.item)">delete</v-icon>
         </td>
       </template>
     </v-data-table>
@@ -46,8 +49,8 @@
 </template>
 
 <script>
-import { get as httpGet } from "@/request";
-import { NOTIFICATION_ERROR } from "@/store";
+import { get as httpGet, delete_ as httpDelete } from "@/request";
+import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from "@/store";
 
 export default {
   name: "ops-vpn-users",
@@ -64,6 +67,21 @@ export default {
     });
   },
   methods: {
+    destroy_user(it) {
+      if (confirm(this.$i18n.t("ops.vpn.users.index.confirm", it))) {
+        httpDelete(`/ops/vpn/users/${it.id}`)
+          .then(() => {
+            this.items = this.items.filter(x => x.id !== it.id);
+            this.$store.commit(
+              NOTIFICATION_SUCCESS,
+              this.$i18n.t("flashes.success")
+            );
+          })
+          .catch(err => {
+            this.$store.commit(NOTIFICATION_ERROR, err);
+          });
+      }
+    },
     fetch_files(id) {
       httpGet(`/ops/vpn/client/${id}`)
         .then(rst => {

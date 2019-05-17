@@ -10,15 +10,32 @@ use rocket::{
     request::{self, FromRequest},
     Outcome, Request, State,
 };
+use uuid::Uuid;
 
 use super::super::super::super::{
-    crypto::Crypto, orm::Database, request::Token as Bearer, settings::Dao as SettingDao,
+    crypto::{Crypto, Secret},
+    errors::Result,
+    orm::{Connection, Database},
+    request::Token as Bearer,
+    settings::Dao as SettingDao,
 };
 
 pub struct Token;
 
 impl Token {
     pub const KEY: &'static str = "vpn.token";
+
+    pub fn new<S: Secret>(db: &Connection, enc: &S) -> Result<String> {
+        let token: String = match SettingDao::get(db, enc, &Token::KEY.to_string()) {
+            Ok(v) => v,
+            Err(_) => {
+                let v = Uuid::new_v4().to_string();
+                SettingDao::set(db, enc, &Token::KEY.to_string(), &v, true)?;
+                v
+            }
+        };
+        Ok(token)
+    }
 }
 
 impl<'a, 'r> FromRequest<'a, 'r> for Token {

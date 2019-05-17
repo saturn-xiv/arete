@@ -3,10 +3,11 @@
     <v-data-table :headers="headers" :items="items" class="elevation-1">
       <template v-slot:items="props">
         <td>
-          <timestamp :value="props.item.createdAt"/>
+          <json-text :value="props.item.address"/>}
         </td>
-        <td>{{ props.item.ip }}</td>
-        <td>{{ props.item.message }}</td>
+        <td>
+          <json-text :value="props.item.status"/>}
+        </td>
       </template>
     </v-data-table>
   </dashboard-layout>
@@ -16,36 +17,34 @@
 import { get as httpGet } from "@/request";
 
 export default {
-  name: "users-logs",
+  name: "ops-vpn-status",
   data() {
     return {
       items: []
     };
   },
   created() {
-    httpGet(`/users/logs?limit=${1 << 10}`).then(rst => {
-      this.items = rst;
+    httpGet(`/ops/vpn/status`).then(rst => {
+      this.items = rst.host;
     });
   },
   computed: {
     headers() {
       return [
         {
-          text: this.$i18n.t("form.labels.created-at"),
-          value: "createdAt"
+          text: this.$i18n.t("ops.vpn.status.addresses"),
+          sortable: false,
+          value: "addresses"
         },
         {
-          text: this.$i18n.t("form.labels.ip"),
-          value: "ip"
-        },
-        {
-          text: this.$i18n.t("form.labels.message"),
-          value: "message"
+          text: this.$i18n.t("ops.vpn.status.status"),
+          sortable: false,
+          value: "status"
         }
       ];
     },
     title() {
-      return this.$i18n.t("nut.users.logs.title");
+      return this.$i18n.t("ops.vpn.status.title");
     }
   }
 };

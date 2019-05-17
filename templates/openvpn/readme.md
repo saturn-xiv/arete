@@ -4,7 +4,7 @@
 * Install 
   
 ```bash
-$ apt install -y openvpn easy-rsa dnsmasq nmap
+$ apt install -y openvpn easy-rsa dnsmasq nmap curl
 $ mkdir -p /etc/openvpn/easy-rsa
 $ cp -r /usr/share/easy-rsa/* /etc/openvpn/easy-rsa
 $ cd /etc/openvpn/easy-rsa

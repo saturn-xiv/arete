@@ -37,6 +37,7 @@ pub fn routes() -> (&'static str, Vec<Route>, Vec<Route>) {
             api::users::create,
             api::users::update,
             api::users::bind,
+            api::users::destroy,
             api::users::change_password,
             api::users::sign_in,
             api::users::connect,

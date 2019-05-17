@@ -1,6 +1,6 @@
 use std::ops::Deref;
 
-use chrono::NaiveDate;
+use chrono::{Duration, NaiveDate, Utc};
 use diesel::prelude::*;
 use failure::Error as FailueError;
 use rocket_contrib::json::Json;
@@ -8,7 +8,7 @@ use validator::Validate;
 
 use super::super::super::super::super::{
     crypto::Crypto,
-    errors::JsonResult,
+    errors::{Error, JsonResult},
     orm::{Database, ID},
 };
 use super::super::super::super::nut::api::users::Administrator;
@@ -65,8 +65,6 @@ pub fn create(_user: Administrator, db: Database, form: Json<Create>) -> JsonRes
 pub struct Update {
     #[validate(length(min = "1", max = "32"))]
     pub name: String,
-    #[validate(length(min = "6", max = "32"))]
-    pub password: String,
     pub startup: NaiveDate,
     pub shutdown: NaiveDate,
 }
@@ -75,14 +73,7 @@ pub struct Update {
 pub fn update(id: ID, _user: Administrator, db: Database, form: Json<Update>) -> JsonResult<()> {
     form.validate()?;
     let db = db.deref();
-    UserDao::update::<Crypto>(
-        db,
-        id,
-        &form.name,
-        &form.password,
-        &form.startup,
-        &form.shutdown,
-    )?;
+    UserDao::update(db, id, &form.name, &form.startup, &form.shutdown)?;
     Ok(Json(()))
 }
 
@@ -97,6 +88,16 @@ pub fn bind(_user: Administrator, id: ID, db: Database, form: Json<Bind>) -> Jso
     form.validate()?;
     let db = db.deref();
     UserDao::bind(db, id, &form.address)?;
+    Ok(Json(()))
+}
+
+#[delete("/users/<id>")]
+pub fn destroy(id: ID, _user: Administrator, db: Database) -> JsonResult<()> {
+    let db = db.deref();
+    db.transaction::<_, FailueError, _>(move || {
+        UserDao::delete(db, id)?;
+        Ok(())
+    })?;
     Ok(Json(()))
 }
 
@@ -123,8 +124,8 @@ pub fn change_password(db: Database, form: Json<ChangePassword>) -> JsonResult<(
 #[derive(Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct SignIn {
-    #[validate(length(min = "1"))]
-    pub username: String,
+    #[validate(email, length(min = "1"))]
+    pub email: String,
     #[validate(length(min = "1"))]
     pub password: String,
 }
@@ -133,15 +134,29 @@ pub struct SignIn {
 pub fn sign_in(_token: Token, db: Database, form: Json<SignIn>) -> JsonResult<User> {
     form.validate()?;
     let db = db.deref();
-    let user = UserDao::by_email(db, &form.username)?;
-    user.auth::<Crypto>(&form.password)?;
-    Ok(Json(user))
+    if let Ok(user) = UserDao::by_email(db, &form.email) {
+        user.auth::<Crypto>(&form.password)?;
+        user.enable()?;
+        return Ok(Json(user));
+    }
+
+    info!("auto register vpn user {}", form.email);
+    let now = Utc::now().naive_utc().date();
+    UserDao::add::<Crypto>(
+        db,
+        &"Guest".to_string(),
+        &form.email,
+        &form.password,
+        &(now + Duration::days(1)),
+        &(now - Duration::days(1)),
+    )?;
+    Err(Error::UserIsNotConfirmed.into())
 }
 
 #[derive(Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Connect {
-    pub username: String,
+    pub email: String,
     pub remote_ip: String,
     pub remote_port: i32,
     pub trusted_ip: String,
@@ -151,7 +166,7 @@ pub struct Connect {
 #[derive(Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Disconnect {
-    pub username: String,
+    pub email: String,
     pub trusted_ip: String,
     pub trusted_port: i32,
     pub received: i64,
@@ -161,7 +176,8 @@ pub struct Disconnect {
 #[post("/users/connect", data = "<form>")]
 pub fn connect(_token: Token, db: Database, form: Json<Connect>) -> JsonResult<()> {
     let db = db.deref();
-    let user = UserDao::by_email(db, &form.username)?;
+    let user = UserDao::by_email(db, &form.email)?;
+    user.enable()?;
 
     db.transaction::<_, FailueError, _>(move || {
         UserDao::online(db, user.id, true)?;
@@ -181,7 +197,8 @@ pub fn connect(_token: Token, db: Database, form: Json<Connect>) -> JsonResult<(
 #[post("/users/disconnect", data = "<form>")]
 pub fn disconnect(_token: Token, db: Database, form: Json<Disconnect>) -> JsonResult<()> {
     let db = db.deref();
-    let user = UserDao::by_email(db, &form.username)?;
+    let user = UserDao::by_email(db, &form.email)?;
+    user.enable()?;
 
     db.transaction::<_, FailueError, _>(move || {
         UserDao::online(db, user.id, false)?;

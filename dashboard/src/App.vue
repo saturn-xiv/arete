@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { USERS_SIGN_IN } from "@/store";
+import { USERS_SIGN_IN, CLEAR_NOTIFICATION } from "@/store";
 import { get as getToken } from "@/token";
 
 export default {
@@ -25,7 +25,9 @@ export default {
       get() {
         return this.$store.getters.notification.message != null;
       },
-      set() {}
+      set() {
+        this.$store.commit(CLEAR_NOTIFICATION);
+      }
     }
   },
   created() {
