@@ -93,17 +93,6 @@ impl Dao for Connection {
                 vpn_logs::dsl::closed_at.eq(&Some(Utc::now().naive_utc())),
             ))
             .execute(self)?;
-        // insert_into(vpn_logs::dsl::vpn_logs)
-        //     .values((
-        //         vpn_logs::dsl::user_id.eq(user),
-        //         vpn_logs::dsl::type_.eq(&type_.to_string()),
-        //         vpn_logs::dsl::trusted_ip.eq(trusted_ip),
-        //         vpn_logs::dsl::trusted_port.eq(trusted_port),
-        //         vpn_logs::dsl::remote_ip.eq(remote_ip),
-        //         vpn_logs::dsl::remote_port.eq(remote_port),
-
-        //     ))
-        //     .execute(self)?;
         Ok(())
     }
 }

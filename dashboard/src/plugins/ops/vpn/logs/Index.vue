@@ -6,12 +6,12 @@
           <timestamp :value="props.item.openedAt"/>
         </td>
         <td>
-          <timestamp :value="props.item.closedAt"/>
+          <timestamp v-if="props.item.closedAt" :value="props.item.closedAt"/>
         </td>
-        <td>{{ props.item.remoteIp }}{{ props.item.remotePort }}</td>
-        <td>{{ props.item.trustedIp }}{{ props.item.trustedPort }}</td>
-        <td>{{ props.item.received }}</td>
-        <td>{{ props.item.send }}</td>
+        <td>{{ props.item.remoteIp }}:{{ props.item.remotePort }}</td>
+        <td>{{ props.item.trustedIp }}:{{ props.item.trustedPort }}</td>
+        <td>{{ props.item.received || 0 }}bytes</td>
+        <td>{{ props.item.send || 0}}bytes</td>
       </template>
     </v-data-table>
   </dashboard-layout>
