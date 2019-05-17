@@ -20,6 +20,7 @@ table! {
         email -> Text,
         password -> Binary,
         online -> Bool,
+        fixed_ip -> Nullable<Text>,
         locked_at -> Nullable<Timestamp>,
         startup -> Date,
         shutdown -> Date,

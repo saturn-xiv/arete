@@ -3,11 +3,12 @@ CREATE TABLE vpn_users(id BIGINT AUTO_INCREMENT PRIMARY KEY,
                                                                          email VARCHAR(255) NOT NULL,
                                                                                             password BLOB NOT NULL,
                                                                                                           online BOOLEAN NOT NULL DEFAULT FALSE,
-                                                                                                                                          locked_at DATETIME,
-                                                                                                                                          startup DATE NOT NULL,
-                                                                                                                                                       shutdown DATE NOT NULL,
-                                                                                                                                                                     created_at DATETIME NOT NULL DEFAULT NOW(),
-                                                                                                                                                                                                          updated_at DATETIME NOT NULL);
+                                                                                                                                          fixed_ip VARCHAR(45),
+                                                                                                                                                   locked_at DATETIME,
+                                                                                                                                                   startup DATE NOT NULL,
+                                                                                                                                                                shutdown DATE NOT NULL,
+                                                                                                                                                                              created_at DATETIME NOT NULL DEFAULT NOW(),
+                                                                                                                                                                                                                   updated_at DATETIME NOT NULL);
 
 
 CREATE INDEX idx_vpn_users_name ON vpn_users(name);

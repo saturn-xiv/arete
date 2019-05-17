@@ -3,11 +3,12 @@ CREATE TABLE vpn_users(id BIGSERIAL PRIMARY KEY,
                                                              email VARCHAR(255) NOT NULL,
                                                                                 password BYTEA NOT NULL,
                                                                                                online BOOLEAN NOT NULL DEFAULT FALSE,
-                                                                                                                               locked_at TIMESTAMP,
-                                                                                                                                         startup DATE NOT NULL,
-                                                                                                                                                      shutdown DATE NOT NULL,
-                                                                                                                                                                    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                                                                                                                                                                          updated_at TIMESTAMP NOT NULL);
+                                                                                                                               fixed_ip VARCHAR(45),
+                                                                                                                                        locked_at TIMESTAMP,
+                                                                                                                                                  startup DATE NOT NULL,
+                                                                                                                                                               shutdown DATE NOT NULL,
+                                                                                                                                                                             created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                                                                                                                                                                                   updated_at TIMESTAMP NOT NULL);
 
 
 CREATE INDEX idx_vpn_users_name ON vpn_users(name);

@@ -16,6 +16,7 @@ pub struct Item {
     pub email: String,
     pub password: Vec<u8>,
     pub online: bool,
+    pub fixed_ip: Option<String>,
     pub locked_at: Option<NaiveDateTime>,
     pub startup: NaiveDate,
     pub shutdown: NaiveDate,
@@ -67,6 +68,7 @@ pub trait Dao {
         shutdown: &NaiveDate,
     ) -> Result<()>;
     fn password<T: Password>(&self, id: ID, password: &String) -> Result<()>;
+    fn bind(&self, id: ID, ip: &Option<String>) -> Result<()>;
 }
 
 impl Dao for Connection {
@@ -178,6 +180,18 @@ impl Dao for Connection {
         update(it)
             .set((
                 vpn_users::dsl::password.eq(&password),
+                vpn_users::dsl::updated_at.eq(&now),
+            ))
+            .execute(self)?;
+        Ok(())
+    }
+
+    fn bind(&self, id: ID, ip: &Option<String>) -> Result<()> {
+        let now = Utc::now().naive_utc();
+        let it = vpn_users::dsl::vpn_users.filter(vpn_users::dsl::id.eq(id));
+        update(it)
+            .set((
+                vpn_users::dsl::fixed_ip.eq(ip),
                 vpn_users::dsl::updated_at.eq(&now),
             ))
             .execute(self)?;

@@ -13,6 +13,7 @@ use super::super::super::super::super::{
     errors::{JsonResult, Result},
     orm::{Database, ID},
     settings::Dao as SettingDao,
+    sys::nmap,
 };
 use super::super::super::super::nut::api::users::Administrator;
 use super::super::{client, models::user::Dao as UserDao, server, ROOT};
@@ -178,6 +179,14 @@ impl Default for Server {
         }
     }
 }
+
+impl Server {
+    pub fn cidr(&self) -> Result<u8> {
+        let it: nmap::Cidr = self.netmask.parse()?;
+        Ok(it.0)
+    }
+}
+
 #[derive(Deserialize, Serialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Client {
@@ -193,6 +202,13 @@ impl Default for Client {
             network: "192.168.6.0".to_string(),
             netmask: "255.255.255.0".to_string(),
         }
+    }
+}
+
+impl Client {
+    pub fn cidr(&self) -> Result<u8> {
+        let it: nmap::Cidr = self.netmask.parse()?;
+        Ok(it.0)
     }
 }
 
@@ -222,6 +238,20 @@ pub fn post(
     let form = form.deref();
     SettingDao::set::<String, Form, Crypto>(db, enc, &Form::KEY.to_string(), form, false)?;
     Ok(Json(()))
+}
+
+#[get("/status")]
+pub fn status(
+    _user: Administrator,
+    enc: State<Arc<Crypto>>,
+    db: Database,
+) -> JsonResult<nmap::Run> {
+    let db = db.deref();
+    let enc = enc.deref();
+    let enc = enc.deref();
+    let cfg: Form = SettingDao::get(db, enc, &Form::KEY.to_string())?;
+    let it = nmap::Run::scan(&cfg.client.network, cfg.client.cidr()?)?;
+    Ok(Json(it))
 }
 
 #[get("/server")]

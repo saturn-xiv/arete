@@ -88,6 +88,20 @@ pub fn update(id: ID, _user: Administrator, db: Database, form: Json<Update>) ->
 
 #[derive(Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
+pub struct Bind {
+    pub address: Option<String>,
+}
+
+#[post("/users/<id>/bind", data = "<form>")]
+pub fn bind(_user: Administrator, id: ID, db: Database, form: Json<Bind>) -> JsonResult<()> {
+    form.validate()?;
+    let db = db.deref();
+    UserDao::bind(db, id, &form.address)?;
+    Ok(Json(()))
+}
+
+#[derive(Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
 pub struct ChangePassword {
     #[validate(email, length(min = "2", max = "64"))]
     pub email: String,

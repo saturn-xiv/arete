@@ -20,6 +20,7 @@ table! {
         email -> Varchar,
         password -> Blob,
         online -> Bool,
+        fixed_ip -> Nullable<Varchar>,
         locked_at -> Nullable<Datetime>,
         startup -> Date,
         shutdown -> Date,
