@@ -54,24 +54,24 @@ impl Form {
                 .join("etc")
                 .join("sysctl.d")
                 .join("openvpn.conf"),
-            mode: 0600,
+            mode: 0o600,
             content: server::Sysctl.render()?,
         });
         items.push(File {
             path: Path::new(&Component::RootDir)
                 .join("etc")
                 .join("dnsmasq.conf"),
-            mode: 0600,
+            mode: 0o600,
             content: server::Dnsmasq { ip: &self.ip }.render()?,
         });
         items.push(File {
-            path: ROOT.join("readme.me"),
-            mode: 0600,
+            path: ROOT.join("readme.md"),
+            mode: 0o600,
             content: server::Readme.render()?,
         });
         items.push(File {
             path: ROOT.join("server.conf"),
-            mode: 0600,
+            mode: 0o600,
             content: server::Config {
                 port: self.port,
                 server: &server::Server {
@@ -90,7 +90,7 @@ impl Form {
         });
         items.push(File {
             path: ROOT.join("script").join("firewall.sh"),
-            mode: 0700,
+            mode: 0o700,
             content: server::Firewall {
                 network: &self.client.network,
                 interface: &self.interface,
@@ -99,7 +99,7 @@ impl Form {
         });
         items.push(File {
             path: ROOT.join("script").join("auth.sh"),
-            mode: 0700,
+            mode: 0o700,
             content: server::Auth {
                 host: &self.host,
                 token: token,
@@ -108,7 +108,7 @@ impl Form {
         });
         items.push(File {
             path: ROOT.join("script").join("connect.sh"),
-            mode: 0700,
+            mode: 0o700,
             content: server::Connect {
                 host: &self.host,
                 token: token,
@@ -117,7 +117,7 @@ impl Form {
         });
         items.push(File {
             path: ROOT.join("script").join("disconnect.sh"),
-            mode: 0700,
+            mode: 0o700,
             content: server::Disconnect {
                 host: &self.host,
                 token: token,
@@ -132,7 +132,7 @@ impl Form {
             let root = ROOT.join("easy-rsa").join("keys");
             items.push(File {
                 path: ROOT.join("client.conf"),
-                mode: 0600,
+                mode: 0o600,
                 content: client::Config {
                     host: &self.host,
                     port: self.port,
@@ -145,7 +145,7 @@ impl Form {
         }
         items.push(File {
             path: ROOT.join("auth.txt"),
-            mode: 0600,
+            mode: 0o600,
             content: client::Auth {
                 user: user,
                 password: password,
