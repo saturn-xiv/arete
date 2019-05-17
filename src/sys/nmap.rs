@@ -25,7 +25,7 @@ pub struct Run {
 impl Run {
     pub fn scan(network: &str, cidr: u8) -> Result<Self> {
         let buf = Command::new("nmap")
-            .arg("-dd")
+            // .arg("-dd")
             .arg("-n")
             .arg("-sn")
             .arg("-oX")
