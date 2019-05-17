@@ -13,6 +13,13 @@ pub struct Run {
     pub verbose: Verbose,
     #[serde(rename = "host", default)]
     pub hosts: Vec<Host>,
+    pub scanner: String,
+    pub args: String,
+    #[serde(rename = "startstr")]
+    pub start: String,
+    pub version: f32,
+    #[serde(rename = "xmloutputversion")]
+    pub xml_output_version: f32,
 }
 
 impl Run {
@@ -20,7 +27,7 @@ impl Run {
         let buf = Command::new("nmap")
             .arg("-dd")
             .arg("-n")
-            .arg("-sP")
+            .arg("-sn")
             .arg("-oX")
             .arg("-")
             .arg(format!("{}/{}", network, cidr))
