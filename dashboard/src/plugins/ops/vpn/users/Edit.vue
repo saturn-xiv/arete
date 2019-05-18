@@ -25,6 +25,13 @@
             disabled
             type="email"
           />
+          <v-text-field
+            prepend-icon="network_check"
+            name="fixedIp"
+            v-model="fixedIp"
+            :label="this.$t('ops.vpn.users.edit.fixed-ip')"
+            type="text"
+          />
         </v-form>
         <v-date-picker v-model="startup"/>
         <v-date-picker v-model="shutdown"/>
@@ -52,6 +59,7 @@ export default {
     return {
       email: null,
       name: null,
+      fixedIp: null,
       startup: null,
       shutdown: null
     };
@@ -62,6 +70,7 @@ export default {
       this.name = rst.name;
       this.startup = rst.startup;
       this.shutdown = rst.shutdown;
+      this.fixedIp = rst.fixedIp;
     });
   },
   methods: {
@@ -73,7 +82,8 @@ export default {
         httpPost(`/ops/vpn/users/${this.$route.params.id}`, {
           name: this.name,
           startup: this.startup,
-          shutdown: this.shutdown
+          shutdown: this.shutdown,
+          fixedIp: this.fixedIp === "" ? null : this.fixedIp
         })
           .then(() => {
             this.$store.commit(

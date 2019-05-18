@@ -1,8 +1,14 @@
+use std::fs::{create_dir_all, remove_file, OpenOptions};
+use std::io::prelude::*;
 use std::ops::Deref;
+use std::os::unix::fs::OpenOptionsExt;
+use std::sync::Arc;
 
+use askama::Template;
 use chrono::{Duration, NaiveDate, Utc};
 use diesel::prelude::*;
 use failure::Error as FailueError;
+use rocket::State;
 use rocket_contrib::json::Json;
 use validator::Validate;
 
@@ -10,11 +16,15 @@ use super::super::super::super::super::{
     crypto::Crypto,
     errors::{Error, JsonResult},
     orm::{Database, ID},
+    settings::Dao as SettingDao,
 };
 use super::super::super::super::nut::api::users::Administrator;
-use super::super::models::{
-    log::Dao as LogDao,
-    user::{Dao as UserDao, Item as User},
+use super::super::{
+    models::{
+        log::Dao as LogDao,
+        user::{Dao as UserDao, Item as User},
+    },
+    server, ROOT,
 };
 use super::Token;
 
@@ -65,29 +75,64 @@ pub fn create(_user: Administrator, db: Database, form: Json<Create>) -> JsonRes
 pub struct Update {
     #[validate(length(min = "1", max = "32"))]
     pub name: String,
+    pub fixed_ip: Option<String>,
     pub startup: NaiveDate,
     pub shutdown: NaiveDate,
 }
 
 #[post("/users/<id>", data = "<form>")]
-pub fn update(id: ID, _user: Administrator, db: Database, form: Json<Update>) -> JsonResult<()> {
+pub fn update(
+    id: ID,
+    _user: Administrator,
+    enc: State<Arc<Crypto>>,
+    db: Database,
+    form: Json<Update>,
+) -> JsonResult<()> {
     form.validate()?;
     let db = db.deref();
-    UserDao::update(db, id, &form.name, &form.startup, &form.shutdown)?;
-    Ok(Json(()))
-}
+    let enc = enc.deref();
+    let enc = enc.deref();
 
-#[derive(Deserialize, Validate)]
-#[serde(rename_all = "camelCase")]
-pub struct Bind {
-    pub address: Option<String>,
-}
+    let fixed_ip = form.fixed_ip.clone();
+    db.transaction::<_, FailueError, _>(move || {
+        UserDao::update(db, id, &form.name, &form.startup, &form.shutdown)?;
+        UserDao::bind(db, id, &form.fixed_ip)?;
+        Ok(())
+    })?;
+    let user = UserDao::by_id(db, id)?;
+    let file = ROOT.join("ccd").join(&user.email);
+    if let Some(p) = file.parent() {
+        if !p.exists() {
+            info!("create directory {}", p.display());
+            create_dir_all(p)?;
+        }
+    }
 
-#[post("/users/<id>/bind", data = "<form>")]
-pub fn bind(_user: Administrator, id: ID, db: Database, form: Json<Bind>) -> JsonResult<()> {
-    form.validate()?;
-    let db = db.deref();
-    UserDao::bind(db, id, &form.address)?;
+    match fixed_ip {
+        Some(ref ip) => {
+            let cfg: super::settings::Form =
+                SettingDao::get(db, enc, &super::settings::Form::KEY.to_string())?;
+            let buf = server::Ccd {
+                ip: &ip,
+                netmask: &cfg.client.netmask,
+            }
+            .render()?;
+            info!("generate file {}", file.display());
+            let mut fd = OpenOptions::new()
+                .write(true)
+                .create(true)
+                .truncate(true)
+                .mode(0o600)
+                .open(file)?;
+            fd.write_all(buf.as_bytes())?;
+        }
+        None => {
+            if file.exists() {
+                info!("remove file {}", file.display());
+                remove_file(file)?;
+            }
+        }
+    };
     Ok(Json(()))
 }
 

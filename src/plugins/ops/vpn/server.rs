@@ -22,6 +22,13 @@ pub struct Client<'a> {
 }
 
 #[derive(Template)]
+#[template(path = "openvpn/ccd", escape = "none")]
+pub struct Ccd<'a> {
+    pub ip: &'a str,
+    pub netmask: &'a str,
+}
+
+#[derive(Template)]
 #[template(path = "openvpn/dnsmasq.conf", escape = "none")]
 pub struct Dnsmasq<'a> {
     pub ip: &'a str,

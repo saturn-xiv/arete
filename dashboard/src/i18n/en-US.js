@@ -105,7 +105,8 @@ export default {
                     title: 'Create a new vpn user'
                 },
                 edit: {
-                    title: 'Edit user vpn {name}'
+                    title: 'Edit user vpn {name}',
+                    'fixed-ip': 'Static ip address'
                 },
                 'change-password': {
                     title: 'Change vpn password'

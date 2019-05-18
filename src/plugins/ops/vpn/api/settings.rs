@@ -44,7 +44,7 @@ pub struct Form {
     pub client: Client,
 }
 impl Form {
-    const KEY: &'static str = "site.author";
+    pub const KEY: &'static str = "site.author";
 
     pub fn server(&self, token: &String) -> Result<Vec<File>> {
         let mut items = Vec::new();
@@ -131,7 +131,7 @@ impl Form {
         {
             let root = ROOT.join("easy-rsa").join("keys");
             items.push(File {
-                path: ROOT.join("client.conf"),
+                path: ROOT.join("client.ovpn"),
                 mode: 0o600,
                 content: client::Config {
                     host: &self.host,
