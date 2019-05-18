@@ -10,12 +10,14 @@ sudo systemctl enable docker
 sudo gpasswd -a who-am-i docker
 ```
 
-- Clean
+- Install for disco, add `edge test` after stable in sources.list's docker line.
+
+- Clean, [see](https://docs.docker.com/config/pruning/)
 
 
 ```bash
-docker system prune # clear, DON RUN IT ON SERVER
-docker image prune # remove all dangling images
+docker system prune --volumes # clear, DON RUN IT ON SERVER
+docker image prune -a # remove all dangling images
 docker ps
 ```
 
