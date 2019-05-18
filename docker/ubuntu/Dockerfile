@@ -26,11 +26,12 @@ RUN apt -y install apt-utils apt-transport-https wget gnupg software-properties-
 # RUN apt -y install elasticsearch
 
 # http://www.rabbitmq.com/which-erlang.html
+# https://www.rabbitmq.com/install-debian.html
 RUN wget -O - "https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-release-signing-key.asc" | apt-key add -
-RUN echo "deb https://dl.bintray.com/rabbitmq-erlang/debian `lsb_release -c -s` erlang" > /etc/apt/sources.list.d/rabbitmq.list
+RUN echo "deb https://dl.bintray.com/rabbitmq-erlang/debian `lsb_release -c -s` erlang-21.x" > /etc/apt/sources.list.d/rabbitmq.list
 RUN echo "deb https://dl.bintray.com/rabbitmq/debian `lsb_release -c -s` main" >> /etc/apt/sources.list.d/rabbitmq.list
 RUN apt update
-RUN apt -y install rabbitmq-server
+RUN apt install rabbitmq-server -y --fix-missing
 
 RUN apt -y autoremove
 RUN apt -y clean
