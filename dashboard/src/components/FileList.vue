@@ -3,7 +3,7 @@
     <template v-slot:items="props">
       <tr @click="props.expanded = !props.expanded">
         <td>{{ props.item.path }}</td>
-        <td>{{ props.item.mode }}</td>
+        <td>0{{ props.item.mode.toString(8) }}</td>
       </tr>
     </template>
     <template v-slot:expand="props">
