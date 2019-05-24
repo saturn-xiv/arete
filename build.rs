@@ -13,6 +13,7 @@ fn main() {
                 .arg("--tags")
                 .arg("--always")
                 .arg("--first-parent")
+                .arg("--dirty")
                 .output()
                 .unwrap()
                 .stdout,
