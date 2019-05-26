@@ -58,7 +58,15 @@ $ git submodule update # update
 - Add a tag: `git tag NAME`
 - Push all tags: `git push origin --tags`
 - Delete remote tag: `git tag -d NAME` and `git push origin :refs/tags/NAME`
+- Changing a remote's URL: 
+
+```bash
+$ git remote -v
+$ git remote set-url origin https://github.com/USERNAME/REPOSITORY.git
+```
+
 - Reset branch
+  
 ```bash
 $ git log
 $ git reset --hard COMMIT-ID

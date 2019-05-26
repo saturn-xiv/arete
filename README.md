@@ -18,6 +18,7 @@ $ ssh -p 2222 deploy@localhost # default password is 'hi'
 
 ## How to use
 
+* Generate a 256-bit base64 encoded string by `openssl rand -base64 32`
 * Generate **config.toml** `arete generate:config`, then change it if you need
 * Migrate database `arete database:migrate`
 * Import locale records `arete i18n:sync`
