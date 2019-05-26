@@ -48,6 +48,7 @@ pub struct Item {
     pub gender: String,
     pub birthday: NaiveDate,
     pub contact: String,
+    pub version: ID,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }

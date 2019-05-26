@@ -24,6 +24,7 @@ table! {
         locked_at -> Nullable<Datetime>,
         startup -> Date,
         shutdown -> Date,
+        version -> Bigint,
         created_at -> Datetime,
         updated_at -> Datetime,
     }

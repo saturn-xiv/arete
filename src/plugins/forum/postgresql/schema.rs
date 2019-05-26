@@ -6,6 +6,7 @@ table! {
         post_id -> Nullable<Int8>,
         body -> Text,
         media_type -> Varchar,
+        version -> Int8,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -18,6 +19,7 @@ table! {
         title -> Varchar,
         body -> Text,
         media_type -> Varchar,
+        version -> Int8,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }

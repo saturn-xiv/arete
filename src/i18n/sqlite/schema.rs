@@ -4,6 +4,7 @@ table! {
         lang -> Text,
         code -> Text,
         message -> Text,
+        version -> Integer,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }

@@ -14,6 +14,7 @@ pub struct Item {
     pub point: i64,
     pub resource_type: String,
     pub resource_id: ID,
+    pub version: ID,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }

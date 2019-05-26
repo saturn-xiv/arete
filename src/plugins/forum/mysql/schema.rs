@@ -6,6 +6,7 @@ table! {
         post_id -> Nullable<Bigint>,
         body -> Text,
         media_type -> Varchar,
+        version -> Bigint,
         created_at -> Datetime,
         updated_at -> Datetime,
     }
@@ -18,6 +19,7 @@ table! {
         title -> Varchar,
         body -> Text,
         media_type -> Varchar,
+        version -> Bigint,
         created_at -> Datetime,
         updated_at -> Datetime,
     }

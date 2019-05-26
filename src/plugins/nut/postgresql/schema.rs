@@ -6,6 +6,7 @@ table! {
         size -> Int8,
         mime_type -> Varchar,
         url -> Varchar,
+        version -> Int8,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -23,6 +24,7 @@ table! {
         loc -> Varchar,
         lang -> Varchar,
         position -> Int2,
+        version -> Int8,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -36,6 +38,7 @@ table! {
         icon -> Varchar,
         color -> Varchar,
         position -> Int2,
+        version -> Int8,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -58,6 +61,7 @@ table! {
         home -> Varchar,
         logo -> Varchar,
         position -> Int2,
+        version -> Int8,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -82,6 +86,7 @@ table! {
         lang -> Varchar,
         x -> Int2,
         y -> Int2,
+        version -> Int8,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -106,6 +111,7 @@ table! {
         media_type -> Varchar,
         level -> Varchar,
         read -> Bool,
+        version -> Int8,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -119,6 +125,7 @@ table! {
         resource -> Nullable<Varchar>,
         nbf -> Date,
         exp -> Date,
+        version -> Int8,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -140,6 +147,7 @@ table! {
         name -> Varchar,
         icon -> Varchar,
         color -> Varchar,
+        version -> Int8,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -164,6 +172,7 @@ table! {
         confirmed_at -> Nullable<Timestamp>,
         locked_at -> Nullable<Timestamp>,
         deleted_at -> Nullable<Timestamp>,
+        version -> Int8,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -175,6 +184,7 @@ table! {
         point -> Int8,
         resource_type -> Varchar,
         resource_id -> Int8,
+        version -> Int8,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }

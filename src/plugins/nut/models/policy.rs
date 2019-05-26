@@ -21,6 +21,7 @@ pub struct Item {
     pub resource: Option<String>,
     pub nbf: NaiveDate,
     pub exp: NaiveDate,
+    pub version: ID,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }

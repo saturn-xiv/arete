@@ -17,6 +17,7 @@ pub struct Item {
     pub required: bool,
     pub type_: String,
     pub position: i16,
+    pub version: ID,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }

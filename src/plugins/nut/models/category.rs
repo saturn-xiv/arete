@@ -16,6 +16,7 @@ pub struct Item {
     pub icon: String,
     pub color: String,
     pub position: i16,
+    pub version: ID,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }

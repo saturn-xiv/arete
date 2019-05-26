@@ -9,6 +9,7 @@ table! {
         #[sql_name = "type"]
         type_ -> Text,
         position -> Int2,
+        version -> Int8,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -24,6 +25,7 @@ table! {
         type_ -> Text,
         nbf -> Date,
         exp -> Date,
+        version -> Int8,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }

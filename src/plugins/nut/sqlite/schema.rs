@@ -6,6 +6,7 @@ table! {
         size -> BigInt,
         mime_type -> Text,
         url -> Text,
+        version -> Integer,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -23,6 +24,7 @@ table! {
         loc -> Text,
         lang -> Text,
         position -> SmallInt,
+        version -> Integer,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -36,6 +38,7 @@ table! {
         icon -> Text,
         color -> Text,
         position -> SmallInt,
+        version -> Integer,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -58,6 +61,7 @@ table! {
         home -> Text,
         logo -> Text,
         position -> SmallInt,
+        version -> Integer,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -82,6 +86,7 @@ table! {
         lang -> Text,
         x -> SmallInt,
         y -> SmallInt,
+        version -> Integer,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -106,6 +111,7 @@ table! {
         media_type -> Text,
         level -> Text,
         read -> Bool,
+        version -> Integer,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -119,6 +125,7 @@ table! {
         resource -> Nullable<Text>,
         nbf -> Date,
         exp -> Date,
+        version -> Integer,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -140,6 +147,7 @@ table! {
         name -> Text,
         icon -> Text,
         color -> Text,
+        version -> Integer,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -164,6 +172,7 @@ table! {
         confirmed_at -> Nullable<Timestamp>,
         locked_at -> Nullable<Timestamp>,
         deleted_at -> Nullable<Timestamp>,
+        version -> Integer,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -175,6 +184,7 @@ table! {
         point -> BigInt,
         resource_type -> Text,
         resource_id -> Integer,
+        version -> Integer,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }

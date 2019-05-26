@@ -16,6 +16,7 @@ pub struct Item {
     pub type_: String,
     pub nbf: NaiveDate,
     pub exp: NaiveDate,
+    pub version: ID,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }

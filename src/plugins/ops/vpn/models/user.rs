@@ -20,6 +20,7 @@ pub struct Item {
     pub locked_at: Option<NaiveDateTime>,
     pub startup: NaiveDate,
     pub shutdown: NaiveDate,
+    pub version: ID,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }

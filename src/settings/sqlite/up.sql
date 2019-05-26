@@ -1,8 +1,8 @@
 CREATE TABLE settings(id INTEGER PRIMARY KEY NOT NULL,
                                              key VARCHAR(255) NOT NULL,
                                                               value BLOB NOT NULL,
-                                                                         salt BLOB, created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                                                                                          version INTEGER NOT NULL DEFAULT 0,
+                                                                         salt BLOB, version INTEGER NOT NULL DEFAULT 0,
+                                                                                                                     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                                                                                                                                            updated_at TIMESTAMP NOT NULL);
 
 

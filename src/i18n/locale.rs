@@ -15,6 +15,7 @@ pub struct Item {
     pub lang: String,
     pub code: String,
     pub message: String,
+    pub version: ID,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }

@@ -30,6 +30,7 @@ pub struct Item {
     pub key: String,
     pub value: Vec<u8>,
     pub salt: Option<Vec<u8>>,
+    pub version: ID,
     pub updated_at: NaiveDateTime,
     pub created_at: NaiveDateTime,
 }

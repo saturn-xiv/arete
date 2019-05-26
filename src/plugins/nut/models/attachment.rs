@@ -16,6 +16,7 @@ pub struct Item {
     pub size: i64,
     pub mime_type: String,
     pub url: String,
+    pub version: ID,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }

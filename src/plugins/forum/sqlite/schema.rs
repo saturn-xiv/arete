@@ -6,6 +6,7 @@ table! {
         post_id -> Nullable<Integer>,
         body -> Text,
         media_type -> Text,
+        version -> Integer,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -18,6 +19,7 @@ table! {
         title -> Text,
         body -> Text,
         media_type -> Text,
+        version -> Integer,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }

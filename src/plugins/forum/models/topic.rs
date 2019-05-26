@@ -19,6 +19,7 @@ pub struct Item {
     pub title: String,
     pub body: String,
     pub media_type: String,
+    pub version: ID,
     pub updated_at: NaiveDateTime,
     pub created_at: NaiveDateTime,
 }

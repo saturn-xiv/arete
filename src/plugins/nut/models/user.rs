@@ -55,6 +55,7 @@ pub struct Item {
     pub confirmed_at: Option<NaiveDateTime>,
     pub locked_at: Option<NaiveDateTime>,
     pub deleted_at: Option<NaiveDateTime>,
+    pub version: ID,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }

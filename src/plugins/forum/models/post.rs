@@ -17,6 +17,7 @@ pub struct Item {
     pub post_id: Option<ID>,
     pub body: String,
     pub media_type: String,
+    pub version: ID,
     pub updated_at: NaiveDateTime,
     pub created_at: NaiveDateTime,
 }

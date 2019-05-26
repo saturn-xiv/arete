@@ -6,6 +6,7 @@ table! {
         size -> Bigint,
         mime_type -> Varchar,
         url -> Varchar,
+        version -> Bigint,
         created_at -> Datetime,
         updated_at -> Datetime,
     }
@@ -23,6 +24,7 @@ table! {
         loc -> Varchar,
         lang -> Varchar,
         position -> Smallint,
+        version -> Bigint,
         created_at -> Datetime,
         updated_at -> Datetime,
     }
@@ -36,6 +38,7 @@ table! {
         icon -> Varchar,
         color -> Varchar,
         position -> Smallint,
+        version -> Bigint,
         created_at -> Datetime,
         updated_at -> Datetime,
     }
@@ -58,6 +61,7 @@ table! {
         home -> Varchar,
         logo -> Varchar,
         position -> Smallint,
+        version -> Bigint,
         created_at -> Datetime,
         updated_at -> Datetime,
     }
@@ -82,6 +86,7 @@ table! {
         lang -> Varchar,
         x -> Smallint,
         y -> Smallint,
+        version -> Bigint,
         created_at -> Datetime,
         updated_at -> Datetime,
     }
@@ -106,6 +111,7 @@ table! {
         media_type -> Varchar,
         level -> Varchar,
         read -> Bool,
+        version -> Bigint,
         created_at -> Datetime,
         updated_at -> Datetime,
     }
@@ -119,6 +125,7 @@ table! {
         resource -> Nullable<Varchar>,
         nbf -> Date,
         exp -> Date,
+        version -> Bigint,
         created_at -> Datetime,
         updated_at -> Datetime,
     }
@@ -140,6 +147,7 @@ table! {
         name -> Varchar,
         icon -> Varchar,
         color -> Varchar,
+        version -> Bigint,
         created_at -> Datetime,
         updated_at -> Datetime,
     }
@@ -164,6 +172,7 @@ table! {
         confirmed_at -> Nullable<Datetime>,
         locked_at -> Nullable<Datetime>,
         deleted_at -> Nullable<Datetime>,
+        version -> Bigint,
         created_at -> Datetime,
         updated_at -> Datetime,
     }
@@ -175,6 +184,7 @@ table! {
         point -> Bigint,
         resource_type -> Varchar,
         resource_id -> Bigint,
+        version -> Bigint,
         created_at -> Datetime,
         updated_at -> Datetime,
     }

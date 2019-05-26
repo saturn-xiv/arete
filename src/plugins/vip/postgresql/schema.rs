@@ -6,6 +6,7 @@ table! {
         gender -> Varchar,
         birthday -> Date,
         contact -> Text,
+        version -> Int8,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }

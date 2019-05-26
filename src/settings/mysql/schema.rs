@@ -4,6 +4,7 @@ table! {
         key -> Varchar,
         value -> Blob,
         salt -> Nullable<Blob>,
+        version -> Bigint,
         created_at -> Datetime,
         updated_at -> Datetime,
     }
