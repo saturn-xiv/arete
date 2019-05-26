@@ -7,8 +7,9 @@ CREATE TABLE vpn_users(id BIGSERIAL PRIMARY KEY,
                                                                                                                                         locked_at TIMESTAMP,
                                                                                                                                                   startup DATE NOT NULL,
                                                                                                                                                                shutdown DATE NOT NULL,
-                                                                                                                                                                             created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                                                                                                                                                                                   updated_at TIMESTAMP NOT NULL);
+                                                                                                                                                                             version BIGINT NOT NULL DEFAULT 0,
+                                                                                                                                                                                                             created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                                                                                                                                                                                                                   updated_at TIMESTAMP NOT NULL);
 
 
 CREATE INDEX idx_vpn_users_name ON vpn_users(name);

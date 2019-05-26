@@ -8,8 +8,9 @@ CREATE TABLE cards(id INTEGER PRIMARY KEY NOT NULL,
                                                                                                                                                     loc VARCHAR(16) NOT NULL,
                                                                                                                                                                     lang VARCHAR(8) NOT NULL,
                                                                                                                                                                                     position SMALLINT NOT NULL,
-                                                                                                                                                                                                      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                                                                                                                                                                                                            updated_at TIMESTAMP NOT NULL);
+                                                                                                                                                                                                      version INTEGER NOT NULL DEFAULT 0,
+                                                                                                                                                                                                                                       created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                                                                                                                                                                                                                                             updated_at TIMESTAMP NOT NULL);
 
 
 CREATE INDEX idx_cards_lang ON cards(lang);
@@ -25,8 +26,9 @@ CREATE TABLE links(id INTEGER PRIMARY KEY NOT NULL,
                                                                                                lang VARCHAR(8) NOT NULL,
                                                                                                                x SMALLINT NOT NULL,
                                                                                                                           y SMALLINT NOT NULL,
-                                                                                                                                     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                                                                                                                                           updated_at TIMESTAMP NOT NULL);
+                                                                                                                                     version INTEGER NOT NULL DEFAULT 0,
+                                                                                                                                                                      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                                                                                                                                                                            updated_at TIMESTAMP NOT NULL);
 
 
 CREATE INDEX idx_links_lang ON links(lang);
@@ -40,8 +42,9 @@ CREATE TABLE friend_links(id INTEGER PRIMARY KEY NOT NULL,
                                                                     home VARCHAR(255) NOT NULL,
                                                                                       logo VARCHAR(255) NOT NULL,
                                                                                                         position SMALLINT NOT NULL,
-                                                                                                                          created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                                                                                                                                updated_at TIMESTAMP NOT NULL);
+                                                                                                                          version INTEGER NOT NULL DEFAULT 0,
+                                                                                                                                                           created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                                                                                                                                                                 updated_at TIMESTAMP NOT NULL);
 
 
 CREATE INDEX idx_friend_links_title ON friend_links(title);
@@ -58,8 +61,9 @@ CREATE TABLE votes(id INTEGER PRIMARY KEY NOT NULL,
                                           point BIGINT NOT NULL,
                                                        resource_type VARCHAR(255) NOT NULL,
                                                                                   resource_id INTEGER NOT NULL,
-                                                                                                      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                                                                                                            updated_at TIMESTAMP NOT NULL);
+                                                                                                      version INTEGER NOT NULL DEFAULT 0,
+                                                                                                                                       created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                                                                                                                                             updated_at TIMESTAMP NOT NULL);
 
 
 CREATE INDEX idx_votes_resource_type ON votes(resource_type);
@@ -72,8 +76,9 @@ CREATE TABLE tags(id INTEGER PRIMARY KEY NOT NULL,
                                          name VARCHAR(255) NOT NULL,
                                                            icon VARCHAR(16) NOT NULL,
                                                                             color VARCHAR(16) NOT NULL,
-                                                                                              created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                                                                                                    updated_at TIMESTAMP NOT NULL);
+                                                                                              version INTEGER NOT NULL DEFAULT 0,
+                                                                                                                               created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                                                                                                                                     updated_at TIMESTAMP NOT NULL);
 
 
 CREATE UNIQUE INDEX idx_tags_name ON tags(name);
@@ -94,8 +99,9 @@ CREATE TABLE categories(id INTEGER PRIMARY KEY NOT NULL,
                                                                                     icon VARCHAR(16) NOT NULL,
                                                                                                      color VARCHAR(16) NOT NULL,
                                                                                                                        position SMALLINT NOT NULL,
-                                                                                                                                         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                                                                                                                                               updated_at TIMESTAMP NOT NULL);
+                                                                                                                                         version INTEGER NOT NULL DEFAULT 0,
+                                                                                                                                                                          created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                                                                                                                                                                                updated_at TIMESTAMP NOT NULL);
 
 
 CREATE INDEX idx_categories_name ON categories(name);

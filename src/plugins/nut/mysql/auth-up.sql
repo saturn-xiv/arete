@@ -14,8 +14,9 @@ CREATE TABLE users(id BIGINT AUTO_INCREMENT PRIMARY KEY,
                                                                                                                                                                                                                                                                                                 confirmed_at DATETIME,
                                                                                                                                                                                                                                                                                                 locked_at DATETIME,
                                                                                                                                                                                                                                                                                                 deleted_at DATETIME,
-                                                                                                                                                                                                                                                                                                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                                                                                                                                                                                                                                                                                                     updated_at DATETIME NOT NULL);
+                                                                                                                                                                                                                                                                                                version BIGINT NOT NULL DEFAULT 0,
+                                                                                                                                                                                                                                                                                                                                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                                                                                                                                                                                                                                                                                                                                     updated_at DATETIME NOT NULL);
 
 
 CREATE INDEX idx_users_real_name ON users(real_name);
@@ -46,8 +47,9 @@ CREATE TABLE policies(id BIGINT AUTO_INCREMENT PRIMARY KEY,
                                                                                        resource VARCHAR(255),
                                                                                                 nbf DATE NOT NULL,
                                                                                                          exp DATE NOT NULL,
-                                                                                                                  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                                                                                                                       updated_at DATETIME NOT NULL);
+                                                                                                                  version BIGINT NOT NULL DEFAULT 0,
+                                                                                                                                                  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                                                                                                                                                       updated_at DATETIME NOT NULL);
 
 
 CREATE INDEX idx_policies_role ON policies(role);
@@ -59,8 +61,9 @@ CREATE TABLE attachments(id BIGINT AUTO_INCREMENT PRIMARY KEY,
                                                                                             size BIGINT NOT NULL,
                                                                                                         mime_type VARCHAR(255) NOT NULL,
                                                                                                                                url VARCHAR(255) NOT NULL,
-                                                                                                                                                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                                                                                                                                                     updated_at DATETIME NOT NULL);
+                                                                                                                                                version BIGINT NOT NULL DEFAULT 0,
+                                                                                                                                                                                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                                                                                                                                                                                     updated_at DATETIME NOT NULL);
 
 
 CREATE INDEX idx_attachments ON attachments(title);
@@ -73,8 +76,9 @@ CREATE TABLE notifications(id BIGINT AUTO_INCREMENT PRIMARY KEY,
                                                                                                        media_type VARCHAR(8) NOT NULL,
                                                                                                                              level VARCHAR(8) NOT NULL,
                                                                                                                                               `read` BOOLEAN NOT NULL,
-                                                                                                                                                             created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                                                                                                                                                                  updated_at DATETIME NOT NULL);
+                                                                                                                                                             version BIGINT NOT NULL DEFAULT 0,
+                                                                                                                                                                                             created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                                                                                                                                                                                                  updated_at DATETIME NOT NULL);
 
 
 CREATE INDEX idx_notifications ON notifications(level);

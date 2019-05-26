@@ -15,8 +15,9 @@ CREATE TABLE users(id BIGSERIAL PRIMARY KEY,
                                                                                                                                                                                                                                                                                                         confirmed_at TIMESTAMP,
                                                                                                                                                                                                                                                                                                                      locked_at TIMESTAMP,
                                                                                                                                                                                                                                                                                                                                deleted_at TIMESTAMP,
-                                                                                                                                                                                                                                                                                                                                          created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                                                                                                                                                                                                                                                                                                                                                updated_at TIMESTAMP NOT NULL);
+                                                                                                                                                                                                                                                                                                                                          version BIGINT NOT NULL DEFAULT 0,
+                                                                                                                                                                                                                                                                                                                                                                          created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                                                                                                                                                                                                                                                                                                                                                                                updated_at TIMESTAMP NOT NULL);
 
 
 CREATE INDEX idx_users_real_name ON users(real_name);
@@ -47,8 +48,9 @@ CREATE TABLE policies(id BIGSERIAL PRIMARY KEY,
                                                                            resource VARCHAR(255),
                                                                                     nbf DATE NOT NULL,
                                                                                              exp DATE NOT NULL,
-                                                                                                      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                                                                                                            updated_at TIMESTAMP NOT NULL);
+                                                                                                      version BIGINT NOT NULL DEFAULT 0,
+                                                                                                                                      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                                                                                                                                            updated_at TIMESTAMP NOT NULL);
 
 
 CREATE INDEX idx_policies_role ON policies(role);
@@ -60,8 +62,9 @@ CREATE TABLE attachments(id BIGSERIAL PRIMARY KEY,
                                                                                 size BIGINT NOT NULL,
                                                                                             mime_type VARCHAR(255) NOT NULL,
                                                                                                                    url VARCHAR(255) NOT NULL,
-                                                                                                                                    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                                                                                                                                          updated_at TIMESTAMP NOT NULL);
+                                                                                                                                    version BIGINT NOT NULL DEFAULT 0,
+                                                                                                                                                                    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                                                                                                                                                                          updated_at TIMESTAMP NOT NULL);
 
 
 CREATE INDEX idx_attachments ON attachments(title);
@@ -74,8 +77,9 @@ CREATE TABLE notifications(id BIGSERIAL PRIMARY KEY,
                                                                                            media_type VARCHAR(8) NOT NULL,
                                                                                                                  level VARCHAR(8) NOT NULL,
                                                                                                                                   read BOOLEAN NOT NULL,
-                                                                                                                                               created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                                                                                                                                                     updated_at TIMESTAMP NOT NULL);
+                                                                                                                                               version BIGINT NOT NULL DEFAULT 0,
+                                                                                                                                                                               created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                                                                                                                                                                                     updated_at TIMESTAMP NOT NULL);
 
 
 CREATE INDEX idx_notifications ON notifications(level);

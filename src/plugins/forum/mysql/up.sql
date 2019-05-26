@@ -3,8 +3,9 @@ CREATE TABLE forum_topics(id BIGINT AUTO_INCREMENT PRIMARY KEY,
                                                                           title VARCHAR(255) NOT NULL,
                                                                                              body TEXT NOT NULL,
                                                                                                        media_type VARCHAR(8) NOT NULL,
-                                                                                                                             created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                                                                                                                                  updated_at DATETIME NOT NULL);
+                                                                                                                             version BIGINT NOT NULL DEFAULT 0,
+                                                                                                                                                             created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                                                                                                                                                                  updated_at DATETIME NOT NULL);
 
 
 CREATE INDEX idx_forum_topics_title ON forum_topics(title);
@@ -15,6 +16,7 @@ CREATE TABLE forum_posts(id BIGINT AUTO_INCREMENT PRIMARY KEY,
                                                                          topic_id BIGINT NOT NULL,
                                                                                          post_id BIGINT, body TEXT NOT NULL,
                                                                                                                    media_type VARCHAR(8) NOT NULL,
-                                                                                                                                         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                                                                                                                                              updated_at DATETIME NOT NULL);
+                                                                                                                                         version BIGINT NOT NULL DEFAULT 0,
+                                                                                                                                                                         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                                                                                                                                                                              updated_at DATETIME NOT NULL);
 
