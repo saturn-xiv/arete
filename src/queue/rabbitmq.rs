@@ -88,7 +88,7 @@ impl Queue for RabbitMQ {
                     .map_err(FailureError::from)
             })
             .and_then(move |channel| {
-                let id = channel.id;
+                let id = channel.id();
                 info!("created channel with id: {}", id);
 
                 channel
@@ -148,7 +148,7 @@ impl Queue for RabbitMQ {
                 client.create_channel().map_err(FailureError::from)
             })
             .and_then(move |channel| {
-                let id = channel.id;
+                let id = channel.id();
                 info!("created channel with id: {}", id);
                 let c = channel.clone();
                 channel
