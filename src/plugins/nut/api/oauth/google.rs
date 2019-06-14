@@ -19,7 +19,36 @@ use super::super::super::super::super::{
     settings::Dao as SettingDao,
 };
 use super::super::super::models::{log::Dao as LogDao, user::Dao as UserDao};
-use super::super::users::{Action, Token};
+use super::super::users::{Action, Administrator, Token};
+
+#[get("/oauth/google")]
+pub fn get(
+    _user: Administrator,
+    enc: State<Arc<Crypto>>,
+    db: Database,
+) -> JsonResult<ClientSecret> {
+    let db = db.deref();
+    let enc = enc.deref();
+    let enc = enc.deref();
+    let it: ClientSecret = SettingDao::get(db, enc, &ClientSecret::KEY.to_string())?;
+    Ok(Json(it))
+}
+
+#[post("/oauth/google", data = "<form>")]
+pub fn post(
+    _user: Administrator,
+    enc: State<Arc<Crypto>>,
+    form: Json<ClientSecret>,
+    db: Database,
+) -> JsonResult<()> {
+    let db = db.deref();
+    let enc = enc.deref();
+    let enc = enc.deref();
+
+    SettingDao::set(db, enc, &ClientSecret::KEY.to_string(), form.deref(), true)?;
+
+    Ok(Json(()))
+}
 
 #[get("/oauth/google/sign-in?<callback>")]
 pub fn get_sign_in(enc: State<Arc<Crypto>>, callback: String, db: Database) -> JsonResult<String> {
