@@ -1,5 +1,4 @@
 use std::fmt;
-use std::str::FromStr;
 
 use rusoto_core::{request::HttpClient, Region};
 use rusoto_s3::{
@@ -30,13 +29,9 @@ impl fmt::Display for Acl {
 }
 
 impl S3 {
-    pub fn new(cred: super::Credentials, region: &str) -> Result<Self> {
+    pub fn new(cred: super::Credentials, region: Region) -> Result<Self> {
         Ok(Self {
-            client: S3Client::new_with(
-                HttpClient::new()?,
-                cred.provider(),
-                Region::from_str(region)?,
-            ),
+            client: S3Client::new_with(HttpClient::new()?, cred.provider(), region),
         })
     }
 

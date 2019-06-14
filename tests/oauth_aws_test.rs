@@ -1,5 +1,6 @@
 extern crate arete;
 extern crate csv;
+extern crate rusoto_core;
 extern crate serde_json;
 
 use std::fs::File;
@@ -7,6 +8,7 @@ use std::io::BufReader;
 use std::path::PathBuf;
 
 use arete::oauth::aws;
+use rusoto_core::Region;
 
 #[test]
 fn it_s3() {
@@ -16,7 +18,7 @@ fn it_s3() {
     for result in rdr.deserialize() {
         let record: aws::Credentials = result.unwrap();
         println!("{:?}", record);
-        let cli = aws::s3::S3::new(record, "us-west-2").unwrap();
+        let cli = aws::s3::S3::new(record, Region::from_str("us-west-2").unwrap()).unwrap();
         for bucket in cli.list_buckets().unwrap() {
             println!("find bucket: {}", bucket);
             for obj in cli.list_objects(bucket, None).unwrap() {
