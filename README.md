@@ -26,6 +26,11 @@ $ ssh -p 2222 deploy@localhost # default password is 'hi'
 * Generate systemd config file `arete generate:systemd`, then mv it into **/lib/systemd/system/** and start it
 * Create the admin in **http://YOUR-HOST/my/install** 
 
+## Mock test
+
+- [MinIO is a high performance object storage server compatible with Amazon S3 APIs](https://github.com/minio/minio)
+- [Message queueing system with an actor-based Scala and Amazon SQS-compatible interfaces. Runs stand-alone or embedded.](https://github.com/softwaremill/elasticmq)
+
 ## Documents
 
 -   [Ant Design](https://ant.design/docs/react/introduce)
