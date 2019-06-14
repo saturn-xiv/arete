@@ -17,7 +17,7 @@ pub fn launch(cfg: Config) -> Result<()> {
     let db = cfg.database.open()?;
     let jwt = Arc::new(Jwt::new(cfg.secrets.0.clone()));
     let enc = Arc::new(Crypto::new(cfg.secrets.clone())?);
-    let qu = Arc::new(cfg.rabbitmq.clone().open()?);
+    let qu = Arc::new(cfg.rabbitmq.clone().open());
 
     info!("start send email thread");
     {

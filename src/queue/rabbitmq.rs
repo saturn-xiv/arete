@@ -1,12 +1,13 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use amq_protocol_uri::{AMQPAuthority, AMQPUri, AMQPUserInfo};
 use failure::Error as FailureError;
 use futures::{future::Future, Stream};
 use lapin::{
     message::Delivery,
     options::{BasicConsumeOptions, BasicPublishOptions, QueueDeclareOptions},
     types::FieldTable,
-    BasicProperties, Client, ConnectionProperties, Credentials,
+    BasicProperties, Client, ConnectionProperties,
 };
 use mime::{Mime, APPLICATION_JSON};
 use serde::ser::Serialize;
@@ -39,37 +40,37 @@ impl Default for Config {
 }
 
 impl Config {
-    pub fn open(self) -> Result<RabbitMQ> {
-        RabbitMQ::new(
-            format!("amqp://{}:{}{}", self.host, self.port, self.virtual_host),
-            self.username,
-            self.password,
-        )
+    pub fn open(self) -> RabbitMQ {
+        RabbitMQ {
+            uri: AMQPUri {
+                vhost: self.virtual_host,
+                authority: AMQPAuthority {
+                    port: self.port,
+                    host: self.host,
+                    userinfo: AMQPUserInfo {
+                        username: self.username,
+                        password: self.password,
+                    },
+                },
+                ..Default::default()
+            },
+            conn: ConnectionProperties::default(),
+        }
     }
 }
 
 pub struct RabbitMQ {
-    addr: String,
+    uri: AMQPUri,
     conn: ConnectionProperties,
-    cred: Credentials,
 }
 
-impl RabbitMQ {
-    pub fn new(addr: String, username: String, password: String) -> Result<Self> {
-        Ok(Self {
-            addr: addr,
-            cred: Credentials::new(username, password),
-            conn: ConnectionProperties::default(),
-        })
-    }
-}
 impl Queue for RabbitMQ {
     fn publish<T: Serialize>(&self, queue: String, mid: String, payload: T) -> Result<()> {
         info!("publish task {}", mid);
 
         let payload = serde_json::to_vec(&payload)?;
 
-        let rt = Client::connect(&self.addr, self.cred.clone(), self.conn.clone())
+        let rt = Client::connect_uri(self.uri.clone(), self.conn.clone())
             .map_err(FailureError::from)
             .and_then(move |client| client.create_channel().map_err(FailureError::from))
             .and_then(move |channel| {
@@ -117,7 +118,7 @@ impl Queue for RabbitMQ {
         queue_name: String,
         handler: Box<dyn Handler>,
     ) -> Result<()> {
-        let rt = Client::connect(&self.addr, self.cred.clone(), self.conn.clone())
+        let rt = Client::connect_uri(self.uri.clone(), self.conn.clone())
             .map_err(FailureError::from)
             .and_then(move |client| client.create_channel().map_err(FailureError::from))
             .and_then(move |channel| {

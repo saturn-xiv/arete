@@ -19,6 +19,7 @@ extern crate failure;
 #[macro_use]
 extern crate serde_json;
 
+extern crate amq_protocol_uri;
 extern crate askama;
 extern crate base64;
 extern crate chrono;
