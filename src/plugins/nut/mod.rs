@@ -59,6 +59,8 @@ pub fn routes() -> (&'static str, Vec<Route>, Vec<Route>) {
     (
         "/",
         routes![
+            api::oauth::google::get_sign_in,
+            api::oauth::google::post_sign_in,
             api::users::sign_in,
             api::users::sign_up,
             api::users::confirm,

@@ -163,6 +163,7 @@ table! {
         uid -> Varchar,
         provider_type -> Varchar,
         provider_id -> Varchar,
+        access_token -> Nullable<Varchar>,
         logo -> Varchar,
         sign_in_count -> Bigint,
         current_sign_in_at -> Nullable<Datetime>,

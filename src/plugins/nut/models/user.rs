@@ -8,6 +8,7 @@ use uuid::Uuid;
 use super::super::super::super::{
     crypto::Password,
     errors::{Error, Result},
+    oauth::google::openid::IdToken,
     orm::{Connection, ID},
 };
 use super::super::schema::users;
@@ -46,6 +47,7 @@ pub struct Item {
     pub uid: String,
     pub provider_type: String,
     pub provider_id: String,
+    pub access_token: Option<String>,
     pub logo: String,
     pub sign_in_count: i64,
     pub current_sign_in_at: Option<NaiveDateTime>,
@@ -104,6 +106,7 @@ pub trait Dao {
     fn by_nick_name(&self, nick_name: &String) -> Result<Item>;
     fn set_profile(&self, id: ID, real_name: &String, logo: &String) -> Result<()>;
     fn sign_in(&self, id: ID, ip: &String) -> Result<()>;
+    fn google(&self, access_token: &String, token: &IdToken, ip: &String) -> Result<Item>;
     fn sign_up<T: Password>(
         &self,
         real_name: &String,
@@ -147,9 +150,72 @@ impl Dao for Connection {
         Ok(it)
     }
 
+    fn google(&self, access_token: &String, id_token: &IdToken, ip: &String) -> Result<Item> {
+        let now = Utc::now().naive_utc();
+        let it = match users::dsl::users
+            .filter(users::dsl::provider_id.eq(&id_token.sub))
+            .filter(users::dsl::provider_type.eq(&Type::Google.to_string()))
+            .first::<Item>(self)
+        {
+            Ok(it) => {
+                if let Some(ref name) = id_token.name {
+                    update(users::dsl::users.filter(users::dsl::id.eq(it.id)))
+                        .set(users::dsl::real_name.eq(&name))
+                        .execute(self)?;
+                }
+                if let Some(ref email) = id_token.email {
+                    update(users::dsl::users.filter(users::dsl::id.eq(it.id)))
+                        .set(users::dsl::email.eq(&email))
+                        .execute(self)?;
+                }
+                if let Some(ref logo) = id_token.picture {
+                    update(users::dsl::users.filter(users::dsl::id.eq(it.id)))
+                        .set(users::dsl::logo.eq(&logo))
+                        .execute(self)?;
+                }
+                it
+            }
+            Err(_) => {
+                let email = match id_token.email {
+                    Some(ref v) => v.clone(),
+                    None => format!("{}@gmail.com", id_token.sub),
+                };
+                let uid = Uuid::new_v4().to_string();
+                insert_into(users::dsl::users)
+                    .values(&New {
+                        real_name: &match id_token.name {
+                            Some(ref v) => v.clone(),
+                            None => "Guest".to_string(),
+                        },
+                        nick_name: &format!("g{}", id_token.sub),
+                        email: &email,
+                        password: None,
+                        provider_type: &Type::Google.to_string(),
+                        provider_id: &id_token.sub,
+                        logo: &match id_token.picture {
+                            Some(ref v) => v.clone(),
+                            None => format!(
+                                "https://www.gravatar.com/avatar/{}.jpg",
+                                gravatar_hash(&email)
+                            ),
+                        },
+                        uid: &uid,
+                        updated_at: &now,
+                    })
+                    .execute(self)?;
+                self.by_uid(&uid)?
+            }
+        };
+        update(users::dsl::users.filter(users::dsl::id.eq(it.id)))
+            .set(users::dsl::access_token.eq(&Some(access_token)))
+            .execute(self)?;
+        self.sign_in(it.id, ip)?;
+
+        Err(format_err!(""))
+    }
+
     fn sign_in(&self, id: ID, ip: &String) -> Result<()> {
         let now = Utc::now().naive_utc();
-        let it = users::dsl::users.filter(users::dsl::id.eq(id));
         let (current_sign_in_at, current_sign_in_ip, sign_in_count) = users::dsl::users
             .select((
                 users::dsl::current_sign_in_at,
@@ -158,7 +224,7 @@ impl Dao for Connection {
             ))
             .filter(users::dsl::id.eq(id))
             .first::<(Option<NaiveDateTime>, Option<String>, i64)>(self)?;
-        update(it)
+        update(users::dsl::users.filter(users::dsl::id.eq(id)))
             .set((
                 users::dsl::current_sign_in_at.eq(&now),
                 users::dsl::current_sign_in_ip.eq(&Some(ip)),

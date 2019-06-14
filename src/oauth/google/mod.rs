@@ -1,4 +1,6 @@
 pub mod openid;
+pub mod photo;
+pub mod youtube;
 
 use std::collections::HashMap;
 use std::fmt;
@@ -14,9 +16,14 @@ use url::{form_urlencoded, Url};
 use super::super::errors::{Error, Result};
 
 /// https://developers.google.com/identity/protocols/OAuth2WebServer
+/// https://developers.google.com/identity/protocols/OpenIDConnect
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ClientSecret {
     pub web: Web,
+}
+
+impl ClientSecret {
+    pub const KEY: &'static str = "google.client-secret";
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -83,15 +90,13 @@ impl fmt::Display for AccessType {
     }
 }
 
-pub trait Get: DeserializeOwned {
-    fn url() -> &'static str;
-}
-
 impl Web {
-    pub fn oauth2(&self, scope: Vec<Scope>, redirect_uri: &str) -> String {
+    pub fn oauth2(&self, scope: Vec<Scope>, redirect_uri: &str) -> (String, String, String) {
         let mut rng = rand::thread_rng();
+        let nonce = rng.gen::<u32>().to_string();
+        let state = rng.gen::<u32>().to_string();
 
-        form_urlencoded::Serializer::new(
+        let url = form_urlencoded::Serializer::new(
             "https://accounts.google.com/o/oauth2/v2/auth?".to_string(),
         )
         .append_pair("client_id", &self.client_id)
@@ -105,37 +110,17 @@ impl Web {
                 .join(" "),
         )
         .append_pair("access_type", &AccessType::default().to_string())
-        .append_pair("state", &rng.gen::<u32>().to_string())
+        .append_pair("state", &state)
         .append_pair("include_granted_scopes", &true.to_string())
         .append_pair("response_type", Code::CODE)
-        .finish()
+        .append_pair("nonce", &nonce)
+        .finish();
+
+        (url, state, nonce)
     }
 
-    pub fn get<Q: Get>(&self, token: &str) -> Result<Q> {
-        let mut res = Client::new().get(Q::url()).bearer_auth(token).send()?;
-        if res.status().is_success() {
-            return Ok(res.json()?);
-        }
-
-        Err(format_err!("{:?}", res))
-    }
-
-    pub fn exchange_authorization_code(
-        &self,
-        redirect_uri: &str,
-        code: &str,
-    ) -> Result<AuthorizationCode> {
-        let mut body = HashMap::new();
-        body.insert("code", code);
-        body.insert("client_id", &self.client_id);
-        body.insert("client_secret", &self.client_secret);
-        body.insert("redirect_uri", redirect_uri);
-        body.insert("grant_type", "authorization_code");
-
-        let mut res = Client::new()
-            .post("https://www.googleapis.com/oauth2/v4/token")
-            .form(&body)
-            .send()?;
+    pub fn get<Q: DeserializeOwned>(&self, action: &str, token: &str) -> Result<Q> {
+        let mut res = Client::new().get(action).bearer_auth(token).send()?;
         if res.status().is_success() {
             return Ok(res.json()?);
         }
@@ -171,12 +156,4 @@ impl FromStr for Code {
         }
         Err(Error::Http(Status::BadRequest).into())
     }
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct AuthorizationCode {
-    pub access_token: String,
-    pub refresh_token: Option<String>,
-    pub expires_in: u64,
-    pub token_type: String,
 }

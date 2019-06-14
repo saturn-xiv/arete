@@ -163,6 +163,7 @@ table! {
         uid -> Text,
         provider_type -> Text,
         provider_id -> Text,
+        access_token -> Nullable<Text>,
         logo -> Text,
         sign_in_count -> BigInt,
         current_sign_in_at -> Nullable<Timestamp>,

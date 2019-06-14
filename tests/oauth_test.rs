@@ -17,7 +17,7 @@ fn it_google() {
     let client: google::ClientSecret = serde_json::from_reader(reader).unwrap();
 
     println!(
-        "{}",
+        "{:?}",
         client.web.oauth2(
             vec![
                 google::Scope::Openid,
