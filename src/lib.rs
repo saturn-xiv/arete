@@ -46,6 +46,7 @@ extern crate r2d2;
 extern crate r2d2_redis;
 extern crate rand;
 extern crate regex;
+extern crate reqwest;
 extern crate serde;
 extern crate serde_xml_rs;
 #[cfg(feature = "sodium")]
