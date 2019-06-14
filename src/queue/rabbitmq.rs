@@ -115,7 +115,7 @@ impl Queue for RabbitMQ {
         &self,
         consumer_name: String,
         queue_name: String,
-        handler: Box<Handler>,
+        handler: Box<dyn Handler>,
     ) -> Result<()> {
         let rt = Client::connect(&self.addr, self.cred.clone(), self.conn.clone())
             .map_err(FailureError::from)
@@ -157,7 +157,7 @@ impl Queue for RabbitMQ {
     }
 }
 
-pub fn handle_message(msg: Delivery, hnd: &Box<Handler>) -> Result<()> {
+pub fn handle_message(msg: Delivery, hnd: &Box<dyn Handler>) -> Result<()> {
     let props = msg.properties;
     debug!("got message: {:?}", props);
 

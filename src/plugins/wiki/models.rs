@@ -42,7 +42,7 @@ pub fn list() -> Result<Vec<(String, String)>> {
 
 fn visit_dirs(
     dir: &Path,
-    cb: &Fn(&DirEntry, &mut Vec<(String, String)>) -> Result<()>,
+    cb: &dyn Fn(&DirEntry, &mut Vec<(String, String)>) -> Result<()>,
     items: &mut Vec<(String, String)>,
 ) -> Result<()> {
     if dir.is_dir() {
