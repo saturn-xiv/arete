@@ -25,6 +25,7 @@ extern crate chrono;
 extern crate chrono_tz;
 extern crate clap;
 extern crate cookie;
+extern crate csv;
 extern crate encoding_rs;
 extern crate eui48;
 extern crate futures;
@@ -47,6 +48,10 @@ extern crate r2d2_redis;
 extern crate rand;
 extern crate regex;
 extern crate reqwest;
+extern crate rusoto_core;
+extern crate rusoto_credential;
+extern crate rusoto_s3;
+extern crate rusoto_sqs;
 extern crate serde;
 extern crate serde_xml_rs;
 #[cfg(feature = "sodium")]
