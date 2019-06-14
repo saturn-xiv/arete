@@ -3,8 +3,8 @@ use std::str::FromStr;
 
 use rusoto_core::{request::HttpClient, Region};
 use rusoto_s3::{
-    CreateBucketRequest, DeleteBucketRequest, DeleteObjectRequest, ListObjectsV2Request,
-    PutObjectRequest, S3Client, S3 as S3Provider,
+    CreateBucketRequest, DeleteBucketRequest, DeleteObjectRequest, GetBucketLocationRequest,
+    ListObjectsV2Request, PutObjectRequest, S3Client, S3 as S3Provider,
 };
 
 use super::super::super::errors::Result;
@@ -38,6 +38,13 @@ impl S3 {
                 Region::from_str(region)?,
             ),
         })
+    }
+
+    pub fn bucket_exists(&self, name: String) -> Result<()> {
+        self.client
+            .get_bucket_location(GetBucketLocationRequest { bucket: name })
+            .sync()?;
+        Ok(())
     }
 
     pub fn create_bucket(&self, name: String, acl: &Acl) -> Result<()> {
