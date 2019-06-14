@@ -1,4 +1,5 @@
 pub mod s3;
+pub mod sqs;
 
 use rusoto_credential::StaticProvider;
 

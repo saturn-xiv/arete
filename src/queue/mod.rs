@@ -5,7 +5,7 @@ use serde::ser::Serialize;
 use super::errors::Result;
 
 pub trait Queue {
-    fn publish<T: Serialize>(&self, name: String, id: String, payload: T) -> Result<()>;
+    fn publish<T: Serialize>(&self, queue: String, id: String, payload: T) -> Result<()>;
     fn consume(&self, consumer: String, queue: String, handler: Box<dyn Handler>) -> Result<()>;
 }
 

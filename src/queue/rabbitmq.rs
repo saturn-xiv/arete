@@ -11,7 +11,6 @@ use lapin::{
 };
 use mime::{Mime, APPLICATION_JSON};
 use serde::ser::Serialize;
-use serde_json;
 use tokio::runtime::Runtime;
 
 use super::super::errors::{Error, Result};
