@@ -11,7 +11,6 @@ use rocket::{
     Outcome, Request, State,
 };
 use rocket_contrib::json::Json;
-use uuid::Uuid;
 use validator::Validate;
 
 use super::super::super::super::{
@@ -20,7 +19,7 @@ use super::super::super::super::{
     i18n::I18n,
     jwt::Jwt,
     orm::{Connection as Db, Database, ID},
-    queue::{rabbitmq::RabbitMQ, Queue},
+    queue::{Queue, Task},
     request::{ClientIp, Locale, Token as Auth},
 };
 use super::super::{
@@ -258,7 +257,7 @@ pub fn sign_up(
     db: Database,
     lang: Locale,
     jwt: State<Arc<Jwt>>,
-    queue: State<Arc<RabbitMQ>>,
+    queue: State<Arc<Box<dyn Queue>>>,
     remote: ClientIp,
     form: Json<SignUp>,
 ) -> JsonResult<()> {
@@ -318,7 +317,7 @@ pub fn confirm(
     db: Database,
     lang: Locale,
     jwt: State<Arc<Jwt>>,
-    queue: State<Arc<RabbitMQ>>,
+    queue: State<Arc<Box<dyn Queue>>>,
     form: Json<Email>,
 ) -> JsonResult<()> {
     form.validate()?;
@@ -368,7 +367,7 @@ pub fn unlock(
     db: Database,
     lang: Locale,
     jwt: State<Arc<Jwt>>,
-    queue: State<Arc<RabbitMQ>>,
+    queue: State<Arc<Box<dyn Queue>>>,
     form: Json<Email>,
 ) -> JsonResult<()> {
     form.validate()?;
@@ -418,7 +417,7 @@ pub fn forgot_password(
     db: Database,
     lang: Locale,
     jwt: State<Arc<Jwt>>,
-    queue: State<Arc<RabbitMQ>>,
+    queue: State<Arc<Box<dyn Queue>>>,
     form: Json<Email>,
 ) -> JsonResult<()> {
     form.validate()?;
@@ -556,7 +555,7 @@ fn send_email(
     db: &Db,
     lang: &String,
     jwt: &Jwt,
-    queue: &RabbitMQ,
+    queue: &Box<dyn Queue>,
     user: &User,
     act: &Action,
     home: &String,
@@ -580,13 +579,12 @@ fn send_email(
 
     queue.publish(
         send_email::NAME.to_string(),
-        Uuid::new_v4().to_string(),
-        send_email::Task {
+        Task::new(&send_email::Task {
             email: user.email.clone(),
             name: user.real_name.clone(),
             subject: subject,
             body: body,
-        },
+        })?,
     )?;
     Ok(())
 }

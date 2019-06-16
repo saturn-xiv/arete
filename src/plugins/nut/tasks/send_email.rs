@@ -5,11 +5,13 @@ use std::time::Duration;
 
 use lettre::{smtp::authentication::Credentials, SmtpClient, Transport};
 use lettre_email::{Email, EmailBuilder};
-use serde_json;
 use validator::Validate;
 
 use super::super::super::super::{
-    crypto::Crypto, errors::Result, orm::Pool as Db, queue::Handler as QueueHandler,
+    crypto::Crypto,
+    errors::Result,
+    orm::Pool as Db,
+    queue::{Handler as QueueHandler, Task as QueueTask},
     settings::Dao as SettingsDao,
 };
 
@@ -85,8 +87,8 @@ pub struct Printer {
 }
 
 impl QueueHandler for Printer {
-    fn handle(&self, _id: String, payload: Vec<u8>) -> Result<()> {
-        let task: Task = serde_json::from_slice(&payload)?;
+    fn handle(&self, task: &QueueTask) -> Result<()> {
+        let task: Task = task.get()?;
         info!("send email {}", task);
         Ok(())
     }
@@ -98,9 +100,8 @@ pub struct SendEmail {
 }
 
 impl QueueHandler for SendEmail {
-    fn handle(&self, _id: String, payload: Vec<u8>) -> Result<()> {
-        let task: Task = serde_json::from_slice(&payload)?;
-
+    fn handle(&self, task: &QueueTask) -> Result<()> {
+        let task: Task = task.get()?;
         info!("send email: {}<{}> {}", task.name, task.email, task.subject);
 
         let db = self.db.get()?;

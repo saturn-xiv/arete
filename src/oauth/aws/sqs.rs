@@ -3,13 +3,13 @@ use rusoto_sqs::{
     CreateQueueRequest, GetQueueUrlRequest, ReceiveMessageRequest, SendMessageRequest,
     Sqs as AwsSqs, SqsClient,
 };
-use serde::ser::Serialize;
 
 use super::super::super::{
     errors::Result,
-    queue::{Handler, Queue},
+    queue::{Handler, Queue, Task},
 };
 
+/// https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-limits.html
 pub struct Sqs {
     client: SqsClient,
 }
@@ -49,10 +49,10 @@ impl Sqs {
 }
 
 impl Queue for Sqs {
-    fn publish<T: Serialize>(&self, queue: String, _id: String, payload: T) -> Result<()> {
+    fn publish(&self, queue: String, task: Task) -> Result<()> {
         self.client
             .send_message(SendMessageRequest {
-                message_body: serde_json::to_string(&payload)?,
+                message_body: serde_json::to_string(&task)?,
                 queue_url: self.get_queue_url(queue)?,
                 ..Default::default()
             })
@@ -70,10 +70,8 @@ impl Queue for Sqs {
             .messages
         {
             for it in items {
-                if let Some(id) = it.message_id {
-                    if let Some(body) = it.body {
-                        handler.handle(id, body.as_bytes().to_vec())?;
-                    }
+                if let Some(ref body) = it.body {
+                    handler.handle(&serde_json::from_str(body)?)?;
                 }
             }
         }

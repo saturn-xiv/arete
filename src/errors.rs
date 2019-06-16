@@ -65,12 +65,8 @@ pub enum Error {
     UserIsDeleted,
     #[fail(display = "your account is locked")]
     UserIsLocked,
-    #[fail(display = "empty message id")]
-    RabbitMQEmptyMessageId,
-    #[fail(display = "empty message content type")]
-    RabbitMQEmptyContentType,
-    #[fail(display = "bad message content type {}", _0)]
-    RabbitMQBadContentType(String),
+    #[fail(display = "bad task message")]
+    BadTaskMessage,
     #[fail(display = "{}", _0)]
     Http(rocket::http::Status),
 }

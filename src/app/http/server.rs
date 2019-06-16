@@ -10,15 +10,14 @@ use super::super::super::{
     jwt::Jwt,
     orm::Database,
     plugins::nut,
-    queue::Queue,
 };
 
 pub fn launch(cfg: Config) -> Result<()> {
     let db = cfg.database.open()?;
     let jwt = Arc::new(Jwt::new(cfg.secrets.0.clone()));
     let enc = Arc::new(Crypto::new(cfg.secrets.clone())?);
-    let qu = Arc::new(cfg.rabbitmq.clone().open());
 
+    let qu = Arc::new(cfg.queue()?);
     info!("start send email thread");
     {
         let db = db.clone();
@@ -47,8 +46,8 @@ pub fn launch(cfg: Config) -> Result<()> {
 
     let err = super::rocket(cfg.rocket()?)
         .manage(jwt)
-        .manage(qu)
         .manage(enc)
+        .manage(qu)
         .attach(Database::fairing())
         .attach(Cache::fairing())
         .launch();

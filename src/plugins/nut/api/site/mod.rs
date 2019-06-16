@@ -5,7 +5,6 @@ use std::sync::Arc;
 
 use rocket::State;
 use rocket_contrib::json::Json;
-use uuid::Uuid;
 use validator::Validate;
 
 use super::super::super::super::{
@@ -14,7 +13,7 @@ use super::super::super::super::{
     crypto::Crypto,
     errors::JsonResult,
     orm::Database,
-    queue::{rabbitmq::RabbitMQ, Queue},
+    queue::{Queue, Task},
     settings::Dao as SettingDao,
 };
 use super::super::tasks::send_email::{
@@ -165,18 +164,17 @@ pub fn set_smtp(
 }
 
 #[patch("/site/smtp")]
-pub fn test_smtp(user: Administrator, queue: State<Arc<RabbitMQ>>) -> JsonResult<()> {
+pub fn test_smtp(user: Administrator, queue: State<Arc<Box<dyn Queue>>>) -> JsonResult<()> {
     let queue = queue.deref();
     let user = user.0;
     queue.publish(
         SendEmailQueueName.to_string(),
-        Uuid::new_v4().to_string(),
-        SendEmailTask {
+        Task::new(&SendEmailTask {
             email: user.email.clone(),
             name: user.real_name.clone(),
             subject: format!("Hi, {}", user.real_name),
             body: "This is a test email.".to_string(),
-        },
+        })?,
     )?;
     Ok(Json(()))
 }

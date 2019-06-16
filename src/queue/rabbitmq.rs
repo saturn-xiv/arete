@@ -9,8 +9,6 @@ use lapin::{
     types::FieldTable,
     BasicProperties, Client, ConnectionProperties,
 };
-use mime::{Mime, APPLICATION_JSON};
-use serde::ser::Serialize;
 use tokio::runtime::Runtime;
 
 use super::super::errors::{Error, Result};
@@ -39,16 +37,16 @@ impl Default for Config {
 }
 
 impl Config {
-    pub fn open(self) -> RabbitMQ {
+    pub fn open(&self) -> RabbitMQ {
         RabbitMQ {
             uri: AMQPUri {
-                vhost: self.virtual_host,
+                vhost: self.virtual_host.clone(),
                 authority: AMQPAuthority {
                     port: self.port,
-                    host: self.host,
+                    host: self.host.clone(),
                     userinfo: AMQPUserInfo {
-                        username: self.username,
-                        password: self.password,
+                        username: self.username.clone(),
+                        password: self.password.clone(),
                     },
                 },
                 ..Default::default()
@@ -64,10 +62,8 @@ pub struct RabbitMQ {
 }
 
 impl Queue for RabbitMQ {
-    fn publish<T: Serialize>(&self, queue: String, mid: String, payload: T) -> Result<()> {
-        info!("publish task {}", mid);
-
-        let payload = serde_json::to_vec(&payload)?;
+    fn publish(&self, queue: String, task: super::Task) -> Result<()> {
+        info!("publish task {}", task.id);
 
         let rt = Client::connect_uri(self.uri.clone(), self.conn.clone())
             .map_err(FailureError::from)
@@ -88,11 +84,11 @@ impl Queue for RabbitMQ {
                             .basic_publish(
                                 "",
                                 &queue,
-                                payload,
+                                task.payload,
                                 BasicPublishOptions::default(),
                                 BasicProperties::default()
-                                    .with_message_id((&mid[..]).into())
-                                    .with_content_type((&APPLICATION_JSON.to_string()[..]).into())
+                                    .with_message_id((&task.id[..]).into())
+                                    .with_content_type((&task.content_type[..]).into())
                                     .with_timestamp(
                                         SystemTime::now()
                                             .duration_since(UNIX_EPOCH)
@@ -159,26 +155,17 @@ impl Queue for RabbitMQ {
 
 pub fn handle_message(msg: Delivery, hnd: &Box<dyn Handler>) -> Result<()> {
     let props = msg.properties;
-    debug!("got message: {:?}", props);
+    info!("got message: {:?}", props);
 
-    let ct: Result<()> = match props.content_type() {
-        Some(v) => {
-            let v = v.to_string();
-            if v.parse::<Mime>()? == APPLICATION_JSON {
-                Ok(())
-            } else {
-                Err(Error::RabbitMQBadContentType(v).into())
-            }
+    if let Some(content_type) = props.content_type() {
+        if let Some(id) = props.message_id() {
+            return hnd.handle(&super::Task {
+                id: id.to_string(),
+                content_type: content_type.to_string(),
+                payload: msg.data,
+            });
         }
-        None => Err(Error::RabbitMQEmptyContentType.into()),
-    };
-    ct?;
+    }
 
-    let id: Result<String> = match props.message_id() {
-        Some(v) => Ok(v.to_string()),
-        None => Err(Error::RabbitMQEmptyMessageId.into()),
-    };
-    let id = id?;
-    info!("consume message {}", id);
-    hnd.handle(id, msg.data)
+    Err(Error::BadTaskMessage.into())
 }

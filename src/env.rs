@@ -5,11 +5,16 @@ use std::path::Path;
 
 use chrono::Utc;
 use rocket::config::{Config as RocketConfig, Environment, Limits, LoggingLevel, Value};
+use rusoto_core::Region;
 use uuid::Uuid;
 
 use super::{
-    cache::Config as CacheConfig, crypto::Key, errors::Result, orm::Config as DatabaseConfig,
-    queue::rabbitmq::Config as RabbitMQConfig,
+    cache::Config as CacheConfig,
+    crypto::Key,
+    errors::Result,
+    oauth::aws,
+    orm::Config as DatabaseConfig,
+    queue::{rabbitmq::Config as RabbitMQConfig, Queue},
 };
 
 include!(concat!(env!("OUT_DIR"), "/env.rs"));
@@ -27,7 +32,10 @@ pub struct Config {
     pub secrets: Key,
     pub database: DatabaseConfig,
     pub cache: CacheConfig,
-    pub rabbitmq: RabbitMQConfig,
+    pub rabbitmq: Option<RabbitMQConfig>,
+    pub aws: Option<aws::Credentials>,
+    pub s3: Option<Region>,
+    pub sqs: Option<Region>,
     pub http: Http,
 }
 
@@ -38,7 +46,10 @@ impl Default for Config {
             secrets: Key::default(),
             database: DatabaseConfig::default(),
             cache: CacheConfig::default(),
-            rabbitmq: RabbitMQConfig::default(),
+            rabbitmq: Some(RabbitMQConfig::default()),
+            aws: Some(aws::Credentials::default()),
+            s3: Some(Region::default()),
+            sqs: Some(Region::default()),
             http: Http::default(),
         }
     }
@@ -53,6 +64,19 @@ impl Config {
     }
     pub fn is_prod(&self) -> bool {
         self.env() == Environment::Production
+    }
+    pub fn queue(&self) -> Result<Box<dyn Queue>> {
+        info!("try RabbitMQ");
+        if let Some(ref qu) = self.rabbitmq {
+            return Ok(Box::new(qu.open()));
+        }
+        info!("try aws sqs");
+        if let Some(ref c) = self.aws {
+            if let Some(ref r) = self.sqs {
+                return Ok(Box::new(aws::sqs::Sqs::new(c.clone(), r.clone())?));
+            }
+        }
+        Err(format_err!("can't find queue configuration"))
     }
     pub fn rocket(&self) -> Result<RocketConfig> {
         let env = self.env();
