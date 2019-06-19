@@ -30,12 +30,12 @@ pub const BANNER: &'static str = include_str!("banner.txt");
 pub struct Config {
     pub env: String,
     pub secrets: Key,
+    pub s3: Option<Region>,
+    pub sqs: Option<Region>,
     pub database: DatabaseConfig,
     pub cache: CacheConfig,
     pub rabbitmq: Option<RabbitMQConfig>,
     pub aws: Option<aws::Credentials>,
-    pub s3: Option<Region>,
-    pub sqs: Option<Region>,
     pub http: Http,
 }
 
