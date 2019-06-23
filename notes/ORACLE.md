@@ -11,7 +11,7 @@
 - Common commands
 
 ```bash
-> SHOW SCHEMAS;
+> SELECT table_name FROM user_tables; 
 > SHOW TABLES;
 > SHOW VIEWS;
 > describe TABLE-NAME;

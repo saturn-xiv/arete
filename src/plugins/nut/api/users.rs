@@ -15,7 +15,7 @@ use validator::Validate;
 
 use super::super::super::super::{
     crypto::Crypto,
-    errors::{JsonResult, Result},
+    errors::{JsonResult, JsonValueResult, Result},
     i18n::I18n,
     jwt::Jwt,
     orm::{Connection as Db, Database, ID},
@@ -137,6 +137,53 @@ pub fn index(_user: Administrator, db: Database) -> JsonResult<Vec<User>> {
     Ok(Json(items))
 }
 
+#[post("/users", data = "<form>")]
+pub fn create(
+    _user: Administrator,
+    db: Database,
+    lang: Locale,
+    remote: ClientIp,
+    form: Json<SignUp>,
+) -> JsonResult<()> {
+    form.validate()?;
+    let form = form.deref();
+    let db = db.deref();
+
+    if let Ok(_) = UserDao::by_email(db, &form.email) {
+        return __i18n_e!(
+            db,
+            &lang.0,
+            "nut.errors.already-exist.email",
+            &json!({"email": form.email})
+        );
+    }
+    if let Ok(_) = UserDao::by_nick_name(db, &form.nick_name) {
+        return __i18n_e!(
+            db,
+            &lang.0,
+            "nut.errors.already-exist.nick-name",
+            &json!({"name": &form.nick_name})
+        );
+    }
+
+    db.transaction::<_, FailueError, _>(move || {
+        UserDao::sign_up::<Crypto>(
+            db,
+            &form.real_name,
+            &form.nick_name,
+            &form.email,
+            &form.password,
+        )?;
+        let it = UserDao::by_email(db, &form.email)?;
+        __i18n_l!(db, it.id, &remote.0, &lang.0, "nut.logs.user.sign-up")?;
+        UserDao::confirm(db, it.id)?;
+        __i18n_l!(db, it.id, &remote.0, &lang.0, "nut.logs.user.confirm")?;
+        Ok(())
+    })?;
+
+    Ok(Json(()))
+}
+
 #[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub enum Action {
@@ -182,7 +229,7 @@ pub fn sign_in(
     jwt: State<Arc<Jwt>>,
     remote: ClientIp,
     form: Json<SignIn>,
-) -> JsonResult<String> {
+) -> JsonValueResult {
     form.validate()?;
 
     let db = db.deref();
@@ -234,7 +281,9 @@ pub fn sign_in(
             exp: exp,
         },
     )?;
-    Ok(Json(token))
+    Ok(rocket_contrib::json!({
+        "token": token,
+    }))
 }
 
 #[derive(Deserialize, Validate)]
@@ -475,6 +524,28 @@ pub fn reset_password(
         "nut.logs.user.reset-password"
     )?;
     Ok(Json(()))
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Self_ {
+    pub uid: String,
+    pub nick_name: String,
+    pub real_name: String,
+    pub email: String,
+    pub policies: Vec<Policy>,
+}
+
+#[get("/users/self")]
+pub fn self_(db: Database, user: User) -> JsonResult<Self_> {
+    let db = db.deref();
+    Ok(Json(Self_ {
+        uid: user.uid.clone(),
+        nick_name: user.nick_name.clone(),
+        real_name: user.real_name.clone(),
+        email: user.email.clone(),
+        policies: PolicyDao::all(db, user.id)?,
+    }))
 }
 
 #[get("/users/logs?<limit>")]

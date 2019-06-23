@@ -75,6 +75,8 @@ pub fn routes() -> (&'static str, Vec<Route>, Vec<Route>) {
             api::users::set_profile,
             api::users::change_password,
             api::users::logs,
+            api::users::self_,
+            api::users::create,
             api::users::sign_out,
             api::users::apply_authority,
             api::users::deny_authority,
@@ -82,6 +84,7 @@ pub fn routes() -> (&'static str, Vec<Route>, Vec<Route>) {
             api::users::show,
             api::users::index,
             api::attachments::show,
+            api::attachments::create,
             api::attachments::index_by_administrator,
             api::attachments::index_by_owner,
             api::attachments::destroy,
@@ -133,6 +136,13 @@ pub fn routes() -> (&'static str, Vec<Route>, Vec<Route>) {
             api::locales::destroy,
             api::locales::languages,
         ],
-        routes![html::about, html::contact, html::index],
+        routes![
+            html::third,
+            html::assets,
+            html::upload,
+            html::about,
+            html::contact,
+            html::index
+        ],
     )
 }
