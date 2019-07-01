@@ -1,4 +1,12 @@
 
+- Create tablespace
+
+```bash
+> create tablespace TABLESPACE datafile 'TABLESPACE.dbf' size 500M autoextend on next 5M maxsize unlimited; 
+> create user USER identified by PASSWORD default tablespace TABLESPACE;
+> grant connect,resource to USER;
+```
+
 - Create user 
 
 ```bash
@@ -19,3 +27,4 @@
 > select * from nls_instance_parameters;
 > select * from nls_session_parameters;
 ```
+

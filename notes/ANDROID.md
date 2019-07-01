@@ -21,8 +21,9 @@ Open Developer options, and then scroll down to find and enable USB debugging.
 ### Enable LAN debugging
 
 ```bash
+adb usb
 adb tcpip 5555
-adb connect 192.168.1.108
+adb connect 192.168.1.108:5555
 adb devices
 adb kill-server
 ```
@@ -32,6 +33,7 @@ adb kill-server
 -   [Andorid SDK](https://wiki.archlinux.org/index.php/android)
 -   [Configuring VM acceleration on Linux](https://developer.android.com/studio/run/emulator-acceleration?utm_source=android-studio#vm-linux)
 -   [Android Material Design Icon Generator Plugin](https://github.com/konifar/android-material-design-icon-generator-plugin)
+-   [Distribution dashboard](https://developer.android.com/about/dashboards/index.html)
 
 ```bash
 egrep -c '(vmx|svm)' /proc/cpuinfo

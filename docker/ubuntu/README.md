@@ -13,3 +13,9 @@ $ docker rm arete # remove exists container if need
 $ docker run --name arete -d -p 2222:22 -v `pwd`:/workspace chonglou/arete:latest # first time to run
 $ docker start arete # next time
 ```
+
+## Usage
+
+```bash
+$ ssh -p 2222 deploy@localhost # password is 'hi'
+```
