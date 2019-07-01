@@ -136,13 +136,6 @@ pub fn routes() -> (&'static str, Vec<Route>, Vec<Route>) {
             api::locales::destroy,
             api::locales::languages,
         ],
-        routes![
-            html::third,
-            html::assets,
-            html::upload,
-            html::about,
-            html::contact,
-            html::index
-        ],
+        routes![html::about, html::contact, html::index],
     )
 }

@@ -2,6 +2,7 @@ pub mod routes;
 pub mod server;
 
 use rocket::{config::Config, custom, Rocket};
+use rocket_contrib::serve::StaticFiles;
 
 use super::super::{
     catchers::catchers,
@@ -9,7 +10,10 @@ use super::super::{
 };
 
 pub fn rocket(cfg: Config) -> Rocket {
-    let mut rt = custom(cfg);
+    let mut rt = custom(cfg)
+        .mount("/3rd", StaticFiles::from("node_modules"))
+        .mount("/assets", StaticFiles::from("assets"))
+        .mount("/upload", StaticFiles::from(FileSystem::root()));
 
     for (path, api, html) in vec![
         forum::routes(),
