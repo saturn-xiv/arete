@@ -6,6 +6,7 @@ use rocket_contrib::serve::StaticFiles;
 
 use super::super::{
     catchers::catchers,
+    storage::fs::FileSystem,
     plugins::{forum, nut, ops::vpn, wiki},
 };
 
