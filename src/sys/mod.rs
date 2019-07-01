@@ -1,4 +1,5 @@
 pub mod git;
+pub mod image_magick;
 pub mod network;
 pub mod nmap;
 pub mod timezone;

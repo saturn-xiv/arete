@@ -59,6 +59,7 @@ extern crate serde_xml_rs;
 #[cfg(feature = "sodium")]
 extern crate sodiumoxide;
 extern crate ssh2;
+extern crate tempfile;
 extern crate tokio;
 extern crate tokio_codec;
 extern crate tokio_io;

@@ -74,6 +74,7 @@ clap = "2"
 amq-protocol-uri = "2"
 mime_guess = "2.0.0-alpha.6"
 jsonwebtoken = "5" # lock by ring
+tempfile = "3"
 
 [dependencies.multipart]
 version = "0.16"

@@ -2,7 +2,9 @@
 - Create tablespace
 
 ```bash
+> drop tablespace TABLESPACE including contents;
 > create tablespace TABLESPACE datafile 'TABLESPACE.dbf' size 500M autoextend on next 5M maxsize unlimited; 
+> drop user USER cascade;
 > create user USER identified by PASSWORD default tablespace TABLESPACE;
 > grant connect,resource to USER;
 ```
