@@ -13,6 +13,7 @@ RUN apt -y install apt-utils apt-transport-https wget gnupg software-properties-
   zip unzip bsdtar telnet git vim pwgen sudo gperf \
   libsodium-dev libpq-dev libmysqlclient-dev libsqlite3-dev libudev-dev liboping-dev libzmq3-dev \
   libssl-dev libreadline-dev zlib1g-dev \
+  qt5-default qtmultimedia5-dev \
   sqlite3 postgresql redis openssh-server nginx supervisor
 
 # RUN add-apt-repository -y ppa:webupd8team/java
