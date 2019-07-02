@@ -28,7 +28,7 @@ pub fn merge(back: &PathBuf, cover: &PathBuf, target: &PathBuf) -> Result<()> {
 
 fn run(cmd: &String) -> Result<()> {
     debug!("{}", cmd);
-    let out = Command::new(cmd).output()?;
+    let out = Command::new("sh").arg("-c").arg(cmd).output()?;
     debug!("{:?}", out);
     Ok(())
 }
