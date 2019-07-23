@@ -77,6 +77,7 @@ pub mod app;
 pub mod cache;
 pub mod catchers;
 pub mod crypto;
+pub mod dict;
 pub mod env;
 pub mod errors;
 pub mod i18n;
