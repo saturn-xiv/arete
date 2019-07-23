@@ -132,12 +132,6 @@ features = ["vendored"]
 version = "1"
 features = ["chrono", "serde_json", "uuid", "numeric", "r2d2", "128-column-tables"]
 
-[dependencies.stardict]
-git = "https://github.com/saturn-xiv/stardict.git"
-
-[dependencies.babylon]
-git = "https://github.com/saturn-xiv/babylon.git"
-
 [package.metadata.deb]
 depends = "$auto, nginx, nodejs, npm"
 section = "admin"
