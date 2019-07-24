@@ -1,6 +1,7 @@
 pub mod bookdata;
 pub mod catalog;
 pub mod metadata;
+pub mod nav;
 pub mod spine;
 
 use std::path::PathBuf;
