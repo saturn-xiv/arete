@@ -58,10 +58,10 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh
 RUN mkdir $HOME/downloads
 
 # java sdk
-ARG ORACLE_JDK_VERSION="8.0.212-zulu"
-ARG OPEN_JDK_VERSION="12.0.1-open"
 RUN curl -s "https://get.sdkman.io" | zsh
 RUN sed -i -e 's/sdkman_auto_answer=false/sdkman_auto_answer=true/g' $HOME/.sdkman/etc/config
+ARG ORACLE_JDK_VERSION="8.0.222-zulu"
+ARG OPEN_JDK_VERSION="12.0.2-open"
 RUN zsh -c "source $HOME/.zshrc \
   && sdk install java $ORACLE_JDK_VERSION \
   && sdk install java $OPEN_JDK_VERSION \
