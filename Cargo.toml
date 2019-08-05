@@ -44,7 +44,7 @@ tokio-io = "0.1"
 tokio-codec = "0.1"
 failure = "0.1"
 language-tags = "0.2"
-lapin-futures = "0.23"
+lapin-futures = "0.25"
 nix = "0.14"
 eui48 = "0.4"
 hex = "0.3"
@@ -63,6 +63,7 @@ rusoto_core = "0.40"
 rusoto_credential = "0.40"
 rusoto_sqs = "0.40"
 rusoto_s3 = "0.40"
+rumqtt = "0.30"
 mustache = "*"
 lazy_static = "1"
 serde = "1"
@@ -123,6 +124,10 @@ features=["query_encoding"]
 [dependencies.uuid]
 version = "0.7"
 features = ["v4"]
+
+[dependencies.zmq]
+version = "0.9"
+features = ["vendored"]
 
 [dependencies.openssl-sys]
 version = "*"
