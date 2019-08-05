@@ -69,6 +69,7 @@ extern crate uuid;
 extern crate validator;
 extern crate xml;
 extern crate yaml_rust;
+extern crate zmq;
 
 #[macro_use]
 pub mod macros;

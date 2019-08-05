@@ -5,7 +5,7 @@ use std::fs::File;
 use failure::SyncFailure;
 
 use super::super::super::super::super::errors::Result;
-use super::super::{Text, ROOT};
+use super::super::ROOT;
 use super::Head;
 
 #[derive(Deserialize, Debug)]
