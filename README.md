@@ -2,6 +2,16 @@
 
 A web application by Rust and Vue.js.
 
+## Vscode
+
+* [vue-devtools](https://github.com/vuejs/vue-devtools)
+* [Vetur](https://github.com/vuejs/vetur)
+* [ESLint](https://github.com/Microsoft/vscode-eslint)
+* [Rust(rls)](https://github.com/rust-lang/rls-vscode)
+* [Icons](https://github.com/vscode-icons/vscode-icons)
+* [OneDark Pro](https://github.com/Binaryify/OneDark-Pro)
+* [Better Toml](https://github.com/bungcip/better-toml)
+
 ## Build
 
 Please install [docker](https://docs.docker.com/install/linux/docker-ce/ubuntu/) at first.
