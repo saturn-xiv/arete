@@ -44,7 +44,7 @@ tokio-io = "0.1"
 tokio-codec = "0.1"
 failure = "0.1"
 language-tags = "0.2"
-lapin-futures = "0.25"
+lapin-futures = "0.26"
 nix = "0.14"
 eui48 = "0.4"
 hex = "0.3"
@@ -127,7 +127,7 @@ features = ["v4"]
 
 [dependencies.zmq]
 version = "0.9"
-features = ["vendored"]
+# features = ["vendored"]
 
 [dependencies.openssl-sys]
 version = "*"
