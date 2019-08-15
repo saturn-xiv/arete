@@ -53,7 +53,14 @@
 
 - For chinese
 
-```bash
+```sql
 NLS_CHARACTERSET=AL32UTF8
 NLS_LANG=SIMPLIFIED CHINESE_CHINA.AL32UTF8
+```
+
+- Backup & restore
+
+```bash
+exp USER/PASSWORD@HOST/ORACLE file=backup.dmp full=y
+imp USER/PASSWORD@HOST/ORACLE file=backup.dmp full=y
 ```

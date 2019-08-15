@@ -22,8 +22,8 @@ $ mysql -u root -p
 - backup & restore
 
 ```bash
-$ mysqldump -u root -p --all-databases > all.sql 
-$ mysqldump -u root -p --opt --skip-extended-insert one > one.sql
+$ mysqldump -h host -u root -p --all-databases > all.sql 
+$ mysqldump -h host -u root -p --opt --skip-extended-insert one > one.sql
 $ mysql -u root -p one < one.sql
 ```
 
