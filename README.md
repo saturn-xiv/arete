@@ -1,11 +1,9 @@
 # ARETE
 
-A web application by Rust and Vue.js.
+A web application by Rust and React.
 
 ## Vscode
 
-* [vue-devtools](https://github.com/vuejs/vue-devtools)
-* [Vetur](https://github.com/vuejs/vetur)
 * [ESLint](https://github.com/Microsoft/vscode-eslint)
 * [Rust(rls)](https://github.com/rust-lang/rls-vscode)
 * [Icons](https://github.com/vscode-icons/vscode-icons)
@@ -43,9 +41,10 @@ $ ssh -p 2222 deploy@localhost # default password is 'hi'
 
 ## Documents
 
--   [Ant Design](https://ant.design/docs/react/introduce)
--   [Ant Design Pro](https://pro.ant.design/components/AvatarList)
--   [Font Awesome](https://fontawesome.com/how-to-use/on-the-web/setup/hosting-font-awesome-yourself)
+-   [Create React App](https://create-react-app.dev/docs/adding-typescript)
+-   [Fabric React](https://developer.microsoft.com/en-us/fabric#/get-started)
+-   [Third-Party Libraries](https://ant.design/docs/react/recommendation)
+-   [A Fast and Flexible Static Site Generator](https://github.com/gohugoio/hugo)
 -   [Diesel: A safe, extensible ORM and Query Builder for Rust](https://github.com/diesel-rs/diesel)
 -   [Rocket: A web framework for Rust](https://rocket.rs/)
 -   [favicon.ico](http://icoconvert.com/)
