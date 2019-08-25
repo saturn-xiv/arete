@@ -64,3 +64,9 @@ NLS_LANG=SIMPLIFIED CHINESE_CHINA.AL32UTF8
 exp USER/PASSWORD@HOST/ORACLE file=backup.dmp full=y
 imp USER/PASSWORD@HOST/ORACLE file=backup.dmp full=y
 ```
+
+- Drop all tables
+
+```sql
+select 'drop table ', table_name, 'cascade constraints;' from user_tables;
+```
