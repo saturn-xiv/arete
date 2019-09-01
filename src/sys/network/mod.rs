@@ -1,12 +1,29 @@
 pub mod dhcp;
 pub mod setup;
 
+use std::fs::File;
+use std::io::prelude::*;
 use std::net::{Ipv4Addr, Ipv6Addr, SocketAddr};
+use std::path::{Component, Path};
 
 use eui48::MacAddress;
 use nix;
 
 use super::super::errors::Result;
+
+pub fn is_on(name: &str) -> Result<bool> {
+    let mut fd = File::open(
+        Path::new(&Component::RootDir)
+            .join("sys")
+            .join("class")
+            .join("net")
+            .join(name)
+            .join("operstate"),
+    )?;
+    let mut buf = String::new();
+    fd.read_to_string(&mut buf)?;
+    Ok(buf.trim() == "up")
+}
 
 pub fn interfaces() -> Result<Vec<String>> {
     let mut items = nix::ifaddrs::getifaddrs()?
