@@ -2,39 +2,56 @@
 
 A web application by Rust and React.
 
-## Vscode
+
+## Usage
+
+* Create deploy user on server
+
+```bash
+$ useradd -s /bin/bash -m deploy 
+$ echo 'deploy ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/101-deploy
+```
+
+* Setup non-password login to servers
+
+```bash
+$ ssh-keygen -t rsa -b 4096 -C "your_email@example.com" # generate ssh key
+$ ssh-copy-id deploy@xxx.xxx.xxx.xxx # upload public ssh key to server
+```
+
+* Install ansible
+
+```bash
+$ pip install --user ansible
+$ echo 'export $PATH=$HOME.local/bin' >> ~/.zshrc # then re-login
+```
+
+* Build on localhost & upload to servers
+
+```bash
+$ git clone https://github.com/saturn-xiv/arete.git
+$ cd arete/deploy
+$ openssl rand -base64 32 # generate random secrets key
+# FIX settings in inventories/production
+$ ansible production build
+$ ansible production deploy
+```
+
+Create the administrator in **http://xxx.xxx.xxx.xxx/my/install** 
+
+## Development
+
+### Vscode
 
 * [ESLint](https://github.com/Microsoft/vscode-eslint)
 * [Rust(rls)](https://github.com/rust-lang/rls-vscode)
 * [Icons](https://github.com/vscode-icons/vscode-icons)
 * [OneDark Pro](https://github.com/Binaryify/OneDark-Pro)
+* [Ansible](https://github.com/VSChina/vscode-ansible)
 * [Better Toml](https://github.com/bungcip/better-toml)
 
-## Build
 
-Please install [docker](https://docs.docker.com/install/linux/docker-ce/ubuntu/) at first.
-
-```bash
-$ git clone https://github.com/saturn-xiv/arete.git ~/workspace/arete # clone source code
-$ cd arete
-$ docker run --name arete -d -p 2222:22 -p 3000:3000 -v $HOME/.ssh:/home/deploy/.ssh -v `pwd`:/workspace chonglou/arete:latest # ONLY for start docker container first time
-$ docker start arete # start docker container NEXT time
-$ ssh -p 2222 deploy@localhost # default password is 'hi'
-> make deb # build for debian/ubuntu package
-> dpkg -c target/debian/arete_0.1.0_amd64.deb
-```
-
-## How to use
-
-* Generate a 256-bit base64 encoded string by `openssl rand -base64 32`
-* Generate **config.toml** `arete generate:config`, then change it if you need
-* Migrate database `arete database:migrate`
-* Import locale records `arete i18n:sync`
-* Generate nginx config file `arete generate:nginx`, then mv it into **/etc/nginx/sites-enabled/** and restart nginx
-* Generate systemd config file `arete generate:systemd`, then mv it into **/lib/systemd/system/** and start it
-* Create the admin in **http://YOUR-HOST/my/install** 
-
-## Mock test
+### Mock test
 
 - [MinIO is a high performance object storage server compatible with Amazon S3 APIs](https://github.com/minio/minio)
 - [Message queueing system with an actor-based Scala and Amazon SQS-compatible interfaces. Runs stand-alone or embedded.](https://github.com/softwaremill/elasticmq)
@@ -45,6 +62,8 @@ $ ssh -p 2222 deploy@localhost # default password is 'hi'
 -   [Fabric React](https://developer.microsoft.com/en-us/fabric#/get-started)
 -   [Third-Party Libraries](https://ant.design/docs/react/recommendation)
 -   [A Fast and Flexible Static Site Generator](https://github.com/gohugoio/hugo)
+-   [Ansible Documentation](https://docs.ansible.com/ansible/latest/user_guide/playbooks_best_practices.html)
+-   [Docker](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 -   [Diesel: A safe, extensible ORM and Query Builder for Rust](https://github.com/diesel-rs/diesel)
 -   [Rocket: A web framework for Rust](https://rocket.rs/)
 -   [favicon.ico](http://icoconvert.com/)

@@ -136,23 +136,3 @@ features = ["vendored"]
 [dependencies.diesel]
 version = "1"
 features = ["chrono", "serde_json", "uuid", "numeric", "r2d2", "128-column-tables"]
-
-[package.metadata.deb]
-depends = "$auto, nginx, nodejs, npm"
-section = "admin"
-priority = "optional"
-maintainer-scripts = "scripts"
-assets = [
-    ["log4rs.yml", "usr/share/arete/", "644"],
-    ["LICENSE", "usr/share/arete/", "644"],
-    ["README.md", "usr/share/arete/", "644"],
-    ["package.json", "usr/share/arete/", "644"],
-    ["package-lock.json", "usr/share/arete/", "644"],
-    ["assets/*", "usr/share/arete/assets/", "644"],
-    ["dashboard/dist/*", "usr/share/arete/dashboard/", "644"],
-    ["dashboard/dist/css/*", "usr/share/arete/dashboard/css/", "644"],
-    ["dashboard/dist/js/*", "usr/share/arete/dashboard/js/", "644"],
-    ["dashboard/dist/img/*", "usr/share/arete/dashboard/img/", "644"],
-    ["dashboard/dist/fonts/*", "usr/share/arete/dashboard/fonts/", "644"],
-    ["target/release/arete", "usr/bin/", "755"]
-]

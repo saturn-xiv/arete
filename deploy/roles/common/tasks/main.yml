@@ -1,0 +1,78 @@
+- name: Update repositories cache
+  become: true
+  apt:
+    update_cache: yes
+
+- name: Upgrade all packages to the latest version
+  become: true
+  apt:
+    name: "*"
+    state: latest
+
+- name: Update all packages to the latest version
+  become: true
+  apt:
+    upgrade: dist
+
+- name: Install dependency packages
+  become: true
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - nginx
+    - zsh
+    - pwgen
+    - vim
+    - build-essential
+    - postgresql
+    - redis
+    - rabbitmq-server
+    - libsodium-dev    
+
+- name: Remove useless packages from the cache
+  become: true
+  apt:
+    autoclean: yes
+
+- name: Remove dependencies that are no longer required
+  become: true
+  apt:
+    autoremove: yes
+
+- name: Enable service ssh
+  systemd:
+    name: ssh
+    enabled: yes
+    masked: no
+
+- name: Enable service timesyncd
+  systemd:
+    name: systemd-timesyncd
+    enabled: yes
+    masked: no
+
+- name: Enable service redis
+  systemd:
+    name: redis
+    enabled: yes
+    masked: no
+
+- name: Enable service postgresql
+  systemd:
+    name: postgresql
+    enabled: yes
+    masked: no
+    
+- name: Enable service rabbitmq-server
+  systemd:
+    name: rabbitmq-server
+    enabled: yes
+    masked: no
+
+- name: Enable service nginx
+  systemd:
+    name: nginx
+    enabled: yes
+    masked: no
+

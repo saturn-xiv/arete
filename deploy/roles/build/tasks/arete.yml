@@ -1,0 +1,5 @@
+- name: Clone arete project
+  git:
+    repo: 'https://github.com/saturn-xiv/arete.git'
+    dest: "{{ workspace }}"
+    force: true
