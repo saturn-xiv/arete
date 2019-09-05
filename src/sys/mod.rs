@@ -8,18 +8,18 @@ pub mod vpn;
 use std::net::ToSocketAddrs;
 use std::process;
 
-use chrono::{Local, NaiveDateTime, TimeZone};
+use chrono::{DateTime, Local, TimeZone};
 use failure::SyncFailure;
 use ntp::unix_time::Instant;
 
 use super::errors::Result;
 
-pub fn ntp<T: ToSocketAddrs>(url: T) -> Result<NaiveDateTime> {
+pub fn ntp<T: ToSocketAddrs>(url: T) -> Result<DateTime<Local>> {
     let response = ntp::request(url).map_err(SyncFailure::new)?;
     debug!("receive time {:?}", response);
     let unix_time = Instant::from(response.transmit_timestamp);
     let local_time = Local.timestamp(unix_time.secs(), unix_time.subsec_nanos() as _);
-    Ok(local_time.naive_local())
+    Ok(local_time)
 }
 
 pub fn reboot() -> Result<()> {
