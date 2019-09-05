@@ -63,7 +63,7 @@ rusoto_core = "0.40"
 rusoto_credential = "0.40"
 rusoto_sqs = "0.40"
 rusoto_s3 = "0.40"
-rumqtt = "0.30"
+paho-mqtt = "0.5"
 mustache = "*"
 lazy_static = "1"
 serde = "1"
@@ -136,3 +136,6 @@ features = ["vendored"]
 [dependencies.diesel]
 version = "1"
 features = ["chrono", "serde_json", "uuid", "numeric", "r2d2", "128-column-tables"]
+
+[dependencies.ntp]
+git = "https://github.com/JeffBelgum/ntp.git"

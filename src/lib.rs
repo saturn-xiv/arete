@@ -44,6 +44,8 @@ extern crate mime;
 extern crate multipart;
 extern crate mustache;
 extern crate nix;
+extern crate ntp;
+extern crate paho_mqtt as mqtt;
 extern crate r2d2;
 #[cfg(feature = "redis")]
 extern crate r2d2_redis;

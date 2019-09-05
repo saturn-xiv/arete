@@ -1,4 +1,6 @@
+pub mod mosquitto;
 pub mod rabbitmq;
+pub mod zeromq;
 
 use mime::APPLICATION_JSON;
 use serde::{de::DeserializeOwned, ser::Serialize};
