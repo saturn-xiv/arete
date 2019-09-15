@@ -26,6 +26,15 @@ pub fn merge(back: &PathBuf, cover: &PathBuf, target: &PathBuf) -> Result<()> {
     ))
 }
 
+pub fn rotate(src: &PathBuf, degrees: i8, target: &PathBuf) -> Result<()> {
+    run(&format!(
+        "convert -rotate '{degrees}' {src} {target}",
+        src = src.display(),
+        target = target.display(),
+        degrees = degrees
+    ))
+}
+
 fn run(cmd: &String) -> Result<()> {
     debug!("{}", cmd);
     let out = Command::new("sh").arg("-c").arg(cmd).output()?;
