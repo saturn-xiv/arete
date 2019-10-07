@@ -63,8 +63,6 @@ rusoto_core = "0.40"
 rusoto_credential = "0.40"
 rusoto_sqs = "0.40"
 rusoto_s3 = "0.40"
-paho-mqtt = "0.5"
-mustache = "*"
 lazy_static = "1"
 serde = "1"
 serde_derive = "1"
@@ -139,3 +137,10 @@ features = ["chrono", "serde_json", "uuid", "numeric", "r2d2", "128-column-table
 
 [dependencies.ntp]
 git = "https://github.com/JeffBelgum/ntp.git"
+
+# https://github.com/eclipse/paho.mqtt.rust/issues/29
+[dependencies.paho-mqtt]
+git = "https://github.com/eclipse/paho.mqtt.rust.git" 
+
+[dependencies.mustache]
+git = "https://github.com/nickel-org/rust-mustache.git"
