@@ -70,3 +70,9 @@ imp USER/PASSWORD@HOST/ORACLE file=backup.dmp full=y
 ```sql
 select 'drop table ', table_name, 'cascade constraints;' from user_tables;
 ```
+
+- Show current continer name
+
+```sql
+show con_name;
+```
