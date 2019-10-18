@@ -5,7 +5,7 @@ RUN apk add sudo bash \
   git pkgconf openssl-dev \
   python make cmake curl \
   ca-certificates gcc \
-  musl-dev libcdr-dev \
+  musl-dev libcdr-dev zeromq-dev libpq perl \
   nodejs npm 
 
 # deploy
