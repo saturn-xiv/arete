@@ -60,11 +60,11 @@ RUN mkdir $HOME/downloads
 # java sdk
 RUN curl -s "https://get.sdkman.io" | zsh
 RUN sed -i -e 's/sdkman_auto_answer=false/sdkman_auto_answer=true/g' $HOME/.sdkman/etc/config
-ARG ORACLE_JDK_VERSION="8.0.222-zulu"
-ARG OPEN_JDK_VERSION="12.0.2-open"
+ARG JDK8="8.0.232-open"
+ARG JDK="13.0.1-open"
 RUN zsh -c "source $HOME/.zshrc \
-  && sdk install java $ORACLE_JDK_VERSION \
-  && sdk install java $OPEN_JDK_VERSION \
+  && sdk install java $JDK8 \
+  && sdk install java $JDK \
   && sdk install maven \
   && sdk install gradle"
 
@@ -74,11 +74,11 @@ RUN wget -P $HOME/downloads https://dl.google.com/android/repository/sdk-tools-l
 RUN mkdir -pv $HOME/local/android-sdk
 RUN unzip $HOME/downloads/sdk-tools-linux-$ANDROID_SDK_VERSION.zip -d $HOME/local/android-sdk
 RUN zsh -c "source $HOME/.zshrc \
-  && sdk use java $ORACLE_JDK_VERSION \
+  && sdk use java $JDK8 \
   && yes | $HOME/local/android-sdk/tools/bin/sdkmanager --licenses"
 
 # nodejs
-RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | zsh
+RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.35.1/install.sh | zsh
 RUN zsh -c "source $HOME/.zshrc \
   && nvm install node \
   && npm install -g yarn"
