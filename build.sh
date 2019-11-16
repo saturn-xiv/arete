@@ -21,7 +21,8 @@ cd $WORKSPACE
 if [ $1 = 'glibc' ];
 then 
     cargo build --release
-else if [ $1 = 'musl' ]
+elif [ $1 = 'musl' ]
+then
     RUSTFLAGS="-C target-feature=-crt-static" cargo build --release
 else
     echo "bad libc type $1"
