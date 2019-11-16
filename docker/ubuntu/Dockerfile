@@ -101,7 +101,7 @@ RUN zsh -c "source $HOME/.zshrc \
 
 # rust
 # https://rust-lang.github.io/rustup-components-history/index.html
-RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
+RUN curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh -s -- -y
 RUN echo 'source $HOME/.cargo/env' >> $HOME/.zshrc
 RUN zsh -c "source $HOME/.zshrc \
   && rustup default nightly \
