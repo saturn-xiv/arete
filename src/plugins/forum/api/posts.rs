@@ -24,9 +24,9 @@ use super::super::models::post::{Dao as PostDao, Item as Post};
 pub struct Form {
     pub topic: ID,
     pub post: Option<ID>,
-    #[validate(length(min = "1"))]
+    #[validate(length(min = 1))]
     pub body: String,
-    #[validate(length(min = "1"))]
+    #[validate(length(min = 1))]
     pub media_type: String,
 }
 

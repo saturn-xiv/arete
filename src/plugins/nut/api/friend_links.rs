@@ -13,11 +13,11 @@ use super::users::Administrator;
 #[derive(Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Form {
-    #[validate(length(min = "1"))]
+    #[validate(length(min = 1))]
     pub home: String,
-    #[validate(length(min = "1"))]
+    #[validate(length(min = 1))]
     pub title: String,
-    #[validate(length(min = "1"))]
+    #[validate(length(min = 1))]
     pub logo: String,
     pub position: i16,
 }

@@ -45,11 +45,11 @@ pub fn show(_user: Administrator, id: ID, db: Database) -> JsonResult<User> {
 #[derive(Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Create {
-    #[validate(length(min = "1", max = "32"))]
+    #[validate(length(min = 1, max = 32))]
     pub name: String,
-    #[validate(email, length(min = "2", max = "64"))]
+    #[validate(email, length(min = 2, max = 64))]
     pub email: String,
-    #[validate(length(min = "6", max = "32"))]
+    #[validate(length(min = 6, max = 32))]
     pub password: String,
     pub startup: NaiveDate,
     pub shutdown: NaiveDate,
@@ -73,7 +73,7 @@ pub fn create(_user: Administrator, db: Database, form: Json<Create>) -> JsonRes
 #[derive(Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Update {
-    #[validate(length(min = "1", max = "32"))]
+    #[validate(length(min = 1, max = 32))]
     pub name: String,
     pub fixed_ip: Option<String>,
     pub startup: NaiveDate,
@@ -149,10 +149,10 @@ pub fn destroy(id: ID, _user: Administrator, db: Database) -> JsonResult<()> {
 #[derive(Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct ChangePassword {
-    #[validate(email, length(min = "2", max = "64"))]
+    #[validate(email, length(min = 3, max = 64))]
     pub email: String,
     pub current_password: String,
-    #[validate(length(min = "6", max = "32"))]
+    #[validate(length(min = 6, max = 32))]
     pub new_password: String,
 }
 
@@ -169,9 +169,9 @@ pub fn change_password(db: Database, form: Json<ChangePassword>) -> JsonResult<(
 #[derive(Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct SignIn {
-    #[validate(email, length(min = "1"))]
+    #[validate(email, length(min = 1))]
     pub email: String,
-    #[validate(length(min = "1"))]
+    #[validate(length(min = 1))]
     pub password: String,
 }
 

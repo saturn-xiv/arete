@@ -67,9 +67,9 @@ pub fn get_sign_in(enc: State<Arc<Crypto>>, callback: String, db: Database) -> J
 #[derive(Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct SignIn {
-    #[validate(length(min = "1"))]
+    #[validate(length(min = 1))]
     pub code: String,
-    #[validate(length(min = "1"))]
+    #[validate(length(min = 1))]
     pub callback: String,
 }
 

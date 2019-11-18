@@ -34,7 +34,7 @@ use super::super::{
 #[derive(Validate, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Apply {
-    #[validate(length(min = "1"))]
+    #[validate(length(min = 1))]
     pub role: String,
     pub resource: Option<String>,
     pub nbf: NaiveDate,
@@ -89,7 +89,7 @@ pub fn index_authority(_user: Administrator, id: ID, db: Database) -> JsonResult
 #[derive(Validate, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Deny {
-    #[validate(length(min = "1"))]
+    #[validate(length(min = 1))]
     pub role: String,
     pub resource: Option<String>,
 }
@@ -216,9 +216,9 @@ pub struct Token {
 #[derive(Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct SignIn {
-    #[validate(length(min = "1"))]
+    #[validate(length(min = 1))]
     pub login: String,
-    #[validate(length(min = "1"))]
+    #[validate(length(min = 1))]
     pub password: String,
 }
 
@@ -289,15 +289,15 @@ pub fn sign_in(
 #[derive(Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct SignUp {
-    #[validate(length(min = "1", max = "32"))]
+    #[validate(length(min = 1, max = 32))]
     pub real_name: String,
-    #[validate(length(min = "1", max = "32"))]
+    #[validate(length(min = 1, max = 32))]
     pub nick_name: String,
-    #[validate(email, length(min = "2", max = "64"))]
+    #[validate(email, length(min = 3, max = 64))]
     pub email: String,
-    #[validate(length(min = "6", max = "32"))]
+    #[validate(length(min = 6, max = 32))]
     pub password: String,
-    #[validate(length(min = "1"))]
+    #[validate(length(min = 1))]
     pub home: String,
 }
 
@@ -357,7 +357,7 @@ pub fn sign_up(
 pub struct Email {
     #[validate(email)]
     pub email: String,
-    #[validate(length(min = "1"))]
+    #[validate(length(min = 1))]
     pub home: String,
 }
 
@@ -490,9 +490,9 @@ pub fn forgot_password(
 #[derive(Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct ResetPassword {
-    #[validate(length(min = "1"))]
+    #[validate(length(min = 1))]
     pub token: String,
-    #[validate(length(min = "6", max = "32"))]
+    #[validate(length(min = 6, max = 32))]
     pub password: String,
 }
 
@@ -563,9 +563,9 @@ pub fn get_profile(user: User) -> JsonResult<User> {
 #[derive(Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Profile {
-    #[validate(length(min = "2", max = "32"))]
+    #[validate(length(min = 2, max = 32))]
     pub real_name: String,
-    #[validate(length(min = "1"))]
+    #[validate(length(min = 1))]
     pub logo: String,
 }
 
@@ -580,9 +580,9 @@ pub fn set_profile(db: Database, user: User, form: Json<Profile>) -> JsonResult<
 #[derive(Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct ChangePassword {
-    #[validate(length(min = "1"))]
+    #[validate(length(min = 1))]
     pub current_password: String,
-    #[validate(length(min = "6", max = "32"))]
+    #[validate(length(min = 6, max = 32))]
     pub new_password: String,
 }
 

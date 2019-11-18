@@ -18,7 +18,7 @@ use super::users::Administrator;
 #[derive(Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Form {
-    #[validate(length(min = "1"))]
+    #[validate(length(min = 1))]
     pub resource_type: String,
     pub resource_id: ID,
     pub like: bool,

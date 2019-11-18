@@ -18,11 +18,11 @@ use super::super::super::super::{
 #[derive(Validate, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Config {
-    #[validate(length(min = "1"))]
+    #[validate(length(min = 1))]
     pub host: String,
-    #[validate(email, length(min = "1"))]
+    #[validate(email, length(min = 1))]
     pub email: String,
-    #[validate(length(min = "1"))]
+    #[validate(length(min = 1))]
     pub password: String,
 }
 

@@ -31,11 +31,11 @@ use super::models::{
 #[derive(Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Install {
-    #[validate(length(min = "1", max = "32"))]
+    #[validate(length(min = 1, max = 32))]
     pub real_name: String,
-    #[validate(email, length(min = "2", max = "64"))]
+    #[validate(email, length(min = 2, max = 64))]
     pub email: String,
-    #[validate(length(min = "6", max = "32"))]
+    #[validate(length(min = 6, max = 32))]
     pub password: String,
 }
 

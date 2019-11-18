@@ -22,11 +22,11 @@ use super::super::models::topic::{Dao as TopicDao, Item as Topic};
 #[derive(Validate, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Form {
-    #[validate(length(min = "1"))]
+    #[validate(length(min = 1))]
     pub title: String,
-    #[validate(length(min = "1"))]
+    #[validate(length(min = 1))]
     pub body: String,
-    #[validate(length(min = "1"))]
+    #[validate(length(min = 1))]
     pub media_type: String,
     pub tags: Vec<ID>,
     pub categories: Vec<ID>,

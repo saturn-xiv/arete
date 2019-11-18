@@ -32,13 +32,13 @@ pub struct File {
 #[serde(rename_all = "camelCase")]
 pub struct Form {
     pub port: u16,
-    #[validate(length(min = "1", max = "32"))]
+    #[validate(length(min = 1, max = 32))]
     pub dns: String,
-    #[validate(length(min = "1", max = "255"))]
+    #[validate(length(min = 1, max = 255))]
     pub host: String,
-    #[validate(length(min = "1", max = "16"))]
+    #[validate(length(min = 1, max = 16))]
     pub ip: String,
-    #[validate(length(min = "1", max = "16"))]
+    #[validate(length(min = 1, max = 16))]
     pub interface: String,
     pub server: Server,
     pub client: Client,
@@ -173,9 +173,9 @@ impl Default for Form {
 #[derive(Deserialize, Serialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Server {
-    #[validate(length(min = "1", max = "16"))]
+    #[validate(length(min = 1, max = 16))]
     pub network: String,
-    #[validate(length(min = "1", max = "16"))]
+    #[validate(length(min = 1, max = 16))]
     pub netmask: String,
 }
 
@@ -198,9 +198,9 @@ impl Server {
 #[derive(Deserialize, Serialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Client {
-    #[validate(length(min = "1", max = "16"))]
+    #[validate(length(min = 1, max = 16))]
     pub network: String,
-    #[validate(length(min = "1", max = "16"))]
+    #[validate(length(min = 1, max = 16))]
     pub netmask: String,
 }
 

@@ -23,9 +23,9 @@ use super::users::Administrator;
 
 #[derive(Validate, Serialize, Deserialize)]
 pub struct Author {
-    #[validate(length(min = "1"))]
+    #[validate(length(min = 1))]
     pub name: String,
-    #[validate(email, length(min = "1"))]
+    #[validate(email, length(min = 1))]
     pub email: String,
 }
 
@@ -82,13 +82,13 @@ pub struct Seo {
 
 #[derive(Validate, Serialize, Deserialize)]
 pub struct Google {
-    #[validate(length(min = "1"))]
+    #[validate(length(min = 1))]
     pub verify_id: String,
 }
 
 #[derive(Validate, Serialize, Deserialize)]
 pub struct Baidu {
-    #[validate(length(min = "1"))]
+    #[validate(length(min = 1))]
     pub verify_id: String,
 }
 
