@@ -7,7 +7,7 @@ import plugins, { IRoute } from "./plugins";
 
 const App: React.FC = () => {
   return (
-    <Router>
+    <Router basename="/my">
       <div>
         <Switch>
           {plugins

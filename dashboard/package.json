@@ -2,6 +2,8 @@
   "name": "dashboard",
   "version": "0.1.1",
   "private": true,
+  "homepage": "/my",
+  "proxy": "http://localhost:8080",
   "dependencies": {
     "@loadable/component": "^5.10.3",
     "@types/jest": "24.0.23",
