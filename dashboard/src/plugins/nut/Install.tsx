@@ -1,13 +1,9 @@
 import React from "react";
-import {
-  injectIntl,
-  FormattedMessage,
-  WrappedComponentProps
-} from "react-intl";
+import { injectIntl, WrappedComponentProps } from "react-intl";
 import { RouteComponentProps, withRouter } from "react-router";
 import { PrimaryButton, TextField } from "office-ui-fabric-react";
 
-import Layout from "../../layouts/application";
+import Layout from "./users/SharedLinks";
 
 interface IProps {}
 
@@ -40,33 +36,23 @@ class Widget extends React.Component<
     const { formatMessage } = this.props.intl;
 
     return (
-      <form onSubmit={this.handleSubmit}>
-        <FormattedMessage id="nut.install.title" tagName="h1" />
-        <TextField label={formatMessage({ id: "form.fields.email" })} />
-        <TextField label={formatMessage({ id: "form.fields.real-name" })} />
-        <TextField label={formatMessage({ id: "form.fields.password" })} />
-        <TextField
-          label={formatMessage({ id: "form.fields.password-confirmation" })}
-        />
-        <br />
-        <PrimaryButton
-          type="submit"
-          text={formatMessage({ id: "form.buttons.submit" })}
-        />
-      </form>
+      <Layout title={{ id: "nut.install.title" }}>
+        <form onSubmit={this.handleSubmit}>
+          <TextField label={formatMessage({ id: "form.fields.email" })} />
+          <TextField label={formatMessage({ id: "form.fields.real-name" })} />
+          <TextField label={formatMessage({ id: "form.fields.password" })} />
+          <TextField
+            label={formatMessage({ id: "form.fields.password-confirmation" })}
+          />
+          <br />
+          <PrimaryButton
+            type="submit"
+            text={formatMessage({ id: "form.buttons.submit" })}
+          />
+        </form>
+      </Layout>
     );
   }
 }
 
 export default injectIntl(withRouter(Widget));
-
-// const Widget: React.FC = () => {
-//   return (
-//     <div>
-//       <FormattedMessage id="nut.install.title" />
-//       <PrimaryButton text="aaa" />
-//     </div>
-//   );
-// };
-
-// export default Widget;

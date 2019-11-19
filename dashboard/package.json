@@ -21,6 +21,7 @@
     "jwt-decode": "^2.2.0",
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.27",
+    "office-ui-fabric-core": "^11.0.0",
     "office-ui-fabric-react": "^7.62.0",
     "qrcode.react": "^1.0.0",
     "react": "^16.12.0",

@@ -1,27 +1,19 @@
 import React from "react";
-import {
-  injectIntl,
-  FormattedMessage,
-  WrappedComponentProps
-} from "react-intl";
-import { RouteComponentProps, withRouter } from "react-router";
-import { PrimaryButton, TextField } from "office-ui-fabric-react";
+import { MessageDescriptor } from "react-intl";
 
 interface IProps {
   children: React.ReactNode;
+  title: MessageDescriptor;
 }
 
 interface IState {}
 
-class Widget extends React.Component<
-  RouteComponentProps<any> & WrappedComponentProps<any> & IProps,
-  IState
-> {
+class Widget extends React.Component<IProps, IState> {
   public render() {
     const { children } = this.props;
 
-    return <div>{children}</div>;
+    return <div className="ms-Grid">{children}</div>;
   }
 }
 
-export default injectIntl(withRouter(Widget));
+export default Widget;

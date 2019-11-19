@@ -4,10 +4,10 @@ import SharedLinks from "./SharedLinks";
 
 const Widget: React.FC = () => {
   return (
-    <div>
+    <SharedLinks title={{ id: "nut.users.sign-in.title" }}>
       Sign In
-      <br /> <SharedLinks />
-    </div>
+      <br />
+    </SharedLinks>
   );
 };
 
