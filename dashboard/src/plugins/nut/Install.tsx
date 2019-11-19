@@ -11,7 +11,7 @@ import {
 } from "office-ui-fabric-react";
 
 import Layout from "./users/SharedLinks";
-import { validate, CONSTRAIONTS, IMessage } from "../../form";
+import { validate, CONSTRAIONTS, IMessageBar } from "../../form";
 
 interface IProps {}
 interface IForm {
@@ -22,22 +22,21 @@ interface IForm {
 }
 interface IState {
   form: IForm;
-  message?: IMessage;
+  message?: IMessageBar;
 }
 
 class Widget extends React.Component<
-  RouteComponentProps<any> & WrappedComponentProps<any> & IProps,
+  RouteComponentProps<any> & WrappedComponentProps & IProps,
   IState
 > {
   constructor(
-    props: RouteComponentProps<any> & WrappedComponentProps<any> & IProps
+    props: RouteComponentProps<any> & WrappedComponentProps & IProps
   ) {
     super(props);
     this.state = {
       form: { email: "", realName: "", password: "", passwordConfirmation: "" }
     };
   }
-
   public handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     var msg = validate(this.state.form, {
@@ -69,7 +68,7 @@ class Widget extends React.Component<
     const { formatMessage } = this.props.intl;
 
     return (
-      <Layout title={{ id: "nut.install.title" }}>
+      <Layout title="nut.install.title">
         <form onSubmit={this.handleSubmit}>
           {this.state.message && (
             <MessageBar

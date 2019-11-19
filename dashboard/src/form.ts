@@ -1,7 +1,7 @@
 import validate_js from "validate.js";
 import { MessageBarType } from "office-ui-fabric-react";
 
-export interface IMessage {
+export interface IMessageBar {
   type: MessageBarType;
   body: string[];
 }

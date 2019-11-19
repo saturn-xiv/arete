@@ -1,24 +1,34 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { MessageDescriptor, FormattedMessage } from "react-intl";
 import { Stack, FontIcon } from "office-ui-fabric-react";
+import {
+  injectIntl,
+  FormattedMessage,
+  WrappedComponentProps
+} from "react-intl";
+import { RouteComponentProps, withRouter } from "react-router";
 
 import Layout from "../../../layouts/application";
 
 interface IProps {
   children: React.ReactNode;
-  title: MessageDescriptor;
+  title: string;
 }
 
-class Widget extends React.Component<IProps, {}> {
+interface IState {}
+
+class Widget extends React.Component<
+  RouteComponentProps<any> & WrappedComponentProps & IProps,
+  IState
+> {
   public render() {
-    const { children, title } = this.props;
+    const { children, title, intl } = this.props;
 
     return (
-      <Layout title={title}>
+      <Layout title={intl.formatMessage({ id: title })}>
         <div className="ms-Grid-row">
           <div className="ms-Grid-col ms-sm12 ms-md6 ms-mdPush3 ms-lg4 ms-lgPush4">
-            <FormattedMessage {...title} tagName="h1" />
+            <FormattedMessage id={title} tagName="h1" />
             {children}
             <br />
             <Stack>
@@ -65,12 +75,4 @@ class Widget extends React.Component<IProps, {}> {
   }
 }
 
-export default Widget;
-
-// const Widget: React.FC = ({}) => {
-//   return (
-//     <Layout>
-
-//     </Layout>
-//   );
-// };
+export default injectIntl(withRouter(Widget));

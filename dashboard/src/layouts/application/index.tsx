@@ -1,18 +1,23 @@
 import React from "react";
-import { MessageDescriptor } from "react-intl";
+import Helmet from "react-helmet";
 
 interface IProps {
   children: React.ReactNode;
-  title: MessageDescriptor;
+  title: string;
 }
 
 interface IState {}
 
 class Widget extends React.Component<IProps, IState> {
   public render() {
-    const { children } = this.props;
-
-    return <div className="ms-Grid">{children}</div>;
+    return (
+      <div className="ms-Grid">
+        {this.props.children}
+        <Helmet>
+          <title>{this.props.title}</title>
+        </Helmet>
+      </div>
+    );
   }
 }
 
