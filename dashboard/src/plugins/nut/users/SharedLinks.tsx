@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { MessageDescriptor, FormattedMessage } from "react-intl";
+import { Stack, FontIcon } from "office-ui-fabric-react";
 
 import Layout from "../../../layouts/application";
 
@@ -17,24 +18,46 @@ class Widget extends React.Component<IProps, {}> {
       <Layout title={title}>
         <div className="ms-Grid-row">
           <div className="ms-Grid-col ms-sm12 ms-md6 ms-mdPush3 ms-lg4 ms-lgPush4">
-            <FormattedMessage id="nut.install.title" tagName="h1" />
+            <FormattedMessage {...title} tagName="h1" />
             {children}
-            <nav>
-              <ul>
-                <li>
-                  <Link to="/">Home</Link>
-                </li>
-                <li>
-                  <Link to="/install">Install</Link>
-                </li>
-                <li>
-                  <Link to="/users/sign-in">Sign In </Link>
-                </li>
-                <li>
-                  <Link to="/users/sign-up">Sign Up</Link>
-                </li>
-              </ul>
-            </nav>
+            <br />
+            <Stack>
+              {[
+                {
+                  icon: "Signin",
+                  label: "users.sign-in",
+                  to: "/users/sign-in"
+                },
+                {
+                  icon: "TemporaryUser",
+                  label: "users.sign-up",
+                  to: "/users/sign-up"
+                },
+                {
+                  icon: "PasswordField",
+                  label: "users.forgot-password",
+                  to: "/users/forgot-password"
+                },
+                {
+                  icon: "MailCheck",
+                  label: "users.confirm",
+                  to: "/users/confirm"
+                },
+                { icon: "Unlock", label: "users.unlock", to: "/users/unlock" },
+                {
+                  icon: "Comment",
+                  label: "leave-words.new",
+                  to: "/leave-words/new"
+                }
+              ].map(it => (
+                <Stack.Item key={it.to}>
+                  <FontIcon iconName={it.icon} /> &nbsp;
+                  <Link to={it.to}>
+                    <FormattedMessage id={`nut.${it.label}.title`} />
+                  </Link>
+                </Stack.Item>
+              ))}
+            </Stack>
           </div>
         </div>
       </Layout>
