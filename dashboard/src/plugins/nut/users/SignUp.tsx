@@ -6,7 +6,7 @@ import SharedLinks from "./SharedLinks";
 const Widget: React.FC = () => {
   return (
     <div>
-      <FormattedMessage id="nut.users.sign-up" />
+      <FormattedMessage id="nut.users.sign-up.title" />
       <br /> <SharedLinks />
     </div>
   );
