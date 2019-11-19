@@ -4,6 +4,7 @@ import { RouteComponentProps, withRouter } from "react-router";
 import { PrimaryButton, TextField } from "office-ui-fabric-react";
 
 import Layout from "./users/SharedLinks";
+import { validate, CONSTRAIONTS } from "../../form";
 
 interface IProps {}
 interface IState {
@@ -31,7 +32,13 @@ class Widget extends React.Component<
 
   public handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(this.state);
+    var msg = validate(this.state, {
+      email: CONSTRAIONTS.email,
+      realName: CONSTRAIONTS.realName,
+      password: CONSTRAIONTS.password,
+      passwordConfirmation: CONSTRAIONTS.passwordConfirmation
+    });
+    console.log(msg);
     // const { form, history, intl } = this.props;
     // form.validateFields((err, values) => {
     //   if (!err) {
