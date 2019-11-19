@@ -6,14 +6,32 @@ import { PrimaryButton, TextField } from "office-ui-fabric-react";
 import Layout from "./users/SharedLinks";
 
 interface IProps {}
+interface IState {
+  realName: string;
+  password: string;
+  email: string;
+  passwordConfirmation: string;
+}
 
 class Widget extends React.Component<
   RouteComponentProps<any> & WrappedComponentProps<any> & IProps,
-  {}
+  IState
 > {
+  constructor(
+    props: RouteComponentProps<any> & WrappedComponentProps<any> & IProps
+  ) {
+    super(props);
+    this.state = {
+      email: "",
+      realName: "",
+      password: "",
+      passwordConfirmation: ""
+    };
+  }
+
   public handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("aaa");
+    console.log(this.state);
     // const { form, history, intl } = this.props;
     // form.validateFields((err, values) => {
     //   if (!err) {
@@ -32,16 +50,48 @@ class Widget extends React.Component<
     //   }
     // });
   };
+  public handleChange = (
+    e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    var target = e.target as HTMLInputElement;
+    var v: any = {};
+    v[target.id] = target.value;
+    this.setState(v);
+  };
   public render() {
     const { formatMessage } = this.props.intl;
 
     return (
       <Layout title={{ id: "nut.install.title" }}>
         <form onSubmit={this.handleSubmit}>
-          <TextField label={formatMessage({ id: "form.fields.email" })} />
-          <TextField label={formatMessage({ id: "form.fields.real-name" })} />
-          <TextField label={formatMessage({ id: "form.fields.password" })} />
           <TextField
+            id="email"
+            required
+            value={this.state.email}
+            onChange={this.handleChange}
+            label={formatMessage({ id: "form.fields.email" })}
+          />
+          <TextField
+            id="realName"
+            required
+            value={this.state.realName}
+            onChange={this.handleChange}
+            label={formatMessage({ id: "form.fields.real-name" })}
+          />
+          <TextField
+            id="password"
+            required
+            type="password"
+            value={this.state.password}
+            onChange={this.handleChange}
+            label={formatMessage({ id: "form.fields.password" })}
+          />
+          <TextField
+            id="passwordConfirmation"
+            required
+            type="password"
+            value={this.state.passwordConfirmation}
+            onChange={this.handleChange}
             label={formatMessage({ id: "form.fields.password-confirmation" })}
           />
           <br />
