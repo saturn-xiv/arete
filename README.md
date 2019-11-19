@@ -59,6 +59,7 @@ Create the administrator in **http://xxx.xxx.xxx.xxx/my/install**
 
 - [Create React App](https://create-react-app.dev/docs/adding-typescript)
 - [Fabric React](https://developer.microsoft.com/en-us/fabric#/get-started)
+- [Validate.js](https://validatejs.org/#validators)
 - [Third-Party Libraries](https://ant.design/docs/react/recommendation)
 - [A Fast and Flexible Static Site Generator](https://github.com/gohugoio/hugo)
 - [Ansible Documentation](https://docs.ansible.com/ansible/latest/user_guide/playbooks_best_practices.html)
