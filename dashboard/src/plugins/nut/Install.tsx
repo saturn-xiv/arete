@@ -1,17 +1,28 @@
 import React from "react";
 import { injectIntl, WrappedComponentProps } from "react-intl";
 import { RouteComponentProps, withRouter } from "react-router";
-import { PrimaryButton, TextField } from "office-ui-fabric-react";
+import {
+  PrimaryButton,
+  TextField,
+  MessageBarType,
+  BaseButton,
+  Button,
+  MessageBar
+} from "office-ui-fabric-react";
 
 import Layout from "./users/SharedLinks";
-import { validate, CONSTRAIONTS } from "../../form";
+import { validate, CONSTRAIONTS, IMessage } from "../../form";
 
 interface IProps {}
-interface IState {
+interface IForm {
   realName: string;
   password: string;
   email: string;
   passwordConfirmation: string;
+}
+interface IState {
+  form: IForm;
+  message?: IMessage;
 }
 
 class Widget extends React.Component<
@@ -23,39 +34,22 @@ class Widget extends React.Component<
   ) {
     super(props);
     this.state = {
-      email: "",
-      realName: "",
-      password: "",
-      passwordConfirmation: ""
+      form: { email: "", realName: "", password: "", passwordConfirmation: "" }
     };
   }
 
   public handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    var msg = validate(this.state, {
+    var msg = validate(this.state.form, {
       email: CONSTRAIONTS.email,
       realName: CONSTRAIONTS.realName,
       password: CONSTRAIONTS.password,
       passwordConfirmation: CONSTRAIONTS.passwordConfirmation
     });
-    console.log(msg);
-    // const { form, history, intl } = this.props;
-    // form.validateFields((err, values) => {
-    //   if (!err) {
-    //     graphql(
-    //       {
-    //         query: `mutation ($realName: String!, $email: String!, $password: String!) {
-    //         install(realName: $realName, email: $email, password: $password)
-    //       }`,
-    //         variables: values
-    //       },
-    //       () => {
-    //         message.success(intl.formatMessage({ id: "flashes.success" }));
-    //         history.push("/users/sign-in");
-    //       }
-    //     );
-    //   }
-    // });
+    if (msg) {
+      this.setState({ message: { type: MessageBarType.error, body: msg } });
+    } else {
+    }
   };
   public handleChange = (
     e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -63,7 +57,13 @@ class Widget extends React.Component<
     var target = e.target as HTMLInputElement;
     var v: any = {};
     v[target.id] = target.value;
-    this.setState(v);
+    var form = Object.assign({}, this.state.form, v);
+    this.setState({ form });
+  };
+  public handleDismiss = (
+    e?: React.MouseEvent<HTMLElement | BaseButton | Button>
+  ) => {
+    this.setState({ message: undefined });
   };
   public render() {
     const { formatMessage } = this.props.intl;
@@ -71,17 +71,29 @@ class Widget extends React.Component<
     return (
       <Layout title={{ id: "nut.install.title" }}>
         <form onSubmit={this.handleSubmit}>
+          {this.state.message && (
+            <MessageBar
+              onDismiss={this.handleDismiss}
+              messageBarType={this.state.message.type}
+            >
+              <ol>
+                {this.state.message.body.map((it, i) => (
+                  <li key={i}>{it}</li>
+                ))}
+              </ol>
+            </MessageBar>
+          )}
           <TextField
             id="email"
             required
-            value={this.state.email}
+            value={this.state.form.email}
             onChange={this.handleChange}
             label={formatMessage({ id: "form.fields.email" })}
           />
           <TextField
             id="realName"
             required
-            value={this.state.realName}
+            value={this.state.form.realName}
             onChange={this.handleChange}
             label={formatMessage({ id: "form.fields.real-name" })}
           />
@@ -89,7 +101,7 @@ class Widget extends React.Component<
             id="password"
             required
             type="password"
-            value={this.state.password}
+            value={this.state.form.password}
             onChange={this.handleChange}
             label={formatMessage({ id: "form.fields.password" })}
           />
@@ -97,7 +109,7 @@ class Widget extends React.Component<
             id="passwordConfirmation"
             required
             type="password"
-            value={this.state.passwordConfirmation}
+            value={this.state.form.passwordConfirmation}
             onChange={this.handleChange}
             label={formatMessage({ id: "form.fields.password-confirmation" })}
           />

@@ -1,8 +1,16 @@
 import validate_js from "validate.js";
+import { MessageBarType } from "office-ui-fabric-react";
 
-export function validate(form: any, constraints: any): string[] {
-  var items = Object.values(validate_js(form, constraints)) as string[][];
-  return items.reduce((acc, it) => acc.concat(it), new Array<string>());
+export interface IMessage {
+  type: MessageBarType;
+  body: string[];
+}
+
+export function validate(form: any, constraints: any): string[] | undefined {
+  var items = (Object.values(
+    validate_js(form, constraints)
+  ) as string[][]).reduce((acc, it) => acc.concat(it), new Array<string>());
+  return items.length > 0 ? items : undefined;
 }
 
 export const CONSTRAIONTS = {
