@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { IntlProvider } from "react-intl";
 import { Provider } from "react-redux";
+import { FontIcon } from "office-ui-fabric-react";
 import loadable from "@loadable/component";
 import "moment-timezone";
 
@@ -16,22 +17,20 @@ const App: React.FC = () => {
     <IntlProvider {...locale}>
       <Provider store={store}>
         <Router basename="/my">
-          <div>
-            <Switch>
-              {plugins
-                .reduce((acc, it) => acc.concat(it.routes), new Array<IRoute>())
-                .map(it => {
-                  const Widget = loadable(it.component, {
-                    fallback: <div>loading</div>
-                  });
-                  return (
-                    <Route key={it.path} path={it.path} exact={true}>
-                      <Widget />
-                    </Route>
-                  );
-                })}
-            </Switch>
-          </div>
+          <Switch>
+            {plugins
+              .reduce((acc, it) => acc.concat(it.routes), new Array<IRoute>())
+              .map(it => {
+                const Widget = loadable(it.component, {
+                  fallback: <FontIcon iconName="Refresh" />
+                });
+                return (
+                  <Route key={it.path} path={it.path} exact={true}>
+                    <Widget />
+                  </Route>
+                );
+              })}
+          </Switch>
         </Router>
       </Provider>
     </IntlProvider>
