@@ -1,12 +1,9 @@
 import validate_js from "validate.js";
-import { MessageBarType } from "office-ui-fabric-react";
+import URI from "urijs";
 
 export const DATETIME_FORMAT = "LL LTS";
 
-export interface IMessageBar {
-  type: MessageBarType;
-  body: string[];
-}
+export const HOME = new URI(window.location.href).origin();
 
 export function validate(form: any, constraints: any): string[] | undefined {
   var rs = validate_js(form, constraints);
@@ -23,7 +20,7 @@ export const CONSTRAIONTS = {
     presence: true,
     email: true
   },
-  nickname: {
+  nickName: {
     presence: true,
     length: {
       minimum: 2,

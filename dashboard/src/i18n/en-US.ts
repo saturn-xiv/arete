@@ -3,17 +3,12 @@ export default {
   "flashes.success": "Success!",
 
   "form.fields.email": "Email",
-  "form.fields.nickname": "Nickname",
+  "form.fields.nick-name": "Nick name",
   "form.fields.real-name": "Real name",
   "form.fields.password": "Password",
   "form.fields.password-confirmation": "Password confirmation",
   "form.fields.current-password": "Current password",
   "form.fields.new-password": "New password",
-  "form.validators.real-name": "Real name length must bettwen 2~32",
-  "form.validators.nickname": "Nickname length must bettwen 4~32",
-  "form.validators.email": "Not a valid email address",
-  "form.validators.password": "Password length must bettwen 6~32",
-  "form.validators.password-confirmation": "Passwords not match",
   "form.buttons.submit": "Submit",
 
   "nut.users.sign-in.title": "Sign in",

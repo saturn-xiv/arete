@@ -16,6 +16,7 @@
     "@types/react-helmet": "^5.0.14",
     "@types/react-redux": "^7.1.5",
     "@types/react-router-dom": "^5.1.2",
+    "@types/urijs": "^1.19.4",
     "emoji-mart": "^2.11.1",
     "google-map-react": "^1.1.5",
     "js-cookie": "^2.2.1",
@@ -38,6 +39,7 @@
     "react-scripts": "3.2.0",
     "redux": "^4.0.4",
     "typescript": "3.7.2",
+    "urijs": "^1.19.2",
     "validate.js": "^0.13.1"
   },
   "scripts": {
