@@ -9,9 +9,16 @@ import {
   Button,
   MessageBar
 } from "office-ui-fabric-react";
+import Moment from "react-moment";
 
 import Layout from "./users/SharedLinks";
-import { validate, CONSTRAIONTS, IMessageBar } from "../../form";
+import {
+  validate,
+  CONSTRAIONTS,
+  DATETIME_FORMAT,
+  IMessageBar
+} from "../../form";
+import { post as httpPost } from "../../request";
 
 interface IProps {}
 interface IForm {
@@ -39,6 +46,8 @@ class Widget extends React.Component<
   }
   public handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const { history, intl } = this.props;
+
     var msg = validate(this.state.form, {
       email: CONSTRAIONTS.email,
       realName: CONSTRAIONTS.realName,
@@ -48,6 +57,21 @@ class Widget extends React.Component<
     if (msg) {
       this.setState({ message: { type: MessageBarType.error, body: msg } });
     } else {
+      httpPost("/install", this.state.form)
+        .then(() => {
+          this.setState({
+            message: {
+              type: MessageBarType.success,
+              body: [intl.formatMessage({ id: "flashes.success" })]
+            }
+          });
+          history.push("/users/sign-in");
+        })
+        .catch(e => {
+          this.setState({
+            message: { type: MessageBarType.error, body: [e] }
+          });
+        });
     }
   };
   public handleChange = (
@@ -75,6 +99,7 @@ class Widget extends React.Component<
               onDismiss={this.handleDismiss}
               messageBarType={this.state.message.type}
             >
+              <Moment format={DATETIME_FORMAT} />
               <ol>
                 {this.state.message.body.map((it, i) => (
                   <li key={i}>{it}</li>

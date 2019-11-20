@@ -1,5 +1,6 @@
 export default {
-  "are-you-sure": "Are you sure?",
+  "flashes.are-you-sure": "Are you sure?",
+  "flashes.success": "Success!",
 
   "form.fields.email": "Email",
   "form.fields.nickname": "Nickname",
