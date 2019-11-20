@@ -4,23 +4,18 @@ import { RouteComponentProps, withRouter } from "react-router";
 import {
   PrimaryButton,
   TextField,
-  MessageBarType,
-  BaseButton,
-  Button,
-  MessageBar
+  MessageBarType
 } from "office-ui-fabric-react";
-import Moment from "react-moment";
+import { connect } from "react-redux";
 
 import Layout from "./users/SharedLinks";
-import {
-  validate,
-  CONSTRAIONTS,
-  DATETIME_FORMAT,
-  IMessageBar
-} from "../../form";
+import { validate, CONSTRAIONTS } from "../../form";
 import { post as httpPost } from "../../request";
+import { showMessageBar, IState as IApplicationState } from "../../actions";
 
-interface IProps {}
+interface IProps {
+  showMessageBar: typeof showMessageBar;
+}
 interface IForm {
   realName: string;
   password: string;
@@ -29,7 +24,6 @@ interface IForm {
 }
 interface IState {
   form: IForm;
-  message?: IMessageBar;
 }
 
 class Widget extends React.Component<
@@ -46,7 +40,7 @@ class Widget extends React.Component<
   }
   public handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const { history, intl } = this.props;
+    const { history, intl, showMessageBar } = this.props;
 
     var msg = validate(this.state.form, {
       email: CONSTRAIONTS.email,
@@ -55,22 +49,19 @@ class Widget extends React.Component<
       passwordConfirmation: CONSTRAIONTS.passwordConfirmation
     });
     if (msg) {
-      this.setState({ message: { type: MessageBarType.error, body: msg } });
+      showMessageBar({ type: MessageBarType.error, messages: msg });
     } else {
       httpPost("/install", this.state.form)
         .then(() => {
-          this.setState({
-            message: {
-              type: MessageBarType.success,
-              body: [intl.formatMessage({ id: "flashes.success" })]
-            }
+          showMessageBar({
+            type: MessageBarType.success,
+            messages: [intl.formatMessage({ id: "flashes.success" })]
           });
+
           history.push("/users/sign-in");
         })
         .catch(e => {
-          this.setState({
-            message: { type: MessageBarType.error, body: [e] }
-          });
+          showMessageBar({ type: MessageBarType.error, messages: [e] });
         });
     }
   };
@@ -83,30 +74,12 @@ class Widget extends React.Component<
     var form = Object.assign({}, this.state.form, v);
     this.setState({ form });
   };
-  public handleDismiss = (
-    e?: React.MouseEvent<HTMLElement | BaseButton | Button>
-  ) => {
-    this.setState({ message: undefined });
-  };
   public render() {
     const { formatMessage } = this.props.intl;
 
     return (
       <Layout title="nut.install.title">
         <form onSubmit={this.handleSubmit}>
-          {this.state.message && (
-            <MessageBar
-              onDismiss={this.handleDismiss}
-              messageBarType={this.state.message.type}
-            >
-              <Moment format={DATETIME_FORMAT} />
-              <ol>
-                {this.state.message.body.map((it, i) => (
-                  <li key={i}>{it}</li>
-                ))}
-              </ol>
-            </MessageBar>
-          )}
           <TextField
             id="email"
             required
@@ -148,4 +121,11 @@ class Widget extends React.Component<
   }
 }
 
-export default injectIntl(withRouter(Widget));
+const mapStateToProps = ({ siteInfo }: IApplicationState) => ({ siteInfo });
+
+const mapDispatchToProps = { showMessageBar };
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(injectIntl(withRouter(Widget)));

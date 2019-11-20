@@ -1,13 +1,15 @@
-import { MessageBarType } from "office-ui-fabric-react";
+import { IMessageBar } from "./components/MessageBar";
 
 export const SITE_REFRESH = "site.refresh";
 export const USER_SIGN_IN = "user.sign-in";
 export const USER_SIGN_OUT = "user.sign-out";
-export const MESSAGE_BAR = "message-bar";
+export const SHOW_MESSAGE_BAR = "message-bar.show";
+export const HIDE_MESSAGE_BAR = "message-bar.hide";
 
-export interface IMessageBar {
-  type?: MessageBarType;
-  body?: string;
+export interface IState {
+  siteInfo: ISite;
+  currentUser: IUser;
+  messageBar: IMessageBar;
 }
 
 export interface ISite {
@@ -41,16 +43,20 @@ export interface IUserSignOutAction {
   type: typeof USER_SIGN_OUT;
 }
 
-export interface IMessageBarAction {
-  type: typeof MESSAGE_BAR;
+export interface IMessageBarShowAction {
+  type: typeof SHOW_MESSAGE_BAR;
   payload: IMessageBar;
 }
 
+export interface IMessageBarHideAction {
+  type: typeof HIDE_MESSAGE_BAR;
+}
 export type ActionTypes =
   | ISiteRefreshAction
   | IUserSignInAction
   | IUserSignOutAction
-  | IMessageBarAction;
+  | IMessageBarHideAction
+  | IMessageBarShowAction;
 
 export const refresh = (info: ISite): ActionTypes => {
   return {
@@ -72,9 +78,15 @@ export const signOut = (): ActionTypes => {
   };
 };
 
-export const showMessage = (msg: IMessageBar): ActionTypes => {
+export const showMessageBar = (msg: IMessageBar): ActionTypes => {
   return {
-    type: MESSAGE_BAR,
+    type: SHOW_MESSAGE_BAR,
     payload: msg
+  };
+};
+
+export const hideMessageBar = (): ActionTypes => {
+  return {
+    type: HIDE_MESSAGE_BAR
   };
 };

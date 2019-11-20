@@ -9,6 +9,7 @@ import {
 import { RouteComponentProps, withRouter } from "react-router";
 
 import Layout from "../../../layouts/application";
+import MessageBar from "../../../components/MessageBar";
 
 interface IProps {
   children: React.ReactNode;
@@ -29,6 +30,7 @@ class Widget extends React.Component<
         <div className="ms-Grid-row">
           <div className="ms-Grid-col ms-sm12 ms-md6 ms-mdPush3 ms-lg4 ms-lgPush4">
             <FormattedMessage id={title} tagName="h1" />
+            <MessageBar />
             {children}
             <br />
             <Stack>
