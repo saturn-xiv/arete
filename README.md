@@ -40,6 +40,14 @@ Create the administrator in **http://xxx.xxx.xxx.xxx/my/install**
 
 ## Development
 
+### Generate logo
+
+```bash
+$ convert -background transparent -resize 512x512 from.svg to.png
+$ convert -background transparent -resize 192x192 from.svg to.png
+$ # favicon.ico: 16x16 32x32 64x64
+```
+
 ### Vscode
 
 - [ESLint](https://github.com/Microsoft/vscode-eslint)
