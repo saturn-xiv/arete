@@ -1,9 +1,9 @@
 import React from "react";
 
-import EmailForm from "./EmailForm";
+import Form from "./EmailForm";
 
 const Widget: React.FC = () => {
-  return <EmailForm action="confirm" />;
+  return <Form action="confirm" />;
 };
 
 export default Widget;

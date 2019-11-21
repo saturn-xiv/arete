@@ -7,10 +7,18 @@ const Plugin: IPlugin = {
 
     { path: "/users/sign-in", component: () => import("./users/SignIn") },
     { path: "/users/sign-up", component: () => import("./users/SignUp") },
+    {
+      path: "/users/confirm/:token",
+      component: () => import("./users/ConfirmToken")
+    },
     { path: "/users/confirm", component: () => import("./users/Confirm") },
     {
       path: "/users/forgot-password",
       component: () => import("./users/ForgotPassword")
+    },
+    {
+      path: "/users/unlock/:token",
+      component: () => import("./users/UnlockToken")
     },
     { path: "/users/unlock", component: () => import("./users/Unlock") }
   ]
