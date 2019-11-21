@@ -4,6 +4,7 @@ pub mod network;
 pub mod nmap;
 pub mod timezone;
 pub mod vpn;
+pub mod watchdog;
 
 use std::net::ToSocketAddrs;
 use std::process;
