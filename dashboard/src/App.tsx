@@ -10,6 +10,7 @@ import "./App.css";
 import plugins, { IRoute } from "./plugins";
 import { get as getLocale } from "./i18n";
 import store from "./store";
+import NoMatch from "./plugins/nut/NoMatch";
 
 const App: React.FC = () => {
   let locale = getLocale();
@@ -30,6 +31,9 @@ const App: React.FC = () => {
                   </Route>
                 );
               })}
+            <Route path="*">
+              <NoMatch />
+            </Route>
           </Switch>
         </Router>
       </Provider>

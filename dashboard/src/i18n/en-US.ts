@@ -1,6 +1,7 @@
 export default {
   "flashes.are-you-sure": "Are you sure?",
   "flashes.success": "Success!",
+  "flashes.not-found": "Not found!",
 
   "form.fields.email": "Email",
   "form.fields.nick-name": "Nick name",
@@ -12,6 +13,7 @@ export default {
   "form.buttons.submit": "Submit",
 
   "nut.users.sign-in.title": "Sign in",
+  "nut.users.sign-in.login": "Login",
   "nut.users.sign-up.title": "Sign up",
   "nut.users.forgot-password.title": "Forgot your password?",
   "nut.users.forgot-password.success":

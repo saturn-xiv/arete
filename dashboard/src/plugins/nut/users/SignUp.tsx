@@ -11,7 +11,7 @@ import { connect } from "react-redux";
 import Layout from "./SharedLinks";
 import { validate, CONSTRAIONTS, HOME } from "../../../form";
 import { post as httpPost } from "../../../request";
-import { showMessageBar, IState as IApplicationState } from "../../../actions";
+import { showMessageBar } from "../../../actions";
 
 interface IProps {
   showMessageBar: typeof showMessageBar;
@@ -139,7 +139,7 @@ class Widget extends React.Component<
   }
 }
 
-const mapStateToProps = ({ siteInfo }: IApplicationState) => ({ siteInfo });
+const mapStateToProps = () => ({});
 
 const mapDispatchToProps = { showMessageBar };
 
