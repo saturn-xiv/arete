@@ -1,11 +1,11 @@
 FROM alpine:latest
 
 RUN apk update
-RUN apk add sudo bash \
+RUN apk add sudo bash pwgen \
   git pkgconf openssl-dev \
-  python make cmake curl \
-  ca-certificates gcc \
-  musl-dev libcdr-dev zeromq-dev libpq perl \
+  python perl make cmake curl \
+  ca-certificates build-base \
+  musl-dev zeromq-dev postgresql-dev \
   nodejs npm 
 
 # deploy

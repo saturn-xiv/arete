@@ -23,7 +23,8 @@ then
     cargo build --release
 elif [ $1 = 'musl' ]
 then
-    RUSTFLAGS="-C target-feature=-crt-static" cargo build --release
+    # https://github.com/rust-lang/cargo/issues/7563
+    PKG_CONFIG_ALL_STATIC=true PQ_LIB_STATIC=true RUSTFLAGS="-C target-feature=-crt-static" cargo build --release
 else
     echo "bad libc type $1"
     exit 2
