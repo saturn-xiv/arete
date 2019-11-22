@@ -20,7 +20,7 @@ fn main() {
         )
         .unwrap();
         let build_time =
-            String::from_utf8(Command::new("date").arg("-R").output().unwrap().stdout).unwrap();
+            String::from_utf8(Command::new("date").arg("-u").output().unwrap().stdout).unwrap();
 
         let dest_path = Path::new(&out_dir).join("env.rs");
         let mut fd = File::create(&dest_path).unwrap();
