@@ -9,11 +9,10 @@ RUN apt -y install apt-utils apt-transport-https wget gnupg software-properties-
   cpio meson intltool libtool gawk texinfo bison bc zsh moreutils tree tzdata \
   libncurses5-dev \  
   net-tools lsof iputils-ping dnsutils psmisc inotify-tools logrotate \
-  musl musl-dev musl-tools llvm clang \
+  llvm clang \
   zip unzip bsdtar telnet git vim pwgen sudo gperf \
   libsodium-dev libpq-dev libmysqlclient-dev libsqlite3-dev libudev-dev liboping-dev libzmq3-dev \
-  libssl-dev libreadline-dev zlib1g-dev \
-  qt5-default qtmultimedia5-dev \
+  libssl-dev libreadline-dev zlib1g-dev \  
   sqlite3 postgresql redis openssh-server nginx supervisor
 
 # RUN add-apt-repository -y ppa:webupd8team/java
@@ -21,10 +20,10 @@ RUN apt -y install apt-utils apt-transport-https wget gnupg software-properties-
 # RUN apt update
 # RUN apt -y install oracle-java8-installer
 
-# RUN wget -O - "https://artifacts.elastic.co/GPG-KEY-elasticsearch" | apt-key add -
-# RUN echo "deb https://artifacts.elastic.co/packages/6.x/apt stable main" > /etc/apt/sources.list.d/elasticsearch.list
-# RUN apt update
-# RUN apt -y install elasticsearch
+RUN wget -O - "https://artifacts.elastic.co/GPG-KEY-elasticsearch" | apt-key add -
+RUN echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" > /etc/apt/sources.list.d/elasticsearch.list
+RUN apt update
+RUN apt -y install elasticsearch
 
 # http://www.rabbitmq.com/which-erlang.html
 # https://www.rabbitmq.com/install-debian.html
@@ -83,30 +82,12 @@ RUN zsh -c "source $HOME/.zshrc \
   && nvm install node \
   && npm install -g yarn"
 
-# ruby
-# ARG RUBY_VERSION="2.6.1"
-# ARG RAILS_VERSION="6.0.0.beta1"
-# RUN git clone https://github.com/rbenv/rbenv.git $HOME/.rbenv
-# RUN echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> $HOME/.zshrc
-# RUN echo 'eval "$(rbenv init -)"' >> $HOME/.zshrc
-# RUN echo 'alias rake="noglob rake"' >> $HOME/.zshrc
-# RUN git clone https://github.com/rbenv/ruby-build.git $HOME/.rbenv/plugins/ruby-build
-# RUN git clone https://github.com/rbenv/rbenv-vars.git $HOME/.rbenv/plugins/rbenv-vars
-# RUN zsh -c "source $HOME/.zshrc \
-#   && rbenv install ${RUBY_VERSION} \
-#   && rbenv global ${RUBY_VERSION} \
-#   && gem install bundler \
-#   && gem install rubocop \
-#   && gem install rails -v ${RAILS_VERSION}"
-
 # rust
 # https://rust-lang.github.io/rustup-components-history/index.html
 RUN curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh -s -- -y
 RUN echo 'source $HOME/.cargo/env' >> $HOME/.zshrc
-RUN zsh -c "source $HOME/.zshrc \
-  && rustup default nightly \
-  && rustup target add x86_64-unknown-linux-musl \
-  && rustup component add rls rust-analysis rust-src rustfmt clippy"
+RUN zsh -c "source $HOME/.zshrc \  
+  && rustup component add rls rust-analysis rust-src"
 
 # arete
 RUN zsh -c "source $HOME/.zshrc \
