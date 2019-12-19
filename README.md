@@ -93,3 +93,5 @@ $ # favicon.ico: 16x16 32x32 64x64
 - [XML Sitemap Validator](https://www.xml-sitemaps.com/validate-xml-sitemap.html)
 - [robots.txt Tester](https://support.google.com/webmasters/answer/6062598?hl=en)
 - [Evernote robust API.](https://dev.evernote.com/)
+- [Actix web is a small, pragmatic, and extremely fast rust web framework](https://github.com/actix/actix-web)
+- [Juniper](https://graphql-rust.github.io/juniper/current/)
