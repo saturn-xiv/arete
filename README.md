@@ -67,6 +67,8 @@ $ # favicon.ico: 16x16 32x32 64x64
 
 - [Create React App](https://create-react-app.dev/docs/adding-typescript)
 - [Fabric React](https://developer.microsoft.com/en-us/fabric#/get-started)
+- [Pluggable enterprise-level react application framework](https://umijs.org/)
+- [Ant Desigh Pro](https://pro.ant.design/docs/getting-started)
 - [Validate.js](https://validatejs.org/#validators)
 - [Third-Party Libraries](https://ant.design/docs/react/recommendation)
 - [A Fast and Flexible Static Site Generator](https://github.com/gohugoio/hugo)
