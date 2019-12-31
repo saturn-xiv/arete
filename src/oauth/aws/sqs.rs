@@ -6,7 +6,7 @@ use rusoto_sqs::{
 
 use super::super::super::{
     errors::Result,
-    queue::{Handler, Queue, Task},
+    queue::{Handler, Task},
 };
 
 /// https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-limits.html
@@ -46,10 +46,8 @@ impl Sqs {
 
         Err(format_err!("can't find queue"))
     }
-}
 
-impl Queue for Sqs {
-    fn publish(&self, queue: String, task: Task) -> Result<()> {
+    pub fn publish(&self, queue: String, task: Task) -> Result<()> {
         self.client
             .send_message(SendMessageRequest {
                 message_body: serde_json::to_string(&task)?,
@@ -59,7 +57,12 @@ impl Queue for Sqs {
             .sync()?;
         Ok(())
     }
-    fn consume(&self, _consumer: String, queue: String, handler: Box<dyn Handler>) -> Result<()> {
+    pub fn consume(
+        &self,
+        _consumer: String,
+        queue: String,
+        handler: Box<dyn Handler>,
+    ) -> Result<()> {
         if let Some(items) = self
             .client
             .receive_message(ReceiveMessageRequest {

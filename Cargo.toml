@@ -50,7 +50,6 @@ rusoto_sqs = "0.42"
 rusoto_s3 = "0.42"
 sodiumoxide = "0.2"
 askama = "0.8"
-lapin = "0.28"
 juniper = "0.14"
 actix-multipart = "0.2"
 actix-files = "0.2"
@@ -71,6 +70,10 @@ actix-web = "2"
 amq-protocol-uri = "3"
 tempfile = "3"
 jsonwebtoken = "7.0.0-alpha.2"
+
+[dependencies.lapin]
+version = "0.28"
+features = ["futures"]
 
 [dependencies.reqwest]
 version = "0.10"

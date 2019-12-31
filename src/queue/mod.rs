@@ -1,5 +1,5 @@
 pub mod mosquitto;
-// pub mod rabbitmq;
+pub mod rabbitmq;
 pub mod zeromq;
 
 use mime::APPLICATION_JSON;
@@ -32,11 +32,6 @@ impl Task {
         }
         Err(format_err!("bad task message type {}", self.content_type))
     }
-}
-
-pub trait Queue: Send + Sync {
-    fn publish(&self, queue: String, task: Task) -> Result<()>;
-    fn consume(&self, consumer: String, queue: String, handler: Box<dyn Handler>) -> Result<()>;
 }
 
 pub trait Handler: Sync + Send {

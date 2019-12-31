@@ -1,18 +1,23 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use amq_protocol_uri::{AMQPAuthority, AMQPUri, AMQPUserInfo};
-use failure::Error as FailureError;
-use futures::{future::Future, Stream};
-use lapin::{
-    message::Delivery,
-    options::{BasicConsumeOptions, BasicPublishOptions, QueueDeclareOptions},
-    types::FieldTable,
-    BasicProperties, Client, ConnectionProperties,
-};
-use tokio::runtime::Runtime;
+// use failure::Error as FailureError;
+// use futures::{future::Future, Stream};
+// use lapin::{
+//     message::Delivery,
+//     options::{BasicConsumeOptions, BasicPublishOptions, QueueDeclareOptions},
+//     types::FieldTable,
+//     BasicProperties, Client, ConnectionProperties,
+// };
+// use tokio::runtime::Runtime;
 
-use super::super::errors::{Error, Result};
-use super::{Handler, Queue};
+use lapin::{
+    message::Delivery, options::*, types::FieldTable, BasicProperties, Channel, Connection,
+    ConnectionProperties, Queue,
+};
+
+use super::super::errors::Result;
+use super::Handler;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -61,99 +66,77 @@ pub struct RabbitMQ {
     conn: ConnectionProperties,
 }
 
-impl Queue for RabbitMQ {
-    fn publish(&self, queue: String, task: super::Task) -> Result<()> {
+impl RabbitMQ {
+    pub async fn open(&self, queue: &String) -> Result<(Channel, Queue)> {
+        let con = Connection::connect_uri(self.uri.clone(), self.conn.clone()).await?;
+        debug!("connected");
+        let ch = con.create_channel().await?;
+        debug!("create channel {}", ch.id());
+        let qu = ch
+            .queue_declare(queue, QueueDeclareOptions::default(), FieldTable::default())
+            .await?;
+        debug!("channel {} declared queue {}", ch.id(), queue);
+        Ok((ch, qu))
+    }
+
+    pub async fn publish(&self, queue: &String, task: super::Task) -> Result<()> {
+        let (ch, _) = self.open(queue).await?;
         info!("publish task {}", task.id);
+        ch.basic_publish(
+            "",
+            queue,
+            BasicPublishOptions::default(),
+            task.payload,
+            BasicProperties::default()
+                .with_message_id((&task.id[..]).into())
+                .with_content_type((&task.content_type[..]).into())
+                .with_timestamp(
+                    SystemTime::now()
+                        .duration_since(UNIX_EPOCH)
+                        .expect("get timestamp")
+                        .as_secs(),
+                ),
+        )
+        .await?;
 
-        let rt = Client::connect_uri(self.uri.clone(), self.conn.clone())
-            .map_err(FailureError::from)
-            .and_then(move |client| client.create_channel().map_err(FailureError::from))
-            .and_then(move |channel| {
-                let id = channel.id();
-                info!("created channel with id: {}", id);
-
-                channel
-                    .queue_declare(
-                        &queue.clone(),
-                        QueueDeclareOptions::default(),
-                        FieldTable::default(),
-                    )
-                    .and_then(move |_| {
-                        info!("channel {} declared queue {}", id, queue);
-                        channel
-                            .basic_publish(
-                                "",
-                                &queue,
-                                task.payload,
-                                BasicPublishOptions::default(),
-                                BasicProperties::default()
-                                    .with_message_id((&task.id[..]).into())
-                                    .with_content_type((&task.content_type[..]).into())
-                                    .with_timestamp(
-                                        SystemTime::now()
-                                            .duration_since(UNIX_EPOCH)
-                                            .expect("get timestamp")
-                                            .as_secs(),
-                                    ),
-                            )
-                            .map(|confirmation| {
-                                info!("publish got confirmation: {:?}", confirmation)
-                            })
-                    })
-                    .map_err(FailureError::from)
-            });
-
-        Runtime::new()?.block_on_all(rt)?;
         Ok(())
     }
 
-    fn consume(
+    pub async fn consume<H: Handler>(
         &self,
-        consumer_name: String,
-        queue_name: String,
-        handler: Box<dyn Handler>,
+        consumer: &String,
+        queue: &String,
+        handler: &H,
     ) -> Result<()> {
-        let rt = Client::connect_uri(self.uri.clone(), self.conn.clone())
-            .map_err(FailureError::from)
-            .and_then(move |client| client.create_channel().map_err(FailureError::from))
-            .and_then(move |channel| {
-                let id = channel.id();
-                info!("created channel with id: {}", id);
-                let c = channel.clone();
-                channel
-                    .queue_declare(
-                        &queue_name.clone(),
-                        QueueDeclareOptions::default(),
-                        FieldTable::default(),
-                    )
-                    .and_then(move |queue| {
-                        info!("channel {} declared queue {:?}", id, queue);
-                        channel.basic_consume(
-                            &queue,
-                            &consumer_name,
-                            BasicConsumeOptions::default(),
-                            FieldTable::default(),
-                        )
-                    })
-                    .and_then(|stream| {
-                        info!("got consumer stream");
-                        stream.for_each(move |message| {
-                            let tag = message.delivery_tag;
-                            if let Err(e) = handle_message(message, &handler) {
-                                error!("failed to handle message: {:?}", e);
-                            }
-                            c.basic_ack(tag, false)
-                        })
-                    })
-                    .map_err(FailureError::from)
-            });
-
-        Runtime::new()?.block_on_all(rt)?;
+        let (ch, qu) = self.open(queue).await?;
+        let consumer = ch
+            .basic_consume(
+                &qu,
+                consumer,
+                BasicConsumeOptions::default(),
+                FieldTable::default(),
+            )
+            .await?;
+        info!("consuming from channel {}...", ch.id());
+        for delivery in consumer {
+            info!("received message: {:?}", delivery);
+            if let Ok(delivery) = delivery {
+                let tag = delivery.delivery_tag;
+                match handle_message(delivery, handler) {
+                    Ok(_) => {
+                        ch.basic_ack(tag, BasicAckOptions::default()).wait()?;
+                    }
+                    Err(e) => {
+                        error!("handler message: {:?}", e);
+                    }
+                }
+            }
+        }
         Ok(())
     }
 }
 
-pub fn handle_message(msg: Delivery, hnd: &Box<dyn Handler>) -> Result<()> {
+pub fn handle_message<H: Handler>(msg: Delivery, hnd: &H) -> Result<()> {
     let props = msg.properties;
     info!("got message: {:?}", props);
 
@@ -167,5 +150,5 @@ pub fn handle_message(msg: Delivery, hnd: &Box<dyn Handler>) -> Result<()> {
         }
     }
 
-    Err(Error::BadTaskMessage.into())
+    Err(format_err!("bad task message"))
 }
