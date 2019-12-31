@@ -38,6 +38,7 @@ extern crate r2d2;
 extern crate r2d2_redis;
 extern crate rand;
 extern crate regex;
+extern crate reqwest;
 extern crate rusoto_core;
 extern crate rusoto_credential;
 extern crate rusoto_s3;
@@ -58,10 +59,18 @@ extern crate zmq;
 #[macro_use]
 pub mod macros;
 
+pub mod cache;
 pub mod crypto;
+pub mod dict;
 pub mod errors;
 pub mod i18n;
+pub mod jwt;
+pub mod oauth;
 pub mod orm;
+pub mod parser;
+pub mod queue;
 pub mod rfc;
 pub mod settings;
+pub mod storage;
 pub mod sys;
+pub mod themes;
