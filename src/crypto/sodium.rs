@@ -7,7 +7,7 @@ use sodiumoxide::{
     randombytes,
 };
 
-use super::super::errors::{Error, Result};
+use super::super::errors::Result;
 use super::Key;
 
 pub struct Crypto {

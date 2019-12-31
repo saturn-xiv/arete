@@ -1,4 +1,3 @@
-use std::io::Cursor;
 use std::result::Result as StdResult;
 
 use failure::{Error as FailureError, Fail};
