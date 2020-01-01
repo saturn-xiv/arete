@@ -1,4 +1,4 @@
-use actix_web::{delete, get, post, web, Responder};
+use actix_web::{delete, get, post, web, HttpResponse, Responder};
 
 #[post("/users/sign-in")]
 async fn sign_in() -> impl Responder {
@@ -62,7 +62,7 @@ async fn change_password() -> impl Responder {
 
 #[get("/users/logs")]
 async fn logs() -> impl Responder {
-    format!("users logs")
+    HttpResponse::Ok().json(())
 }
 
 #[delete("/users/sign-out")]

@@ -11,8 +11,13 @@ use std::net::SocketAddr;
 //     plugins::nut,
 // };
 
+use actix_cors::Cors;
 use actix_session::CookieSession;
-use actix_web::{middleware::Logger, web, App, HttpServer};
+use actix_web::{
+    http::{header, Method},
+    middleware::Logger,
+    web, App, HttpServer,
+};
 use chrono::Duration as ChronoDuration;
 
 use super::super::super::{
@@ -67,10 +72,29 @@ pub async fn launch(cfg: Config) -> Result<()> {
         let key: Result<Vec<u8>> = cfg.secrets.clone().into();
         key?
     };
+    let origin = cfg.http.origin.clone();
 
     HttpServer::new(move || {
         App::new()
             .wrap(Logger::default())
+            .wrap(
+                Cors::new()
+                    .allowed_origin(&origin)
+                    .allowed_methods(vec![
+                        Method::GET,
+                        Method::POST,
+                        Method::PUT,
+                        Method::PATCH,
+                        Method::DELETE,
+                    ])
+                    .allowed_headers(vec![
+                        header::AUTHORIZATION,
+                        header::CONTENT_TYPE,
+                        header::ACCEPT,
+                    ])
+                    .max_age(3600)
+                    .finish(),
+            )
             .wrap(
                 CookieSession::signed(&cookie)
                     .name(NAME)
@@ -81,6 +105,8 @@ pub async fn launch(cfg: Config) -> Result<()> {
             )
             .service(
                 web::scope("/api")
+                    .service(nut::api::install)
+                    .service(nut::api::about)
                     .service(nut::api::users::sign_in)
                     .service(nut::api::users::sign_up)
                     .service(nut::api::users::confirm)
