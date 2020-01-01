@@ -1,6 +1,5 @@
 use std::default::Default;
 use std::fmt;
-use std::ops::Deref;
 use std::time::Duration;
 
 use r2d2_redis::redis::cmd;
@@ -12,9 +11,6 @@ use super::super::errors::Result;
 pub type Connection = r2d2_redis::redis::Connection;
 pub type Pool = r2d2_redis::r2d2::Pool<r2d2_redis::RedisConnectionManager>;
 pub type PooledConnection = r2d2_redis::r2d2::PooledConnection<r2d2_redis::RedisConnectionManager>;
-
-#[database("cache")]
-pub struct Cache(pub Connection);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -49,15 +45,14 @@ impl fmt::Display for Config {
 }
 
 impl super::Provider for Connection {
-    fn get<K, V, F>(&self, key: &K, ttl: Duration, fun: F) -> Result<V>
+    fn get<K, V, F>(&mut self, key: &K, ttl: Duration, fun: F) -> Result<V>
     where
         F: FnOnce() -> Result<V>,
         K: Serialize,
         V: DeserializeOwned + Serialize,
     {
         let key = format!("cache://{}", serde_json::to_string(key)?);
-        let db = self.deref();
-        if let Ok(buf) = cmd("get").arg(&key).query::<Vec<u8>>(db) {
+        if let Ok(buf) = cmd("get").arg(&key).query::<Vec<u8>>(self) {
             if let Ok(val) = serde_json::from_slice(buf.as_slice()) {
                 return Ok(val);
             }
@@ -69,12 +64,12 @@ impl super::Provider for Connection {
             .arg(serde_json::to_vec(&val)?.as_slice())
             .arg("ex")
             .arg(ttl.as_secs())
-            .query(db)?;
+            .query(self)?;
         Ok(val)
     }
-    fn clear(&self) -> Result<()> {
+    fn clear(&mut self) -> Result<()> {
         warn!("clear cache");
-        let rst = cmd("flushdb").query::<String>(self.deref())?;
+        let rst = cmd("flushdb").query::<String>(self)?;
         info!("{}", rst);
         Ok(())
     }

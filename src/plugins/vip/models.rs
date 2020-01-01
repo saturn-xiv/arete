@@ -11,6 +11,7 @@ use super::super::super::{
 use super::schema::vip_members;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub enum Gender {
     Male,
     Female,
@@ -64,6 +65,7 @@ impl Item {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct Contact {
     pub phone: Option<String>,
     pub email: Option<String>,

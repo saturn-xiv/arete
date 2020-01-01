@@ -59,9 +59,11 @@ extern crate zmq;
 #[macro_use]
 pub mod macros;
 
+pub mod app;
 pub mod cache;
 pub mod crypto;
 pub mod dict;
+pub mod env;
 pub mod errors;
 pub mod i18n;
 pub mod jwt;
