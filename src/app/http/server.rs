@@ -1,7 +1,7 @@
 // use std::sync::Arc;
 // use std::thread;
-// use std::time::Duration;
 use std::net::SocketAddr;
+// use std::time::Duration;
 
 // use super::super::super::{
 //     crypto::Crypto,
@@ -11,9 +11,16 @@ use std::net::SocketAddr;
 //     plugins::nut,
 // };
 
-use actix_web::{web, App, HttpServer};
+use actix_session::CookieSession;
+use actix_web::{middleware::Logger, web, App, HttpServer};
+use chrono::Duration as ChronoDuration;
 
-use super::super::super::{env::Config, errors::Result, plugins::nut};
+use super::super::super::{
+    env::{Config, NAME},
+    errors::Result,
+    plugins::nut,
+    storage::fs::FileSystem,
+};
 
 #[actix_rt::main]
 pub async fn launch(cfg: Config) -> Result<()> {
@@ -54,13 +61,24 @@ pub async fn launch(cfg: Config) -> Result<()> {
     //     .attach(Database::fairing())
     //     .attach(Cache::fairing())
     //     .launch();
-    // let mut rt = custom(cfg)
-    // .mount("/3rd", StaticFiles::from("node_modules"))
-    // .mount("/assets", StaticFiles::from("assets"))
-    // .mount("/upload", StaticFiles::from(FileSystem::root()));
 
-    HttpServer::new(|| {
+    let addr = SocketAddr::from(([127, 0, 0, 1], cfg.http.port));
+    let cookie = {
+        let key: Result<Vec<u8>> = cfg.secrets.clone().into();
+        key?
+    };
+
+    HttpServer::new(move || {
         App::new()
+            .wrap(Logger::default())
+            .wrap(
+                CookieSession::signed(&cookie)
+                    .name(NAME)
+                    .http_only(true)
+                    .max_age_time(ChronoDuration::hours(1))
+                    .path("/")
+                    .secure(false),
+            )
             .service(
                 web::scope("/api")
                     .service(nut::api::users::sign_in)
@@ -84,8 +102,11 @@ pub async fn launch(cfg: Config) -> Result<()> {
             .service(nut::html::sitemap_xml_gz)
             .service(nut::html::users::index)
             .service(nut::html::users::show)
+            .service(actix_files::Files::new("/3rd", "node_modules").use_last_modified(true))
+            .service(actix_files::Files::new("/assets", "assets").use_last_modified(true))
+            .service(actix_files::Files::new("/upload", FileSystem::root()).use_last_modified(true))
     })
-    .bind(SocketAddr::from(([127, 0, 0, 1], cfg.http.port)))?
+    .bind(addr)?
     .run()
     .await?;
 
