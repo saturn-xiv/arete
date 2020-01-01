@@ -5,11 +5,7 @@ pub mod i18n;
 
 use clap::{self, SubCommand};
 
-use super::{
-    env,
-    errors::{Error, Result},
-    parser,
-};
+use super::{env, errors::Result, parser};
 
 pub fn launch() -> Result<()> {
     let cfg = "config.toml";

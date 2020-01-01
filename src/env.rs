@@ -74,8 +74,6 @@ impl Default for Config {
 pub struct Http {
     pub origin: String,
     pub port: u16,
-    pub workers: u16,
-    pub keep_alive: u32,
     pub upload: Upload,
 }
 
@@ -83,8 +81,6 @@ impl Default for Http {
     fn default() -> Self {
         Self {
             port: 8080,
-            workers: 1 << 3,
-            keep_alive: 120,
             upload: Upload::default(),
             origin: "https://www.change-me.com".to_string(),
         }
