@@ -101,7 +101,7 @@ features = ["v4"]
 
 [dependencies.zmq]
 version = "0.9"
-features = ["vendored"]
+# features = ["vendored"]
 
 [dependencies.openssl-sys]
 version = "*"
