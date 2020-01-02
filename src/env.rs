@@ -5,12 +5,11 @@ use std::path::Path;
 
 use chrono::Utc;
 
-use rusoto_core::Region;
 use uuid::Uuid;
 
 use super::{
-    cache::Config as CacheConfig, crypto::Key, errors::Result, oauth::aws,
-    orm::Config as DatabaseConfig, queue::rabbitmq::Config as RabbitMQConfig,
+    cache::Config as CacheConfig, crypto::Key, errors::Result, orm::Config as DatabaseConfig,
+    queue::rabbitmq::Config as RabbitMQConfig,
 };
 
 include!(concat!(env!("OUT_DIR"), "/env.rs"));
@@ -21,7 +20,7 @@ pub const HOMEPAGE: &'static str = env!("CARGO_PKG_HOMEPAGE");
 pub const AUTHORS: &'static str = env!("CARGO_PKG_AUTHORS");
 pub const BANNER: &'static str = include_str!("banner.txt");
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, PartialOrd, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub enum Environment {
     Production,
@@ -39,18 +38,38 @@ impl fmt::Display for Environment {
     }
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub enum Theme {
+    #[serde(rename = "bootstrap")]
+    Bootstrap,
+    #[serde(rename = "bulma")]
+    Bulma,
+    #[serde(rename = "materialize")]
+    Materialize,
+    #[serde(rename = "semantic-ui")]
+    SemanticUi,
+}
+
+impl fmt::Display for Theme {
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Theme::Bootstrap => fmt.write_str("bootstrap"),
+            Theme::SemanticUi => fmt.write_str("semantic-ui"),
+            Theme::Materialize => fmt.write_str("materialize"),
+            Theme::Bulma => fmt.write_str("bulma"),
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Config {
     pub env: Environment,
     pub secrets: Key,
-    pub s3: Option<Region>,
-    pub sqs: Option<Region>,
+    pub http: Http,
     pub database: DatabaseConfig,
     pub cache: CacheConfig,
-    pub rabbitmq: Option<RabbitMQConfig>,
-    pub aws: Option<aws::Credentials>,
-    pub http: Http,
+    pub rabbitmq: RabbitMQConfig,
 }
 
 impl Default for Config {
@@ -60,10 +79,7 @@ impl Default for Config {
             secrets: Key::default(),
             database: DatabaseConfig::default(),
             cache: CacheConfig::default(),
-            rabbitmq: Some(RabbitMQConfig::default()),
-            aws: Some(aws::Credentials::default()),
-            s3: Some(Region::default()),
-            sqs: Some(Region::default()),
+            rabbitmq: RabbitMQConfig::default(),
             http: Http::default(),
         }
     }
@@ -74,6 +90,7 @@ impl Default for Config {
 pub struct Http {
     pub origin: String,
     pub port: u16,
+    pub theme: Theme,
     pub upload: Upload,
 }
 
@@ -83,6 +100,7 @@ impl Default for Http {
             port: 8080,
             upload: Upload::default(),
             origin: "https://www.change-me.com".to_string(),
+            theme: Theme::Bootstrap,
         }
     }
 }
