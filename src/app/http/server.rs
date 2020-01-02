@@ -10,8 +10,10 @@ use actix_web::{
 use chrono::Duration as ChronoDuration;
 
 use super::super::super::{
+    crypto::Crypto,
     env::{Config, NAME},
     errors::Result,
+    jwt::Jwt,
     plugins::nut,
     storage::fs::FileSystem,
 };
@@ -19,8 +21,6 @@ use super::super::super::{
 #[actix_rt::main]
 pub async fn launch(cfg: Config) -> Result<()> {
     let db = cfg.database.open()?;
-    // let jwt = Arc::new(Jwt::new(cfg.secrets.0.clone()));
-    // let enc = Arc::new(Crypto::new(cfg.secrets.clone())?);
 
     info!("start send email thread");
     // {
@@ -48,14 +48,6 @@ pub async fn launch(cfg: Config) -> Result<()> {
     //     });
     // }
 
-    // let err = super::rocket(cfg.rocket()?)
-    //     .manage(jwt)
-    //     .manage(enc)
-    //     .manage(qu)
-    //     .attach(Database::fairing())
-    //     .attach(Cache::fairing())
-    //     .launch();
-
     let addr = SocketAddr::from(([127, 0, 0, 1], cfg.http.port));
     let cookie = {
         let key: Result<Vec<u8>> = cfg.secrets.clone().into();
@@ -63,11 +55,19 @@ pub async fn launch(cfg: Config) -> Result<()> {
     };
     let origin = cfg.http.origin.clone();
     let theme = cfg.http.theme.clone();
+    let jwt = Jwt::new(cfg.secrets.0.clone());
+    let enc = Crypto::new(cfg.secrets.clone())?;
+    let mq = cfg.rabbitmq.open();
+    let che = cfg.cache.open()?;
 
     HttpServer::new(move || {
         App::new()
-            .data(db.clone())
             .data(theme.clone())
+            .data(db.clone())
+            .data(che.clone())
+            .data(enc.clone())
+            .data(jwt.clone())
+            .data(mq.clone())
             .wrap(Logger::default())
             .wrap(
                 Cors::new()

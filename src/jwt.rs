@@ -9,6 +9,7 @@ use super::errors::Result;
 // https://www.ibm.com/support/knowledgecenter/zh/SSEQTP_8.5.5/com.ibm.websphere.wlp.doc/ae/cwlp_jwttoken.html
 // https://jwt.io/
 // https://tools.ietf.org/html/rfc7519
+#[derive(Clone)]
 pub struct Jwt {
     key: String,
 }

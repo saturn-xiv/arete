@@ -1,4 +1,16 @@
+use std::fmt;
+
 use actix_web::{delete, get, post, web, HttpResponse, Responder};
+use validator::Validate;
+
+#[derive(Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
+pub struct SignIn {
+    #[validate(length(min = 1))]
+    pub login: String,
+    #[validate(length(min = 1))]
+    pub password: String,
+}
 
 #[post("/users/sign-in")]
 async fn sign_in() -> impl Responder {
@@ -38,6 +50,35 @@ async fn unlock_by_token(params: web::Path<String>) -> impl Responder {
 #[post("/users/reset-password/{token}")]
 async fn reset_password(params: web::Path<String>) -> impl Responder {
     format!("reset password {}", params)
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub enum Action {
+    SignIn,
+    Confirm,
+    Unlock,
+    ResetPassword,
+}
+
+impl fmt::Display for Action {
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Action::SignIn => fmt.write_str("sign-in"),
+            Action::Confirm => fmt.write_str("confirm"),
+            Action::Unlock => fmt.write_str("unlock"),
+            Action::ResetPassword => fmt.write_str("reset-password"),
+        }
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Token {
+    pub uid: String,
+    pub act: Action,
+    pub nbf: i64,
+    pub exp: i64,
 }
 
 #[get("/users")]

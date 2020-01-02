@@ -10,6 +10,7 @@ use sodiumoxide::{
 use super::super::errors::Result;
 use super::Key;
 
+#[derive(Clone)]
 pub struct Crypto {
     key: secretbox::Key,
 }
