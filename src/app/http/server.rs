@@ -1,15 +1,4 @@
-// use std::sync::Arc;
-// use std::thread;
 use std::net::SocketAddr;
-// use std::time::Duration;
-
-// use super::super::super::{
-//     crypto::Crypto,
-//     env::{self, Config},
-//     errors::Result,
-//     jwt::Jwt,
-//     plugins::nut,
-// };
 
 use actix_cors::Cors;
 use actix_session::CookieSession;
@@ -29,7 +18,7 @@ use super::super::super::{
 
 #[actix_rt::main]
 pub async fn launch(cfg: Config) -> Result<()> {
-    // let db = cfg.database.open()?;
+    let db = cfg.database.open()?;
     // let jwt = Arc::new(Jwt::new(cfg.secrets.0.clone()));
     // let enc = Arc::new(Crypto::new(cfg.secrets.clone())?);
 
@@ -73,9 +62,12 @@ pub async fn launch(cfg: Config) -> Result<()> {
         key?
     };
     let origin = cfg.http.origin.clone();
+    let theme = cfg.http.theme.clone();
 
     HttpServer::new(move || {
         App::new()
+            .data(db.clone())
+            .data(theme.clone())
             .wrap(Logger::default())
             .wrap(
                 Cors::new()
@@ -92,7 +84,8 @@ pub async fn launch(cfg: Config) -> Result<()> {
                         header::CONTENT_TYPE,
                         header::ACCEPT,
                     ])
-                    .max_age(3600)
+                    .supports_credentials()
+                    .max_age(60 * 60)
                     .finish(),
             )
             .wrap(

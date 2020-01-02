@@ -23,10 +23,9 @@ struct BulmaIndex;
 struct SemanticUiIndex;
 
 #[get("/")]
-async fn index() -> Result<impl Responder> {
-    let theme = Theme::Bootstrap;
+async fn index(theme: web::Data<Theme>) -> Result<impl Responder> {
     Ok(__html!(
-        theme,
+        **theme,
         BootstrapIndex,
         BulmaIndex,
         SemanticUiIndex,
