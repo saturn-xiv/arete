@@ -1,4 +1,5 @@
 use std::net::SocketAddr;
+use std::sync::Arc;
 
 use actix_cors::Cors;
 use actix_session::CookieSession;
@@ -11,8 +12,9 @@ use chrono::Duration as ChronoDuration;
 
 use super::super::super::{
     crypto::Crypto,
-    env::{Config, NAME},
+    env::{Config, Environment, NAME},
     errors::Result,
+    graphql,
     jwt::Jwt,
     plugins::nut,
     storage::fs::FileSystem,
@@ -59,6 +61,11 @@ pub async fn launch(cfg: Config) -> Result<()> {
     let enc = Crypto::new(cfg.secrets.clone())?;
     let mq = cfg.rabbitmq.open();
     let che = cfg.cache.open()?;
+    let schema = Arc::new(graphql::Schema::new(
+        graphql::query::Root {},
+        graphql::mutation::Root {},
+    ));
+    let env = cfg.env.clone();
 
     HttpServer::new(move || {
         App::new()
@@ -68,9 +75,10 @@ pub async fn launch(cfg: Config) -> Result<()> {
             .data(enc.clone())
             .data(jwt.clone())
             .data(mq.clone())
+            .data(schema.clone())
             .wrap(Logger::default())
-            .wrap(
-                Cors::new()
+            .wrap(match env {
+                Environment::Production => Cors::new()
                     .allowed_origin(&origin)
                     .allowed_methods(vec![
                         Method::GET,
@@ -86,8 +94,10 @@ pub async fn launch(cfg: Config) -> Result<()> {
                     ])
                     .supports_credentials()
                     .max_age(60 * 60)
+                    .send_wildcard()
                     .finish(),
-            )
+                _ => Cors::default(),
+            })
             .wrap(
                 CookieSession::signed(&cookie)
                     .name(NAME)
@@ -119,11 +129,13 @@ pub async fn launch(cfg: Config) -> Result<()> {
             .service(nut::html::rss)
             .service(nut::html::robots_txt)
             .service(nut::html::sitemap_xml_gz)
-            .service(nut::html::users::index)
-            .service(nut::html::users::show)
+            .service(web::resource(graphql::SOURCE).route(web::post().to(graphql::post)))
+            .service(web::resource("/graphiql").route(web::get().to(graphql::get)))
             .service(actix_files::Files::new("/3rd", "node_modules").use_last_modified(true))
             .service(actix_files::Files::new("/assets", "assets").use_last_modified(true))
             .service(actix_files::Files::new("/upload", FileSystem::root()).use_last_modified(true))
+            .service(nut::html::users::index)
+            .service(nut::html::users::show)
     })
     .bind(addr)?
     .run()
