@@ -1,10 +1,10 @@
+use std::default::Default;
 use std::fmt;
 use std::fs::{create_dir_all, File};
 use std::io::Write;
 use std::path::Path;
 
 use chrono::Utc;
-
 use uuid::Uuid;
 
 use super::{
@@ -26,6 +26,12 @@ pub enum Environment {
     Production,
     Development,
     Test,
+}
+
+impl Default for Environment {
+    fn default() -> Self {
+        Self::Development
+    }
 }
 
 impl fmt::Display for Environment {
@@ -50,6 +56,12 @@ pub enum Theme {
     SemanticUi,
 }
 
+impl Default for Theme {
+    fn default() -> Self {
+        Self::Bootstrap
+    }
+}
+
 impl fmt::Display for Theme {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         match self {
@@ -61,7 +73,7 @@ impl fmt::Display for Theme {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Default, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Config {
     pub env: Environment,
@@ -70,19 +82,6 @@ pub struct Config {
     pub database: DatabaseConfig,
     pub cache: CacheConfig,
     pub rabbitmq: RabbitMQConfig,
-}
-
-impl Default for Config {
-    fn default() -> Self {
-        Self {
-            env: Environment::Development,
-            secrets: Key::default(),
-            database: DatabaseConfig::default(),
-            cache: CacheConfig::default(),
-            rabbitmq: RabbitMQConfig::default(),
-            http: Http::default(),
-        }
-    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
