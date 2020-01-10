@@ -77,6 +77,7 @@ pub async fn launch(cfg: Config) -> Result<()> {
             .data(mq.clone())
             .data(schema.clone())
             .wrap(Logger::default())
+            .data(web::JsonConfig::default().limit(1 << 16))
             .wrap(match env {
                 Environment::Production => Cors::new()
                     .allowed_origin(&origin)

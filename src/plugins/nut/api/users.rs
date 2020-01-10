@@ -96,6 +96,15 @@ async fn profile() -> impl Responder {
     format!("users profile")
 }
 
+#[derive(Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
+pub struct ChangePassword {
+    #[validate(length(min = 1))]
+    pub current_password: String,
+    #[validate(length(min = 6, max = 32))]
+    pub new_password: String,
+}
+
 #[post("/users/change-password")]
 async fn change_password() -> impl Responder {
     format!("users change password")
