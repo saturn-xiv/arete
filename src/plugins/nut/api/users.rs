@@ -13,7 +13,7 @@ use super::super::super::super::{
     i18n::I18n,
     jwt::Jwt,
     orm::Pool as Db,
-    request::{ClientIp, Locale},
+    request::{ClientIp, Locale, Pager, Pagination},
 };
 use super::super::{
     models::{
@@ -164,8 +164,18 @@ pub async fn change_password() -> impl Responder {
 }
 
 #[get("/users/logs")]
-pub async fn logs() -> impl Responder {
-    HttpResponse::Ok().json(())
+pub async fn logs(
+    user: CurrentUser,
+    pag: web::Query<Pager>,
+    db: web::Data<Db>,
+) -> Result<impl Responder> {
+    let db = db.get()?;
+    let db = db.deref();
+
+    let user = user.0.id;
+    let total = LogDao::count(db, user)?;
+    let items = LogDao::all(db, user, pag.offset(total), pag.limit())?;
+    Ok(HttpResponse::Ok().json(Pagination::new(total, pag.size, pag.page, items)))
 }
 
 #[delete("/users/sign-out")]

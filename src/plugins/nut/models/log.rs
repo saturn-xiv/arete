@@ -19,7 +19,8 @@ pub struct Item {
 
 pub trait Dao {
     fn add<S: Into<String>>(&self, user: ID, ip: &String, message: S) -> Result<()>;
-    fn all(&self, user: ID, limit: i64) -> Result<Vec<Item>>;
+    fn all(&self, user: ID, offset: i64, limit: i64) -> Result<Vec<Item>>;
+    fn count(&self, user: ID) -> Result<i64>;
 }
 
 impl Dao for Connection {
@@ -34,12 +35,20 @@ impl Dao for Connection {
         Ok(())
     }
 
-    fn all(&self, user: ID, limit: i64) -> Result<Vec<Item>> {
+    fn all(&self, user: ID, offset: i64, limit: i64) -> Result<Vec<Item>> {
         let items = logs::dsl::logs
             .filter(logs::dsl::user_id.eq(user))
             .order(logs::dsl::created_at.desc())
+            .offset(offset)
             .limit(limit)
             .load::<Item>(self)?;
         Ok(items)
+    }
+    fn count(&self, user: ID) -> Result<i64> {
+        let it = logs::dsl::logs
+            .filter(logs::dsl::user_id.eq(user))
+            .count()
+            .first(self)?;
+        Ok(it)
     }
 }
