@@ -1,7 +1,25 @@
 use std::fmt;
+use std::ops::Deref;
+use std::sync::Arc;
 
 use actix_web::{delete, get, post, web, HttpResponse, Responder};
+use chrono::Duration;
+use diesel::Connection;
+use failure::Error;
 use validator::Validate;
+
+use super::super::super::super::{
+    crypto::Crypto,
+    errors::Result,
+    i18n::I18n,
+    jwt::Jwt,
+    orm::Pool,
+    request::{ClientIp, Locale},
+};
+use super::super::{
+    models::log::Dao as LogDao,
+    models::user::{Dao as UserDao, Item as User},
+};
 
 #[derive(Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
@@ -13,8 +31,67 @@ pub struct SignIn {
 }
 
 #[post("/users/sign-in")]
-async fn sign_in() -> impl Responder {
-    format!("users sign in")
+pub async fn sign_in(
+    form: web::Json<SignIn>,
+    jwt: web::Data<Arc<Jwt>>,
+    db: web::Data<Pool>,
+    remote: ClientIp,
+    lang: Locale,
+) -> Result<impl Responder> {
+    form.validate()?;
+
+    let db = db.get()?;
+    let db = db.deref();
+    let user: Result<User> = match UserDao::by_email(db, &form.login) {
+        Ok(v) => Ok(v),
+        Err(_) => match UserDao::by_nick_name(db, &form.login) {
+            Ok(v) => Ok(v),
+            Err(_) => __i18n_e!(
+                db,
+                &lang.0,
+                "nut.errors.user.is-not-exist",
+                &json!({"login": form.login})
+            ),
+        },
+    };
+    let user = user?;
+
+    if let Err(e) = user.auth::<Crypto>(&form.password) {
+        __i18n_l!(
+            db,
+            user.id,
+            &remote.0,
+            &lang.0,
+            "nut.logs.user.sign-in.failed"
+        )?;
+        return Err(e.into());
+    }
+    user.available()?;
+
+    let uid = user.uid.clone();
+    db.transaction::<_, Error, _>(move || {
+        UserDao::sign_in(db, user.id, &remote.0)?;
+        __i18n_l!(
+            db,
+            user.id,
+            &remote.0,
+            &lang.0,
+            "nut.logs.user.sign-in.success"
+        )?;
+        Ok(())
+    })?;
+    let (nbf, exp) = Jwt::timestamps(Duration::weeks(1));
+    let token = jwt.sum(
+        None,
+        &Token {
+            uid: uid,
+            act: Action::SignIn,
+            nbf: nbf,
+            exp: exp,
+        },
+    )?;
+
+    Ok(HttpResponse::Ok().json(json!({ "token": token })))
 }
 
 #[post("/users/sign-up")]
