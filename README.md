@@ -98,3 +98,5 @@ $ # favicon.ico: 16x16 32x32 64x64
 - [Evernote robust API.](https://dev.evernote.com/)
 - [Actix web is a small, pragmatic, and extremely fast rust web framework](https://github.com/actix/actix-web)
 - [Juniper](https://graphql-rust.github.io/juniper/current/)
+- [1 million+ Stunning Free Images to Use Anywhere](https://pixabay.com/)
+- [famfamfam icons](http://www.famfamfam.com/lab/icons/)
