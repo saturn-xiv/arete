@@ -9,9 +9,9 @@ npm install --save urijs @types/urijs \
     js-cookie  @types/js-cookie \
     jwt-decode @types/jwt-decode \
     @loadable/component @types/loadable__component \
-    redux react-redux \
+    redux react-redux @types/react-redux \
     react-router-dom @types/react-router-dom \
     moment moment-timezone react-moment \
-    react-intl react-quill react-markdown \
+    react-intl react-markdown react-quill \
     emoji-mart google-map-react \
     qrcode.react react-copy-to-clipboard antd
