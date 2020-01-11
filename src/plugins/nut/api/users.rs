@@ -1,4 +1,3 @@
-use std::fmt;
 use std::ops::Deref;
 use std::sync::Arc;
 
@@ -13,12 +12,15 @@ use super::super::super::super::{
     errors::Result,
     i18n::I18n,
     jwt::Jwt,
-    orm::Pool,
+    orm::Pool as Db,
     request::{ClientIp, Locale},
 };
 use super::super::{
-    models::log::Dao as LogDao,
-    models::user::{Dao as UserDao, Item as User},
+    models::{
+        log::Dao as LogDao,
+        user::{Dao as UserDao, Item as User},
+    },
+    request::{Action, CurrentUser, Token},
 };
 
 #[derive(Deserialize, Validate)]
@@ -34,7 +36,7 @@ pub struct SignIn {
 pub async fn sign_in(
     form: web::Json<SignIn>,
     jwt: web::Data<Arc<Jwt>>,
-    db: web::Data<Pool>,
+    db: web::Data<Db>,
     remote: ClientIp,
     lang: Locale,
 ) -> Result<impl Responder> {
@@ -129,43 +131,17 @@ async fn reset_password(params: web::Path<String>) -> impl Responder {
     format!("reset password {}", params)
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
-pub enum Action {
-    SignIn,
-    Confirm,
-    Unlock,
-    ResetPassword,
-}
-
-impl fmt::Display for Action {
-    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Action::SignIn => fmt.write_str("sign-in"),
-            Action::Confirm => fmt.write_str("confirm"),
-            Action::Unlock => fmt.write_str("unlock"),
-            Action::ResetPassword => fmt.write_str("reset-password"),
-        }
-    }
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Token {
-    pub uid: String,
-    pub act: Action,
-    pub nbf: i64,
-    pub exp: i64,
-}
-
 #[get("/users")]
 async fn index() -> impl Responder {
     format!("users index")
 }
 
 #[get("/users/self")]
-async fn self_() -> impl Responder {
-    format!("users self")
+async fn self_(user: CurrentUser) -> impl Responder {
+    let mut it = user.0;
+    it.password = None;
+    it.access_token = None;
+    HttpResponse::Ok().json(it)
 }
 
 #[post("/users/profile")]
@@ -183,16 +159,24 @@ pub struct ChangePassword {
 }
 
 #[post("/users/change-password")]
-async fn change_password() -> impl Responder {
+pub async fn change_password() -> impl Responder {
     format!("users change password")
 }
 
 #[get("/users/logs")]
-async fn logs() -> impl Responder {
+pub async fn logs() -> impl Responder {
     HttpResponse::Ok().json(())
 }
 
 #[delete("/users/sign-out")]
-async fn sign_out() -> impl Responder {
-    format!("users sign-out")
+pub async fn sign_out(
+    user: CurrentUser,
+    lang: Locale,
+    remote: ClientIp,
+    db: web::Data<Db>,
+) -> Result<impl Responder> {
+    let db = db.get()?;
+    let db = db.deref();
+    __i18n_l!(db, user.0.id, &remote.0, &lang.0, "nut.logs.user.sign-out")?;
+    Ok(HttpResponse::Ok().json(()))
 }

@@ -36,7 +36,7 @@ impl fmt::Display for Type {
     }
 }
 
-#[derive(Queryable, Serialize, Debug, Clone)]
+#[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Item {
     pub id: ID,
