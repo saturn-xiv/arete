@@ -36,7 +36,7 @@ impl fmt::Display for Type {
     }
 }
 
-#[derive(Queryable, Serialize, Clone)]
+#[derive(Queryable, Serialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Item {
     pub id: ID,
@@ -60,6 +60,12 @@ pub struct Item {
     pub version: ID,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
+}
+
+impl fmt::Display for Item {
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        write!(fmt, "{}<{}>", self.real_name, self.email)
+    }
 }
 
 impl Item {
