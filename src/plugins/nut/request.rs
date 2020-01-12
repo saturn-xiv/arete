@@ -39,6 +39,7 @@ impl fmt::Display for Action {
 #[serde(rename_all = "camelCase")]
 pub struct Token {
     pub uid: String,
+    pub sub: String,
     pub act: Action,
     pub nbf: i64,
     pub exp: i64,
@@ -62,10 +63,7 @@ impl CurrentUser {
         let db = db.get()?;
         let db = db.deref();
         let user = UserDao::by_uid(db, &token.claims.uid)?;
-        // FIXME
-        // if !user.available() {
-        //     return Err(format_err!("user isn't available"));
-        // }
+        user.available()?;
         Ok(user)
     }
 }

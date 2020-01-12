@@ -71,6 +71,7 @@ pub async fn sign_in(
     user.available()?;
 
     let uid = user.uid.clone();
+    let name = user.real_name.clone();
     db.transaction::<_, Error, _>(move || {
         UserDao::sign_in(db, user.id, &remote.0)?;
         __i18n_l!(
@@ -87,6 +88,7 @@ pub async fn sign_in(
         None,
         &Token {
             uid: uid,
+            sub: name,
             act: Action::SignIn,
             nbf: nbf,
             exp: exp,
