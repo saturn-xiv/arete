@@ -11,7 +11,7 @@ npm install --save urijs @types/urijs \
     @loadable/component @types/loadable__component \
     redux react-redux @types/react-redux \
     react-router-dom @types/react-router-dom \
-    moment moment-timezone react-moment \
+    moment moment-timezone react-moment @types/moment-timezone \
     react-intl react-markdown react-quill \
     emoji-mart google-map-react \
     qrcode.react react-copy-to-clipboard antd
