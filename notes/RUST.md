@@ -1,23 +1,21 @@
 ## Rust
 
--   Install rustup
+- Install rustup
 
 ```bash
-curl https://sh.rustup.rs -sSf | sh
+$ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
--   Add to ~/.zshrc
+- Add to ~/.zshrc
 
 ```bash
-source $HOME/.cargo/env
-export RUSTFLAGS="-Aproc-macro-derive-resolution-fallback" # https://github.com/diesel-rs/diesel/issues/1785
+$ source $HOME/.cargo/env
 ```
 
--   Re-login at first
+- Re-login at first
 
--   Install rust
+- Install rust
 
 ```bash
-rustup override set nightly
-rustup component add rustfmt rls-preview rust-analysis rust-src clippy
+$ rustup component add rustfmt rls rust-analysis rust-src clippy
 ```
