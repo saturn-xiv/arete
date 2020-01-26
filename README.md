@@ -57,6 +57,7 @@ $ # favicon.ico: 16x16 32x32 64x64
 - [Ansible](https://github.com/VSChina/vscode-ansible)
 - [Better Toml](https://github.com/bungcip/better-toml)
 - [Prettier - Code formatter](https://github.com/prettier/prettier-vscode)
+- [SQL Formatter](https://github.com/kufii/vscode-sql-formatter)
 
 ### Mock test
 
