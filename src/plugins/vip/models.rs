@@ -49,6 +49,7 @@ pub struct Item {
     pub gender: String,
     pub birthday: NaiveDate,
     pub contact: String,
+    pub point: i64,
     pub version: ID,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
@@ -98,6 +99,7 @@ pub trait Dao {
     ) -> Result<()>;
     fn list(&self) -> Result<Vec<Item>>;
     fn delete(&self, id: ID) -> Result<()>;
+    fn point(&self, id: ID, v: i64) -> Result<()>;
 }
 
 impl Dao for Connection {
@@ -155,6 +157,21 @@ impl Dao for Connection {
             .order(vip_members::dsl::nick_name.asc())
             .load::<Item>(self)?;
         Ok(items)
+    }
+    fn point(&self, id: ID, v: i64) -> Result<()> {
+        let now = Utc::now().naive_utc();
+        let point = vip_members::dsl::vip_members
+            .select(vip_members::dsl::point)
+            .filter(vip_members::dsl::id.eq(id))
+            .first::<i64>(self)?;
+        let it = vip_members::dsl::vip_members.filter(vip_members::dsl::id.eq(id));
+        update(it)
+            .set((
+                vip_members::dsl::point.eq(point + v),
+                vip_members::dsl::updated_at.eq(&now),
+            ))
+            .execute(self)?;
+        Ok(())
     }
     fn delete(&self, id: ID) -> Result<()> {
         delete(vip_members::dsl::vip_members.filter(vip_members::dsl::id.eq(id))).execute(self)?;

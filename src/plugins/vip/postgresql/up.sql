@@ -5,7 +5,7 @@ CREATE TABLE vip_members(
     gender VARCHAR(16) NOT NULL,
     birthday DATE NOT NULL,
     contact TEXT NOT NULL,
-    points BIGINT NOT NULL DEFAULT 0,
+    point BIGINT NOT NULL DEFAULT 0,
     version BIGINT NOT NULL DEFAULT 0,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL

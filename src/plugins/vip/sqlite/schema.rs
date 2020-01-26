@@ -6,6 +6,7 @@ table! {
         gender -> Text,
         birthday -> Date,
         contact -> Text,
+        point -> BigInt,
         version -> Integer,
         created_at -> Timestamp,
         updated_at -> Timestamp,
