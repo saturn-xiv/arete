@@ -5,4 +5,3 @@ pub mod nut;
 pub mod ops;
 pub mod survey;
 pub mod vip;
-pub mod wiki;
