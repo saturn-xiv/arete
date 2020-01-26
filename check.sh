@@ -2,10 +2,6 @@
 
 set -e
 
-# echo "Upgrade rust & cargo..."
-# rustup update stable
-# cargo update
-
 echo "Check default features..."
 cargo check
 echo "Build default features..."
