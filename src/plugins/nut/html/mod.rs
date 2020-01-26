@@ -2,36 +2,8 @@ pub mod users;
 
 use actix_web::{get, web, HttpResponse, Responder};
 use askama::Template;
-use mime::TEXT_HTML_UTF_8;
 
-use super::super::super::{env::Theme, errors::Result};
-
-#[derive(Template)]
-#[template(path = "bootstrap/index.html")]
-struct BootstrapIndex;
-
-#[derive(Template)]
-#[template(path = "materialize/index.html")]
-struct MaterializeIndex;
-
-#[derive(Template)]
-#[template(path = "bulma/index.html")]
-struct BulmaIndex;
-
-#[derive(Template)]
-#[template(path = "semantic-ui/index.html")]
-struct SemanticUiIndex;
-
-#[get("/")]
-async fn index(theme: web::Data<Theme>) -> Result<impl Responder> {
-    Ok(__html!(
-        **theme,
-        BootstrapIndex,
-        BulmaIndex,
-        SemanticUiIndex,
-        MaterializeIndex
-    ))
-}
+use super::super::super::errors::Result;
 
 #[get("/rss/{lang}")]
 async fn rss(params: web::Path<String>) -> impl Responder {

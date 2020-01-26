@@ -126,7 +126,6 @@ pub async fn launch(cfg: Config) -> Result<()> {
                     .service(nut::api::users::change_password)
                     .service(nut::api::users::sign_out),
             )
-            .service(nut::html::index)
             .service(nut::html::rss)
             .service(nut::html::robots_txt)
             .service(nut::html::sitemap_xml_gz)
