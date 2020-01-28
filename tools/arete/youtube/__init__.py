@@ -14,15 +14,16 @@ import googleapiclient.discovery
 PUBLIC_PRIVACY = 'public'
 
 
-def walk_upload_playlist(youtube, func):
+def list_channels(youtube):
+    playlists = []
+
     response = youtube.channels().list(
         mine=True,
         part='snippet,contentDetails,statistics',
     ).execute()
 
-    for channel in response['items']:
-        logging.debug("find channel %s" % channel)
-        func(youtube, channel['contentDetails']['relatedPlaylists']['uploads'])
+    logging.debug("find channels %s" % response)
+    return response['items']
 
 
 def __auth(conf):

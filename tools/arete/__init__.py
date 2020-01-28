@@ -4,10 +4,11 @@ import os
 import logging
 
 VIDEO_EXTENSIONS = ['.mp4']
+MAX_RETRIES = 12
 
 
 class Video:
-    def __init__(self, path, playlist, title, description,):
+    def __init__(self, path, playlist, title, description):
         self.title = title
         self.description = description
         self.playlist = playlist
@@ -24,12 +25,17 @@ class Video:
 
 def load_videos(root):
     items = []
-    for playlist in os.listdir(root):
+    playlists = os.listdir(root)
+    playlists.sort()
+    for playlist in playlists:
         desc = open(os.path.join(root, playlist, 'description'),
                     'r').read().strip()
         title = open(os.path.join(root, playlist, 'title'), 'r').read().strip()
         logging.debug("find playlist %s \n %s" % (playlist, desc))
-        for video in os.listdir(os.path.join(root, playlist)):
+
+        videos = os.listdir(os.path.join(root, playlist))
+        videos.sort()
+        for video in videos:
             names = os.path.splitext(video)
             if names[1] in VIDEO_EXTENSIONS:
                 logging.debug("find video file %s" % video)

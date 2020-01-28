@@ -3,7 +3,7 @@
 import logging
 
 from .. import VIDEO_EXTENSIONS, load_videos
-from . import connect, walk_upload_playlist
+from . import connect, list_channels
 
 
 def __list_uploaded(youtube, uploads_playlist_id):
@@ -17,7 +17,7 @@ def __list_uploaded(youtube, uploads_playlist_id):
     while request:
         response = request.execute()
         for item in response['items']:
-            logging.debug("find playlist %s" % item)
+            logging.debug("find playlist item %s" % item)
             title = item['snippet']['title']
             video_id = item['snippet']['resourceId']['videoId']
             logging.info('%s (%s)' % (title, video_id))
@@ -28,4 +28,6 @@ def __list_uploaded(youtube, uploads_playlist_id):
 def start(conf):
     logging.info("fetch all videos in youtube")
     youtube = connect(conf)
-    walk_upload_playlist(youtube, __list_uploaded)
+    for channel in list_channels(youtube):
+        __list_uploaded(
+            youtube, channel['contentDetails']['relatedPlaylists']['uploads'])
