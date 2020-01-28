@@ -101,3 +101,7 @@ $ # favicon.ico: 16x16 32x32 64x64
 - [Juniper](https://graphql-rust.github.io/juniper/current/)
 - [1 million+ Stunning Free Images to Use Anywhere](https://pixabay.com/)
 - [famfamfam icons](http://www.famfamfam.com/lab/icons/)
+- [Python Youtube V3 Quickstart](https://developers.google.com/youtube/v3/quickstart/python)
+- [Code samples for YouTube APIs](https://github.com/youtube/api-samples)
+- [Youtube data api](https://developers.google.com/youtube/v3/docs)
+- [The official Python client library for Google's discovery based APIs.](https://github.com/googleapis/google-api-python-client)
