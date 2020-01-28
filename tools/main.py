@@ -22,28 +22,14 @@ import logging
 import time
 
 import arete.server
-import arete.youtube
-import arete.youku
+import arete.youtube.list
+import arete.youtube.upload
+import arete.youku.list
+import arete.youku.upload
 
 
 CHOICE_UPLOAD = "upload"
 CHOICE_LIST = "list"
-
-
-# ------------------------ youtube -----------------
-
-
-# def youtube_authenticated_service(conf):
-
-
-# def youtube_list(conf):
-
-
-# def youtube_upload(conf, folder):
-#     youtube = youtube_authenticated_service(conf)
-#     logging.info("load videos from %s", folder)
-
-# -------------------------------------
 
 
 if __name__ == '__main__':
@@ -62,13 +48,13 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     if args.youtube == CHOICE_LIST:
-        arete.youtube.list(args.google_client_secrets)
+        arete.youtube.list.start(args.google_client_secrets)
     elif args.youtube == CHOICE_UPLOAD:
-        arete.youtube.upload(args.google_client_secrets, args.work_dir)
+        arete.youtube.upload.start(args.google_client_secrets, args.work_dir)
     elif args.youku == CHOICE_LIST:
-        arete.youku.list(args.credentials)
+        arete.youku.list.start()
     elif args.youku == CHOICE_UPLOAD:
-        arete.youku.upload(args.credentials, args.work_dir)
+        arete.youku.upload.start(args.work_dir)
     elif args.server:
         arete.server.start(args.server)
     else:

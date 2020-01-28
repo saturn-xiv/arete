@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import logging
 import os
 import json
+import logging
 
 
 import google_auth_oauthlib
@@ -14,7 +14,18 @@ import googleapiclient.discovery
 PUBLIC_PRIVACY = 'public'
 
 
-def __sign_in(conf):
+def walk_upload_playlist(youtube, func):
+    response = youtube.channels().list(
+        mine=True,
+        part='snippet,contentDetails,statistics',
+    ).execute()
+
+    for channel in response['items']:
+        logging.debug("find channel %s" % channel)
+        func(youtube, channel['contentDetails']['relatedPlaylists']['uploads'])
+
+
+def __auth(conf):
     cred = os.path.splitext(conf)[0]+'.token'
     if os.path.exists(cred):
         logging.info("load credentials from %s" % cred)
@@ -45,50 +56,11 @@ def __sign_in(conf):
         return credentials
 
 
-def __connect(credentials):
+def connect(conf):
+    cred = __auth(conf)
     return googleapiclient.discovery.build(
         'youtube',
         'v3',
-        credentials=credentials,
+        credentials=cred,
         cache_discovery=False
     )
-
-
-def __list_uploaded(youtube, uploads_playlist_id):
-    request = youtube.playlistItems().list(
-        playlistId=uploads_playlist_id,
-        part='snippet,contentDetails',
-        maxResults=50
-    )
-
-    while request:
-        response = request.execute()
-
-        for item in response['items']:
-            logging.debug("find playlist %s" % item)
-            title = item['snippet']['title']
-            video_id = item['snippet']['resourceId']['videoId']
-            logging.info('%s (%s)' % (title, video_id))
-
-        request = youtube.playlistItems().list_next(request, response)
-
-
-def upload(conf, target):
-    logging.info("upload videos in folder %s to youtube" % target)
-
-
-def list(conf):
-    logging.info("fetch all videos in youtube")
-    cred = __sign_in(conf)
-    youtube = __connect(cred)
-    response = youtube.channels().list(
-        mine=True,
-        part='snippet,contentDetails,statistics',
-    ).execute()
-
-    for channel in response['items']:
-        logging.debug("find channel %s" % channel)
-        __list_uploaded(
-            youtube,
-            channel['contentDetails']['relatedPlaylists']['uploads']
-        )
