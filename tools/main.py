@@ -1,15 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""
-https://github.com/youtube/api-samples/tree/master/python
-
-$ virtualenv -p /usr/bin/python3 tmp/local/python
-$ source tmp/local/python/bin/activate
-$ pip install pyzmq bottle
-$ pip install google-api-python-client google-auth google-auth-oauthlib google-auth-httplib2
-
-"""
 
 import os
 import datetime
