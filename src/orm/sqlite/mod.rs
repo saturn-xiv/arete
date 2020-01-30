@@ -3,8 +3,9 @@ pub mod schema;
 use std::default::Default;
 use std::fmt;
 use std::path::Path;
+use std::time::Duration;
 
-use diesel::{prelude::*, sql_query, sqlite::SqliteConnection};
+use diesel::{connection::SimpleConnection, sqlite::SqliteConnection};
 
 use super::super::errors::Result;
 
@@ -49,7 +50,25 @@ pub fn schema_migrations_exists(name: &str) -> String {
     )
 }
 
-pub fn set_timeout(db: &Connection, timeout: u8) -> Result<()> {
-    sql_query(&format!("PRAGMA busy_timeout = {}", timeout as u16 * 1000)).execute(db)?;
-    Ok(())
+// https://stackoverflow.com/questions/57123453/how-to-use-diesel-with-sqlite-connections-and-avoid-database-is-locked-type-of
+pub trait Pragma {
+    fn busy_timeout(&self, d: Duration) -> Result<()>;
+    fn wal_mode(&self, busy_timeout: Duration) -> Result<()>;
+}
+
+impl Pragma for Connection {
+    fn busy_timeout(&self, d: Duration) -> Result<()> {
+        self.batch_execute(&format!(
+            "PRAGMA foreign_keys = ON; PRAGMA busy_timeout = {};",
+            d.as_micros()
+        ))?;
+        Ok(())
+    }
+    fn wal_mode(&self, busy_timeout: Duration) -> Result<()> {
+        self.batch_execute(&format!(
+            "PRAGMA synchronous = NORMAL; PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON; PRAGMA busy_timeout = {};",
+            busy_timeout.as_micros()
+        ))?;
+        Ok(())
+    }
 }
