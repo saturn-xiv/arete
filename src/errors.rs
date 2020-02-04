@@ -27,4 +27,6 @@ pub enum Error {
     LettreSmtp(#[fail(cause)] lettre::smtp::error::Error),
     #[fail(display = "{}", _0)]
     R2d2(#[fail(cause)] r2d2::Error),
+    #[fail(display = "{}", _0)]
+    Multipart(actix_multipart::MultipartError),
 }
