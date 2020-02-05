@@ -5,7 +5,7 @@ use std::fmt;
 use std::path::Path;
 use std::time::Duration;
 
-use diesel::{connection::SimpleConnection, sqlite::SqliteConnection};
+use diesel::{connection::SimpleConnection, SqliteConnection};
 
 use super::super::errors::Result;
 
@@ -17,6 +17,7 @@ use super::super::errors::Result;
 /// .header 	Display or hide the output table header
 /// .mode 	Select mode for the output table
 /// .dump 	Dump database in SQL text format
+/// pragma compile_options;
 /// SELECT name FROM sqlite_master WHERE type='table' AND name='TABLE_NAME'
 pub type Connection = SqliteConnection;
 pub type ID = i32;
@@ -65,8 +66,9 @@ impl Pragma for Connection {
         Ok(())
     }
     fn wal_mode(&self, busy_timeout: Duration) -> Result<()> {
+        // NORMAL
         self.batch_execute(&format!(
-            "PRAGMA synchronous = NORMAL; PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON; PRAGMA busy_timeout = {};",
+            "PRAGMA synchronous = OFF; PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON; PRAGMA busy_timeout = {};",
             busy_timeout.as_micros()
         ))?;
         Ok(())
