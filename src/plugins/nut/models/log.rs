@@ -18,13 +18,13 @@ pub struct Item {
 }
 
 pub trait Dao {
-    fn add<S: Into<String>>(&self, user: ID, ip: &String, message: S) -> Result<()>;
+    fn add<S: Into<String>>(&self, user: ID, ip: &str, message: S) -> Result<()>;
     fn all(&self, user: ID, offset: i64, limit: i64) -> Result<Vec<Item>>;
     fn count(&self, user: ID) -> Result<i64>;
 }
 
 impl Dao for Connection {
-    fn add<S: Into<String>>(&self, user: ID, ip: &String, message: S) -> Result<()> {
+    fn add<S: Into<String>>(&self, user: ID, ip: &str, message: S) -> Result<()> {
         insert_into(logs::dsl::logs)
             .values((
                 logs::dsl::user_id.eq(user),

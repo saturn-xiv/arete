@@ -60,8 +60,8 @@ pub trait Dao {
         user: ID,
         role: &Role,
         resource: &Option<String>,
-        nbf: &NaiveDate,
-        exp: &NaiveDate,
+        nbf: NaiveDate,
+        exp: NaiveDate,
     ) -> Result<()>;
 }
 
@@ -124,8 +124,8 @@ impl Dao for Connection {
         user: ID,
         role: &Role,
         resource: &Option<String>,
-        nbf: &NaiveDate,
-        exp: &NaiveDate,
+        nbf: NaiveDate,
+        exp: NaiveDate,
     ) -> Result<()> {
         let now = Utc::now().naive_utc();
 
@@ -158,12 +158,9 @@ impl Dao for Connection {
                     .values(&New {
                         user_id: &user,
                         role: &role.to_string(),
-                        resource: match resource {
-                            Some(ref v) => Some(v),
-                            None => None,
-                        },
-                        exp: exp,
-                        nbf: nbf,
+                        resource: resource.as_ref().map(|x| x as _),
+                        exp: &exp,
+                        nbf: &nbf,
                         updated_at: &now,
                     })
                     .execute(self)?;

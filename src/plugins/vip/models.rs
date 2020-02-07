@@ -82,19 +82,19 @@ pub struct Contact {
 pub trait Dao {
     fn add(
         &self,
-        nick_name: &String,
-        real_name: &String,
+        nick_name: &str,
+        real_name: &str,
         gender: &Gender,
-        birthday: &NaiveDate,
+        birthday: NaiveDate,
         contact: &Contact,
     ) -> Result<()>;
     fn get(&self, id: ID) -> Result<Item>;
     fn update(
         &self,
         id: ID,
-        real_name: &String,
+        real_name: &str,
         gender: &Gender,
-        birthday: &NaiveDate,
+        birthday: NaiveDate,
         contact: &Contact,
     ) -> Result<()>;
     fn list(&self) -> Result<Vec<Item>>;
@@ -105,10 +105,10 @@ pub trait Dao {
 impl Dao for Connection {
     fn add(
         &self,
-        nick_name: &String,
-        real_name: &String,
+        nick_name: &str,
+        real_name: &str,
         gender: &Gender,
-        birthday: &NaiveDate,
+        birthday: NaiveDate,
         contact: &Contact,
     ) -> Result<()> {
         let now = Utc::now().naive_utc();
@@ -133,9 +133,9 @@ impl Dao for Connection {
     fn update(
         &self,
         id: ID,
-        real_name: &String,
+        real_name: &str,
         gender: &Gender,
-        birthday: &NaiveDate,
+        birthday: NaiveDate,
         contact: &Contact,
     ) -> Result<()> {
         let now = Utc::now().naive_utc();

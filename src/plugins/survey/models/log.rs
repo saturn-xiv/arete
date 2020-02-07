@@ -18,12 +18,12 @@ pub struct Item {
 }
 
 pub trait Dao {
-    fn add(&self, form: ID, user: Option<ID>, ip: &String, message: &String) -> Result<()>;
+    fn add(&self, form: ID, user: Option<ID>, ip: &str, message: &str) -> Result<()>;
     fn by_form(&self, id: ID) -> Result<Vec<Item>>;
 }
 
 impl Dao for Connection {
-    fn add(&self, form: ID, user: Option<ID>, ip: &String, message: &String) -> Result<()> {
+    fn add(&self, form: ID, user: Option<ID>, ip: &str, message: &str) -> Result<()> {
         let now = Utc::now().naive_utc();
         insert_into(survey_logs::dsl::survey_logs)
             .values((

@@ -26,21 +26,21 @@ pub trait Dao {
     fn add(
         &self,
         user: ID,
-        title: &String,
-        body: &String,
+        title: &str,
+        body: &str,
         media_type: &Mime,
-        tags: &Vec<ID>,
-        categories: &Vec<ID>,
+        tags: &[ID],
+        categories: &[ID],
     ) -> Result<()>;
     fn get(&self, id: ID) -> Result<Item>;
     fn update(
         &self,
         id: ID,
-        title: &String,
-        body: &String,
+        title: &str,
+        body: &str,
         media_type: &Mime,
-        tags: &Vec<ID>,
-        categories: &Vec<ID>,
+        tags: &[ID],
+        categories: &[ID],
     ) -> Result<()>;
     fn latest(&self) -> Result<Vec<Item>>;
     fn by_user(&self, id: ID) -> Result<Vec<Item>>;
@@ -51,11 +51,11 @@ impl Dao for Connection {
     fn add(
         &self,
         user: ID,
-        title: &String,
-        body: &String,
+        title: &str,
+        body: &str,
         media_type: &Mime,
-        _tags: &Vec<ID>,
-        _categories: &Vec<ID>,
+        _tags: &[ID],
+        _categories: &[ID],
     ) -> Result<()> {
         let now = Utc::now().naive_utc();
         insert_into(forum_topics::dsl::forum_topics)
@@ -79,11 +79,11 @@ impl Dao for Connection {
     fn update(
         &self,
         id: ID,
-        title: &String,
-        body: &String,
+        title: &str,
+        body: &str,
         media_type: &Mime,
-        tags: &Vec<ID>,
-        categories: &Vec<ID>,
+        tags: &[ID],
+        categories: &[ID],
     ) -> Result<()> {
         let now = Utc::now().naive_utc();
         let it = forum_topics::dsl::forum_topics.filter(forum_topics::dsl::id.eq(id));

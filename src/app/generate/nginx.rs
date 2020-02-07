@@ -9,10 +9,10 @@ use clap::{App, SubCommand};
 
 use super::super::super::{env::NAME, errors::Result};
 
-pub const COMMAND_NAME: &'static str = "generate:nginx";
-pub const COMMAND_ABOUT: &'static str = "Generate nginx.conf";
-pub const ARG_HTTPS: &'static str = "https";
-pub const ARG_SERVER_NAME: &'static str = "server_name";
+pub const COMMAND_NAME: &str = "generate:nginx";
+pub const COMMAND_ABOUT: &str = "Generate nginx.conf";
+pub const ARG_HTTPS: &str = "https";
+pub const ARG_SERVER_NAME: &str = "server_name";
 
 pub fn command<'a, 'b>() -> App<'a, 'b> {
     SubCommand::with_name(COMMAND_NAME)
@@ -51,8 +51,8 @@ pub fn run(domain: String, port: u16, ssl: bool) -> Result<()> {
     let tpl = Config {
         domain: &domain,
         name: NAME,
-        port: port,
-        ssl: ssl,
+        port,
+        ssl,
         root: &format!("{}", cur.display()),
     }
     .render()?;

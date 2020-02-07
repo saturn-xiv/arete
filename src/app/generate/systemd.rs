@@ -13,8 +13,8 @@ use super::super::super::{
     errors::Result,
 };
 
-pub const COMMAND_NAME: &'static str = "generate:systemd";
-pub const COMMAND_ABOUT: &'static str = "Generate systemd service.conf";
+pub const COMMAND_NAME: &str = "generate:systemd";
+pub const COMMAND_ABOUT: &str = "Generate systemd service.conf";
 
 #[derive(Template)]
 #[template(path = "systemd.conf", escape = "none")]

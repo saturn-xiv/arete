@@ -95,14 +95,14 @@ impl fmt::Display for Cidr {
         if self.0 > Self::MAX {
             return Err(fmt::Error);
         }
-        let mask: u64 = (0xffffffff >> (Self::MAX - self.0)) << (Self::MAX - self.0);
+        let mask: u64 = (0xffff_ffff >> (Self::MAX - self.0)) << (Self::MAX - self.0);
         write!(
             f,
             "{}.{}.{}.{}",
-            (0xff000000 & mask) >> 24,
-            (0x00ff0000 & mask) >> 16,
-            (0x0000ff00 & mask) >> 8,
-            (0x000000ff & mask)
+            (0xff00_0000 & mask) >> 24,
+            (0x00ff_0000 & mask) >> 16,
+            (0x0000_ff00 & mask) >> 8,
+            (0x0000_00ff & mask)
         )
     }
 }

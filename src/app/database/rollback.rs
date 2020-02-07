@@ -7,7 +7,7 @@ use super::super::super::{
     orm::{migration::Dao, Connection},
 };
 
-pub const COMMAND_NAME: &'static str = "database:rollback";
+pub const COMMAND_NAME: &str = "database:rollback";
 
 pub fn command<'a, 'b>() -> App<'a, 'b> {
     SubCommand::with_name(COMMAND_NAME).about("Rollback database the last migration")

@@ -24,22 +24,14 @@ pub struct Item {
 
 pub trait Dao {
     fn by_id(&self, id: ID) -> Result<Item>;
-    fn create(
-        &self,
-        lang: &String,
-        label: &String,
-        href: &String,
-        loc: &String,
-        x: i16,
-        y: i16,
-    ) -> Result<()>;
+    fn create(&self, lang: &str, label: &str, href: &str, loc: &str, x: i16, y: i16) -> Result<()>;
     fn update(
         &self,
         id: ID,
-        lang: &String,
-        label: &String,
-        href: &String,
-        loc: &String,
+        lang: &str,
+        label: &str,
+        href: &str,
+        loc: &str,
         x: i16,
         y: i16,
     ) -> Result<()>;
@@ -54,15 +46,7 @@ impl Dao for Connection {
             .first::<Item>(self)?;
         Ok(it)
     }
-    fn create(
-        &self,
-        lang: &String,
-        label: &String,
-        href: &String,
-        loc: &String,
-        x: i16,
-        y: i16,
-    ) -> Result<()> {
+    fn create(&self, lang: &str, label: &str, href: &str, loc: &str, x: i16, y: i16) -> Result<()> {
         let now = Utc::now().naive_utc();
         insert_into(links::dsl::links)
             .values((
@@ -81,10 +65,10 @@ impl Dao for Connection {
     fn update(
         &self,
         id: ID,
-        lang: &String,
-        label: &String,
-        href: &String,
-        loc: &String,
+        lang: &str,
+        label: &str,
+        href: &str,
+        loc: &str,
         x: i16,
         y: i16,
     ) -> Result<()> {

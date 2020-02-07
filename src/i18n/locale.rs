@@ -35,16 +35,16 @@ pub struct File<'a> {
 }
 
 pub trait Dao {
-    fn sync(&self, files: &Vec<File>) -> Result<(usize, usize)>;
+    fn sync(&self, files: &[File]) -> Result<(usize, usize)>;
     fn languages(&self) -> Result<Vec<String>>;
-    fn count(&self, lang: &String) -> Result<i64>;
+    fn count(&self, lang: &str) -> Result<i64>;
     fn all(&self) -> Result<Vec<Item>>;
-    fn by_lang(&self, lang: &String) -> Result<Vec<Item>>;
+    fn by_lang(&self, lang: &str) -> Result<Vec<Item>>;
     fn by_id(&self, id: ID) -> Result<Item>;
-    fn by_lang_and_code(&self, lang: &String, code: &String) -> Result<Item>;
+    fn by_lang_and_code(&self, lang: &str, code: &str) -> Result<Item>;
     fn delete(&self, id: ID) -> Result<()>;
-    fn create(&self, lang: &String, code: &String, message: &String) -> Result<()>;
-    fn update(&self, id: ID, code: &String, message: &String) -> Result<()>;
+    fn create(&self, lang: &str, code: &str, message: &str) -> Result<()>;
+    fn update(&self, id: ID, code: &str, message: &str) -> Result<()>;
 }
 
 fn loop_yaml(
@@ -112,7 +112,7 @@ fn loop_yaml(
 }
 
 impl Dao for Connection {
-    fn sync(&self, items: &Vec<File>) -> Result<(usize, usize)> {
+    fn sync(&self, items: &[File]) -> Result<(usize, usize)> {
         let mut find = 0;
         let mut inserted = 0;
 
@@ -135,14 +135,14 @@ impl Dao for Connection {
             .load::<String>(self)?)
     }
 
-    fn count(&self, lang: &String) -> Result<i64> {
+    fn count(&self, lang: &str) -> Result<i64> {
         let cnt: i64 = locales::dsl::locales
             .count()
             .filter(locales::dsl::lang.eq(lang))
             .get_result(self)?;
         Ok(cnt)
     }
-    fn by_lang(&self, lang: &String) -> Result<Vec<Item>> {
+    fn by_lang(&self, lang: &str) -> Result<Vec<Item>> {
         let items = locales::dsl::locales
             .filter(locales::dsl::lang.eq(lang))
             .order(locales::dsl::code.asc())
@@ -161,14 +161,14 @@ impl Dao for Connection {
             .first::<Item>(self)?;
         Ok(it)
     }
-    fn by_lang_and_code(&self, lang: &String, code: &String) -> Result<Item> {
+    fn by_lang_and_code(&self, lang: &str, code: &str) -> Result<Item> {
         let it = locales::dsl::locales
             .filter(locales::dsl::lang.eq(lang))
             .filter(locales::dsl::code.eq(code))
             .first::<Item>(self)?;
         Ok(it)
     }
-    fn update(&self, id: ID, code: &String, message: &String) -> Result<()> {
+    fn update(&self, id: ID, code: &str, message: &str) -> Result<()> {
         let now = Utc::now().naive_utc();
         let it = locales::dsl::locales.filter(locales::dsl::id.eq(id));
         update(it)
@@ -180,13 +180,13 @@ impl Dao for Connection {
             .execute(self)?;
         Ok(())
     }
-    fn create(&self, lang: &String, code: &String, message: &String) -> Result<()> {
+    fn create(&self, lang: &str, code: &str, message: &str) -> Result<()> {
         let now = Utc::now().naive_utc();
         insert_into(locales::dsl::locales)
             .values(&New {
-                lang: lang,
-                code: code,
-                message: message,
+                lang,
+                code,
+                message,
                 updated_at: &now,
             })
             .execute(self)?;

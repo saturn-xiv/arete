@@ -8,7 +8,7 @@ use toml;
 
 use super::super::super::errors::Result;
 
-pub const NAME: &'static str = "generate:config";
+pub const NAME: &str = "generate:config";
 
 pub fn help<P: AsRef<Path>>(file: P) -> String {
     format!("Generate {}", file.as_ref().display())

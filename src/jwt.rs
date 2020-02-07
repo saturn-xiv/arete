@@ -18,7 +18,7 @@ pub struct Jwt {
 
 impl Jwt {
     pub fn new(key: String) -> Self {
-        return Self { key: key };
+        return Self { key };
     }
     pub fn timestamps(ttl: Duration) -> (i64, i64) {
         let nbf = Utc::now().naive_utc();

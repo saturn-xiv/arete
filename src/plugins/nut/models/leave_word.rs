@@ -19,13 +19,13 @@ pub struct Item {
 }
 
 pub trait Dao {
-    fn add(&self, ip: &String, body: &String, media_type: &Mime) -> Result<()>;
+    fn add(&self, ip: &str, body: &str, media_type: &Mime) -> Result<()>;
     fn all(&self, limit: i64) -> Result<Vec<Item>>;
     fn delete(&self, id: ID) -> Result<()>;
 }
 
 impl Dao for Connection {
-    fn add(&self, ip: &String, body: &String, media_type: &Mime) -> Result<()> {
+    fn add(&self, ip: &str, body: &str, media_type: &Mime) -> Result<()> {
         insert_into(leave_words::dsl::leave_words)
             .values((
                 leave_words::dsl::ip.eq(ip),

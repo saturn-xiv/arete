@@ -27,15 +27,15 @@ pub trait Dao {
     fn connect(
         &self,
         user: ID,
-        trusted_ip: &String,
+        trusted_ip: &str,
         trusted_port: i32,
-        remote_ip: &String,
+        remote_ip: &str,
         remote_port: i32,
     ) -> Result<()>;
     fn disconnect(
         &self,
         user: ID,
-        trusted_ip: &String,
+        trusted_ip: &str,
         trusted_port: i32,
         received: i64,
         send: i64,
@@ -53,9 +53,9 @@ impl Dao for Connection {
     fn connect(
         &self,
         user: ID,
-        trusted_ip: &String,
+        trusted_ip: &str,
         trusted_port: i32,
-        remote_ip: &String,
+        remote_ip: &str,
         remote_port: i32,
     ) -> Result<()> {
         insert_into(vpn_logs::dsl::vpn_logs)
@@ -73,7 +73,7 @@ impl Dao for Connection {
     fn disconnect(
         &self,
         user: ID,
-        trusted_ip: &String,
+        trusted_ip: &str,
         trusted_port: i32,
         received: i64,
         send: i64,

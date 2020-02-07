@@ -13,7 +13,7 @@ use super::super::super::{
     settings,
 };
 
-pub const COMMAND_NAME: &'static str = "database:migrate";
+pub const COMMAND_NAME: &str = "database:migrate";
 
 pub fn command<'a, 'b>() -> App<'a, 'b> {
     SubCommand::with_name(COMMAND_NAME).about("Migrate database to latest migration")

@@ -19,7 +19,7 @@ impl Crypto {
     pub fn new(key: Key) -> Result<Self> {
         let key: Result<Vec<u8>> = key.into();
         match secretbox::Key::from_slice(&key?) {
-            Some(key) => Ok(Self { key: key }),
+            Some(key) => Ok(Self { key }),
             None => Err(format_err!("bad secret key")),
         }
     }

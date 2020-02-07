@@ -13,7 +13,7 @@ use mime::{APPLICATION_JSON, TEXT_HTML_UTF_8};
 
 pub type Schema = RootNode<'static, query::Root, mutation::Root>;
 
-pub const SOURCE: &'static str = "/graphql";
+pub const SOURCE: &str = "/graphql";
 
 pub async fn get() -> HttpResponse {
     let html = graphiql_source(SOURCE);

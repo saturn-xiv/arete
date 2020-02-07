@@ -95,7 +95,7 @@ impl Interface {
     pub fn escape(mut self) {
         if let Some((n, w)) = self.wifi {
             match w {
-                Wifi::Psk { ssid, password: _ } => {
+                Wifi::Psk { ssid, .. } => {
                     self.wifi = Some((
                         n,
                         Wifi::Psk {
@@ -137,10 +137,10 @@ impl Interface {
             match e {
                 Ether::Static {
                     address,
-                    netmask: _,
                     gateway,
                     dns1,
                     dns2,
+                    ..
                 } => {
                     eth.insert(
                         Yaml::String("addresses".to_string()),

@@ -39,8 +39,8 @@ pub trait Dao {
     fn add(
         &self,
         form: ID,
-        key: &String,
-        title: &String,
+        key: &str,
+        title: &str,
         description: &Option<String>,
         required: bool,
         type_: &Type,
@@ -50,8 +50,8 @@ pub trait Dao {
     fn update(
         &self,
         id: ID,
-        key: &String,
-        title: &String,
+        key: &str,
+        title: &str,
         description: &Option<String>,
         required: bool,
         type_: &Type,
@@ -66,8 +66,8 @@ impl Dao for Connection {
     fn add(
         &self,
         form: ID,
-        key: &String,
-        title: &String,
+        key: &str,
+        title: &str,
         description: &Option<String>,
         required: bool,
         type_: &Type,
@@ -92,8 +92,8 @@ impl Dao for Connection {
     fn update(
         &self,
         id: ID,
-        key: &String,
-        title: &String,
+        key: &str,
+        title: &str,
         description: &Option<String>,
         required: bool,
         type_: &Type,

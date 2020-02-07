@@ -26,25 +26,25 @@ pub trait Dao {
     fn create(
         &self,
         parent: Option<ID>,
-        name: &String,
-        icon: &String,
-        color: &String,
+        name: &str,
+        icon: &str,
+        color: &str,
         position: i16,
     ) -> Result<()>;
     fn update(
         &self,
         id: ID,
         parent: Option<ID>,
-        name: &String,
-        icon: &String,
-        color: &String,
+        name: &str,
+        icon: &str,
+        color: &str,
         position: i16,
     ) -> Result<()>;
     fn all(&self) -> Result<Vec<Item>>;
     fn delete(&self, id: ID) -> Result<()>;
-    fn bind(&self, categories: &[ID], rty: &String, rid: ID) -> Result<()>;
-    fn unbind(&self, rty: &String, rid: ID) -> Result<()>;
-    fn resources(&self, category: ID, rty: &String) -> Result<Vec<ID>>;
+    fn bind(&self, categories: &[ID], rty: &str, rid: ID) -> Result<()>;
+    fn unbind(&self, rty: &str, rid: ID) -> Result<()>;
+    fn resources(&self, category: ID, rty: &str) -> Result<Vec<ID>>;
     fn children(&self, category: Option<ID>) -> Result<Vec<Item>>;
 }
 
@@ -58,9 +58,9 @@ impl Dao for Connection {
     fn create(
         &self,
         parent: Option<ID>,
-        name: &String,
-        icon: &String,
-        color: &String,
+        name: &str,
+        icon: &str,
+        color: &str,
         position: i16,
     ) -> Result<()> {
         let now = Utc::now().naive_utc();
@@ -81,9 +81,9 @@ impl Dao for Connection {
         &self,
         id: ID,
         parent: Option<ID>,
-        name: &String,
-        icon: &String,
-        color: &String,
+        name: &str,
+        icon: &str,
+        color: &str,
         position: i16,
     ) -> Result<()> {
         let now = Utc::now().naive_utc();
@@ -123,7 +123,7 @@ impl Dao for Connection {
         Ok(())
     }
 
-    fn bind(&self, categories: &[ID], rty: &String, rid: ID) -> Result<()> {
+    fn bind(&self, categories: &[ID], rty: &str, rid: ID) -> Result<()> {
         let now = Utc::now().naive_utc();
         for it in categories {
             insert_into(category_resources::dsl::category_resources)
@@ -137,7 +137,7 @@ impl Dao for Connection {
         }
         Ok(())
     }
-    fn unbind(&self, rty: &String, rid: ID) -> Result<()> {
+    fn unbind(&self, rty: &str, rid: ID) -> Result<()> {
         delete(
             category_resources::dsl::category_resources
                 .filter(category_resources::dsl::resource_type.eq(rty))
@@ -146,7 +146,7 @@ impl Dao for Connection {
         .execute(self)?;
         Ok(())
     }
-    fn resources(&self, category: ID, rty: &String) -> Result<Vec<ID>> {
+    fn resources(&self, category: ID, rty: &str) -> Result<Vec<ID>> {
         let items = category_resources::dsl::category_resources
             .select(category_resources::dsl::resource_id)
             .filter(category_resources::dsl::category_id.eq(category))

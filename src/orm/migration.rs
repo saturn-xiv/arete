@@ -69,7 +69,7 @@ impl<'a> PartialEq for New<'a> {
 }
 
 pub trait Dao {
-    fn load(&self, items: &Vec<New>) -> Result<()>;
+    fn load(&self, items: &[New]) -> Result<()>;
     fn migrate(&self) -> Result<()>;
     fn rollback(&self) -> Result<()>;
     fn versions(&self) -> Result<Vec<Item>>;
@@ -85,13 +85,13 @@ pub struct Table {
 impl Dao for Connection {
     fn check(&self) -> Result<()> {
         let rst = sql_query(schema_migrations_exists("schema_migrations")).load::<Table>(self)?;
-        if rst.len() == 0 {
+        if rst.is_empty() {
             info!("database is empty");
             self.batch_execute(super::UP)?;
         }
         Ok(())
     }
-    fn load(&self, items: &Vec<New>) -> Result<()> {
+    fn load(&self, items: &[New]) -> Result<()> {
         self.check()?;
 
         for it in items {

@@ -28,11 +28,11 @@ pub trait Dao {
         user: ID,
         topic: ID,
         post: Option<ID>,
-        body: &String,
+        body: &str,
         media_type: &Mime,
     ) -> Result<()>;
     fn get(&self, id: ID) -> Result<Item>;
-    fn update(&self, id: ID, body: &String, media_type: &Mime) -> Result<()>;
+    fn update(&self, id: ID, body: &str, media_type: &Mime) -> Result<()>;
     fn latest(&self) -> Result<Vec<Item>>;
     fn by_user(&self, id: ID) -> Result<Vec<Item>>;
     fn by_topic(&self, id: ID) -> Result<Vec<Item>>;
@@ -45,7 +45,7 @@ impl Dao for Connection {
         user: ID,
         topic: ID,
         post: Option<ID>,
-        body: &String,
+        body: &str,
         media_type: &Mime,
     ) -> Result<()> {
         let now = Utc::now().naive_utc();
@@ -67,7 +67,7 @@ impl Dao for Connection {
             .first::<Item>(self)?;
         Ok(it)
     }
-    fn update(&self, id: ID, body: &String, media_type: &Mime) -> Result<()> {
+    fn update(&self, id: ID, body: &str, media_type: &Mime) -> Result<()> {
         let now = Utc::now().naive_utc();
         let it = forum_posts::dsl::forum_posts.filter(forum_posts::dsl::id.eq(id));
         update(it)

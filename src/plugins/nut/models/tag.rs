@@ -21,12 +21,12 @@ pub struct Item {
 
 pub trait Dao {
     fn by_id(&self, id: ID) -> Result<Item>;
-    fn create(&self, name: &String, icon: &String, color: &String) -> Result<()>;
-    fn update(&self, id: ID, name: &String, icon: &String, color: &String) -> Result<()>;
+    fn create(&self, name: &str, icon: &str, color: &str) -> Result<()>;
+    fn update(&self, id: ID, name: &str, icon: &str, color: &str) -> Result<()>;
     fn all(&self) -> Result<Vec<Item>>;
     fn delete(&self, id: ID) -> Result<()>;
-    fn bind(&self, tags: &[ID], rty: &String, rid: ID) -> Result<()>;
-    fn unbind(&self, rty: &String, rid: ID) -> Result<()>;
+    fn bind(&self, tags: &[ID], rty: &str, rid: ID) -> Result<()>;
+    fn unbind(&self, rty: &str, rid: ID) -> Result<()>;
     fn resources(&self, tag: ID) -> Result<Vec<(String, ID)>>;
 }
 
@@ -37,7 +37,7 @@ impl Dao for Connection {
             .first::<Item>(self)?;
         Ok(it)
     }
-    fn create(&self, name: &String, icon: &String, color: &String) -> Result<()> {
+    fn create(&self, name: &str, icon: &str, color: &str) -> Result<()> {
         let now = Utc::now().naive_utc();
         insert_into(tags::dsl::tags)
             .values((
@@ -50,7 +50,7 @@ impl Dao for Connection {
         Ok(())
     }
 
-    fn update(&self, id: ID, name: &String, icon: &String, color: &String) -> Result<()> {
+    fn update(&self, id: ID, name: &str, icon: &str, color: &str) -> Result<()> {
         let now = Utc::now().naive_utc();
         update(tags::dsl::tags.filter(tags::dsl::id.eq(id)))
             .set((
@@ -77,7 +77,7 @@ impl Dao for Connection {
         Ok(())
     }
 
-    fn bind(&self, tags: &[ID], rty: &String, rid: ID) -> Result<()> {
+    fn bind(&self, tags: &[ID], rty: &str, rid: ID) -> Result<()> {
         let now = Utc::now().naive_utc();
         for it in tags {
             insert_into(tag_resources::dsl::tag_resources)
@@ -92,7 +92,7 @@ impl Dao for Connection {
         Ok(())
     }
 
-    fn unbind(&self, rty: &String, rid: ID) -> Result<()> {
+    fn unbind(&self, rty: &str, rid: ID) -> Result<()> {
         delete(
             tag_resources::dsl::tag_resources
                 .filter(tag_resources::dsl::resource_type.eq(rty))

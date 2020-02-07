@@ -4,12 +4,12 @@ use super::super::super::super::orm::ID;
 
 #[get("/leave-words")]
 async fn index() -> impl Responder {
-    format!("leave-words index")
+    "leave-words index"
 }
 
 #[post("/leave-words")]
 async fn create() -> impl Responder {
-    format!("leave-words index")
+    "leave-words index"
 }
 
 #[delete("/leave-words/{id}")]

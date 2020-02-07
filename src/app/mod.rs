@@ -27,19 +27,22 @@ pub fn launch() -> Result<()> {
         .subcommand(SubCommand::with_name(http::routes::NAME).about(http::routes::ABOUT))
         .get_matches();
 
-    if let Some(_) = matches.subcommand_matches(http::routes::NAME) {
+    if matches.subcommand_matches(http::routes::NAME).is_some() {
         return http::routes::run();
     }
 
     log4rs::init_file("log4rs.yml", Default::default())?;
-    if let Err(_) = sodiumoxide::init() {
+    if sodiumoxide::init().is_err() {
         return Err(format_err!("sodium init failed"));
     }
 
-    if let Some(_) = matches.subcommand_matches(generate::config::NAME) {
+    if matches.subcommand_matches(generate::config::NAME).is_some() {
         return generate::config::run::<&'static str, env::Config>(cfg);
     }
-    if let Some(_) = matches.subcommand_matches(generate::systemd::COMMAND_NAME) {
+    if matches
+        .subcommand_matches(generate::systemd::COMMAND_NAME)
+        .is_some()
+    {
         return generate::systemd::run();
     }
 
@@ -55,21 +58,33 @@ pub fn launch() -> Result<()> {
         );
     }
 
-    if let Some(_) = matches.subcommand_matches(i18n::sync::COMMAND_NAME) {
+    if matches
+        .subcommand_matches(i18n::sync::COMMAND_NAME)
+        .is_some()
+    {
         return i18n::sync::run(cfg);
     }
 
-    if let Some(_) = matches.subcommand_matches(database::migrate::COMMAND_NAME) {
+    if matches
+        .subcommand_matches(database::migrate::COMMAND_NAME)
+        .is_some()
+    {
         let db = cfg.database.open()?;
         let db = db.get()?;
         return database::migrate::run(&db);
     }
-    if let Some(_) = matches.subcommand_matches(database::rollback::COMMAND_NAME) {
+    if matches
+        .subcommand_matches(database::rollback::COMMAND_NAME)
+        .is_some()
+    {
         let db = cfg.database.open()?;
         let db = db.get()?;
         return database::rollback::run(&db);
     }
-    if let Some(_) = matches.subcommand_matches(database::status::COMMAND_NAME) {
+    if matches
+        .subcommand_matches(database::status::COMMAND_NAME)
+        .is_some()
+    {
         let db = cfg.database.open()?;
         let db = db.get()?;
         return database::status::run(&db);

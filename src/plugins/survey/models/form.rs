@@ -38,20 +38,20 @@ pub trait Dao {
     fn add(
         &self,
         user: ID,
-        title: &String,
-        description: &String,
-        nbf: &NaiveDate,
-        exp: &NaiveDate,
+        title: &str,
+        description: &str,
+        nbf: NaiveDate,
+        exp: NaiveDate,
         type_: &Type,
     ) -> Result<()>;
 
     fn update(
         &self,
         id: ID,
-        title: &String,
-        description: &String,
-        nbf: &NaiveDate,
-        exp: &NaiveDate,
+        title: &str,
+        description: &str,
+        nbf: NaiveDate,
+        exp: NaiveDate,
     ) -> Result<()>;
     fn get(&self, id: ID) -> Result<Item>;
     fn delete(&self, id: ID) -> Result<()>;
@@ -62,10 +62,10 @@ impl Dao for Connection {
     fn add(
         &self,
         user: ID,
-        title: &String,
-        description: &String,
-        nbf: &NaiveDate,
-        exp: &NaiveDate,
+        title: &str,
+        description: &str,
+        nbf: NaiveDate,
+        exp: NaiveDate,
         type_: &Type,
     ) -> Result<()> {
         let now = Utc::now().naive_utc();
@@ -86,10 +86,10 @@ impl Dao for Connection {
     fn update(
         &self,
         id: ID,
-        title: &String,
-        description: &String,
-        nbf: &NaiveDate,
-        exp: &NaiveDate,
+        title: &str,
+        description: &str,
+        nbf: NaiveDate,
+        exp: NaiveDate,
     ) -> Result<()> {
         let now = Utc::now().naive_utc();
         let it = survey_forms::dsl::survey_forms.filter(survey_forms::dsl::id.eq(id));

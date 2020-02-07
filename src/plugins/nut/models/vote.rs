@@ -21,13 +21,13 @@ pub struct Item {
 
 pub trait Dao {
     fn all(&self) -> Result<Vec<Item>>;
-    fn by_resource_type(&self, rty: &String) -> Result<Vec<Item>>;
-    fn like(&self, rty: &String, rid: ID, is: bool) -> Result<()>;
+    fn by_resource_type(&self, rty: &str) -> Result<Vec<Item>>;
+    fn like(&self, rty: &str, rid: ID, is: bool) -> Result<()>;
     fn delete(&self, id: ID) -> Result<()>;
 }
 
 impl Dao for Connection {
-    fn like(&self, rty: &String, rid: ID, is: bool) -> Result<()> {
+    fn like(&self, rty: &str, rid: ID, is: bool) -> Result<()> {
         let now = Utc::now().naive_utc();
         match votes::dsl::votes
             .filter(votes::dsl::resource_type.eq(rty))
@@ -69,7 +69,7 @@ impl Dao for Connection {
         Ok(())
     }
 
-    fn by_resource_type(&self, rty: &String) -> Result<Vec<Item>> {
+    fn by_resource_type(&self, rty: &str) -> Result<Vec<Item>> {
         let items = votes::dsl::votes
             .filter(votes::dsl::resource_type.eq(rty))
             .order(votes::dsl::point.desc())

@@ -10,8 +10,8 @@ use super::super::super::{
     i18n::locale::{Dao as LocaleDao, File},
 };
 
-pub const COMMAND_NAME: &'static str = "i18n:sync";
-pub const COMMAND_ABOUT: &'static str = "Sync locale records to database";
+pub const COMMAND_NAME: &str = "i18n:sync";
+pub const COMMAND_ABOUT: &str = "Sync locale records to database";
 
 pub fn command<'a, 'b>() -> App<'a, 'b> {
     SubCommand::with_name(COMMAND_NAME).about(COMMAND_ABOUT)

@@ -70,24 +70,24 @@ impl fmt::Display for Item {
 
 impl Item {
     pub fn available(&self) -> Result<()> {
-        if let Some(_) = self.deleted_at {
+        if self.deleted_at.is_some() {
             return Err(format_err!("user is deleted"));
         }
-        if let Some(_) = self.locked_at {
+        if self.locked_at.is_some() {
             return Err(format_err!("user is locked"));
         }
-        if None == self.confirmed_at {
+        if self.confirmed_at.is_none() {
             return Err(format_err!("user isn't confirmed"));
         }
         Ok(())
     }
-    pub fn auth<E: Password>(&self, password: &String) -> Result<()> {
+    pub fn auth<E: Password>(&self, password: &str) -> Result<()> {
         if let Some(ref v) = self.password {
             if E::verify(v, password.as_bytes()) {
                 return Ok(());
             }
         }
-        return Err(format_err!("bad password"));
+        Err(format_err!("bad password"))
     }
 }
 
@@ -107,24 +107,24 @@ pub struct New<'a> {
 
 pub trait Dao {
     fn by_id(&self, id: ID) -> Result<Item>;
-    fn by_uid(&self, uid: &String) -> Result<Item>;
-    fn by_email(&self, email: &String) -> Result<Item>;
-    fn by_nick_name(&self, nick_name: &String) -> Result<Item>;
-    fn set_profile(&self, id: ID, real_name: &String, logo: &String) -> Result<()>;
-    fn sign_in(&self, id: ID, ip: &String) -> Result<()>;
-    fn google(&self, access_token: &String, token: &IdToken, ip: &String) -> Result<Item>;
+    fn by_uid(&self, uid: &str) -> Result<Item>;
+    fn by_email(&self, email: &str) -> Result<Item>;
+    fn by_nick_name(&self, nick_name: &str) -> Result<Item>;
+    fn set_profile(&self, id: ID, real_name: &str, logo: &str) -> Result<()>;
+    fn sign_in(&self, id: ID, ip: &str) -> Result<()>;
+    fn google(&self, access_token: &str, token: &IdToken, ip: &str) -> Result<Item>;
     fn sign_up<T: Password>(
         &self,
-        real_name: &String,
-        nick_name: &String,
-        email: &String,
-        password: &String,
+        real_name: &str,
+        nick_name: &str,
+        email: &str,
+        password: &str,
     ) -> Result<()>;
     fn lock(&self, id: ID, on: bool) -> Result<()>;
     fn confirm(&self, id: ID) -> Result<()>;
     fn count(&self) -> Result<i64>;
     fn all(&self) -> Result<Vec<Item>>;
-    fn password<T: Password>(&self, id: ID, password: &String) -> Result<()>;
+    fn password<T: Password>(&self, id: ID, password: &str) -> Result<()>;
 }
 
 impl Dao for Connection {
@@ -135,28 +135,28 @@ impl Dao for Connection {
         Ok(it)
     }
 
-    fn by_uid(&self, uid: &String) -> Result<Item> {
+    fn by_uid(&self, uid: &str) -> Result<Item> {
         let it = users::dsl::users
             .filter(users::dsl::uid.eq(uid))
             .first(self)?;
         Ok(it)
     }
 
-    fn by_email(&self, email: &String) -> Result<Item> {
+    fn by_email(&self, email: &str) -> Result<Item> {
         let it = users::dsl::users
             .filter(users::dsl::email.eq(&email.trim().to_lowercase()))
             .first(self)?;
         Ok(it)
     }
 
-    fn by_nick_name(&self, nick_name: &String) -> Result<Item> {
+    fn by_nick_name(&self, nick_name: &str) -> Result<Item> {
         let it = users::dsl::users
             .filter(users::dsl::nick_name.eq(nick_name.trim()))
             .first(self)?;
         Ok(it)
     }
 
-    fn google(&self, access_token: &String, id_token: &IdToken, ip: &String) -> Result<Item> {
+    fn google(&self, access_token: &str, id_token: &IdToken, ip: &str) -> Result<Item> {
         let now = Utc::now().naive_utc();
         let it = match users::dsl::users
             .filter(users::dsl::provider_id.eq(&id_token.sub))
@@ -220,7 +220,7 @@ impl Dao for Connection {
         Err(format_err!(""))
     }
 
-    fn sign_in(&self, id: ID, ip: &String) -> Result<()> {
+    fn sign_in(&self, id: ID, ip: &str) -> Result<()> {
         let now = Utc::now().naive_utc();
         let (current_sign_in_at, current_sign_in_ip, sign_in_count) = users::dsl::users
             .select((
@@ -244,10 +244,10 @@ impl Dao for Connection {
     }
     fn sign_up<T: Password>(
         &self,
-        real_name: &String,
-        nick_name: &String,
-        email: &String,
-        password: &String,
+        real_name: &str,
+        nick_name: &str,
+        email: &str,
+        password: &str,
     ) -> Result<()> {
         let email = email.trim().to_lowercase();
         let nick_name = nick_name.trim();
@@ -282,7 +282,7 @@ impl Dao for Connection {
         Ok(())
     }
 
-    fn set_profile(&self, id: ID, real_name: &String, logo: &String) -> Result<()> {
+    fn set_profile(&self, id: ID, real_name: &str, logo: &str) -> Result<()> {
         let now = Utc::now().naive_utc();
         update(users::dsl::users.filter(users::dsl::id.eq(id)))
             .set((
@@ -318,7 +318,7 @@ impl Dao for Connection {
         Ok(items)
     }
 
-    fn password<T: Password>(&self, id: ID, password: &String) -> Result<()> {
+    fn password<T: Password>(&self, id: ID, password: &str) -> Result<()> {
         let now = Utc::now().naive_utc();
         let password = T::sum(password.as_bytes())?;
         let it = users::dsl::users.filter(users::dsl::id.eq(id));

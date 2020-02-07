@@ -19,26 +19,12 @@ pub struct Item {
 }
 
 pub trait Dao {
-    fn add(
-        &self,
-        form: ID,
-        email: &String,
-        username: &String,
-        ip: &String,
-        content: &String,
-    ) -> Result<()>;
+    fn add(&self, form: ID, email: &str, username: &str, ip: &str, content: &str) -> Result<()>;
     fn by_form(&self, id: ID) -> Result<Vec<Item>>;
 }
 
 impl Dao for Connection {
-    fn add(
-        &self,
-        form: ID,
-        email: &String,
-        username: &String,
-        ip: &String,
-        content: &String,
-    ) -> Result<()> {
+    fn add(&self, form: ID, email: &str, username: &str, ip: &str, content: &str) -> Result<()> {
         let now = Utc::now().naive_utc();
         insert_into(survey_responses::dsl::survey_responses)
             .values((

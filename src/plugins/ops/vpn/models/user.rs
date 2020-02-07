@@ -26,7 +26,7 @@ pub struct Item {
 }
 
 impl Item {
-    pub fn auth<E: Password>(&self, password: &String) -> Result<()> {
+    pub fn auth<E: Password>(&self, password: &str) -> Result<()> {
         if !E::verify(&self.password, password.as_bytes()) {
             return Err(format_err!("bad password"));
         }
@@ -57,27 +57,21 @@ pub struct New<'a> {
 
 pub trait Dao {
     fn by_id(&self, id: ID) -> Result<Item>;
-    fn by_email(&self, email: &String) -> Result<Item>;
+    fn by_email(&self, email: &str) -> Result<Item>;
     fn online(&self, id: ID, on: bool) -> Result<()>;
-    fn enable(&self, id: ID, startup: &NaiveDate, shutdown: &NaiveDate) -> Result<()>;
+    fn enable(&self, id: ID, startup: NaiveDate, shutdown: NaiveDate) -> Result<()>;
     fn add<T: Password>(
         &self,
-        name: &String,
-        email: &String,
-        password: &String,
-        startup: &NaiveDate,
-        shutdown: &NaiveDate,
+        name: &str,
+        email: &str,
+        password: &str,
+        startup: NaiveDate,
+        shutdown: NaiveDate,
     ) -> Result<()>;
     fn lock(&self, id: ID, on: bool) -> Result<()>;
     fn all(&self) -> Result<Vec<Item>>;
-    fn update(
-        &self,
-        id: ID,
-        name: &String,
-        startup: &NaiveDate,
-        shutdown: &NaiveDate,
-    ) -> Result<()>;
-    fn password<T: Password>(&self, id: ID, password: &String) -> Result<()>;
+    fn update(&self, id: ID, name: &str, startup: NaiveDate, shutdown: NaiveDate) -> Result<()>;
+    fn password<T: Password>(&self, id: ID, password: &str) -> Result<()>;
     fn bind(&self, id: ID, ip: &Option<String>) -> Result<()>;
     fn delete(&self, id: ID) -> Result<()>;
 }
@@ -90,7 +84,7 @@ impl Dao for Connection {
         Ok(it)
     }
 
-    fn by_email(&self, email: &String) -> Result<Item> {
+    fn by_email(&self, email: &str) -> Result<Item> {
         let it = vpn_users::dsl::vpn_users
             .filter(vpn_users::dsl::email.eq(&email.trim().to_lowercase()))
             .first(self)?;
@@ -99,19 +93,19 @@ impl Dao for Connection {
 
     fn add<T: Password>(
         &self,
-        name: &String,
-        email: &String,
-        password: &String,
-        startup: &NaiveDate,
-        shutdown: &NaiveDate,
+        name: &str,
+        email: &str,
+        password: &str,
+        startup: NaiveDate,
+        shutdown: NaiveDate,
     ) -> Result<()> {
         let email = email.trim().to_lowercase();
         insert_into(vpn_users::dsl::vpn_users)
             .values(&New {
                 name: name,
                 email: &email,
-                startup: startup,
-                shutdown: shutdown,
+                startup: &startup,
+                shutdown: &shutdown,
                 password: &T::sum(password.as_bytes())?,
                 updated_at: &Utc::now().naive_utc(),
             })
@@ -119,13 +113,7 @@ impl Dao for Connection {
         Ok(())
     }
 
-    fn update(
-        &self,
-        id: ID,
-        name: &String,
-        startup: &NaiveDate,
-        shutdown: &NaiveDate,
-    ) -> Result<()> {
+    fn update(&self, id: ID, name: &str, startup: NaiveDate, shutdown: NaiveDate) -> Result<()> {
         let it = vpn_users::dsl::vpn_users.filter(vpn_users::dsl::id.eq(id));
         update(it)
             .set((
@@ -162,7 +150,7 @@ impl Dao for Connection {
         Ok(())
     }
 
-    fn enable(&self, id: ID, startup: &NaiveDate, shutdown: &NaiveDate) -> Result<()> {
+    fn enable(&self, id: ID, startup: NaiveDate, shutdown: NaiveDate) -> Result<()> {
         let now = Utc::now().naive_utc();
         let it = vpn_users::dsl::vpn_users.filter(vpn_users::dsl::id.eq(id));
         update(it)
@@ -182,7 +170,7 @@ impl Dao for Connection {
         Ok(items)
     }
 
-    fn password<T: Password>(&self, id: ID, password: &String) -> Result<()> {
+    fn password<T: Password>(&self, id: ID, password: &str) -> Result<()> {
         let now = Utc::now().naive_utc();
         let password = T::sum(password.as_bytes())?;
         let it = vpn_users::dsl::vpn_users.filter(vpn_users::dsl::id.eq(id));

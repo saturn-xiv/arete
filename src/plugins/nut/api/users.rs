@@ -66,7 +66,7 @@ pub async fn sign_in(
             &lang.0,
             "nut.logs.user.sign-in.failed"
         )?;
-        return Err(e.into());
+        return Err(e);
     }
     user.available()?;
 
@@ -100,22 +100,22 @@ pub async fn sign_in(
 
 #[post("/users/sign-up")]
 async fn sign_up() -> impl Responder {
-    format!("lang ")
+    "lang "
 }
 
 #[post("/users/confirm")]
 async fn confirm() -> impl Responder {
-    format!("confirm ")
+    "confirm "
 }
 
 #[post("/users/unlock")]
 async fn unlock() -> impl Responder {
-    format!("unlock ")
+    "unlock "
 }
 
 #[post("/users/forgot-password")]
 async fn forgot_password() -> impl Responder {
-    format!("forgot password ")
+    "forgot password "
 }
 
 #[post("/users/confirm/{token}")]
@@ -135,7 +135,7 @@ async fn reset_password(params: web::Path<String>) -> impl Responder {
 
 #[get("/users")]
 async fn index() -> impl Responder {
-    format!("users index")
+    "users index"
 }
 
 #[get("/users/self")]
@@ -148,7 +148,7 @@ async fn self_(user: CurrentUser) -> impl Responder {
 
 #[post("/users/profile")]
 async fn profile() -> impl Responder {
-    format!("users profile")
+    "users profile"
 }
 
 #[derive(Deserialize, Validate)]
@@ -162,7 +162,7 @@ pub struct ChangePassword {
 
 #[post("/users/change-password")]
 pub async fn change_password() -> impl Responder {
-    format!("users change password")
+    "users change password"
 }
 
 #[get("/users/logs")]

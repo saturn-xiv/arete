@@ -1,6 +1,7 @@
 pub mod leave_words;
 pub mod users;
 
+use std::default::Default;
 use std::ops::Deref;
 
 use actix_web::{get, post, web, HttpResponse, Responder};
@@ -45,8 +46,8 @@ pub struct Ok {
     pub created_at: NaiveDateTime,
 }
 
-impl Ok {
-    pub fn new() -> Self {
+impl Default for Ok {
+    fn default() -> Self {
         Self {
             created_at: Utc::now().naive_local(),
         }
