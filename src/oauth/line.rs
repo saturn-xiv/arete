@@ -10,7 +10,7 @@ pub struct Config {
 
 impl Config {
     // https://developers.line.me/en/docs/line-login/login-button/
-    pub fn authorization_url(&self, state: &String, nonce: &String) -> String {
+    pub fn authorization_url(&self, state: &str, nonce: &str) -> String {
         form_urlencoded::Serializer::new(String::from(
             "https://access.line.me/oauth2/v2.1/authorize",
         ))

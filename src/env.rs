@@ -14,11 +14,11 @@ use super::{
 
 include!(concat!(env!("OUT_DIR"), "/env.rs"));
 
-pub const NAME: &'static str = env!("CARGO_PKG_NAME");
-pub const DESCRIPTION: &'static str = env!("CARGO_PKG_DESCRIPTION");
-pub const HOMEPAGE: &'static str = env!("CARGO_PKG_HOMEPAGE");
-pub const AUTHORS: &'static str = env!("CARGO_PKG_AUTHORS");
-pub const BANNER: &'static str = include_str!("banner.txt");
+pub const NAME: &str = env!("CARGO_PKG_NAME");
+pub const DESCRIPTION: &str = env!("CARGO_PKG_DESCRIPTION");
+pub const HOMEPAGE: &str = env!("CARGO_PKG_HOMEPAGE");
+pub const AUTHORS: &str = env!("CARGO_PKG_AUTHORS");
+pub const BANNER: &str = include_str!("banner.txt");
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]

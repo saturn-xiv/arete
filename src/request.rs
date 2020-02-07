@@ -39,10 +39,10 @@ impl<T: Serialize> Pagination<T> {
             page
         };
         Self {
-            size: size,
-            page: page,
-            total: pages,
-            items: items,
+            size,
+            page,
+            total,
+            items,
         }
     }
 }

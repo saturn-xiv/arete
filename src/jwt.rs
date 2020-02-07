@@ -18,7 +18,7 @@ pub struct Jwt {
 
 impl Jwt {
     pub fn new(key: String) -> Self {
-        return Self { key };
+        Self { key }
     }
     pub fn timestamps(ttl: Duration) -> (i64, i64) {
         let nbf = Utc::now().naive_utc();
@@ -36,7 +36,7 @@ impl Jwt {
         )?;
         Ok(token)
     }
-    pub fn parse<T: DeserializeOwned>(&self, token: &String) -> Result<TokenData<T>> {
+    pub fn parse<T: DeserializeOwned>(&self, token: &str) -> Result<TokenData<T>> {
         let mut vat = Validation::new(Algorithm::HS512);
         vat.leeway = 60;
         let val = decode(token, &DecodingKey::from_base64_secret(&self.key)?, &vat)?;

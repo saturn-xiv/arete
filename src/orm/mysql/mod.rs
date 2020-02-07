@@ -11,7 +11,7 @@ use std::fmt;
 pub type Connection = diesel::mysql::MysqlConnection;
 pub type ID = i64;
 
-pub const UP: &'static str = include_str!("up.sql");
+pub const UP: &str = include_str!("up.sql");
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]

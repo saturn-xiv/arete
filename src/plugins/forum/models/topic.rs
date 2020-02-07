@@ -125,4 +125,4 @@ impl Dao for Connection {
     }
 }
 
-pub const RESOURCE_TYPE: &'static str = "forum.topic";
+pub const RESOURCE_TYPE: &str = "forum.topic";

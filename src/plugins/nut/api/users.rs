@@ -87,11 +87,11 @@ pub async fn sign_in(
     let token = jwt.sum(
         None,
         &Token {
-            uid: uid,
+            uid,
             sub: name,
             act: Action::SignIn,
-            nbf: nbf,
-            exp: exp,
+            nbf,
+            exp,
         },
     )?;
 

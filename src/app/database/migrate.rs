@@ -22,7 +22,7 @@ pub fn command<'a, 'b>() -> App<'a, 'b> {
 /// date +"%Y%m%d%H%M%S"
 pub fn run(db: &Connection) -> Result<()> {
     db.transaction::<_, Error, _>(|| {
-        db.load(&vec![
+        db.load(&[
             Migration {
                 name: "create-locales",
                 version: "20190101053014",

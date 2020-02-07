@@ -74,7 +74,7 @@ fn loop_yaml(
                 inserted += 1;
                 insert_into(locales::dsl::locales)
                     .values(&New {
-                        lang: lang,
+                        lang,
                         code: &k,
                         message: &v,
                         updated_at: &Utc::now().naive_utc(),

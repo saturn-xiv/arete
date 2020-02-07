@@ -24,7 +24,7 @@ pub fn run(cfg: Config) -> Result<()> {
     let (inserted, find) = db.transaction::<_, Error, _>(|| {
         LocaleDao::sync(
             db,
-            &vec![
+            &[
                 File {
                     lang: "en-US",
                     body: include_str!("en-US.yml"),

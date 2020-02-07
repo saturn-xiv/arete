@@ -102,7 +102,7 @@ impl Dao for Connection {
         let email = email.trim().to_lowercase();
         insert_into(vpn_users::dsl::vpn_users)
             .values(&New {
-                name: name,
+                name,
                 email: &email,
                 startup: &startup,
                 shutdown: &shutdown,

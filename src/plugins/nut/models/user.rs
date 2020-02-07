@@ -253,8 +253,8 @@ impl Dao for Connection {
         let nick_name = nick_name.trim();
         insert_into(users::dsl::users)
             .values(&New {
-                real_name: real_name,
-                nick_name: nick_name,
+                real_name,
+                nick_name,
                 email: &email,
                 password: Some(&T::sum(password.as_bytes())?),
                 provider_type: &Type::Email.to_string(),

@@ -25,15 +25,10 @@ fn main() {
         let dest_path = Path::new(&out_dir).join("env.rs");
         let mut fd = File::create(&dest_path).unwrap();
 
+        writeln!(fd, r#"pub const VERSION: &str = "{}";"#, git_version.trim()).unwrap();
         writeln!(
             fd,
-            r#"pub const VERSION: &'static str = "{}";"#,
-            git_version.trim()
-        )
-        .unwrap();
-        writeln!(
-            fd,
-            r#"pub const BUILD_TIME: &'static str = "{}";"#,
+            r#"pub const BUILD_TIME: &str = "{}";"#,
             build_time.trim()
         )
         .unwrap();

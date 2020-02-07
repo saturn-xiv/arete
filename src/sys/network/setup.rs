@@ -99,21 +99,17 @@ impl Interface {
                     self.wifi = Some((
                         n,
                         Wifi::Psk {
-                            ssid: ssid,
+                            ssid,
                             password: "".to_string(),
                         },
                     ))
                 }
-                Wifi::Eap {
-                    ssid,
-                    identity,
-                    password: _,
-                } => {
+                Wifi::Eap { ssid, identity, .. } => {
                     self.wifi = Some((
                         n,
                         Wifi::Eap {
-                            ssid: ssid,
-                            identity: identity,
+                            ssid,
+                            identity,
                             password: "".to_string(),
                         },
                     ))

@@ -76,7 +76,7 @@ impl S3 {
         if let Some(items) = self
             .client
             .list_objects_v2(ListObjectsV2Request {
-                bucket: bucket,
+                bucket,
                 start_after: after,
                 ..Default::default()
             })
@@ -96,7 +96,7 @@ impl S3 {
         self.client
             .put_object(PutObjectRequest {
                 acl: Some(acl.to_string()),
-                bucket: bucket,
+                bucket,
                 key: name,
                 body: Some(body.into()),
                 ..Default::default()
@@ -108,7 +108,7 @@ impl S3 {
     pub fn delete_object(&self, bucket: String, name: String) -> Result<()> {
         self.client
             .delete_object(DeleteObjectRequest {
-                bucket: bucket,
+                bucket,
                 key: name,
                 ..Default::default()
             })
