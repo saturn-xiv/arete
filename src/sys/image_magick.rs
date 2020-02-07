@@ -35,7 +35,7 @@ pub fn rotate(src: &PathBuf, degrees: i8, target: &PathBuf) -> Result<()> {
     ))
 }
 
-fn run(cmd: &String) -> Result<()> {
+fn run(cmd: &str) -> Result<()> {
     debug!("{}", cmd);
     let out = Command::new("sh").arg("-c").arg(cmd).output()?;
     debug!("{:?}", out);

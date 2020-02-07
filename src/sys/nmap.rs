@@ -79,7 +79,7 @@ impl FromStr for Cidr {
     type Err = Error;
 
     fn from_str(mask: &str) -> Result<Self> {
-        for i in Self::MIN..Self::MAX + 1 {
+        for i in Self::MIN..=Self::MAX {
             let it = Self(i);
             if it.to_string() == mask {
                 return Ok(it);

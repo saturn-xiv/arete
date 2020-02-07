@@ -107,10 +107,7 @@ impl Dao for Connection {
                     .values(&New {
                         key: &key,
                         value: &val,
-                        salt: match salt {
-                            Some(ref v) => Some(v),
-                            None => None,
-                        },
+                        salt: salt.as_ref().map(|x| x as _),
                         updated_at: &now,
                     })
                     .execute(self)?;

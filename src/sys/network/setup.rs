@@ -97,9 +97,9 @@ impl Interface {
             match w {
                 Wifi::Psk { ssid, password: _ } => {
                     self.wifi = Some((
-                        n.clone(),
+                        n,
                         Wifi::Psk {
-                            ssid: ssid.clone(),
+                            ssid: ssid,
                             password: "".to_string(),
                         },
                     ))
@@ -110,10 +110,10 @@ impl Interface {
                     password: _,
                 } => {
                     self.wifi = Some((
-                        n.clone(),
+                        n,
                         Wifi::Eap {
-                            ssid: ssid.clone(),
-                            identity: identity.clone(),
+                            ssid: ssid,
+                            identity: identity,
                             password: "".to_string(),
                         },
                     ))

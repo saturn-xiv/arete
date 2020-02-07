@@ -39,7 +39,7 @@ impl Client {
         self.queue.reconnect()?;
         Ok(())
     }
-    pub fn send<K: Serialize + Debug>(&self, payload: &K, to: &Vec<String>) -> Result<()> {
+    pub fn send<K: Serialize + Debug>(&self, payload: &K, to: &[String]) -> Result<()> {
         self.queue.connect(None)?;
         for to in to {
             self.queue.publish(
@@ -53,7 +53,7 @@ impl Client {
         Ok(())
     }
 
-    pub fn receive<V, E, H>(&mut self, id: &str, topics: &Vec<String>, hnd: &H) -> Result<()>
+    pub fn receive<V, E, H>(&mut self, id: &str, topics: &[String], hnd: &H) -> Result<()>
     where
         V: DeserializeOwned + Debug,
         E: Debug,

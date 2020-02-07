@@ -68,7 +68,7 @@ pub struct RabbitMQ {
 }
 
 impl RabbitMQ {
-    pub async fn open(&self, queue: &String) -> Result<(Channel, Queue)> {
+    pub async fn open(&self, queue: &str) -> Result<(Channel, Queue)> {
         let con = Connection::connect_uri(self.uri.clone(), self.conn.clone()).await?;
         debug!("connected");
         let ch = con.create_channel().await?;
@@ -80,7 +80,7 @@ impl RabbitMQ {
         Ok((ch, qu))
     }
 
-    pub async fn publish(&self, queue: &String, task: super::Task) -> Result<()> {
+    pub async fn publish(&self, queue: &str, task: super::Task) -> Result<()> {
         let (ch, _) = self.open(queue).await?;
         info!("publish task {}", task.id);
         ch.basic_publish(
@@ -105,8 +105,8 @@ impl RabbitMQ {
 
     pub async fn consume<H: Handler>(
         &self,
-        consumer: &String,
-        queue: &String,
+        consumer: &str,
+        queue: &str,
         handler: &H,
     ) -> Result<()> {
         let (ch, qu) = self.open(queue).await?;
