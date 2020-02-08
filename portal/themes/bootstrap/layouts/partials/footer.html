@@ -4,10 +4,10 @@
     </p>
     <p>
         &copy; {{.Site.Copyright}}
+        {{ range .Site.Menus.footer }}
         &middot;
-        <a href="#">Privacy</a>
-        &middot;
-        <a href="#">Terms</a>
+        <a href="{{ .URL }}">{{ .Title }}</a>
+        {{ end }}
         &middot;
         <a rel="license" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
             <img alt="Creative Commons License" style="border-width:0"
