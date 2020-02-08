@@ -6,3 +6,9 @@ other = "Search"
 
 [HeaderSwitchLanguage]
 other = "Sitch language"
+
+[SinglePageBy]
+other = "by"
+
+[ListPageMore]
+other = "View details"

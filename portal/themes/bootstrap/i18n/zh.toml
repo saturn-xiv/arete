@@ -6,3 +6,9 @@ other = "搜索"
 
 [HeaderSwitchLanguage]
 other = "切换语言"
+
+[SinglePageBy]
+other = "作者:"
+
+[ListPageMore]
+other = "详细信息"

@@ -1,7 +1,17 @@
 {{ define "main" }}
 
-{{ range .Data.Pages }}
-<h1><a href={{ .Permalink }}>{{ .Title }}</a></h1>
-{{ end }}
+<div class="row">
+    {{ range .Data.Pages }}
+    <div class="col-md-4">
+        <h2>{{ .Title }}</h2>
+        <p>{{ .Summary }}</p>
+        <p>
+            <a class="btn btn-secondary" href="{{ .Permalink }}" role="button">
+                {{i18n "ListPageMore"}} &raquo;
+            </a>
+        </p>
+    </div>
+    {{ end }}
+</div>
 
 {{end}}

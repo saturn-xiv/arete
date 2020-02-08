@@ -1,7 +1,11 @@
 {{ define "main" }}
 
-<h1>{{ .Title }}</h1>
-<h2>{{ .Date.Format "Sun, Feb 11, 2018" }}</h2>
-{{ .Content }}
+<div class="row">
+    <div class="col-md-12">
+        <h2>{{ .Title }}</h2>
+        <p>{{ .Date.Format "Sun, Feb 11, 2018" }} by {{.Params.author}}</p>
+        {{ .Content }}
+    </div>
+</div>
 
 {{ end }}
