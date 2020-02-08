@@ -1,7 +1,9 @@
 baseURL = "https://www.example.org/"
 theme = "bootstrap"
-
 defaultContentLanguage = "en"
+
+[params]
+cdn = "/3rd"
 
 [languages]
 [languages.en]
