@@ -1,4 +1,17 @@
-baseURL = "http://example.org/"
-languageCode = "en-us"
-title = "My New Hugo Site"
+baseURL = "https://www.example.org/"
 theme = "bootstrap"
+
+defaultContentLanguage = "en"
+
+[languages]
+[languages.en]
+languageName = "English"
+title = "Title"
+copyright = "2020"
+weight = 1
+
+[languages.zh]
+languageName = "中文"
+title = "标题"
+copyright = "2020"
+weight = 2
