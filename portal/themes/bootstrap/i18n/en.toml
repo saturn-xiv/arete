@@ -1,2 +1,8 @@
 [FooterBackToHome]
 other = "Back to home"
+
+[HeaderSearchButton]
+other = "Search"
+
+[HeaderSwitchLanguage]
+other = "Sitch language"

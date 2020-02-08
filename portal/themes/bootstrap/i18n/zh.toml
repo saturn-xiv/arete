@@ -1,2 +1,8 @@
 [FooterBackToHome]
 other = "返回主页"
+
+[HeaderSearchButton]
+other = "搜索"
+
+[HeaderSwitchLanguage]
+other = "切换语言"

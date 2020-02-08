@@ -106,3 +106,4 @@ $ # favicon.ico: 16x16 32x32 64x64
 - [Youtube data api](https://developers.google.com/youtube/v3/docs)
 - [The official Python client library for Google's discovery based APIs.](https://github.com/googleapis/google-api-python-client)
 - [Language Plural Rules](http://www.unicode.org/cldr/charts/28/supplemental/language_plural_rules.html)
+- [Creative Commons](https://creativecommons.org/licenses/)
