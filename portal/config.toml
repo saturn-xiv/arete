@@ -4,6 +4,7 @@ defaultContentLanguage = "en"
 
 [params]
 cdn = "/3rd"
+timestamp = "Monday, 2 January 2006 15:04:05 MST"
 
 [languages]
 [languages.en]
