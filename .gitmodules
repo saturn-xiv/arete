@@ -1,0 +1,3 @@
+[submodule "portal/themes/bootstrap"]
+	path = portal/themes/bootstrap
+	url = https://github.com/saturn-xiv/hugo-bootstrap.git
