@@ -12,4 +12,7 @@ echo "Upgrade node & npm..."
 nvm install node
 npm install -g npm
 
+echo "Upgrade submodule"
+git submodule update --remote --merge
+
 exit 0

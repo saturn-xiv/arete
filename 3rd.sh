@@ -8,6 +8,7 @@ npm install --save urijs @types/urijs \
     react-helmet @types/react-helmet \
     js-cookie  @types/js-cookie \
     jwt-decode @types/jwt-decode \
+    dinero @types/dinero.js \
     @loadable/component @types/loadable__component \
     redux react-redux @types/react-redux \
     react-router-dom @types/react-router-dom \
