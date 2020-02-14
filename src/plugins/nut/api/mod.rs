@@ -27,6 +27,7 @@ async fn about(lang: Locale, db: web::Data<Db>) -> Result<impl Responder> {
     let db = db.deref();
     let languages = i18n::locale::Dao::languages(db)?;
     let lang = lang.0;
+    let now = Utc::now().naive_local();
 
     Ok(HttpResponse::Ok().json(json!({
         "name": NAME,
@@ -39,7 +40,8 @@ async fn about(lang: Locale, db: web::Data<Db>) -> Result<impl Responder> {
         "copyright": I18n::t(db, &lang, "site.copyright", &None::<String>),
         "description": DESCRIPTION,
         "languages": languages,
-        "startup": *STARTUP,
+        "startup": (now - *STARTUP).to_string(),
+        "now": now,
     })))
 }
 
