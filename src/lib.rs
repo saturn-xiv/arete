@@ -83,3 +83,9 @@ pub mod rfc;
 pub mod settings;
 pub mod storage;
 pub mod sys;
+
+use chrono::{NaiveDateTime, Utc};
+
+lazy_static! {
+    pub static ref STARTUP: NaiveDateTime = Utc::now().naive_local();
+}

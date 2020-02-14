@@ -13,6 +13,7 @@ use super::super::super::{
     i18n::{self, I18n},
     orm::Pool as Db,
     request::Locale,
+    STARTUP,
 };
 
 #[post("/install")]
@@ -38,6 +39,7 @@ async fn about(lang: Locale, db: web::Data<Db>) -> Result<impl Responder> {
         "copyright": I18n::t(db, &lang, "site.copyright", &None::<String>),
         "description": DESCRIPTION,
         "languages": languages,
+        "startup": *STARTUP,
     })))
 }
 
