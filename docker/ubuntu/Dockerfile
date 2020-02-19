@@ -59,7 +59,7 @@ RUN mkdir $HOME/downloads
 # java sdk
 RUN curl -s "https://get.sdkman.io" | zsh
 RUN sed -i -e 's/sdkman_auto_answer=false/sdkman_auto_answer=true/g' $HOME/.sdkman/etc/config
-ARG JDK8="8.0.232-open"
+ARG JDK8="8.0.242-open"
 ARG JDK="13.0.1-open"
 RUN zsh -c "source $HOME/.zshrc \
   && sdk install java $JDK8 \
