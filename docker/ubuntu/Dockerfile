@@ -77,7 +77,7 @@ RUN zsh -c "source $HOME/.zshrc \
   && yes | $HOME/local/android-sdk/tools/bin/sdkmanager --licenses"
 
 # nodejs
-RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.35.1/install.sh | zsh
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.2/install.sh | zsh
 RUN zsh -c "source $HOME/.zshrc \
   && nvm install node \
   && npm install -g yarn"
