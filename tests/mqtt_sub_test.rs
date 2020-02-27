@@ -15,7 +15,7 @@ impl arete::queue::mosquitto::Handler for Handler {
 #[test]
 fn it_sub() {
     env_logger::init();
-    let mut cli = arete::queue::mosquitto::Client::new("localhost", None).unwrap();
+    let mut cli = arete::queue::mosquitto::Connection::new("localhost", None).unwrap();
     cli.receive("unittest", &vec!["hi".to_string()], &Handler)
         .unwrap();
 }
