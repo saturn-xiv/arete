@@ -37,6 +37,7 @@ extern crate mime;
 extern crate mustache;
 extern crate nix;
 extern crate paho_mqtt as mqtt;
+extern crate percent_encoding;
 extern crate r2d2;
 extern crate r2d2_redis;
 extern crate rand;
@@ -89,3 +90,5 @@ use chrono::{NaiveDateTime, Utc};
 lazy_static! {
     pub static ref STARTUP: NaiveDateTime = Utc::now().naive_local();
 }
+
+pub const XML_HEADER: &str = r###"<?xml version="1.0" encoding="utf-8" ?>"###;

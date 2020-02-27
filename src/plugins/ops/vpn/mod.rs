@@ -17,6 +17,8 @@ pub use self::sqlite::*;
 
 use std::path::{Component, Path, PathBuf};
 
+// https://www.wireguard.com/
+
 lazy_static! {
     pub static ref ROOT: PathBuf = Path::new(&Component::RootDir).join("etc").join("openvpn");
 }
