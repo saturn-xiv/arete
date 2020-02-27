@@ -5,7 +5,6 @@ pub mod nmap;
 pub mod timezone;
 pub mod vpn;
 pub mod watchdog;
-pub mod zeromq;
 
 use std::process;
 

@@ -2,6 +2,7 @@ use std::fmt::Debug;
 use std::result::Result as StdResult;
 use std::time::Duration;
 
+use paho_mqtt::{Client, ConnectOptionsBuilder, CreateOptionsBuilder, MessageBuilder};
 use serde::{de::DeserializeOwned, ser::Serialize};
 
 use super::super::{
@@ -9,18 +10,18 @@ use super::super::{
     sys::{hostname, pid},
 };
 
-pub struct Client {
-    queue: mqtt::Client,
+pub struct Connection {
+    queue: paho_mqtt::Client,
 }
 
-impl Client {
+impl Connection {
     const QOS: i32 = 1;
     pub const WILL: &'static str = "will";
     pub const KEEP_ALIVE: u64 = 20;
     pub fn new(host: &str, port: Option<u16>) -> Result<Self> {
         Ok(Self {
-            queue: mqtt::Client::new(
-                mqtt::CreateOptionsBuilder::new()
+            queue: Client::new(
+                CreateOptionsBuilder::new()
                     .server_uri(format!(
                         "tcp://{}:{}",
                         host,
@@ -43,7 +44,7 @@ impl Client {
         self.queue.connect(None)?;
         for to in to {
             self.queue.publish(
-                mqtt::MessageBuilder::new()
+                MessageBuilder::new()
                     .topic(to)
                     .payload(serde_json::to_vec(payload)?)
                     .qos(Self::QOS)
@@ -63,11 +64,11 @@ impl Client {
 
         debug!("connecting to the MQTT broker...");
         self.queue.connect(
-            mqtt::ConnectOptionsBuilder::new()
+            ConnectOptionsBuilder::new()
                 .keep_alive_interval(Duration::from_secs(Self::KEEP_ALIVE))
                 .clean_session(false)
                 .will_message(
-                    mqtt::MessageBuilder::new()
+                    paho_mqtt::MessageBuilder::new()
                         .topic(Self::WILL)
                         .payload(id)
                         .finalize(),
