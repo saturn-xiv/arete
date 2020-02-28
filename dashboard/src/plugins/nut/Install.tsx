@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Button, Form, Input, message } from "antd";
-import { FormComponentProps } from "antd/lib/form/Form";
 import {
   injectIntl,
   WrappedComponentProps,
@@ -22,51 +21,53 @@ interface IProps {
 interface IState {}
 
 class Widget extends Component<
-  FormComponentProps &
-    RouteComponentProps<any> &
-    WrappedComponentProps &
-    IProps,
+  RouteComponentProps<any> & WrappedComponentProps & IProps,
   IState
 > {
-  public handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const { form, intl, signIn, history } = this.props;
-    form.validateFields((err, values) => {
-      if (!err) {
-        httpPost("/users/sign-in", values)
-          .then(rst => {
-            signIn(rst.token);
-            message.success(intl.formatMessage({ id: "flashes.success" }));
-            history.push("/users/logs");
-          })
-          .catch(message.error);
-      }
-    });
+  onFinish = (values: any) => {
+    const { intl, signIn, history } = this.props;
+    httpPost("/users/sign-in", values)
+      .then(rst => {
+        signIn(rst.token);
+        message.success(intl.formatMessage({ id: "flashes.success" }));
+        history.push("/users/logs");
+      })
+      .catch(message.error);
   };
+
   public render() {
     const { formatMessage } = this.props.intl;
-    const { getFieldDecorator } = this.props.form;
+
     const title = { id: "nut.install.title" };
     return (
       <Layout title={formatMessage(title)}>
-        <Form onSubmit={this.handleSubmit}>
-          <FormItem label={<FormattedMessage id="attributes.login" />}>
-            {getFieldDecorator("login", {
-              rules: [
-                {
-                  required: true
-                }
-              ]
-            })(<Input />)}
+        <Form
+          name="nut.install"
+          initialValues={{}}
+          onFinish={this.onFinish}
+          onFinishFailed={message.error}
+        >
+          <FormItem
+            name="login"
+            rules={[
+              {
+                required: true
+              }
+            ]}
+            label={<FormattedMessage id="attributes.login" />}
+          >
+            <Input />
           </FormItem>
-          <FormItem label={<FormattedMessage id="attributes.password" />}>
-            {getFieldDecorator("password", {
-              rules: [
-                {
-                  required: true
-                }
-              ]
-            })(<Input type="password" />)}
+          <FormItem
+            name="password"
+            rules={[
+              {
+                required: true
+              }
+            ]}
+            label={<FormattedMessage id="attributes.password" />}
+          >
+            <Input type="password" />
           </FormItem>
           <FormItem>
             <Button type="primary" htmlType="submit">
@@ -79,6 +80,4 @@ class Widget extends Component<
   }
 }
 
-export default Form.create()(
-  injectIntl(connect(() => ({}), { signIn })(withRouter(Widget)))
-);
+export default injectIntl(connect(() => ({}), { signIn })(withRouter(Widget)));

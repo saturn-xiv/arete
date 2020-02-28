@@ -1,11 +1,19 @@
-import React, { Component } from "react";
+import React, { Component, ReactNode } from "react";
 import { connect } from "react-redux";
 import {
   injectIntl,
   FormattedMessage,
   WrappedComponentProps
 } from "react-intl";
-import { Icon, Layout, Menu, message, Modal } from "antd";
+import { Layout, Menu, message, Modal } from "antd";
+import {
+  GlobalOutlined,
+  MenuFoldOutlined,
+  HomeOutlined,
+  GithubOutlined,
+  LogoutOutlined,
+  MenuUnfoldOutlined
+} from "@ant-design/icons";
 import { ClickParam, SelectParam } from "antd/lib/menu";
 import { RouteComponentProps, withRouter } from "react-router";
 
@@ -27,12 +35,12 @@ import Title from "../Title";
 const { Header, Sider, Content } = Layout;
 
 interface IHeaderBarItem {
-  icon: string;
+  icon: ReactNode;
   id: string;
 }
 
 interface ISiderBarMenu {
-  icon: string;
+  icon: ReactNode;
   label: string;
   to: string;
   items: ISiderBarItem[];
@@ -115,9 +123,9 @@ class Widget extends Component<
   };
   headerMenus = (): IHeaderBarItem[] => {
     return [
-      { id: "users.sign-out", icon: "logout" },
-      { id: "github", icon: "github" },
-      { id: "home", icon: "home" }
+      { id: "users.sign-out", icon: <LogoutOutlined /> },
+      { id: "github", icon: <GithubOutlined /> },
+      { id: "home", icon: <HomeOutlined /> }
     ];
   };
   componentDidMount() {
@@ -161,7 +169,7 @@ class Widget extends Component<
                 key={it.label}
                 title={
                   <span>
-                    <Icon type={it.icon} />
+                    {it.icon}
                     <FormattedMessage id={it.label} />
                   </span>
                 }
@@ -184,10 +192,11 @@ class Widget extends Component<
           >
             <Menu onClick={this.handleHeaderBar} mode="horizontal">
               <Menu.Item key="toggle">
-                <Icon
-                  className="trigger"
-                  type={this.state.collapsed ? "menu-unfold" : "menu-fold"}
-                />
+                {this.state.collapsed ? (
+                  <MenuUnfoldOutlined />
+                ) : (
+                  <MenuFoldOutlined />
+                )}
               </Menu.Item>
               {this.headerMenus().map(it => (
                 <Menu.Item
@@ -196,7 +205,7 @@ class Widget extends Component<
                   }}
                   key={it.id}
                 >
-                  <Icon type={it.icon} />
+                  {it.icon}
                 </Menu.Item>
               ))}
               <Menu.SubMenu
@@ -204,7 +213,7 @@ class Widget extends Component<
                   float: "right"
                 }}
                 key="switch-languages"
-                title={<Icon type="global" />}
+                title={<GlobalOutlined />}
               >
                 {siteInfo.languages.map(it => (
                   <Menu.Item key={`lang-${it}`}>

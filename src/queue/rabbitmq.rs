@@ -109,10 +109,10 @@ impl RabbitMQ {
         queue: &str,
         handler: &H,
     ) -> Result<()> {
-        let (ch, qu) = self.open(queue).await?;
+        let (ch, _qu) = self.open(queue).await?;
         let consumer = ch
             .basic_consume(
-                &qu,
+                queue,
                 consumer,
                 BasicConsumeOptions::default(),
                 FieldTable::default(),
