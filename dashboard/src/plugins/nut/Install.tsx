@@ -11,6 +11,7 @@ import { withRouter, RouteComponentProps } from "react-router";
 import { post as httpPost } from "../../utils/request";
 import { signIn } from "../../actions";
 import Layout from "../../layouts/application";
+import { LAYOUT, TAIL_LAYOUT } from "../../components/form";
 
 const FormItem = Form.Item;
 
@@ -42,10 +43,10 @@ class Widget extends Component<
     return (
       <Layout title={formatMessage(title)}>
         <Form
+          {...LAYOUT}
           name="nut.install"
           initialValues={{}}
           onFinish={this.onFinish}
-          onFinishFailed={message.error}
         >
           <FormItem
             name="login"
@@ -69,7 +70,7 @@ class Widget extends Component<
           >
             <Input type="password" />
           </FormItem>
-          <FormItem>
+          <FormItem {...TAIL_LAYOUT}>
             <Button type="primary" htmlType="submit">
               <FormattedMessage id="buttons.submit" />
             </Button>
