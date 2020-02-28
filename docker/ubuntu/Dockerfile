@@ -60,10 +60,10 @@ RUN mkdir $HOME/downloads
 RUN curl -s "https://get.sdkman.io" | zsh
 RUN sed -i -e 's/sdkman_auto_answer=false/sdkman_auto_answer=true/g' $HOME/.sdkman/etc/config
 ARG JDK8="8.0.242-open"
-ARG JDK="13.0.1-open"
+# ARG JDK="13.0.1-open"
+# && sdk install java $JDK \
 RUN zsh -c "source $HOME/.zshrc \
   && sdk install java $JDK8 \
-  && sdk install java $JDK \
   && sdk install maven \
   && sdk install gradle"
 
