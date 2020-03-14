@@ -5,7 +5,10 @@ use std::default::Default;
 use std::ops::Deref;
 
 use actix_web::{get, post, web, HttpResponse, Responder};
+use bytesize::ByteSize;
 use chrono::{NaiveDateTime, Utc};
+use humantime::format_duration;
+use nix::sys::sysinfo::sysinfo;
 
 use super::super::super::{
     env::{AUTHORS, BUILD_TIME, DESCRIPTION, HOMEPAGE, NAME, VERSION},
@@ -20,6 +23,19 @@ use super::super::super::{
 #[post("/install")]
 async fn install() -> impl Responder {
     HttpResponse::Ok().json(())
+}
+
+#[get("/status")]
+async fn status() -> Result<impl Responder> {
+    let si = sysinfo()?;
+    let load = si.load_average();
+    Ok(HttpResponse::Ok().json(json!({
+            "uptime": format_duration(si.uptime()).to_string(),
+            "process": si.process_count(),
+            "load": (format!("1 Minute: {:.2}", load.0), format!("5 Minutes: {:.2}", load.1), format!("15 Minutes: {:.2}", load.2)),
+            "swap": format!("{}/{}", ByteSize(si.swap_total()-si.swap_free()), ByteSize(si.swap_total())),
+            "ram": format!("{}/{}", ByteSize(si.ram_total()-si.ram_unused()), ByteSize(si.ram_total())),
+    })))
 }
 
 #[get("/about")]

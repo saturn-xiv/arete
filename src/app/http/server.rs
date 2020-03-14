@@ -111,6 +111,7 @@ pub async fn launch(cfg: Config) -> Result<()> {
                 web::scope("/api")
                     .service(nut::api::install)
                     .service(nut::api::about)
+                    .service(nut::api::status)
                     .service(nut::api::users::sign_in)
                     .service(nut::api::users::sign_up)
                     .service(nut::api::users::confirm)
