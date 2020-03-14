@@ -8,7 +8,7 @@ use actix_web::{get, post, web, HttpResponse, Responder};
 use bytesize::ByteSize;
 use chrono::{NaiveDateTime, Utc};
 use humantime::format_duration;
-use nix::sys::sysinfo::sysinfo;
+use nix::sys::{sysinfo::sysinfo, utsname::uname};
 
 use super::super::super::{
     env::{AUTHORS, BUILD_TIME, DESCRIPTION, HOMEPAGE, NAME, VERSION},
@@ -28,9 +28,11 @@ async fn install() -> impl Responder {
 #[get("/status")]
 async fn status() -> Result<impl Responder> {
     let si = sysinfo()?;
+    let un = uname();
     let load = si.load_average();
     Ok(HttpResponse::Ok().json(json!({
             "uptime": format_duration(si.uptime()).to_string(),
+            "uname": format!("{} {} {} {} {}", un.sysname(), un.nodename(), un.machine(), un.release(), un.version()),
             "process": si.process_count(),
             "load": (format!("1 Minute: {:.2}", load.0), format!("5 Minutes: {:.2}", load.1), format!("15 Minutes: {:.2}", load.2)),
             "swap": format!("{}/{}", ByteSize(si.swap_total()-si.swap_free()), ByteSize(si.swap_total())),
