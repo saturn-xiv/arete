@@ -21,24 +21,24 @@ impl Sqs {
         })
     }
 
-    pub fn create_queue(&self, name: String) -> Result<()> {
+    pub async fn create_queue(&self, name: String) -> Result<()> {
         self.client
             .create_queue(CreateQueueRequest {
                 queue_name: name,
                 ..Default::default()
             })
-            .sync()?;
+            .await?;
         Ok(())
     }
 
-    fn get_queue_url(&self, name: String) -> Result<String> {
+    async fn get_queue_url(&self, name: String) -> Result<String> {
         if let Some(it) = self
             .client
             .get_queue_url(GetQueueUrlRequest {
                 queue_name: name,
                 ..Default::default()
             })
-            .sync()?
+            .await?
             .queue_url
         {
             return Ok(it);
@@ -47,17 +47,17 @@ impl Sqs {
         Err(format_err!("can't find queue"))
     }
 
-    pub fn publish(&self, queue: String, task: Task) -> Result<()> {
+    pub async fn publish(&self, queue: String, task: Task) -> Result<()> {
         self.client
             .send_message(SendMessageRequest {
                 message_body: serde_json::to_string(&task)?,
-                queue_url: self.get_queue_url(queue)?,
+                queue_url: self.get_queue_url(queue).await?,
                 ..Default::default()
             })
-            .sync()?;
+            .await?;
         Ok(())
     }
-    pub fn consume(
+    pub async fn consume(
         &self,
         _consumer: String,
         queue: String,
@@ -66,10 +66,10 @@ impl Sqs {
         if let Some(items) = self
             .client
             .receive_message(ReceiveMessageRequest {
-                queue_url: self.get_queue_url(queue)?,
+                queue_url: self.get_queue_url(queue).await?,
                 ..Default::default()
             })
-            .sync()?
+            .await?
             .messages
         {
             for it in items {

@@ -35,32 +35,32 @@ impl S3 {
         })
     }
 
-    pub fn bucket_exists(&self, name: String) -> Result<()> {
+    pub async fn bucket_exists(&self, name: String) -> Result<()> {
         self.client
             .get_bucket_location(GetBucketLocationRequest { bucket: name })
-            .sync()?;
+            .await?;
         Ok(())
     }
 
-    pub fn create_bucket(&self, name: String, acl: &Acl) -> Result<()> {
+    pub async fn create_bucket(&self, name: String, acl: &Acl) -> Result<()> {
         self.client
             .create_bucket(CreateBucketRequest {
                 acl: Some(acl.to_string()),
                 bucket: name,
                 ..Default::default()
             })
-            .sync()?;
+            .await?;
         Ok(())
     }
-    pub fn delete_bucket(&self, name: String) -> Result<()> {
+    pub async fn delete_bucket(&self, name: String) -> Result<()> {
         self.client
             .delete_bucket(DeleteBucketRequest { bucket: name })
-            .sync()?;
+            .await?;
         Ok(())
     }
-    pub fn list_buckets(&self) -> Result<Vec<String>> {
+    pub async fn list_buckets(&self) -> Result<Vec<String>> {
         let mut buckets = Vec::new();
-        if let Some(items) = self.client.list_buckets().sync()?.buckets {
+        if let Some(items) = self.client.list_buckets().await?.buckets {
             for it in items {
                 if let Some(it) = it.name {
                     buckets.push(it);
@@ -70,7 +70,7 @@ impl S3 {
         Ok(buckets)
     }
 
-    pub fn list_objects(&self, bucket: String, after: Option<String>) -> Result<Vec<String>> {
+    pub async fn list_objects(&self, bucket: String, after: Option<String>) -> Result<Vec<String>> {
         let mut objects = Vec::new();
 
         if let Some(items) = self
@@ -80,7 +80,7 @@ impl S3 {
                 start_after: after,
                 ..Default::default()
             })
-            .sync()?
+            .await?
             .contents
         {
             for it in items {
@@ -92,7 +92,13 @@ impl S3 {
         Ok(objects)
     }
 
-    pub fn put_object(&self, bucket: String, name: String, body: Vec<u8>, acl: &Acl) -> Result<()> {
+    pub async fn put_object(
+        &self,
+        bucket: String,
+        name: String,
+        body: Vec<u8>,
+        acl: &Acl,
+    ) -> Result<()> {
         self.client
             .put_object(PutObjectRequest {
                 acl: Some(acl.to_string()),
@@ -101,18 +107,18 @@ impl S3 {
                 body: Some(body.into()),
                 ..Default::default()
             })
-            .sync()?;
+            .await?;
         Ok(())
     }
 
-    pub fn delete_object(&self, bucket: String, name: String) -> Result<()> {
+    pub async fn delete_object(&self, bucket: String, name: String) -> Result<()> {
         self.client
             .delete_object(DeleteObjectRequest {
                 bucket,
                 key: name,
                 ..Default::default()
             })
-            .sync()?;
+            .await?;
         Ok(())
     }
 }
