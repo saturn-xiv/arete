@@ -9,7 +9,11 @@ use super::super::super::{
         migration::{Dao, New as Migration},
         Connection,
     },
-    plugins::{forum, nut, ops::vpn, survey, vip},
+    plugins::{
+        forum, nut,
+        ops::{monitor, vpn},
+        survey, vip,
+    },
     settings,
 };
 
@@ -70,6 +74,12 @@ pub fn run(db: &Connection) -> Result<()> {
                 version: "20190514084629",
                 up: vpn::UP,
                 down: vpn::DOWN,
+            },
+            Migration {
+                name: "create-ops-monitor",
+                version: "20200324202306",
+                up: monitor::UP,
+                down: monitor::DOWN,
             },
         ])?;
         db.migrate()
