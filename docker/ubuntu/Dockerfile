@@ -1,6 +1,7 @@
 FROM ubuntu:latest
 
 ENV DEBIAN_FRONTEND noninteractive
+ENV HOSTNAME armbian
 
 RUN apt update
 RUN apt -y upgrade

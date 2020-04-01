@@ -1,5 +1,7 @@
 FROM alpine:latest
 
+ENV HOSTNAME armbian
+
 RUN apk update
 RUN apk add sudo zsh pwgen vim screen \
   git pkgconf openssl-dev \
