@@ -154,7 +154,7 @@ def __upload_video(youtube, playlists, item):
     logging.info("upload video %s => %s" % (item.path, item.title))
 
     insert_request = youtube.videos().insert(
-        part='snippet,status'
+        part='snippet,status',
         body=dict(
             snippet=dict(
                 title=item.title,
@@ -163,7 +163,7 @@ def __upload_video(youtube, playlists, item):
             status=dict(
                 privacyStatus=PUBLIC_PRIVACY
             )
-        )
+        ),
         media_body=googleapiclient.http.MediaFileUpload(
             item.file, chunksize=-1, resumable=True
         )

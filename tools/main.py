@@ -17,11 +17,12 @@ import arete.youtube.list
 import arete.youtube.upload
 import arete.youku.list
 import arete.youku.upload
+import arete.monitor.snmp
 
 
 CHOICE_UPLOAD = "upload"
 CHOICE_LIST = "list"
-
+CHOICE_SNMP = "snmp"
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
@@ -36,6 +37,9 @@ if __name__ == '__main__':
     parser.add_argument('--google-client-secrets',
                         help='google client secrets file')
     parser.add_argument('-s', '--server', type=int, help='start server')
+    parser.add_argument('-c', '--config', type=str, help='config file')
+    parser.add_argument('-m', '--monitor',
+                        choices=[CHOICE_SNMP], help='start monitor agent')
 
     args = parser.parse_args()
     if args.youtube == CHOICE_LIST:
@@ -46,6 +50,8 @@ if __name__ == '__main__':
         arete.youku.list.start()
     elif args.youku == CHOICE_UPLOAD:
         arete.youku.upload.start(args.work_dir)
+    elif args.monitor == CHOICE_SNMP:
+        arete.monitor.snmp.start(args.config)
     elif args.server:
         arete.server.start(args.server)
     else:
