@@ -25,4 +25,7 @@ table! {
     }
 }
 
-allow_tables_to_appear_in_same_query!(forum_posts, forum_topics,);
+allow_tables_to_appear_in_same_query!(
+    forum_posts,
+    forum_topics,
+);

@@ -3,7 +3,7 @@ table! {
         id -> Int8,
         name -> Varchar,
         code -> Varchar,
-        value -> Bytea,
+        value -> Text,
         created_at -> Timestamp,
     }
 }

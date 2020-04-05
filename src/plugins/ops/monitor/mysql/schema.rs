@@ -3,7 +3,7 @@ table! {
         id -> Bigint,
         name -> Varchar,
         code -> Varchar,
-        value -> Blob,
+        value -> Text,
         created_at -> Datetime,
     }
 }

@@ -3,7 +3,7 @@ table! {
         id -> Integer,
         name -> Text,
         code -> Text,
-        value -> Binary,
+        value -> Text,
         created_at -> Timestamp,
     }
 }

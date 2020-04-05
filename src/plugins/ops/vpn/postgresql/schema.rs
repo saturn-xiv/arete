@@ -30,4 +30,7 @@ table! {
     }
 }
 
-allow_tables_to_appear_in_same_query!(vpn_logs, vpn_users,);
+allow_tables_to_appear_in_same_query!(
+    vpn_logs,
+    vpn_users,
+);
