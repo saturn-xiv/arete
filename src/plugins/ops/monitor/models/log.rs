@@ -22,6 +22,7 @@ pub trait Dao {
     fn by_name_and_code(&self, name: &str, code: &str, limit: i64) -> Result<Vec<Item>>;
     fn by_name(&self, name: &str, limit: i64) -> Result<Vec<Item>>;
     fn by_code(&self, code: &str, limit: i64) -> Result<Vec<Item>>;
+    fn by_uid(&self, uid: &str) -> Result<Vec<Item>>;
     fn add(&self, name: &str, uid: &str, code: &str, v: &str) -> Result<()>;
 }
 
@@ -48,6 +49,13 @@ impl Dao for Connection {
             .filter(monitor_logs::dsl::code.eq(code))
             .order(monitor_logs::dsl::created_at.desc())
             .limit(limit)
+            .load::<Item>(self)?;
+        Ok(items)
+    }
+    fn by_uid(&self, uid: &str) -> Result<Vec<Item>> {
+        let items = monitor_logs::dsl::monitor_logs
+            .filter(monitor_logs::dsl::uid.eq(uid))
+            .order(monitor_logs::dsl::created_at.desc())
             .load::<Item>(self)?;
         Ok(items)
     }
