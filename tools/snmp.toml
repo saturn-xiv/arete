@@ -1,29 +1,9 @@
 postgresql = "host='localhost' dbname='arete' user='postgres'"
-sleep = 5
+sleep = 60
 hosts = [
     "192.168.8.29",
     "192.168.8.21",
     "192.168.8.22",
     "192.168.8.23",
     "192.168.8.24",
-]
-
-
-[db]
-host = "127.0.0.1"
-name = "arete"
-port = 5432
-user = "postgres"
-password = ""
-
-[auth]
-user = "guest"
-sha = "ssssssss"
-aes = "aaaaaaaa"
-
-[oids]
-get = [
-    "sysDescr",    
-]
-walk = [
 ]

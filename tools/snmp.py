@@ -1,18 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# pip install toml pysnmp psycopg2
+"""Setup.
 
-# import os
-# import datetime
+third packages:
+$ pip install toml pysnmp psycopg2
+
+/etc/snmp/snmpd.conf:
+agentAddress udp:161,udp6:[::1]:161
+view systemonly included .1.3.6
+
+"""
+
+
 import argparse
-# import sys
-# import subprocess
-# import urllib.request
-# import json
 import logging
 import threading
 import time
+import uuid
 
 import toml
 import pysnmp.hlapi
@@ -20,11 +25,9 @@ import psycopg2
 
 
 class Crawler(threading.Thread):
-    def __init__(self, db, host, get, walk, delay, ok):
+    def __init__(self, db, host, delay, ok):
         super().__init__()
         self.host = host
-        self.get = get
-        self.walk = walk
         self.db = db
         self.delay = delay
         self.ok = ok
@@ -33,42 +36,34 @@ class Crawler(threading.Thread):
         logging.info("start thread %s" % self.host)
         while self.ok.is_set():
             cur = self.db.cursor()
-
-            for it in self.get:
-                self.__get(it, cur)
-            for it in self.walk:
-                self.__walk(it, cur)
-
+            self.__walk(cur)
             self.db.commit()
             cur.close()
 
             time.sleep(self.delay)
 
-    def __get(self, oid, cur):
-        logging.debug("get %s from %s", oid, self.host)
-        errorIndication, errorStatus, errorIndex, varBinds = next(
-            pysnmp.hlapi.getCmd(pysnmp.hlapi.SnmpEngine(),
-                                pysnmp.hlapi.CommunityData(
-                                    'public', mpModel=0),
-                                pysnmp.hlapi.UdpTransportTarget((host, 161)),
-                                pysnmp.hlapi.ContextData(),
-                                pysnmp.hlapi.ObjectType(pysnmp.hlapi.ObjectIdentity('SNMPv2-MIB', oid, 0)))
-        )
+    def __walk(self, cur):
+        logging.debug("walk %s", self.host)
+        uid = str(uuid.uuid4())
+        for errorIndication, errorStatus, errorIndex, varBinds in pysnmp.hlapi.nextCmd(pysnmp.hlapi.SnmpEngine(),
+                                                                                       pysnmp.hlapi.CommunityData(
+            'public', mpModel=0),
+            pysnmp.hlapi.UdpTransportTarget((host, 161)),
+            pysnmp.hlapi.ContextData(),
+            pysnmp.hlapi.ObjectType(pysnmp.hlapi.ObjectIdentity(".1.3"))
+        ):
 
-        if errorIndication:
-            logging.error(errorIndication)
-        elif errorStatus:
-            logging.error('%s at %s' % (errorStatus.prettyPrint(),
-                                        errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
-        else:
-            for key, val in varBinds:
-                logging.debug("%s = %s" %
-                              (key.prettyPrint(), val.prettyPrint()))
-                cur.execute("INSERT INTO monitor_logs (name, code, value) VALUES (%s, %s, %s)",
-                            (self.host, key.prettyPrint(), val.prettyPrint()))
-
-    def __walk(self, oid, cur):
-        logging.debug("walk %s from %s", oid, self.host)
+            if errorIndication:
+                logging.error(errorIndication)
+            elif errorStatus:
+                logging.error('%s at %s' % (errorStatus.prettyPrint(),
+                                            errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
+            else:
+                for key, val in varBinds:
+                    # logging.debug("%s = %s" %
+                    #               (key.prettyPrint(), val.prettyPrint()))
+                    cur.execute("INSERT INTO monitor_logs (name, uid, code, value) VALUES (%s, %s, %s, %s)",
+                                (self.host, uid, key.prettyPrint(), val.prettyPrint()))
 
 
 if __name__ == '__main__':
@@ -90,8 +85,6 @@ if __name__ == '__main__':
         it = Crawler(
             psycopg2.connect(cfg['postgresql']),
             host,
-            cfg['oids']['get'],
-            cfg['oids']['walk'],
             cfg['sleep'],
             ok
         )
