@@ -13,11 +13,14 @@ view systemonly included .1.3.6
 """
 
 
+import os
 import argparse
 import logging
 import threading
 import time
 import uuid
+import fcntl
+import tempfile
 
 import toml
 import pysnmp.hlapi
@@ -75,6 +78,10 @@ if __name__ == '__main__':
                         type=str, help='config file')
 
     args = parser.parse_args()
+
+    lock = open(os.path.join(tempfile.gettempdir(), ".snmp.lck"), "wb")
+    fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
+
     logging.info("load config from %s" % args.config)
     cfg = toml.load(args.config)
 
@@ -97,3 +104,5 @@ if __name__ == '__main__':
     except (KeyboardInterrupt, SystemExit):
         logging.warning("exit...")
         ok.clear()
+
+    fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
