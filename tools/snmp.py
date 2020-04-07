@@ -3,8 +3,8 @@
 
 """Setup.
 
-third packages:
-$ pip install toml pysnmp psycopg2
+install third packages:
+$ pip3 install --user toml pysnmp psycopg2
 
 /etc/snmp/snmpd.conf:
 agentAddress udp:161,udp6:[::1]:161
