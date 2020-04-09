@@ -4,7 +4,7 @@
 """Setup.
 
 install third packages:
-$ pip3 install --user toml pysnmp psycopg2
+$ pip3 install --user toml pysnmp psycopg2 systemd
 
 /etc/snmp/snmpd.conf:
 agentAddress udp:161,udp6:[::1]:161
@@ -25,6 +25,12 @@ import tempfile
 import toml
 import pysnmp.hlapi
 import psycopg2
+from systemd.journal import JournalHandler
+
+logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
+                    level=logging.DEBUG)
+logger = logging.getLogger(os.path.basename(__file__))
+logger.addHandler(JournalHandler())
 
 
 class Crawler(threading.Thread):
@@ -36,7 +42,7 @@ class Crawler(threading.Thread):
         self.ok = ok
 
     def run(self):
-        logging.info("start thread %s" % self.host)
+        logger.info("start thread %s" % self.host)
         while self.ok.is_set():
             cur = self.db.cursor()
             self.__walk(cur)
@@ -46,7 +52,7 @@ class Crawler(threading.Thread):
             time.sleep(self.delay)
 
     def __walk(self, cur):
-        logging.debug("walk %s", self.host)
+        logger.debug("walk %s", self.host)
         uid = str(uuid.uuid4())
         for errorIndication, errorStatus, errorIndex, varBinds in pysnmp.hlapi.nextCmd(pysnmp.hlapi.SnmpEngine(),
                                                                                        pysnmp.hlapi.CommunityData(
@@ -57,21 +63,19 @@ class Crawler(threading.Thread):
         ):
 
             if errorIndication:
-                logging.error(errorIndication)
+                logger.error(errorIndication)
             elif errorStatus:
-                logging.error('%s at %s' % (errorStatus.prettyPrint(),
-                                            errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
+                logger.error('%s at %s' % (errorStatus.prettyPrint(),
+                                           errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
             else:
                 for key, val in varBinds:
-                    # logging.debug("%s = %s" %
+                    # logger.debug("%s = %s" %
                     #               (key.prettyPrint(), val.prettyPrint()))
                     cur.execute("INSERT INTO monitor_logs (name, uid, code, value) VALUES (%s, %s, %s, %s)",
                                 (self.host, uid, key.prettyPrint(), val.prettyPrint()))
 
 
 if __name__ == '__main__':
-    logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
-                        level=logging.DEBUG)
 
     parser = argparse.ArgumentParser(description='Snmp agent.')
     parser.add_argument('-c', '--config', required=True,
@@ -82,7 +86,7 @@ if __name__ == '__main__':
     lock = open(os.path.join(tempfile.gettempdir(), ".snmp.lck"), "wb")
     fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
 
-    logging.info("load config from %s" % args.config)
+    logger.info("load config from %s" % args.config)
     cfg = toml.load(args.config)
 
     ok = threading.Event()
@@ -102,7 +106,7 @@ if __name__ == '__main__':
         while True:
             time.sleep(.1)
     except (KeyboardInterrupt, SystemExit):
-        logging.warning("exit...")
+        logger.warning("exit...")
         ok.clear()
 
     fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
