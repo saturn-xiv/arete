@@ -14,6 +14,7 @@
 /// SHA1 is a function that computes a 160-bit hash from an arbitrary amount of input data. It is clearly explained in RFC3174. HMAC is a standardized method to turn a cryptographic hash function into a keyed message authentication function. It is specified in RFC2104.
 ///
 /// To summarize, the key derivation process involves iterating a HMAC-SHA1 function 4096 times, and then doing that again to produce more key bits.
+use std::fmt;
 use std::fs::read_to_string;
 use std::path::{Component, Path, PathBuf};
 
@@ -120,11 +121,32 @@ impl Interface {
     }
 }
 
+pub enum Renderer {
+    Networkd,
+    NetworkManager,
+}
+
+impl fmt::Display for Renderer {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Self::Networkd => "networkd",
+                Self::NetworkManager => "NetworkManager",
+            }
+        )
+    }
+}
+
 impl Interface {
-    pub fn netplan(&self, renderer: String) -> Result<String> {
+    pub fn netplan(&self, renderer: &Renderer) -> Result<String> {
         let mut network = Hash::new();
         network.insert(Yaml::String("version".to_string()), Yaml::Integer(2));
-        network.insert(Yaml::String("renderer".to_string()), Yaml::String(renderer));
+        network.insert(
+            Yaml::String("renderer".to_string()),
+            Yaml::String(renderer.to_string()),
+        );
 
         if let Some((ref n, ref e)) = self.ether {
             let mut ethernets = Hash::new();
