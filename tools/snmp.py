@@ -4,6 +4,7 @@
 """Setup.
 
 install third packages:
+$ sudo apt-get install build-essential libsystemd-dev python3-dev pkg-config
 $ pip3 install --user toml pysnmp psycopg2 systemd
 
 /etc/snmp/snmpd.conf:
