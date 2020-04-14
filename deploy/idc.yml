@@ -1,0 +1,4 @@
+- hosts: idc
+  roles:
+    - ubuntu
+    - idc

@@ -1,0 +1,33 @@
+#!/bin/sh
+
+
+set -e
+
+USAGE="$0 INVENTORY email|vpn|web|idc|ping"
+export USAGE
+
+if [ $# -ne 2 ]
+then
+    echo $USAGE
+    exit 1
+fi
+
+if [ ! -f "$1/hosts" ] 
+then
+    echo "inventory $1 not exists!"
+    echo $USAGE
+    exit 2
+fi
+
+if [ ! -f "$2.yml" ] 
+then
+    echo "task $2 not exists!"
+    echo $USAGE
+    exit 3
+fi
+
+# ANSIBLE_DEBUG=1 or append -vvvv option to view more log
+ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -f 200 -i $1 $2.yml
+
+echo 'Done!'
+exit 0

@@ -30,10 +30,11 @@ $ echo 'export $PATH=$HOME.local/bin' >> ~/.zshrc # then re-login
 ```bash
 $ git clone https://github.com/saturn-xiv/arete.git
 $ cd arete/deploy
+$ cp -r staging production
 $ openssl rand -base64 32 # generate random secrets key
+$ pwgen 32 1 # generate random password
 # FIX settings in inventories/production
-$ ansible production build
-$ ansible production deploy
+$ ./run
 ```
 
 Create the administrator in **http://xxx.xxx.xxx.xxx/my/install**

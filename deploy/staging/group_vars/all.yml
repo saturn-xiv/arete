@@ -1,0 +1,7 @@
+ansible_user: deploy
+ansible_ssh_private_key_file: agents/staging
+app_domain: change-me.com
+app_secrets: BrTQT6d7sArSwkrFmtjRgNcuBRqct8VOSQrRKNsveyk=
+app_username: arete
+app_password: sahTi1phoh4hoa0PheiQuaGh1ti0aj4U
+app_debug_mode: true

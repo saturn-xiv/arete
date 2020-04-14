@@ -20,15 +20,15 @@
     name: "{{ packages }}"
   vars:
     packages:
-    - nginx
-    - zsh
-    - pwgen
-    - vim
-    - build-essential
-    - postgresql
-    - redis
-    - rabbitmq-server
-    - libsodium-dev    
+      - nginx
+      - zsh
+      - pwgen
+      - vim
+      - build-essential
+      - postgresql
+      - redis
+      - rabbitmq-server
+      - libsodium-dev
 
 - name: Remove useless packages from the cache
   become: true
@@ -63,7 +63,7 @@
     name: postgresql
     enabled: yes
     masked: no
-    
+
 - name: Enable service rabbitmq-server
   systemd:
     name: rabbitmq-server
@@ -75,4 +75,3 @@
     name: nginx
     enabled: yes
     masked: no
-
