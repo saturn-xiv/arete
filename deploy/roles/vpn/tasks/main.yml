@@ -1,2 +1,15 @@
-- import_tasks: backend.yml
-- import_tasks: frontend.yml
+- name: Install dependency packages
+  become: true
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - wireguard
+
+- name: Enable service wireguard
+  become: true
+  systemd:
+    name: wireguard
+    enabled: yes
+    masked: no
+    state: restarted

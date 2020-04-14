@@ -1,0 +1,33 @@
+- name: Install dependency packages
+  become: true
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - postgresql
+      - redis
+      - rabbitmq-server
+
+- name: Enable service redis
+  become: true
+  systemd:
+    name: redis
+    enabled: yes
+    masked: no
+    state: restarted
+
+- name: Enable service postgresql
+  become: true
+  systemd:
+    name: postgresql
+    enabled: yes
+    masked: no
+    state: restarted
+
+- name: Enable service rabbitmq-server
+  become: true
+  systemd:
+    name: rabbitmq-server
+    enabled: yes
+    masked: no
+    state: restarted

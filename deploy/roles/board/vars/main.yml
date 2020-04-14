@@ -1,2 +1,0 @@
-workspace: "{{ansible_env.HOME}}/workspace/saturn-xiv/arete"
-shell: /bin/zsh

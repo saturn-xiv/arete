@@ -1,0 +1,32 @@
+- name: Install dependency packages
+  become: true
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - dovecot-core
+      - dovecot-imapd
+      - dovecot-pop3d
+      - dovecot-lmtpd
+      - dovecot-pgsql
+      - postfix
+      - postfix-pgsql
+
+- include: smtp.yml
+- include: imap.yml
+
+- name: Enable service dovecot
+  become: true
+  systemd:
+    name: dovecot
+    enabled: yes
+    masked: no
+    state: restarted
+
+- name: Enable service postfix
+  become: true
+  systemd:
+    name: postfix
+    enabled: yes
+    masked: no
+    state: restarted

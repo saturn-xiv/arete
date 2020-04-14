@@ -1,0 +1,15 @@
+- name: Install dependency packages
+  become: true
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - nginx
+
+- name: Enable service nginx
+  become: true
+  systemd:
+    name: nginx
+    enabled: yes
+    masked: no
+    state: restarted

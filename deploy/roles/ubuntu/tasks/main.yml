@@ -20,15 +20,30 @@
     name: "{{ packages }}"
   vars:
     packages:
-      - nginx
-      - zsh
+      - systemd-cron
       - pwgen
+      - tree
       - vim
+      - ntpdate
+      - lshw
+      - tcpdump
+      - hddtemp
+      - uuid-runtime
+      - imagemagick
+      - ffmpeg
+      - net-tools
+      - libtool
+      - ethtool
+      - dnsutils
+      - dnsmasq
+      - git
       - build-essential
-      - postgresql
-      - redis
-      - rabbitmq-server
+      - autoconf-archive
+      - pkg-config
       - libsodium-dev
+      - liboping-dev
+      - libzmq3-dev
+      - libsqlite3-dev
 
 - name: Remove useless packages from the cache
   become: true
@@ -41,37 +56,40 @@
     autoremove: yes
 
 - name: Enable service ssh
+  become: true
   systemd:
     name: ssh
     enabled: yes
     masked: no
 
 - name: Enable service timesyncd
+  become: true
   systemd:
     name: systemd-timesyncd
     enabled: yes
     masked: no
 
-- name: Enable service redis
-  systemd:
-    name: redis
-    enabled: yes
-    masked: no
+- name: Set timezone to UTC.
+  become: true
+  timezone:
+    name: UTC
 
-- name: Enable service postgresql
+- name: Make sure cron is enable.
+  become: true
   systemd:
-    name: postgresql
+    name: cron.target
     enabled: yes
-    masked: no
 
-- name: Enable service rabbitmq-server
-  systemd:
-    name: rabbitmq-server
-    enabled: yes
-    masked: no
+- name: Change root's password.
+  become: true
+  shell: echo "root:$(pwgen 32 1)" | chpasswd
 
-- name: Enable service nginx
-  systemd:
-    name: nginx
-    enabled: yes
-    masked: no
+- name: Change default editor to vim
+  become: true
+  shell: update-alternatives --set editor /usr/bin/vim.basic
+
+- name: Install python packages
+  pip:
+    executable: pip3
+    name:
+      - wheel
