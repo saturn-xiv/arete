@@ -7,7 +7,7 @@ export const failed = (err: string) =>
   notification.error({
     message: moment().format("ll LTS"),
     description: err,
-    duration: 30
+    duration: 30,
   });
 
 export const backend = (u: string): string => `/api${u}`;
@@ -23,7 +23,7 @@ export const options = (method: string, body?: any): RequestInit => {
     method: method,
     // mode: 'cors',
     credentials: "include",
-    headers
+    headers,
   };
   if (body) {
     it.body = JSON.stringify(body);
@@ -39,16 +39,22 @@ const parse = (res: any) => {
       });
 };
 
+// https://blog.logrocket.com/programmatic-file-downloads-in-the-browser-9a5186298d5c/
 export const download = (path: string, name: string) => {
   return fetch(backend(path), options("GET"))
-    .then(response => response.blob())
-    .then(response => {
-      var blob = response;
-      var reader = new window.FileReader();
-      reader.readAsDataURL(blob);
-      reader.onloadend = function() {
-        window.open(reader.result as string);
+    .then((response) => response.blob())
+    .then((blob) => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = name;
+      const clickHandler = () => {
+        setTimeout(() => {
+          URL.revokeObjectURL(url);
+        }, 150);
       };
+      a.addEventListener("click", clickHandler, false);
+      a.click();
     })
     .catch(message.error);
 };
