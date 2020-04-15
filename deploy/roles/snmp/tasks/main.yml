@@ -1,0 +1,26 @@
+- name: Install dependency packages
+  become: true
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - snmpd
+
+- name: Enable snmpd agent.
+  lineinfile:
+    path: /etc/snmp/snmpd.conf
+    regexp: "^agentAddress "
+    line: agentAddress udp:161,udp6:[::1]:161
+
+- name: Enable system info.
+  lineinfile:
+    path: /etc/snmp/snmpd.conf
+    line: view systemonly included .1.3.6.1.4.1.2021
+
+- name: Enable service snmpd
+  become: true
+  systemd:
+    name: snmpd
+    enabled: yes
+    masked: no
+    state: restarted

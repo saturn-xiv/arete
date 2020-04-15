@@ -1,0 +1,4 @@
+- hosts: snmp
+  roles:
+    - ubuntu
+    - snmp
