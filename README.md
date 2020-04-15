@@ -76,6 +76,7 @@ $ # favicon.ico: 16x16 32x32 64x64
 - [Ant Desigh Pro](https://pro.ant.design/docs/getting-started)
 - [Validate.js](https://validatejs.org/#validators)
 - [Third-Party Libraries](https://ant.design/docs/react/recommendation)
+- [Material-UI](https://material-ui.com/getting-started/installation/)
 
 ### Rust
 

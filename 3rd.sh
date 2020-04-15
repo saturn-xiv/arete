@@ -16,4 +16,6 @@ npm install --save urijs @types/urijs \
     react-intl react-quill \
     react-mde react-markdown \
     emoji-mart google-map-react \
-    qrcode.react react-copy-to-clipboard antd
+    qrcode.react react-copy-to-clipboard \
+    famfamfam-flags famfamfam-mini famfamfam-silk \
+    @material-ui/core @material-ui/icons
