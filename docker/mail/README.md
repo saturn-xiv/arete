@@ -3,7 +3,7 @@
 ```bash
 $ docker pull ubuntu:latest
 $ docker build -t mail .
-$ docker run --rm -it -p 2222:22 mail
+$ docker run --rm -it -p 2222:22 -p 8080:80 mail
 ```
 
 ## Run from Docker Hub
