@@ -20,6 +20,7 @@ do
     diesel print-schema -o vip_members > src/plugins/vip/$i/schema.rs
     diesel print-schema -o vpn_users vpn_logs > src/plugins/ops/vpn/$i/schema.rs
     diesel print-schema -o monitor_logs > src/plugins/ops/monitor/$i/schema.rs
+    diesel print-schema -o ops_mail_domains ops_mail_users ops_mail_aliases > src/plugins/ops/mail/$i/schema.rs
 done
 
 exit 0

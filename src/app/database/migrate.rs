@@ -11,7 +11,7 @@ use super::super::super::{
     },
     plugins::{
         forum, nut,
-        ops::{monitor, vpn},
+        ops::{mail, monitor, vpn},
         survey, vip,
     },
     settings,
@@ -80,6 +80,12 @@ pub fn run(db: &Connection) -> Result<()> {
                 version: "20200324202306",
                 up: monitor::UP,
                 down: monitor::DOWN,
+            },
+            Migration {
+                name: "create-ops-mail",
+                version: "20200418115237",
+                up: mail::UP,
+                down: mail::DOWN,
             },
         ])?;
         db.migrate()

@@ -1,10 +1,11 @@
 pub mod client;
 pub mod models;
+pub mod server;
+
 #[cfg(feature = "mysql")]
 pub mod mysql;
 #[cfg(feature = "postgresql")]
 pub mod postgresql;
-pub mod server;
 #[cfg(feature = "sqlite")]
 pub mod sqlite;
 
