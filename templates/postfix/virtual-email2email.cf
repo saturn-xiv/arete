@@ -1,0 +1,5 @@
+user = {{user}}
+password = {{password}}
+hosts = {{host}}
+dbname = {{name}}
+query = SELECT email FROM ops_mail_users WHERE email='%s'

@@ -12,6 +12,7 @@ RUN apt -y install apt-utils apt-transport-https wget gnupg software-properties-
   zip unzip bsdtar telnet git vim pwgen sudo gperf \
   dovecot-core dovecot-imapd dovecot-pop3d dovecot-lmtpd dovecot-pgsql \
   postfix postfix-pgsql \
+  mailutils \
   php-fpm php-mbstring php-gettext php-xml php-recode php-pear php-mysql php-pgsql php-ldap \
   aspell aspell-en \
   openssh-server nginx supervisor
@@ -73,6 +74,14 @@ RUN echo "AllowUsers deploy" >> /etc/ssh/sshd_config
 COPY nginx.conf /etc/nginx/sites-enabled/default
 RUN echo "daemon off;" >> /etc/nginx/nginx.conf
 RUN mkdir /run/php
+
+RUN mkdir -p /var/mail/vhosts
+RUN groupadd -g 5000 vmail
+RUN useradd -g vmail -u 5000 vmail -d /var/mail
+RUN chown -R vmail:vmail /var/mail
+
+RUN chown -R vmail:dovecot /etc/dovecot
+RUN chmod -R o-rwx /etc/dovecot
 
 COPY supervisord.conf /etc/supervisord.conf
 

@@ -1,3 +1,4 @@
+pub mod generate;
 pub mod models;
 
 #[cfg(feature = "mysql")]
