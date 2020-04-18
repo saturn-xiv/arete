@@ -42,3 +42,5 @@ mail.example.com MX 10 example.com
 - https://www.digitalocean.com/community/tutorials/how-to-set-up-a-postfix-email-server-with-dovecot-dynamic-maildirs-and-lmtp
 - https://www.digitalocean.com/community/tutorials/how-to-configure-a-mail-server-using-postfix-dovecot-mysql-and-spamassassin
 - https://www.linode.com/docs/email/postfix/email-with-postfix-dovecot-and-mysql/
+- [postfixadmin](https://github.com/postfixadmin/postfixadmin)
+- [SquirrelMail](http://squirrelmail.org/download.php)
