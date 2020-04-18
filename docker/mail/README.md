@@ -1,3 +1,26 @@
+## Build and test
+
+```bash
+$ docker pull ubuntu:latest
+$ docker build -t mail .
+$ docker run --rm -it -p 2222:22 mail
+```
+
+## Run from Docker Hub
+
+```bash
+$ docker pull chonglou/mail:latest
+$ docker run --rm -it --network host -d -p 2222:22 -v `pwd`:/var/mail chonglou/mail:latest
+```
+
+## Usage
+
+```bash
+$ ssh -p 2222 deploy@localhost # password is 'hi'
+```
+
+## Server settings
+
 1. Verify that the iptables firewall is not blocking any of the standard mail ports (25, 465, 587, 110, 995, 143, and 993)
 1. Configure DNSPermalink
 

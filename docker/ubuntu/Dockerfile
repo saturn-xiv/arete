@@ -1,19 +1,18 @@
 FROM ubuntu:latest
 
 ENV DEBIAN_FRONTEND noninteractive
-ENV HOSTNAME armbian
 
 RUN apt update
 RUN apt -y upgrade
 RUN apt -y install apt-utils apt-transport-https wget gnupg software-properties-common \ 
   curl build-essential cmake pkg-config dh-autoreconf dh-make checkinstall \
-  cpio meson intltool libtool gawk texinfo bison bc zsh moreutils tree tzdata \
-  libncurses5-dev \  
+  cpio meson intltool libtool gawk texinfo bison bc zsh moreutils tree tzdata locales \
   net-tools lsof iputils-ping dnsutils psmisc inotify-tools logrotate \
   llvm clang \
   zip unzip bsdtar telnet git vim pwgen sudo gperf \
   libsodium-dev libpq-dev libmysqlclient-dev libsqlite3-dev libudev-dev liboping-dev libzmq3-dev \
   libssl-dev libreadline-dev zlib1g-dev \  
+  libncurses5-dev \  
   sqlite3 postgresql redis openssh-server nginx supervisor
 
 # RUN add-apt-repository -y ppa:webupd8team/java
