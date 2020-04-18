@@ -12,7 +12,6 @@ table! {
     ops_mail_domains (id) {
         id -> Int8,
         name -> Varchar,
-        locked_at -> Nullable<Timestamp>,
         version -> Int8,
         created_at -> Timestamp,
         updated_at -> Timestamp,
@@ -23,8 +22,10 @@ table! {
     ops_mail_users (id) {
         id -> Int8,
         domain_id -> Int8,
+        name -> Varchar,
         email -> Varchar,
         password -> Varchar,
+        locked_at -> Nullable<Timestamp>,
         version -> Int8,
         created_at -> Timestamp,
         updated_at -> Timestamp,

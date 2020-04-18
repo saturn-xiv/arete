@@ -6,12 +6,12 @@ use super::errors::Result;
 
 pub use self::sodium::*;
 
-// https://wiki.dovecot.org/Authentication/PasswordSchemes
+// https://doc.dovecot.org/configuration_manual/authentication/password_schemes/
 // https://www.tunnelsup.com/using-salted-sha-hashes-with-dovecot-authentication/
 // doveadm pw -t {SSHA256.hex}4a847fefc4f9ab450f16783c5025d64313942a1ceb2599707cdb65940ba901e513fa442f -p pass
 pub trait SSha512 {
     fn sum(plain: &[u8], salt: &[u8]) -> String;
-    fn verify(cipher: String, plain: &[u8]) -> bool;
+    fn verify(cipher: &str, plain: &[u8]) -> bool;
 }
 
 pub trait Random {

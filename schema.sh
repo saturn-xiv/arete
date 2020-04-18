@@ -23,4 +23,6 @@ do
     diesel print-schema -o ops_mail_domains ops_mail_users ops_mail_aliases > src/plugins/ops/mail/$i/schema.rs
 done
 
+cargo fmt
+
 exit 0

@@ -73,8 +73,8 @@ impl super::SSha512 for Crypto {
         base64::encode(&[hash(&[plain, salt].concat()).as_ref(), salt].concat())
     }
 
-    fn verify(cipher: String, plain: &[u8]) -> bool {
-        match base64::decode(&cipher) {
+    fn verify(cipher: &str, plain: &[u8]) -> bool {
+        match base64::decode(cipher) {
             Ok(buf) => cipher == Self::sum(plain, &buf[DIGESTBYTES..]),
             Err(_) => false,
         }
