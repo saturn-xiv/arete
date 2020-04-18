@@ -18,4 +18,4 @@ npm install --save urijs @types/urijs \
     emoji-mart google-map-react \
     qrcode.react react-copy-to-clipboard \
     famfamfam-flags famfamfam-mini famfamfam-silk \
-    @material-ui/core @material-ui/icons
+    @material-ui/core @material-ui/icons @material-ui/pickers
