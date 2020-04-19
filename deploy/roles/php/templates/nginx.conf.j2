@@ -1,7 +1,7 @@
 server {
     listen 80;
     root /var/www/{{app_domain}};
-    server_name {{domain}};
+    server_name {{app_domain}};
 
     gzip on;
     access_log logs/{{app_domain}}-access.log main;

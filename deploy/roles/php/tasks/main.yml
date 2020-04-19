@@ -31,7 +31,7 @@
 - name: Upload nginx.conf
   become: true
   template:
-    src: nginx.j2
+    src: nginx.conf.j2
     dest: /etc/nginx/sites-enabled/{{app_domain}}.conf
     mode: "0444"
 
