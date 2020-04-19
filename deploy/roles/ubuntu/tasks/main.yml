@@ -20,6 +20,7 @@
     name: "{{ packages }}"
   vars:
     packages:
+      - python3-pip
       - systemd-cron
       - pwgen
       - tree
@@ -31,6 +32,8 @@
       - uuid-runtime
       - imagemagick
       - ffmpeg
+      - aspell
+      - aspell-en
       - net-tools
       - libtool
       - ethtool

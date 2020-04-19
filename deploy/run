@@ -3,7 +3,7 @@
 
 set -e
 
-USAGE="$0 INVENTORY email|vpn|web|idc|ping"
+USAGE="$0 INVENTORY email|vpn|web|idc|ping|php"
 export USAGE
 
 if [ $# -ne 2 ]

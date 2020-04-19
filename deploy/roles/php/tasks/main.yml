@@ -1,0 +1,52 @@
+- name: Install dependency packages
+  become: true
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - nginx
+      - php-fpm
+      - php-mbstring
+      - php-gettext
+      - php-xml
+      - php-recode
+      - php-pear
+      - php-mysql
+      - php-pgsql
+      - php-ldap
+
+- name: Create web site root.
+  become: true
+  file:
+    state: directory
+    path: /var/www/{{app_domain}}
+
+- name: Upload info.php
+  become: true
+  copy:
+    src: info.php
+    dest: /var/www/{{app_domain}}/info.php
+    mode: "0444"
+
+- name: Upload nginx.conf
+  become: true
+  template:
+    src: nginx.j2
+    dest: /etc/nginx/sites-enabled/{{app_domain}}.conf
+    mode: "0444"
+
+- name: Enable service nginx
+  become: true
+  systemd:
+    name: nginx
+    enabled: yes
+    masked: no
+    state: restarted
+
+- name: Enable service php-fpm
+  become: true
+  systemd:
+    name: php7.2-fpm
+    enabled: yes
+    masked: no
+    state: restarted

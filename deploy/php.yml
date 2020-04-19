@@ -1,0 +1,4 @@
+- hosts: php
+  roles:
+    - ubuntu
+    - php
