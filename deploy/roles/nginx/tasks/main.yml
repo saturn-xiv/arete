@@ -1,0 +1,45 @@
+- name: Add universe repo
+  become: true
+  shell: add-apt-repository universe
+
+- name: Add certbot repo
+  become: true
+  apt_repository:
+    repo: ppa:certbot/certbot
+
+- name: Update repositories cache
+  become: true
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install dependency packages
+  become: true
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - nginx
+      - certbot
+      - python3-certbot-nginx
+
+- name: Create web site root.
+  become: true
+  file:
+    state: directory
+    path: /var/www/{{app_domain}}
+
+- name: Enable service nginx
+  become: true
+  systemd:
+    name: nginx
+    enabled: yes
+    masked: no
+    state: restarted
+
+# https://letsencrypt.org/2015/11/09/why-90-days.html
+- name: Renew certs every 89 days
+  cron:
+    name: "renew certs every 89 days"
+    day: "*/89"
+    job: "/usr/bin/certbot renew --force-renewal"

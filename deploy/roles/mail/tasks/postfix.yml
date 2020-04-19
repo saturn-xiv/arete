@@ -1,0 +1,41 @@
+- name: Upload postfix/master.cf
+  become: true
+  copy:
+    src: postfix/master.cf
+    dest: /etc/postfix/master.cf
+    mode: "0400"
+
+- name: Upload postfix/main.cf
+  become: true
+  template:
+    src: postfix/main.cf.j2
+    dest: /etc/postfix/main.cf
+    mode: "0400"
+
+- name: Upload postfix/virtual-alias-maps.cf
+  become: true
+  template:
+    src: postfix/virtual-alias-maps.cf.j2
+    dest: /etc/postfix/virtual-alias-maps.cf
+    mode: "0400"
+
+- name: Upload postfix/virtual-email2email.cf
+  become: true
+  template:
+    src: postfix/virtual-email2email.cf.j2
+    dest: /etc/postfix/virtual-email2email.cf
+    mode: "0400"
+
+- name: Upload postfix/virtual-mailbox-domains.cf.cf
+  become: true
+  template:
+    src: postfix/virtual-mailbox-domains.cf.cf.j2
+    dest: /etc/postfix/virtual-mailbox-domains.cf.cf
+    mode: "0400"
+
+- name: Upload postfix/virtual-mailbox-maps.cf.cf
+  become: true
+  template:
+    src: postfix/virtual-mailbox-maps.cf.cf.j2
+    dest: /etc/postfix/virtual-mailbox-maps.cf.cf
+    mode: "0400"

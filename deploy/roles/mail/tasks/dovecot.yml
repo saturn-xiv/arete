@@ -1,0 +1,64 @@
+- name: Upload dovecot/dovecot.conf
+  become: true
+  template:
+    src: dovecot/dovecot.conf.j2
+    dest: /etc/dovecot/dovecot.conf
+    mode: "0400"
+
+- name: Upload dovecot/dovecot-sql.conf.ext
+  become: true
+  template:
+    src: dovecot/dovecot-sql.conf.ext.j2
+    dest: /etc/dovecot/dovecot-sql.conf.ext
+    mode: "0400"
+
+- name: Upload dovecot/conf.d/10-ssl.conf
+  become: true
+  template:
+    src: dovecot/conf.d/10-ssl.conf.j2
+    dest: /etc/dovecot/conf.d/10-ssl.conf.cf
+    mode: "0400"
+
+- name: Upload dovecot/conf.d/10-auth.conf
+  become: true
+  copy:
+    src: dovecot/conf.d/10-auth.conf
+    dest: /etc/dovecot/conf.d/10-auth.conf
+    mode: "0400"
+
+- name: Upload dovecot/conf.d/10-mail.conf
+  become: true
+  copy:
+    src: dovecot/conf.d/10-mail.conf
+    dest: /etc/dovecot/conf.d/10-mail.conf
+    mode: "0400"
+
+- name: Upload dovecot/conf.d/10-master.conf
+  become: true
+  copy:
+    src: dovecot/conf.d/10-master.conf
+    dest: /etc/dovecot/conf.d/10-master.conf
+    mode: "0400"
+
+- name: Upload dovecot/conf.d/auth-sql.conf.ext
+  become: true
+  copy:
+    src: dovecot/conf.d/auth-sql.conf.ext
+    dest: /etc/dovecot/conf.d/auth-sql.conf.ext
+    mode: "0400"
+
+- name: Upload dovecot/conf.d/auth-system.conf.ext
+  become: true
+  copy:
+    src: dovecot/conf.d/auth-system.conf.ext
+    dest: /etc/dovecot/conf.d/auth-system.conf.ext
+    mode: "0400"
+
+- name: Change /etc/dovecot permissions
+  become: true
+  file:
+    path: /etc/dovecot
+    state: directory
+    owner: vmail
+    group: dovecot
+    mode: "0770"

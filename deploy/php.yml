@@ -1,4 +1,5 @@
 - hosts: php
   roles:
     - ubuntu
+    - nginx
     - php

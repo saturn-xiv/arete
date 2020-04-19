@@ -1,0 +1,5 @@
+user = {{app_db_user}}
+password = {{app_db_password}}
+hosts = {{app_db_host}}
+dbname = {{app_db_name}}
+query = SELECT email FROM ops_mail_users WHERE email='%s' AND locked_at IS NULL

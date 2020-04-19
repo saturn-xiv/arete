@@ -17,8 +17,8 @@ append_dot_mydomain = no
 readme_directory = no
 
 # TLS parameters
-smtpd_tls_cert_file=/etc/letsencrypt/live/{{domain}}/fullchain.pem
-smtpd_tls_key_file=/etc/letsencrypt/live/{{domain}}/privkey.pem
+smtpd_tls_cert_file=/etc/letsencrypt/live/{{app_key_domain}}/fullchain.pem
+smtpd_tls_key_file=/etc/letsencrypt/live/{{app_key_domain}}/privkey.pem
 smtpd_use_tls=yes
 smtpd_tls_auth_only = yes
 smtp_tls_security_level = may
@@ -60,10 +60,10 @@ smtpd_relay_restrictions =
 # See /usr/share/doc/postfix/TLS_README.gz in the postfix-doc package for
 # information on enabling SSL in the smtp client.
 
-myhostname = {{domain}}
+myhostname = {{app_domain}}
 alias_maps = hash:/etc/aliases
 alias_database = hash:/etc/aliases
-mydomain = {{domain}}
+mydomain = {{app_domain}}
 myorigin = $mydomain
 mydestination = localhost
 relayhost =
@@ -77,10 +77,10 @@ inet_protocols = all
 virtual_transport = lmtp:unix:private/dovecot-lmtp
 
 # Virtual domains, users, and aliases
-virtual_mailbox_domains = {{driver}}:/etc/postfix/virtual-mailbox-domains.cf
-virtual_mailbox_maps = {{driver}}:/etc/postfix/virtual-mailbox-maps.cf
-virtual_alias_maps = {{driver}}:/etc/postfix/virtual-alias-maps.cf,
-        {{driver}}:/etc/postfix/virtual-email2email.cf
+virtual_mailbox_domains = pgsql:/etc/postfix/virtual-mailbox-domains.cf
+virtual_mailbox_maps = pgsql:/etc/postfix/virtual-mailbox-maps.cf
+virtual_alias_maps = pgsql:/etc/postfix/virtual-alias-maps.cf,
+        pgsql:/etc/postfix/virtual-email2email.cf
 
 # Even more Restrictions and MTA params
 disable_vrfy_command = yes

@@ -2,6 +2,7 @@
   become: true
   apt:
     update_cache: yes
+    cache_valid_time: 3600
 
 - name: Upgrade all packages to the latest version
   become: true
@@ -20,6 +21,7 @@
     name: "{{ packages }}"
   vars:
     packages:
+      - software-properties-common
       - python3-pip
       - systemd-cron
       - pwgen

@@ -4,7 +4,6 @@
     name: "{{ packages }}"
   vars:
     packages:
-      - nginx
       - php-fpm
       - php-mbstring
       - php-gettext
@@ -14,12 +13,6 @@
       - php-mysql
       - php-pgsql
       - php-ldap
-
-- name: Create web site root.
-  become: true
-  file:
-    state: directory
-    path: /var/www/{{app_domain}}
 
 - name: Upload info.php
   become: true
@@ -34,14 +27,6 @@
     src: nginx.conf.j2
     dest: /etc/nginx/sites-enabled/{{app_domain}}.conf
     mode: "0444"
-
-- name: Enable service nginx
-  become: true
-  systemd:
-    name: nginx
-    enabled: yes
-    masked: no
-    state: restarted
 
 - name: Enable service php-fpm
   become: true

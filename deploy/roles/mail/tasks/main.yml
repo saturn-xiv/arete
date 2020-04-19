@@ -13,8 +13,49 @@
       - postfix-pgsql
       - mailutils
 
-- include: smtp.yml
-- include: imap.yml
+- name: Ovveride hostname
+  become: true
+  hostname:
+    name: mail.{{ app_domain }}
+
+- name: Ensure localhost in hosts
+  become: true
+  lineinfile:
+    path: /etc/hosts
+    regexp: '^127\.0\.0\.1 '
+    line: "127.0.0.1 localhost.localdomain localhost"
+
+- name: Ensure public ip in hosts
+  become: true
+  lineinfile:
+    path: /etc/hosts
+    line: "{{app_public_ip}} mail.{{app_domain}} mail"
+
+- name: Ensure group "vmail" exists
+  become: true
+  group:
+    name: vmail
+    gid: 5000
+
+- name: Ensure user "vmail" exists
+  become: true
+  user:
+    name: vmail
+    uid: 5000
+    group: vmail
+    home: /var/mail
+
+- name: Change /var/mail permissions
+  become: true
+  file:
+    path: /var/mail
+    state: directory
+    owner: vmail
+    group: vmail
+    mode: "0700"
+
+- include: postfix.yml
+- include: dovecot.yml
 
 - name: Enable service dovecot
   become: true

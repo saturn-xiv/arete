@@ -71,7 +71,7 @@
 #   connect = host=sql.example.com dbname=virtual user=virtual password=blarg
 #   connect = /etc/dovecot/authdb.sqlite
 #
-connect = host={{host}} dbname={{name}} user={{user}} password={{password}}
+connect = host={{app_db_host}} port={{app_db_port}} dbname={{app_db_name}} user={{app_db_user}} password={{app_db_password}}
 
 # Default password scheme.
 #
