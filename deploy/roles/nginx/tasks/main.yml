@@ -39,6 +39,7 @@
 
 # https://letsencrypt.org/2015/11/09/why-90-days.html
 - name: Renew certs every 89 days
+  become: true
   cron:
     name: "renew certs every 89 days"
     day: "*/89"
