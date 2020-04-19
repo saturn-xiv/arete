@@ -26,16 +26,16 @@
     dest: /etc/postfix/virtual-email2email.cf
     mode: "0400"
 
-- name: Upload postfix/virtual-mailbox-domains.cf.cf
+- name: Upload postfix/virtual-mailbox-domains.cf
   become: true
   template:
-    src: postfix/virtual-mailbox-domains.cf.cf.j2
-    dest: /etc/postfix/virtual-mailbox-domains.cf.cf
+    src: postfix/virtual-mailbox-domains.cf.j2
+    dest: /etc/postfix/virtual-mailbox-domains.cf
     mode: "0400"
 
-- name: Upload postfix/virtual-mailbox-maps.cf.cf
+- name: Upload postfix/virtual-mailbox-maps.cf
   become: true
   template:
-    src: postfix/virtual-mailbox-maps.cf.cf.j2
-    dest: /etc/postfix/virtual-mailbox-maps.cf.cf
+    src: postfix/virtual-mailbox-maps.cf.j2
+    dest: /etc/postfix/virtual-mailbox-maps.cf
     mode: "0400"
