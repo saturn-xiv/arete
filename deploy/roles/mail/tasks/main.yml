@@ -11,6 +11,7 @@
       - dovecot-pgsql
       - postfix
       - postfix-pgsql
+      - mailutils
 
 - include: smtp.yml
 - include: imap.yml

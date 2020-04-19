@@ -1,0 +1,4 @@
+- hosts: mail
+  roles:
+    - ubuntu
+    - mail
