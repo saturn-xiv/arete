@@ -1,8 +1,10 @@
 server {
+    listen 80;
+    gzip on;
+    
     root /var/www/{{ app_domain }};
     server_name {{ app_domain }};
-
-    gzip on;
+    
     access_log /var/log/nginx/{{ app_domain }}-access.log;
     error_log /var/log/nginx/{{ app_domain }}-error.log;
 
@@ -22,24 +24,6 @@ server {
 
         fastcgi_param DOCUMENT_ROOT     $realpath_root;
         fastcgi_param SCRIPT_FILENAME   $realpath_root$fastcgi_script_name;
-    }
-
-    listen 443 ssl; # managed by Certbot
-    ssl_certificate /etc/letsencrypt/live/{{ app_key_domain }}/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/{{ app_key_domain }}/privkey.pem; # managed by Certbot
-    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
-
-}
-server {
-    if ($host = {{ app_domain }}) {
-        return 301 https://$host$request_uri;
-    } # managed by Certbot
-
-
-    listen 80;
-    server_name {{ app_domain }};
-    return 404; # managed by Certbot
-
+    }   
 
 }

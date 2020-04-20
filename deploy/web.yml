@@ -6,4 +6,5 @@
 - hosts: web
   roles:
     - ubuntu
+    - nginx
     - web

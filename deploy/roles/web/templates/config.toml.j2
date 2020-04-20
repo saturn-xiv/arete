@@ -1,0 +1,29 @@
+env = "development"
+secrets = "PXw4rleIYOlpZNkXdSKoqQugWa+w/+7t9DETYRpk75g="
+
+[http]
+origin = "https://{{app_domain}}"
+port = {{app_http_port}}
+theme = "{{app_http_theme}}"
+
+[http.upload]
+local_root = "tmp/upload"
+endpoint = "/upload"
+
+[database]
+host = "{{app_db_host}}"
+name = "{{app_db_name}}"
+port = {{app_db_port}}
+password = "{{app_db_password}}"
+
+[cache]
+host = "{{app_redis_host}}"
+port = {{app_redis_port}}
+db = {{app_redis_db}}
+
+[rabbitmq]
+host = "{{app_mq_host}}"
+port = {{app_mq_port}}
+username = "{{app_mq_user}}"
+password = "{{app_mq_password}}"
+virtualHost = "{{app_mq_virtual_host}}"

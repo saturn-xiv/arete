@@ -1,1 +1,2 @@
 app_domain: www.change-me.com
+app_generate_nginx: true

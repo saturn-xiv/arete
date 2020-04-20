@@ -1,0 +1,12 @@
+[Unit]
+Description={{app_domain}} api
+After=redis.service postgresql.service rabbitmq.service
+
+[Service]
+Type=simple
+WorkingDirectory=/var/www/{{app_domain}}
+ExecStart=/var/www/{{app_domain}}/arete
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

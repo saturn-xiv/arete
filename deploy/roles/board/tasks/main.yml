@@ -1,8 +1,23 @@
-- name: Clone arete project
+- name: Clone source
   git:
-    repo: "https://github.com/saturn-xiv/arete.git"
-    dest: "{{ app_workspace }}"
-    force: true
+    repo: https://github.com/saturn-xiv/arete.git
+    dest: "{{app_workspace}}/arete"
 
-- include: api.yml
-- include: dashboard.yml
+- name: Install frontend packages
+  shell: npm install
+  args:
+    chdir: "{{app_workspace}}/arete/dashboard"
+    creates: node_modules
+
+- name: Build frontend script
+  shell: npm run build
+  args:
+    chdir: "{{app_workspace}}/arete/dashboard"
+
+- name: Build backend script
+  shell: |
+    cargo build --release
+    strip -s target/release/arete
+    exit 0
+  args:
+    chdir: "{{app_workspace}}/arete"

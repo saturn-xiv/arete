@@ -22,12 +22,15 @@
   vars:
     packages:
       - software-properties-common
+      - apt-transport-https
       - python3-pip
       - systemd-cron
       - pwgen
       - tree
       - vim
       - ntpdate
+      - curl
+      - wget
       - lshw
       - tcpdump
       - hddtemp
@@ -42,13 +45,10 @@
       - dnsutils
       - dnsmasq
       - git
+      - gnupg
       - build-essential
       - autoconf-archive
       - pkg-config
-      - libsodium-dev
-      - liboping-dev
-      - libzmq3-dev
-      - libsqlite3-dev
 
 - name: Remove useless packages from the cache
   become: true

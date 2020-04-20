@@ -1,6 +1,6 @@
 ansible_user: deploy
 ansible_ssh_private_key_file: agents/staging
-app_workspace: ~/build/arete
+app_workspace: ~/build/
 app_domain: change-me.com
 app_key_domain: change-me.com
 app_secrets: BrTQT6d7sArSwkrFmtjRgNcuBRqct8VOSQrRKNsveyk=
@@ -9,4 +9,11 @@ app_db_port: 5432
 app_db_name: arete
 app_db_user: arete
 app_db_password: sahTi1phoh4hoa0PheiQuaGh1ti0aj4U
-app_debug_mode: true
+app_redis_host: localhost
+app_redis_port: 6379
+app_redis_db: 0
+app_mq_host: localhost
+app_mq_port: 5672
+app_mq_user: arete
+app_mq_password: ahveen6vee3ahY4ohp2eish0eimeish2
+app_mq_virtual: /arete

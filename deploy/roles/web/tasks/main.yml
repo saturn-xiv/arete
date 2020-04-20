@@ -4,12 +4,98 @@
     name: "{{ packages }}"
   vars:
     packages:
-      - nginx
+      - redis
+      - nodejs
+      - npm
+      - libsodium-dev
+      - liboping-dev
+      - libzmq3-dev
+      - libsqlite3-dev
 
-- name: Enable service nginx
+- name: Enable service redis
+  become: true
+  systemd:
+    name: redis
+    enabled: yes
+    masked: no
+    state: restarted
+
+- name: Create deploy tmp/upload path.
+  file:
+    state: directory
+    path: "/var/www/{{ app_domain }}/tmp/upload"
+
+- name: Upload api
+  copy:
+    src: "{{ app_workspace }}/arete/target/{{ target_name }}/release/arete"
+    dest: "/var/www/{{ app_domain }}/arete"
+    mode: "0555"
+
+- name: Upload log4rs.yml
+  template:
+    src: log4rs.yml.j2
+    dest: "/var/www/{{ app_domain }}/log4rs.yml"
+    mode: "0444"
+
+- name: Upload dashboard
+  copy:
+    src: "{{ app_workspace }}/arete/dashboard/build/"
+    dest: "/var/www/{{ app_domain }}/dashboard"
+
+- name: Upload assets
+  copy:
+    src: "{{ app_workspace }}/arete/assets/"
+    dest: "/var/www/{{ app_domain }}/package.json"
+
+- name: Upload package.json
+  copy:
+    src: "{{ app_workspace }}/arete/package.json"
+    dest: "/var/www/{{ app_domain }}/package.json"
+
+- name: Upload package-lock.json
+  copy:
+    src: "{{ app_workspace }}/arete/package-lock.json"
+    dest: "/var/www/{{ app_domain }}/package-lock.json"
+
+- name: Install frontend packages
+  shell: npm install
+  args:
+    chdir: "{{app_workspace}}/arete"
+
+- name: Upload config.toml
+  template:
+    src: "config.toml.j2"
+    dest: "/var/www/{{ app_domain }}/config.toml"
+    mode: "0400"
+
+- name: Upload api systemd service
+  become: true
+  template:
+    src: systemd/api.conf.j2
+    dest: /lib/systemd/system/{{app_domain}}.service
+    mode: "0444"
+
+- name: Make sure api is enable.
+  become: true
+  systemd:
+    name: "{{app_domain}}"
+    enabled: yes
+    masked: no
+    state: restarted
+
+- name: Upload nginx.conf
+  become: true
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/sites-enabled/{{app_domain}}.conf
+    mode: "0444"
+  when: app_generate_nginx
+
+- name: Restart nginx.
   become: true
   systemd:
     name: nginx
     enabled: yes
     masked: no
     state: restarted
+  when: app_generate_nginx
