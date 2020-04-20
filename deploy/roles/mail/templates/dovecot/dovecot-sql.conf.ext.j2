@@ -29,7 +29,7 @@
 # );
 
 # Database driver: mysql, pgsql, sqlite
-#driver = 
+driver = pgsql
 
 # Database connection string. This is driver-specific setting.
 #
@@ -139,7 +139,7 @@ default_pass_scheme = SHA512-CRYPT
 #  SELECT userid AS user, password, \
 #    home AS userdb_home, uid AS userdb_uid, gid AS userdb_gid \
 #  FROM users WHERE userid = '%u'
-password_query = SELECT email as user, password FROM virtual_users WHERE email='%u' AND locked_at IS NOT NULL;
+password_query = SELECT email as user, password FROM ops_mail_users WHERE email='%u' AND locked_at IS NULL;
 
 
 # Query to get a list of all usernames.

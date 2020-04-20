@@ -16,4 +16,4 @@ app_mq_host: localhost
 app_mq_port: 5672
 app_mq_user: arete
 app_mq_password: ahveen6vee3ahY4ohp2eish0eimeish2
-app_mq_virtual: /arete
+app_mq_virtual_host: /arete

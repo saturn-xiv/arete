@@ -52,6 +52,15 @@
     state: directory
     owner: vmail
     group: vmail
+    mode: "0775"
+
+- name: Change /var/mail/vhosts permissions
+  become: true
+  file:
+    path: /var/mail/vhosts
+    state: directory
+    owner: vmail
+    group: vmail
     mode: "0700"
 
 - include: postfix.yml

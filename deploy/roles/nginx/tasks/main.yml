@@ -28,7 +28,7 @@
   file:
     state: directory
     path: /var/www/{{app_domain}}
-    user: "{{ ansible_user }}"
+    owner: "{{ ansible_user }}"
 
 - name: Enable service nginx
   become: true

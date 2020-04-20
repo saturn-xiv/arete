@@ -27,7 +27,7 @@
 
 - name: Upload api
   copy:
-    src: "{{ app_workspace }}/arete/target/{{ target_name }}/release/arete"
+    src: "{{ app_workspace }}/arete/target/release/arete"
     dest: "/var/www/{{ app_domain }}/arete"
     mode: "0555"
 
@@ -60,7 +60,7 @@
 - name: Install frontend packages
   shell: npm install
   args:
-    chdir: "{{app_workspace}}/arete"
+    chdir: "/var/www/{{ app_domain }}"
 
 - name: Upload config.toml
   template:
@@ -71,7 +71,7 @@
 - name: Upload api systemd service
   become: true
   template:
-    src: systemd/api.conf.j2
+    src: systemd.conf.j2
     dest: /lib/systemd/system/{{app_domain}}.service
     mode: "0444"
 

@@ -9,6 +9,22 @@ example.com MX 10 example.com
 mail.example.com MX 10 example.com
 ```
 
+1. commands
+
+```basj
+$ postqueue -p # print queue
+$ postsuper -d ID # delete by id
+$ postsuper -d ALL # delete all
+$ postsuper –h ID # hold all
+$ postsuper -r ALL # re-order
+$ postcat -q ID # show bu id
+$ postqueue -f # flush queue
+
+$ postfix check # test postfix config files
+$ echo "Email body text" | mail -s "Email subject line" recipient@gmail.com -aFrom:email1@example.com # outgoing
+$ mail -f /var/mail/vhosts/example.com/email1
+```
+
 ## Resources
 
 - https://www.digitalocean.com/community/tutorials/how-to-set-up-a-postfix-email-server-with-dovecot-dynamic-maildirs-and-lmtp
