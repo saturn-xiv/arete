@@ -16,7 +16,7 @@ class Widget extends Component<IProps, IState> {
     return (
       <Router basename={basename}>
         <Switch>
-          {routes.map(it => (
+          {routes.map((it) => (
             <Route
               key={it.path}
               path={it.path}

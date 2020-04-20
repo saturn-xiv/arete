@@ -55,26 +55,26 @@ export type ActionTypes =
 export const refresh = (payload: ISite): ActionTypes => {
   return {
     type: SITE_REFRESH,
-    payload
+    payload,
   };
 };
 
 export const signIn = (payload: string): ActionTypes => {
   return {
     type: USER_SIGN_IN,
-    payload
+    payload,
   };
 };
 
 export const signOut = (): ActionTypes => {
   return {
-    type: USER_SIGN_OUT
+    type: USER_SIGN_OUT,
   };
 };
 
 export const openSideBar = (payload: string[]): ActionTypes => {
   return {
     type: SIDE_BAR_OPEN,
-    payload
+    payload,
   };
 };

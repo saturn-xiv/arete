@@ -1,14 +1,4 @@
-import { notification, message } from "antd";
-import moment from "moment";
-
 import { get as getToken } from "./token";
-
-export const failed = (err: string) =>
-  notification.error({
-    message: moment().format("ll LTS"),
-    description: err,
-    duration: 30,
-  });
 
 export const backend = (u: string): string => `/api${u}`;
 
@@ -55,8 +45,7 @@ export const download = (path: string, name: string) => {
       };
       a.addEventListener("click", clickHandler, false);
       a.click();
-    })
-    .catch(message.error);
+    });
 };
 
 export const get = (path: string) =>

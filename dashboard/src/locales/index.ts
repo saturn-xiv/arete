@@ -1,7 +1,4 @@
 import Cookies from "js-cookie";
-import antdZhCn from "antd/es/locale/zh_CN";
-import antdZhTw from "antd/es/locale/zh_TW";
-import antdEnUs from "antd/es/locale/en_US";
 import moment from "moment";
 import "moment/locale/zh-cn";
 import "moment/locale/zh-tw";
@@ -20,7 +17,7 @@ export const set = (lang: string) => {
   localStorage.setItem(KEY, lang);
   Cookies.set(KEY, lang, {
     expires: 1 << 16,
-    path: "/"
+    path: "/",
   });
   window.location.reload();
 };
@@ -30,17 +27,16 @@ export const detect = () => {
   switch (lang) {
     case "zh-Hans":
       moment.locale("zh-cn");
-      return { locale: lang, antd: antdZhCn, messages: zhHans };
+      return { locale: lang, messages: zhHans };
     case "zh-Hant":
       moment.locale("zh-tw");
-      return { locale: lang, antd: antdZhTw, messages: zhHant };
+      return { locale: lang, messages: zhHant };
     default:
       moment.locale();
       return {
         locale: "en-US",
         moment: null,
-        antd: antdEnUs,
-        messages: enUS
+        messages: enUS,
       };
   }
 };

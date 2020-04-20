@@ -7,5 +7,5 @@ import sideBar from "./side-bar";
 export default combineReducers({
   sideBar,
   siteInfo,
-  currentUser
+  currentUser,
 });
