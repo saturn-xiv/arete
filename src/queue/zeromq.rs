@@ -64,12 +64,13 @@ impl Queue {
             // TCP_KEEPIDLE 发送Keep-Alive probe后，对方多久没有回应，然后重新再发送keep alive probe的时间间隔
             sck.set_tcp_keepalive_idle(5)?;
         }
+        sck.set_sndhwm(Self::SNDHWM)?;
+        sck.set_rcvhwm(Self::RCVHWM)?;
         sck.connect(&url)?;
         sck.set_subscribe(match topic {
             Some(ref topic) => topic.as_bytes(),
             None => b"",
         })?;
-        sck.set_rcvhwm(Self::RCVHWM)?;
         Ok(sck)
     }
 
@@ -79,6 +80,7 @@ impl Queue {
         let ctx = zmq::Context::new();
         let sck = ctx.socket(zmq::PUB)?;
         sck.set_sndhwm(Self::SNDHWM)?;
+        sck.set_rcvhwm(Self::RCVHWM)?;
         sck.bind(&url)?;
         Ok(sck)
     }
@@ -88,6 +90,7 @@ impl Queue {
         let ctx = zmq::Context::new();
         let sck = ctx.socket(zmq::PUSH)?;
         sck.set_sndhwm(Self::SNDHWM)?;
+        sck.set_rcvhwm(Self::RCVHWM)?;
         sck.connect(&url)?;
         Ok(sck)
     }
@@ -96,6 +99,7 @@ impl Queue {
         info!("open pull socket to {}", url);
         let ctx = zmq::Context::new();
         let sck = ctx.socket(zmq::PULL)?;
+        sck.set_sndhwm(Self::SNDHWM)?;
         sck.set_rcvhwm(Self::RCVHWM)?;
         sck.bind(&url)?;
         Ok(sck)
