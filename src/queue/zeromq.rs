@@ -47,7 +47,8 @@ impl Queue {
 }
 
 impl Queue {
-    pub const SNDHWM: i32 = 1 << 12;
+    pub const SNDHWM: i32 = 0;
+    pub const RCVHWM: i32 = 0;
     pub fn sub(&self, topic: Option<String>) -> Result<zmq::Socket> {
         let url = self.client();
         info!("open sub socket to {}", url);
@@ -68,6 +69,7 @@ impl Queue {
             Some(ref topic) => topic.as_bytes(),
             None => b"",
         })?;
+        sck.set_rcvhwm(Self::RCVHWM)?;
         Ok(sck)
     }
 
@@ -94,6 +96,7 @@ impl Queue {
         info!("open pull socket to {}", url);
         let ctx = zmq::Context::new();
         let sck = ctx.socket(zmq::PULL)?;
+        sck.set_rcvhwm(Self::RCVHWM)?;
         sck.bind(&url)?;
         Ok(sck)
     }
