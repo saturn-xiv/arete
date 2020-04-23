@@ -97,6 +97,22 @@
   become: true
   shell: update-alternatives --set editor /usr/bin/vim.basic
 
+- name: Install oh-my-zsh
+  git:
+    repo: "https://github.com/robbyrussell/oh-my-zsh.git"
+    dest: "{{ ansible_env.HOME }}/.oh-my-zsh"
+
+- name: Create a new zsh configuration file
+  copy:
+    src: "{{ ansible_env.HOME }}/.oh-my-zsh/templates/zshrc.zsh-template"
+    dest: "{{ ansible_env.HOME }}/.zshrc"
+    mode: 0400
+    remote_src: true
+
+- name: Using zsh as default shell.
+  become: true
+  shell: "chsh -s /usr/bin/zsh {{ ansible_user }}"
+
 - name: Install python packages
   pip:
     executable: pip3
