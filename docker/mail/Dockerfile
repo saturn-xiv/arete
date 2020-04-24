@@ -9,7 +9,7 @@ RUN apt -y install apt-utils apt-transport-https wget gnupg software-properties-
   cpio meson intltool libtool gawk texinfo bison bc zsh moreutils tree tzdata locales \  
   net-tools lsof iputils-ping dnsutils psmisc inotify-tools logrotate \
   llvm clang \
-  zip unzip bsdtar telnet git vim pwgen sudo gperf \
+  zip unzip telnet git vim pwgen sudo gperf \
   dovecot-core dovecot-imapd dovecot-pop3d dovecot-lmtpd dovecot-pgsql \
   postfix postfix-pgsql \
   mailutils \

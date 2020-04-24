@@ -9,7 +9,7 @@ RUN apt -y install apt-utils apt-transport-https wget gnupg software-properties-
   cpio meson intltool libtool gawk texinfo bison bc zsh moreutils tree tzdata locales \
   net-tools lsof iputils-ping dnsutils psmisc inotify-tools logrotate \
   llvm clang \
-  zip unzip bsdtar telnet git vim pwgen sudo gperf \
+  zip unzip telnet git vim pwgen sudo gperf \
   libsodium-dev libpq-dev libmysqlclient-dev libsqlite3-dev libudev-dev liboping-dev libzmq3-dev \
   libssl-dev libreadline-dev zlib1g-dev \  
   libncurses5-dev \  
