@@ -66,18 +66,16 @@ csv = "1"
 actix-rt = "1"
 actix-utils = "1"
 actix-service = "1"
+lapin = "1.0.0-alpha6"
 humantime="2"
 url = "2"
 clap = "2"
 percent-encoding = "2"
 mime_guess = "2"
 actix-web = "2"
-amq-protocol-uri = "5"
+amq-protocol-uri = "6.0.0-beta2"
 tempfile = "3"
 jsonwebtoken = "7"
-
-[dependencies.lapin]
-version = "0.39"
 
 [dependencies.reqwest]
 version = "0.10"

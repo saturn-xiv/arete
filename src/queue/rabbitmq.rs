@@ -1,19 +1,9 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use amq_protocol_uri::{AMQPAuthority, AMQPUri, AMQPUserInfo};
-// use failure::Error as FailureError;
-// use futures::{future::Future, Stream};
-// use lapin::{
-//     message::Delivery,
-//     options::{BasicConsumeOptions, BasicPublishOptions, QueueDeclareOptions},
-//     types::FieldTable,
-//     BasicProperties, Client, ConnectionProperties,
-// };
-// use tokio::runtime::Runtime;
-
 use lapin::{
-    message::Delivery, options::*, types::FieldTable, BasicProperties, Channel, Connection,
-    ConnectionProperties, Queue,
+    message::Delivery, options::*, types::FieldTable, BasicProperties, Channel, CloseOnDrop,
+    Connection, ConnectionProperties, Queue,
 };
 
 use super::super::errors::Result;
@@ -68,7 +58,7 @@ pub struct RabbitMQ {
 }
 
 impl RabbitMQ {
-    pub async fn open(&self, queue: &str) -> Result<(Channel, Queue)> {
+    pub async fn open(&self, queue: &str) -> Result<(CloseOnDrop<Channel>, Queue)> {
         let con = Connection::connect_uri(self.uri.clone(), self.conn.clone()).await?;
         debug!("connected");
         let ch = con.create_channel().await?;
