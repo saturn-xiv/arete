@@ -1,12 +1,24 @@
 import React from "react";
+import { Provider } from "react-redux";
+import { createStore } from "redux";
+import { IntlProvider } from "react-intl";
 
-interface IProps {}
-interface IState {}
+import "./main.css";
+import reducers from "./reducers";
+import { detect as detectLocale } from "./locales";
+import Router from "./Router";
 
-class Component extends React.Component<IProps, IState> {
-  render() {
-    return <div />;
-  }
-}
+const store = createStore(reducers);
+const intl = detectLocale();
+
+const Component: React.FC = () => {
+  return (
+    <Provider store={store}>
+      <IntlProvider locale={intl.locale} messages={intl.messages}>
+        <Router basename="/my" />
+      </IntlProvider>
+    </Provider>
+  );
+};
 
 export default Component;

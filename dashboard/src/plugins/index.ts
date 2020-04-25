@@ -1,3 +1,5 @@
+import { MessageDescriptor } from "react-intl";
+
 import nut from "./nut";
 import album from "./album";
 import cbeta from "./cbeta";
@@ -8,12 +10,16 @@ import ops_monitor from "./ops/monitor";
 import survey from "./survey";
 import vip from "./vip";
 
-export interface IRoute {
+export interface IMenu {
   path: string;
+  title: MessageDescriptor;
   component: any;
+  children?: IMenu[];
+  hidden?: boolean;
+  authority?: string[];
 }
 
-const routes = new Array<IRoute>()
+const menus = new Array<IMenu>()
   .concat(album)
   .concat(cbeta)
   .concat(forum)
@@ -24,4 +30,4 @@ const routes = new Array<IRoute>()
   .concat(vip)
   .concat(nut);
 
-export default routes;
+export default menus;

@@ -9,7 +9,7 @@ class Component extends React.Component<
   IState
 > {
   render() {
-    return <div>home</div>;
+    return <div>reset password</div>;
   }
 }
 

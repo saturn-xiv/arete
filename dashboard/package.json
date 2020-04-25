@@ -2,6 +2,8 @@
   "name": "dashboard",
   "version": "0.1.0",
   "private": true,
+  "homepage": "/my",
+  "proxy": "http://localhost:8080",
   "dependencies": {
     "@fluentui/react": "^7.107.5",
     "@loadable/component": "^5.12.0",

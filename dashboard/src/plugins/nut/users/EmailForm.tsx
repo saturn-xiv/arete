@@ -1,8 +1,15 @@
 import React from "react";
+import { RouteComponentProps } from "react-router";
 
-class Component {
+interface IProps {}
+interface IState {}
+
+class Component extends React.Component<
+  RouteComponentProps<any> & IProps,
+  IState
+> {
   render() {
-    return <div />;
+    return <div>email</div>;
   }
 }
 

@@ -9,7 +9,7 @@ class Component extends React.Component<
   IState
 > {
   render() {
-    return <div />;
+    return <div>not found</div>;
   }
 }
 

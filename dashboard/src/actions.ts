@@ -8,6 +8,7 @@ export interface IState {
   currentUser: IUser;
   sideBar: ISideBar;
 }
+
 export interface ISite {
   title?: string;
   subhead?: string;
@@ -25,6 +26,7 @@ export interface ISideBar {
 export interface IUser {
   uid?: string;
   name?: string;
+  roles?: string[];
 }
 
 export interface ISiteRefreshAction {
