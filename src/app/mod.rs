@@ -31,7 +31,6 @@ pub fn launch() -> Result<()> {
         return http::routes::run();
     }
 
-    log4rs::init_file("log4rs.yml", Default::default())?;
     if sodiumoxide::init().is_err() {
         return Err(format_err!("sodium init failed"));
     }

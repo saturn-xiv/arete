@@ -3,6 +3,7 @@ Description={{app_domain}} api
 After=redis.service postgresql.service rabbitmq.service
 
 [Service]
+Environment=RUST_LOG=info
 Type=simple
 WorkingDirectory=/var/www/{{app_domain}}
 ExecStart=/var/www/{{app_domain}}/arete

@@ -33,7 +33,6 @@ extern crate jsonwebtoken;
 extern crate juniper;
 extern crate lettre;
 extern crate lettre_email;
-extern crate log4rs;
 extern crate md5;
 extern crate mime;
 extern crate mustache;

@@ -31,12 +31,6 @@
     dest: "/var/www/{{ app_domain }}/arete"
     mode: "0555"
 
-- name: Upload log4rs.yml
-  template:
-    src: log4rs.yml.j2
-    dest: "/var/www/{{ app_domain }}/log4rs.yml"
-    mode: "0444"
-
 - name: Upload dashboard
   copy:
     src: "{{ app_workspace }}/arete/dashboard/build/"
