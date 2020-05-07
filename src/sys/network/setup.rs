@@ -140,6 +140,8 @@ impl fmt::Display for Renderer {
 }
 
 impl Interface {
+    pub const ETHER_METRIC: i64 = 50;
+    pub const WIFI_METRIC: i64 = 200;
     pub fn netplan(&self, renderer: &Renderer) -> Result<String> {
         let mut network = Hash::new();
         network.insert(Yaml::String("version".to_string()), Yaml::Integer(2));
@@ -188,6 +190,17 @@ impl Interface {
                 }
                 Ether::Dhcp => {
                     eth.insert(Yaml::String("dhcp4".to_string()), Yaml::Boolean(true));
+                    {
+                        let mut overrides = Hash::new();
+                        overrides.insert(
+                            Yaml::String("route-metric".to_string()),
+                            Yaml::Integer(Self::ETHER_METRIC),
+                        );
+                        eth.insert(
+                            Yaml::String("dhcp4-overrides".to_string()),
+                            Yaml::Hash(overrides),
+                        );
+                    }
                 }
             };
 
@@ -252,6 +265,17 @@ impl Interface {
                 Yaml::Hash(access_points),
             );
             wlan.insert(Yaml::String("dhcp4".to_string()), Yaml::Boolean(true));
+            {
+                let mut overrides = Hash::new();
+                overrides.insert(
+                    Yaml::String("route-metric".to_string()),
+                    Yaml::Integer(Self::WIFI_METRIC),
+                );
+                wlan.insert(
+                    Yaml::String("dhcp4-overrides".to_string()),
+                    Yaml::Hash(overrides),
+                );
+            }
 
             wifis.insert(Yaml::String(n.clone()), Yaml::Hash(wlan));
             network.insert(Yaml::String("wifis".to_string()), Yaml::Hash(wifis));
