@@ -4,6 +4,12 @@
 # dependencies
 /node_modules
 
+# yarn
+/.yarnrc.yml
+/.yarn/
+/.pnp.js
+/yarn.lock
+
 # testing
 /tmp/
 /config.toml
