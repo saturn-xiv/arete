@@ -1,5 +1,6 @@
 {
   "name": "arete",
+  "private": true,
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.13.0",
     "bootstrap": "^4.5.0",
