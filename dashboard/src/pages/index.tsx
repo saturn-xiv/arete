@@ -1,10 +1,11 @@
 import React from 'react';
-import styles from './index.less';
+import { useIntl } from 'umi';
 
 export default () => {
+  const intl = useIntl();
   return (
     <div>
-      <h1 className={styles.title}>Page index</h1>
+      <h1>{intl.formatMessage({ id: 'home.title' })}</h1>
     </div>
   );
-}
+};
