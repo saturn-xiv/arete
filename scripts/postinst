@@ -1,8 +1,0 @@
-#!/bin/sh
-
-set -e
-
-cd /usr/share/arete 
-npm install
-
-exit 0
