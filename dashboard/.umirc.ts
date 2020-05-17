@@ -6,6 +6,9 @@ export default defineConfig({
   },
   base: '/my/',
   locale: { default: 'en-US' },
+  hash: true,
+  dynamicImport: { loading: '@/Loading' },
   antd: false,
   layout: false,
+  favicon: '/favicon.ico',
 });

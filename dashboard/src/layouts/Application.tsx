@@ -44,6 +44,7 @@ export default function({ children }: IRouteComponentProps) {
       />
       <div key="main" data-grid={{ x: 4, y: 0, w: 4, h: 1, static: true }}>
         {children}
+        <br />
         <Nav
           onLinkClick={(ev, item) => {
             ev?.preventDefault();
