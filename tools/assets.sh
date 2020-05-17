@@ -11,6 +11,10 @@ fi
 
 yarn install
 
+cd dashboard
+yarn install
+cd -
+
 echo "Done."
 
 exit 0
