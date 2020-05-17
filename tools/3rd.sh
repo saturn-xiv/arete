@@ -14,4 +14,5 @@ yarn add urijs @types/urijs \
     qrcode.react react-copy-to-clipboard \
     famfamfam-flags famfamfam-mini famfamfam-silk \
     react-helmet @types/react-helmet \
+    validate.js \
     @fluentui/react react-grid-layout @types/react-grid-layout

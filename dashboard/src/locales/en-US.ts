@@ -9,6 +9,7 @@ export default {
   'form.fields.password-confirmation': 'Password confirmation',
   'form.buttons.reset': 'Reset',
   'form.buttons.submit': 'Submit',
+  'form.validate-messages.password-confirmation': 'Passwords not match',
   'home.title': 'Home',
   'install.title': 'Install',
   'users.sign-in.title': 'Sign in',

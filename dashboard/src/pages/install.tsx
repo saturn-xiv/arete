@@ -1,30 +1,98 @@
-import React, { useState } from 'react';
+import React, { FormEvent, useState } from 'react';
 import { useIntl } from 'umi';
 import { TextField } from 'office-ui-fabric-react/lib/TextField';
 import { Helmet } from 'react-helmet';
+import validate from 'validate.js';
 
-import Form from '@/components/Form';
+import Form, {
+  USERNAME,
+  trim,
+  PASSWORD,
+  NICKNAME,
+  EMAIL,
+} from '@/components/Form';
+
+interface IFormData {
+  email: string;
+  username: string;
+  nickname: string;
+  password: string;
+  passwordConfirmation: string;
+}
+
+interface IFormError {
+  email?: string[];
+  username?: string[];
+  nickname?: string[];
+  password?: string[];
+  passwordConfirmation?: string[];
+}
+
+const constraints = {
+  email: EMAIL,
+  username: USERNAME,
+  nickname: NICKNAME,
+  password: PASSWORD,
+  passwordConfirmation: PASSWORD,
+};
 
 export default () => {
   const intl = useIntl();
   const title = intl.formatMessage({ id: 'install.title' });
 
-  const [username, setUsername] = useState('');
-  const [nickname, setNickname] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordConfirmation, setPasswordConfirmation] = useState('');
+  const [formError, setFormError] = useState<IFormError>();
+  const [formData, setFormData] = useState<IFormData>({
+    email: '',
+    username: '',
+    nickname: '',
+    password: '',
+    passwordConfirmation: '',
+  });
 
   const onReset = () => {
-    setUsername('');
-    setNickname('');
-    setEmail('');
-    setPassword('');
-    setPasswordConfirmation('');
+    setFormData({
+      username: '',
+      email: '',
+      nickname: '',
+      password: '',
+      passwordConfirmation: '',
+    });
   };
-  const onSubmit = () => {
-    console.log('on submit', nickname);
+
+  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!formError) {
+      console.log('submit', trim(formData));
+    }
   };
+
+  const onValidate = (data: IFormData) => {
+    let err = validate(trim(data), constraints);
+
+    if (data.password !== data.passwordConfirmation) {
+      err = Object.assign({}, err, {
+        passwordConfirmation: [
+          intl.formatMessage({
+            id: 'form.validate-messages.password-confirmation',
+          }),
+        ],
+      });
+    }
+
+    setFormError(err);
+  };
+
+  const onChange = (
+    event: FormEvent<HTMLInputElement | HTMLTextAreaElement>,
+    id: string,
+  ) => {
+    const data = Object.assign({}, formData, {
+      [id]: (event.target as HTMLInputElement).value,
+    });
+    setFormData(data);
+    onValidate(data);
+  };
+
   return (
     <>
       <Helmet>
@@ -32,36 +100,41 @@ export default () => {
       </Helmet>
       <Form onSubmit={onSubmit} onReset={onReset} title={title}>
         <TextField
-          value={username}
-          onChange={event =>
-            setUsername((event.target as HTMLInputElement).value)
-          }
+          value={formData.username}
+          required
+          onChange={event => onChange(event, 'username')}
+          errorMessage={formError?.username?.join('')}
           label={intl.formatMessage({ id: 'form.fields.username' })}
         />
         <TextField
-          value={nickname}
-          onChange={event =>
-            setNickname((event.target as HTMLInputElement).value)
-          }
+          value={formData.nickname}
+          required
+          onChange={event => onChange(event, 'nickname')}
+          errorMessage={formError?.nickname?.join('')}
           label={intl.formatMessage({ id: 'form.fields.nickname' })}
         />
         <TextField
-          value={email}
-          onChange={event => setEmail((event.target as HTMLInputElement).value)}
+          value={formData.email}
+          required
+          type="email"
+          onChange={event => onChange(event, 'email')}
+          errorMessage={formError?.email?.join('')}
           label={intl.formatMessage({ id: 'form.fields.email' })}
         />
         <TextField
-          value={password}
-          onChange={event =>
-            setPassword((event.target as HTMLInputElement).value)
-          }
+          value={formData.password}
+          required
+          type="password"
+          onChange={event => onChange(event, 'password')}
+          errorMessage={formError?.password?.join('')}
           label={intl.formatMessage({ id: 'form.fields.password' })}
         />
         <TextField
-          value={passwordConfirmation}
-          onChange={event =>
-            setPasswordConfirmation((event.target as HTMLInputElement).value)
-          }
+          value={formData.passwordConfirmation}
+          required
+          type="password"
+          onChange={event => onChange(event, 'passwordConfirmation')}
+          errorMessage={formError?.passwordConfirmation?.join('')}
           label={intl.formatMessage({
             id: 'form.fields.password-confirmation',
           })}
