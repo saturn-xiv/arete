@@ -7,7 +7,8 @@ if [ $# -ne 1 ] ; then
     exit 1
 fi
 
-VERSION=$(`git describe --tags --always --dirty`)
+git pull
+VERSION=$(git describe --tags --always --dirty)
 
 echo "Build $VERSION ..."
 if [ -d "tmp/$VERSION" ]
@@ -28,8 +29,11 @@ fi
 
 echo 'Build frontend....'
 cd dashboard
-if [ ! -d "node_modules" ]
+if [ ! -f ".yarn.lock" ]
 then
+	yarn set version berry
+	yarn set version latest
+	touch yarn.lock
 	yarn install
 fi
 yarn build
