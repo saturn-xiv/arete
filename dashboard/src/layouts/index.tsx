@@ -1,9 +1,11 @@
+import React from 'react';
 import { IRouteComponentProps } from 'umi';
 import Application from './Application';
 
 const non_sign_in = function(path: string): boolean {
   if (
     [
+      '/install',
       '/users/sign-in',
       '/users/sign-up',
       '/users/confirm',
@@ -25,13 +27,7 @@ const non_sign_in = function(path: string): boolean {
   return false;
 };
 
-export default function({
-  children,
-  location,
-  route,
-  history,
-  match,
-}: IRouteComponentProps) {
+export default function({ children, location }: IRouteComponentProps) {
   return non_sign_in(location.pathname) ? (
     <Application>{children}</Application>
   ) : (

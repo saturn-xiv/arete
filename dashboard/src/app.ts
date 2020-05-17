@@ -1,4 +1,7 @@
 import Cookies from 'js-cookie';
+import { initializeIcons } from 'office-ui-fabric-react/lib/Icons';
+
+initializeIcons();
 
 const fetchRoles = async function() {
   console.log('TODO fetch roles');
