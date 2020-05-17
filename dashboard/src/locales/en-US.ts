@@ -2,6 +2,13 @@ import languages from '../utils/languages';
 
 export default {
   ...languages,
+  'form.fields.username': 'Username',
+  'form.fields.nickname': 'Nickname',
+  'form.fields.email': 'Email',
+  'form.fields.password': 'Password',
+  'form.fields.password-confirmation': 'Password confirmation',
+  'form.buttons.reset': 'Reset',
+  'form.buttons.submit': 'Submit',
   'home.title': 'Home',
   'install.title': 'Install',
   'users.sign-in.title': 'Sign in',

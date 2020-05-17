@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { IRouteComponentProps } from 'umi';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import { useIntl, history } from 'umi';
@@ -34,7 +34,11 @@ const sharedLinks: ILink[] = [
   { icon: 'Message', label: 'leave-words.new.title', path: '/leave-words/new' },
 ];
 
-export default function({ children }: IRouteComponentProps) {
+export interface IProps {
+  children: ReactNode;
+}
+
+export default function({ children }: IProps) {
   const intl = useIntl();
   return (
     <ResponsiveGridLayout cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}>

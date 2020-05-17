@@ -3,6 +3,8 @@ import { initializeIcons } from 'office-ui-fabric-react/lib/Icons';
 
 initializeIcons();
 
+// --------------------------------
+
 const fetchRoles = async function() {
   console.log('TODO fetch roles');
   return { roles: ['member'] };
@@ -12,6 +14,8 @@ export async function getInitialState() {
   const data = await fetchRoles();
   return data;
 }
+
+// --------------------------------
 
 const LOCALE = 'locale';
 
@@ -28,3 +32,5 @@ export const locale = {
     updater();
   },
 };
+
+// --------------------------------

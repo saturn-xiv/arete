@@ -30,9 +30,7 @@ fi
 echo 'Build frontend....'
 cd dashboard
 if [ ! -f ".yarn.lock" ]
-then
-	yarn set version berry
-	yarn set version latest
+then	
 	touch yarn.lock
 	yarn install
 fi

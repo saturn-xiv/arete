@@ -123,6 +123,10 @@ $ # favicon.ico: 16x16 32x32 64x64
 - [famfamfam icons](http://www.famfamfam.com/lab/icons/)
 - [yarn](https://yarnpkg.com/getting-started)
 
+### Icons
+
+- [Fluent UI Icons](https://developer.microsoft.com/en-us/fluentui#/styles/web/icons)
+
 ### Guidelines
 
 - [Alibaba Java Coding Guidelines](https://github.com/alibaba/p3c)
