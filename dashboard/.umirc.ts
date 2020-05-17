@@ -5,5 +5,7 @@ export default defineConfig({
     type: 'none',
   },
   base: '/my/',
-  locale: {},
+  locale: { default: 'en-US' },
+  antd: false,
+  layout: false,
 });

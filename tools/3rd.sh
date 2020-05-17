@@ -13,9 +13,5 @@ yarn add urijs @types/urijs \
     emoji-mart google-map-react \
     qrcode.react react-copy-to-clipboard \
     famfamfam-flags famfamfam-mini famfamfam-silk \
-    react-intl \
-    redux react-redux @types/react-redux \
-    react-router-dom @types/react-router-dom \
-    @loadable/component @types/loadable__component \
     react-helmet @types/react-helmet \
-    @fluentui/react \
+    @fluentui/react

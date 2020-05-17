@@ -1,0 +1,7 @@
+@import '~react-quill/dist/quill.snow.css';
+@import '~react-mde/lib/styles/css/react-mde-all.css';
+
+body {
+  margin: 0;
+  padding: 0;
+}
