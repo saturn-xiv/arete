@@ -11,8 +11,9 @@ yarn add urijs @types/urijs \
     moment moment-timezone react-moment @types/moment-timezone \
     react-quill react-mde react-markdown \
     emoji-mart google-map-react \
-    qrcode.react react-copy-to-clipboard \
-    famfamfam-flags famfamfam-mini famfamfam-silk \
+    qrcode.react react-copy-to-clipboard \    
     react-helmet @types/react-helmet \
-    validate.js \
-    @fluentui/react react-grid-layout @types/react-grid-layout
+    react-intl \
+    redux react-redux @types/react-redux \
+    react-router-dom @types/react-router-dom \
+    @loadable/component @types/loadable__component \

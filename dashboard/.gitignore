@@ -1,0 +1,8 @@
+# nodejs
+/node_modules/
+/.yarn/
+/yarn.lock
+
+# production
+/build/
+

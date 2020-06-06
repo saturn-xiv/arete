@@ -1,18 +1,12 @@
 # cargo
 /target/
 
-# dependencies
-/node_modules
-
-# yarn
+# nodejs
+/node_modules/
 /.yarnrc.yml
 /.yarn/
-/.pnp.js
 /yarn.lock
 
 # testing
 /tmp/
 /config.toml
-
-#building
-/dist*
