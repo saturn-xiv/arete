@@ -81,7 +81,6 @@ $ # favicon.ico: 16x16 32x32 64x64
 ### Rust
 
 - [Diesel: A safe, extensible ORM and Query Builder for Rust](https://github.com/diesel-rs/diesel)
-
 - [Actix web is a small, pragmatic, and extremely fast rust web framework](https://github.com/actix/actix-web)
 - [Juniper](https://graphql-rust.github.io/juniper/current/)
 

@@ -18,6 +18,7 @@ import logging
 import csv
 import tempfile
 import datetime
+import hashlib
 from urllib.request import pathname2url
 
 logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
@@ -25,10 +26,11 @@ logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
 
 
 def _concat(in_):
-    out = datetime.datetime.now().strftime("%Y%m%d%H:%M:%S.mp4")
-    logging.debug("generate file %s" % out)
+    out = datetime.datetime.now().strftime("%Y%m%d%H%M%S.mp4")
+    logging.debug("generate out file %s" % out)
     job = subprocess.Popen(
-        ["ffmpeg", "-f", "concat", "-i", in_,  "-c", "copy", out],
+        ["ffmpeg",  "-f", "concat", "-i", in_,
+            "-c", "copy", out],  # "-safe", '0',
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT
     )
@@ -45,7 +47,11 @@ def _split(_in, begin, end):
         logging.error("can't find file %s" % _in)
         return
 
-    out = pathname2url(_in, begin, end)
+    # out = pathname2url(begin + end + _in)
+    md = hashlib.md5()
+    md.update([_in, begin, end].join('-'))
+    out = md.hexdigest()+".mp4"
+
     if os.path.exists(out):
         logging.warning("%s already exists, ignore" % out)
         return out
@@ -61,7 +67,7 @@ def _split(_in, begin, end):
         logging.error(stderr)
         return
     logging.debug(stdout)
-    return pathname2url(_in, begin, end)
+    return out
 
 
 def _run(name):
@@ -82,9 +88,11 @@ def _run(name):
         in_ = "%s.txt" % name
         with open(in_, 'w') as file:
             for it in items:
+                file.write('file')
+                file.write(" '")
                 file.write(it)
-                file.write("\n")
-        out = _concat(in_, "%s.mp4")
+                file.write("'\n")
+        out = _concat(in_)
         if out:
             logging.info("Done!")
 

@@ -1,9 +1,11 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use amq_protocol_uri::{AMQPAuthority, AMQPUri, AMQPUserInfo};
+
+use futures_util::stream::StreamExt;
 use lapin::{
-    message::Delivery, options::*, types::FieldTable, BasicProperties, Channel, CloseOnDrop,
-    Connection, ConnectionProperties, Queue,
+    message::Delivery, options::*, types::FieldTable, BasicProperties, Channel, Connection,
+    ConnectionProperties,
 };
 
 use super::super::errors::Result;
@@ -58,21 +60,17 @@ pub struct RabbitMQ {
 }
 
 impl RabbitMQ {
-    pub async fn open(&self, queue: &str) -> Result<(CloseOnDrop<Channel>, Queue)> {
+    pub async fn open(&self, queue: &str) -> Result<Channel> {
         let con = Connection::connect_uri(self.uri.clone(), self.conn.clone()).await?;
-        debug!("connected");
         let ch = con.create_channel().await?;
-        debug!("create channel {}", ch.id());
-        let qu = ch
-            .queue_declare(queue, QueueDeclareOptions::default(), FieldTable::default())
+        ch.queue_declare(queue, QueueDeclareOptions::default(), FieldTable::default())
             .await?;
-        debug!("channel {} declared queue {}", ch.id(), queue);
-        Ok((ch, qu))
+        Ok(ch)
     }
 
     pub async fn publish(&self, queue: &str, task: super::Task) -> Result<()> {
-        let (ch, _) = self.open(queue).await?;
-        info!("publish task {}", task.id);
+        let ch = self.open(queue).await?;
+        info!("publish task {}://{}", queue, task.id);
         ch.basic_publish(
             "",
             queue,
@@ -88,6 +86,7 @@ impl RabbitMQ {
                         .as_secs(),
                 ),
         )
+        .await?
         .await?;
 
         Ok(())
@@ -99,8 +98,8 @@ impl RabbitMQ {
         queue: &str,
         handler: &H,
     ) -> Result<()> {
-        let (ch, _qu) = self.open(queue).await?;
-        let consumer = ch
+        let ch = self.open(queue).await?;
+        let mut cm = ch
             .basic_consume(
                 queue,
                 consumer,
@@ -108,20 +107,18 @@ impl RabbitMQ {
                 FieldTable::default(),
             )
             .await?;
-        info!("consuming from channel {}...", ch.id());
-        for delivery in consumer {
-            info!("received message: {:?}", delivery);
-            if let Ok(delivery) = delivery {
-                let tag = delivery.delivery_tag;
-                match handle_message(delivery, handler) {
-                    Ok(_) => {
-                        ch.basic_ack(tag, BasicAckOptions::default()).wait()?;
-                    }
-                    Err(e) => {
-                        error!("handler message: {:?}", e);
-                    }
-                }
-            }
+        info!(
+            "consuming from channel {}@{}/{}...",
+            consumer,
+            queue,
+            ch.id()
+        );
+        while let Some(msg) = cm.next().await {
+            let (ch, msg) = msg?;
+            debug!("received message: {:?}", msg);
+            handle_message(msg.clone(), handler)?;
+            ch.basic_ack(msg.delivery_tag, BasicAckOptions::default())
+                .wait()?;
         }
         Ok(())
     }
