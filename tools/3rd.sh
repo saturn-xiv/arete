@@ -11,9 +11,10 @@ yarn add urijs @types/urijs \
     moment moment-timezone react-moment @types/moment-timezone \
     react-quill react-mde react-markdown \
     emoji-mart google-map-react \
-    qrcode.react react-copy-to-clipboard \    
+    qrcode.react react-copy-to-clipboard \
     react-helmet @types/react-helmet \
     react-intl \
     redux react-redux @types/react-redux \
     react-router-dom @types/react-router-dom \
     @loadable/component @types/loadable__component \
+    @material-ui/core @material-ui/icons fontsource-roboto
