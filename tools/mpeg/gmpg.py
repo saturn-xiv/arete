@@ -1,16 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Setup.
-
-https://www.riverbankcomputing.com/static/Docs/PyQt5/
-http://zetcode.com/gui/pyqt5/
-
-install third packages:
-$ sudo apt-get install ffmpeg
-
-"""
-
 
 import csv
 import sys
@@ -19,7 +9,7 @@ import logging
 from datetime import datetime
 
 from PyQt5.QtWidgets import QApplication, QProgressDialog, QDateTimeEdit, QLabel, QSizePolicy, QDialog, QAbstractScrollArea, QTableView, QAbstractItemView, QPushButton, QListView, QVBoxLayout,  QHBoxLayout, QMenu, QToolBar, QWidget, QDesktopWidget, QFileDialog, QListWidget, QAction, QMainWindow, QMessageBox, QStyle, QHeaderView
-from PyQt5.QtGui import QIcon, QStandardItemModel, QStandardItem
+from PyQt5.QtGui import QFont, QIcon, QStandardItemModel, QStandardItem
 from PyQt5.QtCore import QProcess, QDir, QEvent, pyqtSignal,  QThread, QCoreApplication, Qt, QTranslator, QObject,  QStringListModel, QTime
 
 
@@ -62,57 +52,53 @@ class MainWindow(QMainWindow):
         self.addToolBar(toolbar)
 
         self.toolbarNew = QAction(self)
-        self.toolbarNew.setIcon(self.style().standardIcon(
-            QStyle.SP_FileDialogNewFolder))
+        self.toolbarNew.setIcon(QIcon("icons/new.svg"))
         self.toolbarNew.triggered.connect(self.onNew)
         toolbar.addAction(self.toolbarNew)
 
         self.toolbarEdit = QAction(self)
-        self.toolbarEdit.setIcon(self.style().standardIcon(
-            QStyle.SP_LineEditClearButton))
+        self.toolbarEdit.setIcon(QIcon("icons/edit.svg"))
         self.toolbarEdit.triggered.connect(self.onEdit)
         toolbar.addAction(self.toolbarEdit)
 
         self.toolbarUp = QAction(self)
-        self.toolbarUp.setIcon(self.style().standardIcon(
-            QStyle.SP_ArrowUp))
+        self.toolbarUp.setIcon(QIcon("icons/arrow-up.svg"))
         self.toolbarUp.triggered.connect(self.onUp)
         toolbar.addAction(self.toolbarUp)
 
         self.toolbarDown = QAction(self)
-        self.toolbarDown.setIcon(self.style().standardIcon(
-            QStyle.SP_ArrowDown))
+        self.toolbarDown.setIcon(QIcon("icons/arrow-down.svg"))
         self.toolbarDown.triggered.connect(self.onDown)
         toolbar.addAction(self.toolbarDown)
 
         self.toolbarDelete = QAction(self)
-        self.toolbarDelete.setIcon(self.style().standardIcon(
-            QStyle.SP_DialogDiscardButton))
+        self.toolbarDelete.setIcon(QIcon("icons/ashbin.svg"))
         self.toolbarDelete.triggered.connect(self.onDelete)
         toolbar.addAction(self.toolbarDelete)
 
         self.toolbarRun = QAction(self)
-        self.toolbarRun.setIcon(self.style().standardIcon(
-            QStyle.SP_MediaPlay))
+        self.toolbarRun.setIcon(QIcon("icons/process.svg"))
         self.toolbarRun.triggered.connect(self.onRun)
         toolbar.addAction(self.toolbarRun)
 
         self.toolbarQuit = QAction(self)
-        self.toolbarQuit.setIcon(self.style().standardIcon(
-            QStyle.SP_DialogCloseButton))
+        self.toolbarQuit.setIcon(QIcon("icons/quit.svg"))
         self.toolbarQuit.triggered.connect(self.close)
         toolbar.addAction(self.toolbarQuit)
 
+        self.toolbarAbout = QAction(self)
+        self.toolbarAbout.setIcon(QIcon("icons/about.svg"))
+        self.toolbarAbout.triggered.connect(self.onAboutUs)
+        toolbar.addAction(self.toolbarAbout)
+
     def initMenuBar(self):
         self.quitFileMenu = QAction(self)
-        self.quitFileMenu.setIcon(self.style().standardIcon(
-            QStyle.SP_DialogCloseButton))
+        self.quitFileMenu.setIcon(QIcon("icons/quit.svg"))
         self.quitFileMenu.setShortcut('Ctrl+Q')
         self.quitFileMenu.triggered.connect(self.close)
 
         self.aboutHelpMenu = QAction(self)
-        self.aboutHelpMenu.setIcon(self.style().standardIcon(
-            QStyle.SP_DialogHelpButton))
+        self.aboutHelpMenu.setIcon(QIcon("icons/about.svg"))
         self.aboutHelpMenu.setShortcut('Ctrl+A')
         self.aboutHelpMenu.triggered.connect(self.onAboutUs)
 
@@ -189,6 +175,8 @@ class MainWindow(QMainWindow):
 
         # self.resize(800, 600)
         # self.move(QDesktopWidget().availableGeometry().center())
+        self.setWindowIcon(self.style().standardIcon(
+            QStyle.SP_ComputerIcon))
         self.showMaximized()
         self.show()
 
@@ -216,6 +204,9 @@ class MainWindow(QMainWindow):
             return
 
         command = "ffmpeg"
+        if os.name == 'nt':
+            command = "%s\\ffmpeg\\bin\\ffmpeg.ext" % os.getenv("SystemDrive")
+
         files = []
         for it in range(self.taskModel.rowCount()):
             file = self.taskModel.data(self.taskModel.index(it, 0))
@@ -231,13 +222,14 @@ class MainWindow(QMainWindow):
             dlg = ProgressDialog(self, out, command, args)
             dlg.exec()
 
-            if dlg.process.exitStatus() == QProcess.CrashExit:
+            if dlg.process.exitStatus() != QProcess.NormalExit:
                 QMessageBox.critical(self, QCoreApplication.translate(
                     'TaskTable', "error"), dlg.process.errorString())
                 return
             files.append(out)
 
         if len(files) <= 1:
+            self.appendLog("Done!")
             return
         args = ["-y", "-i", "concat:%s" % "|".join(files),
                 "-c", "copy", "-bsf:a", "aac_adtstoasc", name]
@@ -245,7 +237,7 @@ class MainWindow(QMainWindow):
         dlg = ProgressDialog(self, out, command, args)
         dlg.exec()
 
-        if dlg.process.exitStatus() == QProcess.CrashExit:
+        if dlg.process.exitStatus() != QProcess.NormalExit:
             QMessageBox.critical(self, QCoreApplication.translate(
                 'TaskTable', "error"), dlg.process.errorString())
             return
@@ -307,6 +299,8 @@ class MainWindow(QMainWindow):
 
         dlg.show()
         dlg.exec()
+        if (not dlg.file.text()) or dlg.begin.time() >= dlg.end.time():
+            return
         logging.debug("file=%s begin=%s end=%s" % (
             dlg.file.text(), dlg.begin.time(), dlg.end.time()))
         item = [QStandardItem(dlg.file.text()), QStandardItem(
@@ -351,6 +345,8 @@ class MainWindow(QMainWindow):
         self.toolbarRun.setText(QCoreApplication.translate('ToolBar', "run"))
         self.toolbarEdit.setText(QCoreApplication.translate('ToolBar', "edit"))
         self.toolbarQuit.setText(QCoreApplication.translate('ToolBar', "quit"))
+        self.toolbarAbout.setText(
+            QCoreApplication.translate('ToolBar', "about"))
 
         self.fileMenu.setTitle(
             QCoreApplication.translate('MenuBar', "file"))
@@ -438,6 +434,6 @@ if __name__ == '__main__':
                         level=logging.DEBUG)
     logging.info("start...")
     app = QApplication(sys.argv)
-    app.setStyle('Macintosh')  # 'Windows'
+    # app.setStyle('Cleanlooks')  # 'Windows' Macintosh
     win = MainWindow()
     sys.exit(app.exec_())
