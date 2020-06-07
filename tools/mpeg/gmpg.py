@@ -175,8 +175,7 @@ class MainWindow(QMainWindow):
 
         # self.resize(800, 600)
         # self.move(QDesktopWidget().availableGeometry().center())
-        self.setWindowIcon(self.style().standardIcon(
-            QStyle.SP_ComputerIcon))
+        self.setWindowIcon(QIcon("icons/moive.svg"))
         self.showMaximized()
         self.show()
 
@@ -390,6 +389,7 @@ class TaskDialog(QDialog):
 
         self.initUi()
         self.setWindowTitle(title)
+        # self.setMinimumWidth(200)
         self.setWindowModality(Qt.ApplicationModal)
 
     def initUi(self):

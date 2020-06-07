@@ -3,12 +3,12 @@
 <context>
     <name>ExitDialog</name>
     <message>
-        <location filename="../gmpg.py" line="184"/>
+        <location filename="../gmpg.py" line="183"/>
         <source>title</source>
         <translation>退出</translation>
     </message>
     <message>
-        <location filename="../gmpg.py" line="184"/>
+        <location filename="../gmpg.py" line="183"/>
         <source>body</source>
         <translation>你确定要退出么？</translation>
     </message>
@@ -16,12 +16,12 @@
 <context>
     <name>LogTable</name>
     <message>
-        <location filename="../gmpg.py" line="362"/>
+        <location filename="../gmpg.py" line="361"/>
         <source>created-at</source>
         <translation>发生时间</translation>
     </message>
     <message>
-        <location filename="../gmpg.py" line="362"/>
+        <location filename="../gmpg.py" line="361"/>
         <source>message</source>
         <translation>消息</translation>
     </message>
@@ -29,27 +29,27 @@
 <context>
     <name>MenuBar</name>
     <message>
-        <location filename="../gmpg.py" line="353"/>
+        <location filename="../gmpg.py" line="352"/>
         <source>file.quit</source>
         <translation>退出</translation>
     </message>
     <message>
-        <location filename="../gmpg.py" line="359"/>
+        <location filename="../gmpg.py" line="358"/>
         <source>help.about</source>
         <translation>关于我们</translation>
     </message>
     <message>
-        <location filename="../gmpg.py" line="351"/>
+        <location filename="../gmpg.py" line="350"/>
         <source>file</source>
         <translation>&amp;文件</translation>
     </message>
     <message>
-        <location filename="../gmpg.py" line="355"/>
+        <location filename="../gmpg.py" line="354"/>
         <source>lang</source>
         <translation>&amp;语言</translation>
     </message>
     <message>
-        <location filename="../gmpg.py" line="357"/>
+        <location filename="../gmpg.py" line="356"/>
         <source>help</source>
         <translation>&amp;帮助</translation>
     </message>
@@ -57,7 +57,7 @@
 <context>
     <name>TaskDialog</name>
     <message>
-        <location filename="../gmpg.py" line="291"/>
+        <location filename="../gmpg.py" line="290"/>
         <source>title.new</source>
         <translation>新增任务</translation>
     </message>
@@ -95,7 +95,7 @@
     <message>
         <location filename="../gmpg.py" line="398"/>
         <source>file</source>
-        <translation>文件</translation>
+        <translation>视频文件</translation>
     </message>
     <message>
         <location filename="../gmpg.py" line="401"/>
@@ -108,17 +108,17 @@
         <translation>截止时间</translation>
     </message>
     <message>
-        <location filename="../gmpg.py" line="285"/>
+        <location filename="../gmpg.py" line="284"/>
         <source>error</source>
         <translation>出错了</translation>
     </message>
     <message>
-        <location filename="../gmpg.py" line="285"/>
+        <location filename="../gmpg.py" line="284"/>
         <source>not-selected</source>
         <translation>请选择一行数据</translation>
     </message>
     <message>
-        <location filename="../gmpg.py" line="199"/>
+        <location filename="../gmpg.py" line="198"/>
         <source>empty</source>
         <translation>任务列表为空</translation>
     </message>
@@ -126,42 +126,42 @@
 <context>
     <name>ToolBar</name>
     <message>
-        <location filename="../gmpg.py" line="340"/>
+        <location filename="../gmpg.py" line="339"/>
         <source>new</source>
         <translation>新增</translation>
     </message>
     <message>
-        <location filename="../gmpg.py" line="341"/>
+        <location filename="../gmpg.py" line="340"/>
         <source>up</source>
         <translation>上移</translation>
     </message>
     <message>
-        <location filename="../gmpg.py" line="342"/>
+        <location filename="../gmpg.py" line="341"/>
         <source>down</source>
         <translation>下移</translation>
     </message>
     <message>
-        <location filename="../gmpg.py" line="343"/>
+        <location filename="../gmpg.py" line="342"/>
         <source>delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../gmpg.py" line="345"/>
+        <location filename="../gmpg.py" line="344"/>
         <source>run</source>
         <translation>运行</translation>
     </message>
     <message>
-        <location filename="../gmpg.py" line="347"/>
+        <location filename="../gmpg.py" line="346"/>
         <source>quit</source>
         <translation>退出</translation>
     </message>
     <message>
-        <location filename="../gmpg.py" line="346"/>
+        <location filename="../gmpg.py" line="345"/>
         <source>edit</source>
         <translation>编辑</translation>
     </message>
     <message>
-        <location filename="../gmpg.py" line="348"/>
+        <location filename="../gmpg.py" line="347"/>
         <source>about</source>
         <translation>关于</translation>
     </message>
@@ -169,7 +169,7 @@
 <context>
     <name>Window</name>
     <message>
-        <location filename="../gmpg.py" line="372"/>
+        <location filename="../gmpg.py" line="371"/>
         <source>title</source>
         <translation>MP4分割及连接器</translation>
     </message>
