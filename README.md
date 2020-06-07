@@ -110,6 +110,10 @@ $ # favicon.ico: 16x16 32x32 64x64
 - [Language Plural Rules](http://www.unicode.org/cldr/charts/28/supplemental/language_plural_rules.html)
 - [Creative Commons](https://creativecommons.org/licenses/)
 
+### Python
+
+- [PyQT5](http://zetcode.com/gui/pyqt5/)
+
 ### Tools
 
 - [A Fast and Flexible Static Site Generator](https://github.com/gohugoio/hugo)
