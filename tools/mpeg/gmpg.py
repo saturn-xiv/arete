@@ -150,12 +150,12 @@ class MainWindow(QMainWindow):
         self.taskModel.setHorizontalHeaderLabels(['file', 'begin', 'end'])
         self.taskTable.setModel(self.taskModel)
 
-        self.taskModel.appendRow(
-            [QStandardItem("in.mp4"), QStandardItem("00:00:15"), QStandardItem("00:00:30")])
-        self.taskModel.appendRow(
-            [QStandardItem("in.mp4"), QStandardItem("00:01:15"), QStandardItem("00:01:45")])
-        self.taskModel.appendRow(
-            [QStandardItem("in.mp4"), QStandardItem("00:02:00"), QStandardItem("00:03:00")])
+        # self.taskModel.appendRow(
+        #     [QStandardItem("in.mp4"), QStandardItem("00:00:15"), QStandardItem("00:00:30")])
+        # self.taskModel.appendRow(
+        #     [QStandardItem("in.mp4"), QStandardItem("00:01:15"), QStandardItem("00:01:45")])
+        # self.taskModel.appendRow(
+        #     [QStandardItem("in.mp4"), QStandardItem("00:02:00"), QStandardItem("00:03:00")])
 
         header = self.taskTable.horizontalHeader()
         header.setSectionResizeMode(0, QHeaderView.Stretch)
@@ -163,16 +163,16 @@ class MainWindow(QMainWindow):
         header.setSectionResizeMode(2, QHeaderView.ResizeToContents)
 
     def initLogList(self):
-        logTable = QTableView()
-        logTable.setSelectionBehavior(QTableView.SelectRows)
-        logTable.setSelectionMode(QAbstractItemView.ExtendedSelection)
-        self.box.addWidget(logTable)
+        self.logTable = QTableView()
+        self.logTable.setSelectionBehavior(QTableView.SelectRows)
+        self.logTable.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.box.addWidget(self.logTable)
 
         self.logModel = QStandardItemModel()
         self.logModel.setHorizontalHeaderLabels(['created-at', 'message'])
-        logTable.setModel(self.logModel)
+        self.logTable.setModel(self.logModel)
 
-        header = logTable.horizontalHeader()
+        header = self.logTable.horizontalHeader()
         header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
         header.setSectionResizeMode(1, QHeaderView.Stretch)
 
@@ -207,7 +207,13 @@ class MainWindow(QMainWindow):
 
     # https://stackoverflow.com/questions/32604886/ffmpeg-concat-protocol-does-not-combine-video-files
     def onRun(self):
-        name, _ = QFileDialog.getOpenFileName(self)
+        if self.taskModel.rowCount() == 0:
+            QMessageBox.critical(self, QCoreApplication.translate(
+                'TaskTable', "error"), QCoreApplication.translate('TaskTable', "empty"))
+            return
+        name, _ = QFileDialog.getSaveFileName(self)
+        if not name:
+            return
 
         command = "ffmpeg"
         files = []
@@ -215,9 +221,12 @@ class MainWindow(QMainWindow):
             file = self.taskModel.data(self.taskModel.index(it, 0))
             begin = self.taskModel.data(self.taskModel.index(it, 1))
             end = self.taskModel.data(self.taskModel.index(it, 2))
-            out = "%d-%s" % (it, name)
+            out = "%s.%d" % (name, it)
+            if self.taskModel.rowCount() == 1:
+                out = name
             args = ["-y", "-i", file, "-ss", begin,
-                    "-to", end, "-c", "copy", "-bsf:v", "h264_mp4toannexb", "-f", "mpegts", out]
+                    "-to", end, "-c", "copy", "-bsf:v", "h264_mp4toannexb",
+                    "-f", "mpegts", out]
             self.appendLog("%s %s" % (command, ' '.join(args)))
             dlg = ProgressDialog(self, out, command, args)
             dlg.exec()
@@ -228,7 +237,9 @@ class MainWindow(QMainWindow):
                 return
             files.append(out)
 
-        args = ["-y", "-i", "concat:%s" % '|'.join(files),
+        if len(files) <= 1:
+            return
+        args = ["-y", "-i", "concat:%s" % "|".join(files),
                 "-c", "copy", "-bsf:a", "aac_adtstoasc", name]
         self.appendLog("%s %s" % (command, ' '.join(args)))
         dlg = ProgressDialog(self, out, command, args)
@@ -311,6 +322,7 @@ class MainWindow(QMainWindow):
     def appendLog(self, msg):
         self.logModel.appendRow(
             [QStandardItem(str(datetime.now())), QStandardItem(msg)])
+        # self.logTable.resizeRowsToContents()
 
     def setLang(self, lng):
         logging.info("switch lang to %s" % lng)
@@ -404,8 +416,9 @@ class TaskDialog(QDialog):
         self.setLayout(box)
 
     def onSelectFile(self):
-        name, _type = QFileDialog.getOpenFileName(self)
-        self.file.setText(name)
+        name, _ = QFileDialog.getOpenFileName(self)
+        if name:
+            self.file.setText(name)
 
     def onSubmit(self):
         if not self.file.text():

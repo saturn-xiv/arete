@@ -1,5 +1,6 @@
 *.log
 *.csv
 *.mp4
+*.mp4.?
 *.txt
 *.qm
