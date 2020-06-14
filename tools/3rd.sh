@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # https://create-react-app.dev/docs/adding-typescript/
-# yarn create create-react-app dashboard --template typescript
+# yarn create react-app my-app --template typescript
 
 # third
 yarn add urijs @types/urijs \
@@ -9,7 +9,8 @@ yarn add urijs @types/urijs \
     jwt-decode @types/jwt-decode \
     dinero @types/dinero.js \
     moment moment-timezone react-moment @types/moment-timezone \
-    react-quill react-mde react-markdown \
+    draft-js react-quill react-mde react-markdown \
+    react-hook-form \
     emoji-mart google-map-react \
     qrcode.react react-copy-to-clipboard \
     react-helmet @types/react-helmet \

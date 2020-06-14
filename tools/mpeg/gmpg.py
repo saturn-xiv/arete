@@ -231,7 +231,7 @@ class MainWindow(QMainWindow):
             self.appendLog("Done!")
             return
         args = ["-y", "-i", "concat:%s" % "|".join(files),
-                "-c", "copy", "-bsf:a", "aac_adtstoasc", name]
+                "-c", "copy", "-brand", "mp42", "-bsf:a", "aac_adtstoasc", name]
         self.appendLog("%s %s" % (command, ' '.join(args)))
         dlg = ProgressDialog(self, out, command, args)
         dlg.exec()
