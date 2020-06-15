@@ -10,10 +10,11 @@ $ cd arete
 # start backend api
 $ cargo build
 $ ./target/debug/arete generate:config # setup config.toml
+$ yarn install
 $ cargo run
 # start dashboard at http://localhost:3000/my/
 $ cd dashboard
-$ yarn
+$ yarn install
 $ yarn start
 ```
 
