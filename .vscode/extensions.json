@@ -1,0 +1,12 @@
+{
+    "recommendations": [
+        "zhuangtongfa.material-theme",
+        "vscode-icons-team.vscode-icons",
+        "hookyqr.beautify",
+        "dbaeumer.vscode-eslint",
+        "editorconfig.editorconfig",
+        "rust-lang.rust",
+        "bungcip.better-toml",
+        "adpyke.vscode-sql-formatter",
+    ]
+}
