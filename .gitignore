@@ -1,0 +1,6 @@
+# production
+/target/
+
+# misc 
+tmp/
+/config.toml
