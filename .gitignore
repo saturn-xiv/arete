@@ -1,5 +1,6 @@
 # production
 /target/
+node_modules/
 
 # misc 
 tmp/
