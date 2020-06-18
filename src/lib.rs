@@ -15,6 +15,8 @@ extern crate failure;
 #[macro_use]
 extern crate serde_json;
 
+extern crate actix_files;
+extern crate actix_web;
 extern crate amq_protocol_uri;
 extern crate askama;
 extern crate base64;
@@ -95,3 +97,4 @@ lazy_static! {
 }
 
 pub const XML_HEADER: &str = r###"<?xml version="1.0" encoding="utf-8" ?>"###;
+pub const VIEWS_ROOT: &str = "themes";

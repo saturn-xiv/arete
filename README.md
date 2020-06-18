@@ -92,6 +92,7 @@ $ # favicon.ico: 16x16 32x32 64x64
 - [1 million+ Stunning Free Images to Use Anywhere](https://pixabay.com/)
 - [famfamfam icons](http://www.famfamfam.com/lab/icons/)
 - [yarn](https://yarnpkg.com/getting-started)
+- [Handlebars](https://handlebarsjs.com/guide/)
 
 ### Icons
 

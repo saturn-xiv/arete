@@ -76,7 +76,6 @@ url = "2"
 clap = "2"
 percent-encoding = "2"
 mime_guess = "2"
-handlebars = "3"
 tempfile = "3"
 amq-protocol-uri = "6.0.0-rc11"
 jsonwebtoken = "7"
@@ -109,6 +108,10 @@ features = ["from_url"]
 [dependencies.diesel]
 version = "1"
 features = ["chrono", "serde_json", "uuid", "numeric", "r2d2", "postgres", "mysql", "sqlite"]
+
+[dependencies.handlebars]
+version = "3"
+features = ["dir_source"]
 
 [dependencies.openssl-sys]
 version = "*"

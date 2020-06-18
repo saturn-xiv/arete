@@ -44,35 +44,6 @@ impl fmt::Display for Environment {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub enum Theme {
-    #[serde(rename = "bootstrap")]
-    Bootstrap,
-    #[serde(rename = "bulma")]
-    Bulma,
-    #[serde(rename = "materialize")]
-    Materialize,
-    #[serde(rename = "semantic-ui")]
-    SemanticUi,
-}
-
-impl Default for Theme {
-    fn default() -> Self {
-        Self::Bootstrap
-    }
-}
-
-impl fmt::Display for Theme {
-    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Theme::Bootstrap => fmt.write_str("bootstrap"),
-            Theme::SemanticUi => fmt.write_str("semantic-ui"),
-            Theme::Materialize => fmt.write_str("materialize"),
-            Theme::Bulma => fmt.write_str("bulma"),
-        }
-    }
-}
-
 #[derive(Serialize, Deserialize, Default, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Config {
@@ -89,7 +60,6 @@ pub struct Config {
 pub struct Http {
     pub origin: String,
     pub port: u16,
-    pub theme: Theme,
     pub upload: Upload,
 }
 
@@ -99,7 +69,6 @@ impl Default for Http {
             port: 8080,
             upload: Upload::default(),
             origin: "https://www.change-me.com".to_string(),
-            theme: Theme::Bootstrap,
         }
     }
 }

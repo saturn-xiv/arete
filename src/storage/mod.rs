@@ -1,4 +1,5 @@
 pub mod fs;
+pub mod s3;
 
 use super::errors::Result;
 

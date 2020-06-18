@@ -1,5 +1,4 @@
 use std::net::SocketAddr;
-use std::sync::Arc;
 
 use actix_cors::Cors;
 use actix_session::CookieSession;
@@ -9,6 +8,7 @@ use actix_web::{
     web, App, HttpServer,
 };
 use chrono::Duration as ChronoDuration;
+use handlebars::Handlebars;
 
 use super::super::super::{
     crypto::Crypto,
@@ -17,12 +17,22 @@ use super::super::super::{
     graphql,
     jwt::Jwt,
     plugins::nut,
-    storage::fs::FileSystem,
+    VIEWS_ROOT,
 };
 
 #[actix_rt::main]
 pub async fn launch(cfg: Config) -> Result<()> {
     let db = cfg.database.open()?;
+
+    info!("load theme files");
+    let mut handlebars = Handlebars::new();
+    {
+        handlebars.set_strict_mode(true);
+        handlebars.register_templates_directory(".hbs", VIEWS_ROOT)?;
+        // let tr = "";
+        // let ago = ""
+    }
+    let handlebars = web::Data::new(handlebars);
 
     info!("start send email thread");
     // {
@@ -56,12 +66,11 @@ pub async fn launch(cfg: Config) -> Result<()> {
         key?
     };
     let origin = cfg.http.origin.clone();
-    let theme = cfg.http.theme.clone();
     let jwt = Jwt::new(cfg.secrets.0.clone());
     let enc = Crypto::new(cfg.secrets.clone())?;
     let mq = cfg.rabbitmq.open();
     let che = cfg.cache.open()?;
-    let schema = Arc::new(graphql::Schema::new(
+    let schema = web::Data::new(graphql::Schema::new(
         graphql::query::Root {},
         graphql::mutation::Root {},
     ));
@@ -69,13 +78,13 @@ pub async fn launch(cfg: Config) -> Result<()> {
 
     HttpServer::new(move || {
         App::new()
-            .data(theme.clone())
             .data(db.clone())
             .data(che.clone())
             .data(enc.clone())
             .data(jwt.clone())
             .data(mq.clone())
-            .data(schema.clone())
+            .app_data(schema.clone())
+            .app_data(handlebars.clone())
             .wrap(Logger::default())
             .data(web::JsonConfig::default().limit(1 << 16))
             .wrap(match env {
@@ -103,18 +112,18 @@ pub async fn launch(cfg: Config) -> Result<()> {
                 CookieSession::signed(&cookie)
                     .name(NAME)
                     .http_only(true)
-                    .max_age(ChronoDuration::hours(1).num_seconds())
+                    .max_age_time(ChronoDuration::hours(1))
                     .path("/")
                     .secure(cfg!(not(debug_assertions))),
             )
+            .service(nut::html::home)
+            .service(nut::html::assets)
             .service(nut::html::seo::rss)
             .service(nut::html::seo::robots_txt)
             .service(nut::html::seo::sitemap_xml_gz)
             .service(web::resource(graphql::SOURCE).route(web::post().to(graphql::post)))
             .service(web::resource("/graphiql").route(web::get().to(graphql::get)))
             .service(actix_files::Files::new("/3rd", "node_modules").use_last_modified(true))
-            .service(actix_files::Files::new("/assets", "assets").use_last_modified(true))
-            .service(actix_files::Files::new("/upload", FileSystem::root()).use_last_modified(true))
     })
     .bind(addr)?
     .run()
