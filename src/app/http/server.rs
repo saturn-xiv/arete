@@ -1,3 +1,5 @@
+use std::ffi::OsStr;
+use std::fs::read_dir;
 use std::net::SocketAddr;
 
 use actix_cors::Cors;
@@ -20,6 +22,12 @@ use super::super::super::{
     VIEWS_ROOT,
 };
 
+// handlebars_helper!(lower: |s: str| s.to_lowercase());
+// handlebars_helper!(upper: |s: str| s.to_uppercase());
+// handlebars_helper!(hex: |v: i64| format!("0x{:x}", v));
+// handlebars_helper!(money: |v: i64, {cur: str="$"}| format!("{}{}.00", cur, v));
+// handlebars_helper!(datetime: |v: NaiveDateTime, {format: str="%c"}| v.format(format));
+
 #[actix_rt::main]
 pub async fn launch(cfg: Config) -> Result<()> {
     let db = cfg.database.open()?;
@@ -28,9 +36,26 @@ pub async fn launch(cfg: Config) -> Result<()> {
     let mut handlebars = Handlebars::new();
     {
         handlebars.set_strict_mode(true);
+        {
+            // handlebars.register_helper("lower", Box::new(lower));
+            // handlebars.register_helper("upper", Box::new(upper));
+            // handlebars.register_helper("hex", Box::new(hex));
+            // handlebars.register_helper("money", Box::new(money));
+            // handlebars.register_helper("datetime", Box::new(datetime));
+        }
+        for entry in read_dir("helpers")? {
+            let entry = entry?;
+            let path = entry.path();
+            if path.is_file() && path.extension() == Some(OsStr::new("rhai")) {
+                if let Some(name) = path.file_stem() {
+                    if let Some(name) = name.to_str() {
+                        debug!("load template helper {}", name);
+                        handlebars.register_script_helper_file(name, &path)?;
+                    }
+                }
+            }
+        }
         handlebars.register_templates_directory(".hbs", VIEWS_ROOT)?;
-        // let tr = "";
-        // let ago = ""
     }
     let handlebars = web::Data::new(handlebars);
 

@@ -111,7 +111,7 @@ features = ["chrono", "serde_json", "uuid", "numeric", "r2d2", "postgres", "mysq
 
 [dependencies.handlebars]
 version = "3"
-features = ["dir_source"]
+features = ["dir_source", "script_helper"]
 
 [dependencies.openssl-sys]
 version = "*"

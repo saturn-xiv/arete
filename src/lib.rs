@@ -14,6 +14,8 @@ extern crate diesel;
 extern crate failure;
 #[macro_use]
 extern crate serde_json;
+#[macro_use]
+extern crate handlebars;
 
 extern crate actix_files;
 extern crate actix_web;
