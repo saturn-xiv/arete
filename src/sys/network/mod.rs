@@ -1,7 +1,8 @@
 pub mod dhcp;
-pub mod setup;
+pub mod systemd;
+pub mod ubuntu;
 
-use std::fs::File;
+use std::fs::{read_to_string, File};
 use std::io::prelude::*;
 use std::net::{Ipv4Addr, Ipv6Addr, SocketAddr};
 use std::path::{Component, Path};
@@ -9,6 +10,18 @@ use std::path::{Component, Path};
 use eui48::MacAddress;
 
 use super::super::errors::Result;
+
+pub fn mac(n: &str) -> Result<MacAddress> {
+    let it = read_to_string(
+        Path::new(&Component::RootDir)
+            .join("sys")
+            .join("class")
+            .join("net")
+            .join(n)
+            .join("address"),
+    )?;
+    Ok(it.trim().parse()?)
+}
 
 pub fn is_on(name: &str) -> Result<bool> {
     let mut fd = File::open(
@@ -43,66 +56,54 @@ pub fn interfaces() -> Result<Vec<String>> {
     Ok(items)
 }
 
-pub fn ip4(name: &str) -> Result<Option<Ipv4Addr>> {
-    let items = nix::ifaddrs::getifaddrs()?
-        .filter(|x| x.interface_name == *name)
-        .map(|x| {
-            if let Some(addr) = x.address {
+pub fn ip4(name: &str) -> Result<Ipv4Addr> {
+    for it in nix::ifaddrs::getifaddrs()? {
+        if it.interface_name == *name {
+            if let Some(addr) = it.address {
                 if let nix::sys::socket::SockAddr::Inet(addr) = addr {
                     if let SocketAddr::V4(addr) = addr.to_std() {
-                        return Some(*addr.ip());
+                        return Ok(*addr.ip());
                     }
                 }
             }
-            None
-        })
-        .filter(|x| *x != None)
-        .collect::<Vec<_>>();
+        }
+    }
 
-    Ok(match items.first() {
-        Some(it) => *it,
-        None => None,
-    })
+    Err(format_err!("bad network device {}", name))
 }
 
-pub fn ip6(name: &str) -> Result<Option<Ipv6Addr>> {
-    let items = nix::ifaddrs::getifaddrs()?
-        .filter(|x| x.interface_name == *name)
-        .map(|x| {
-            if let Some(addr) = x.address {
+pub fn ip6(name: &str) -> Result<Ipv6Addr> {
+    for it in nix::ifaddrs::getifaddrs()? {
+        if it.interface_name == *name {
+            if let Some(addr) = it.address {
                 if let nix::sys::socket::SockAddr::Inet(addr) = addr {
                     if let SocketAddr::V6(addr) = addr.to_std() {
-                        return Some(*addr.ip());
+                        return Ok(*addr.ip());
                     }
                 }
             }
-            None
-        })
-        .filter(|x| *x != None)
-        .collect::<Vec<_>>();
+        }
+    }
 
-    Ok(match items.first() {
-        Some(it) => *it,
-        None => None,
-    })
+    Err(format_err!("bad network device {}", name))
 }
 
-pub fn mac(name: &str) -> Result<Option<MacAddress>> {
-    let items = nix::ifaddrs::getifaddrs()?
-        .filter(|x| x.interface_name == *name)
-        .map(|x| {
-            if let Some(addr) = x.address {
-                if let nix::sys::socket::SockAddr::Link(addr) = addr {
-                    return Some(MacAddress::new(addr.addr()));
-                }
-            }
-            None
-        })
-        .filter(|x| *x != None)
-        .collect::<Vec<_>>();
+// pub fn mac(name: &str) -> Result<Option<MacAddress>> {
+//     let items = nix::ifaddrs::getifaddrs()?
+//         .filter(|x| x.interface_name == *name)
+//         .map(|x| {
+//             if let Some(addr) = x.address {
+//                 if let nix::sys::socket::SockAddr::Link(addr) = addr {
+//                     return Some(MacAddress::new(addr.addr()));
+//                 }
+//             }
+//             None
+//         })
+//         .filter(|x| *x != None)
+//         .collect::<Vec<_>>();
 
-    Ok(match items.first() {
-        Some(it) => *it,
-        None => None,
-    })
-}
+//     Ok(match items.first() {
+//         Some(it) => *it,
+//         None => None,
+//     })
+// }

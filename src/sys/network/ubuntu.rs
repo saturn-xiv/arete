@@ -15,7 +15,6 @@
 ///
 /// To summarize, the key derivation process involves iterating a HMAC-SHA1 function 4096 times, and then doing that again to produce more key bits.
 use std::fmt;
-use std::fs::read_to_string;
 use std::path::{Component, Path, PathBuf};
 
 use askama::Template;
@@ -32,18 +31,6 @@ lazy_static! {
         .join("etc")
         .join("wpa_supplicant")
         .join("wpa_supplicant.conf");
-}
-
-pub fn mac(n: &str) -> Result<String> {
-    let it = read_to_string(
-        Path::new(&Component::RootDir)
-            .join("sys")
-            .join("class")
-            .join("net")
-            .join(n)
-            .join("address"),
-    )?;
-    Ok(it.trim().to_string())
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Template)]
@@ -70,25 +57,28 @@ impl Default for Interface {
 
 impl Interface {
     pub fn mac(&self) -> Result<String> {
-        if let Some((ref n, _)) = self.ether {
-            return mac(n);
-        }
-        if let Some((ref n, _)) = self.wifi {
-            return mac(n);
+        let name = if let Some((ref n, _)) = self.ether {
+            Some(n)
+        } else if let Some((ref n, _)) = self.wifi {
+            Some(n)
+        } else {
+            None
+        };
+        if let Some(name) = name {
+            let it = super::mac(name)?;
+            return Ok(it.to_hex_string());
         }
         Err(format_err!("network isn't enable"))
     }
 
     pub fn ip4(&self) -> Result<String> {
         if let Some((ref n, _)) = self.ether {
-            if let Some(v) = super::ip4(&n)? {
-                return Ok(format!("{}", v));
-            }
+            let ip = super::ip4(n)?;
+            return Ok(ip.to_string());
         }
         if let Some((ref n, _)) = self.wifi {
-            if let Some(v) = super::ip4(&n)? {
-                return Ok(format!("{}", v));
-            }
+            let ip = super::ip4(n)?;
+            return Ok(ip.to_string());
         }
         Err(format_err!("network isn't enable"))
     }
