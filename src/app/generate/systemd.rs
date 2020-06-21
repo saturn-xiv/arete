@@ -17,7 +17,7 @@ pub const COMMAND_NAME: &str = "generate:systemd";
 pub const COMMAND_ABOUT: &str = "Generate systemd service.conf";
 
 #[derive(Template)]
-#[template(path = "systemd.conf", escape = "none")]
+#[template(path = "systemd/service.conf", escape = "none")]
 struct Config<'a> {
     user: &'a str,
     group: &'a str,

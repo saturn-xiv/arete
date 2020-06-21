@@ -1,0 +1,15 @@
+[Match]
+Name={{ name }}
+
+[Network]
+LinkLocalAddressing=ipv6
+Address={{ address }}/{{ netmask }}
+Gateway={{ gateway }}
+DNS={{ dns1 }}
+{% match dns2 %}
+  {% when Some with (it) %}
+DNS={{ it }}  
+  {% when None %}
+{% endmatch %}
+
+

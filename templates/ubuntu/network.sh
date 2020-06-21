@@ -1,4 +1,4 @@
-using ip instead of ifconfig
+# using ip instead of ifconfig
 
 auto lo
 iface lo inet loopback

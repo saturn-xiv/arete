@@ -1,0 +1,13 @@
+[Match]
+Name={{ name }}
+
+[Network]
+DHCP=ipv4
+LinkLocalAddressing=ipv6
+
+[DHCP]
+RouteMetric={{ metric }}
+UseMTU=true
+{% if options.len() > 0 %}
+RequestOptions={% for it in options %}{{it}} {% endfor %}
+{% endif %}

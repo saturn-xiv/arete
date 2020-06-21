@@ -34,7 +34,7 @@ lazy_static! {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Template)]
-#[template(path = "network.sh", escape = "none")]
+#[template(path = "ubuntu/network.sh", escape = "none")]
 #[serde(rename_all = "camelCase")]
 pub struct Interface {
     pub wifi: Option<(String, Wifi)>,
