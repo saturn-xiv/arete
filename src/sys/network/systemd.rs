@@ -33,7 +33,7 @@ pub enum Wifi {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Template)]
-#[template(path = "systemd/wpa.conf", escape = "none")]
+#[template(path = "systemd/wpa.service", escape = "none")]
 #[serde(rename_all = "camelCase")]
 pub struct Wpa;
 
