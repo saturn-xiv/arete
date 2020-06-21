@@ -6,6 +6,8 @@ systemctl enable wpa_supplicant@wlan0.conf
 systemctl enable systemd-networkd
 systemctl enable systemd-resolved
 ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
+
+/etc/systemd/network/00-wireless-dhcp.network
 */
 #[derive(Serialize, Deserialize, Debug, Clone, Template)]
 #[template(path = "systemd/wpa_supplicant.conf", escape = "none")]

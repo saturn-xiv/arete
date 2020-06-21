@@ -23,18 +23,21 @@ pub fn mac(n: &str) -> Result<MacAddress> {
     Ok(it.trim().parse()?)
 }
 
-pub fn is_on(name: &str) -> Result<bool> {
-    let mut fd = File::open(
+pub fn is_on(name: &str) -> bool {
+    if let Ok(mut fd) = File::open(
         Path::new(&Component::RootDir)
             .join("sys")
             .join("class")
             .join("net")
             .join(name)
             .join("operstate"),
-    )?;
-    let mut buf = String::new();
-    fd.read_to_string(&mut buf)?;
-    Ok(buf.trim() == "up")
+    ) {
+        let mut buf = String::new();
+        if fd.read_to_string(&mut buf).is_ok() {
+            return buf.trim() == "up";
+        }
+    }
+    false
 }
 
 pub fn interfaces() -> Result<Vec<String>> {
