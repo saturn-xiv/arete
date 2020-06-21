@@ -1,8 +1,13 @@
 use askama::Template;
 
 /*
+
+https://wiki.debian.org/SystemdNetworkd
+
 wpa_passphrase MyNetwork SuperSecretPassphrase > /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
-systemctl enable wpa_supplicant@wlan0.conf
+
+echo "@reboot root /sbin/wpa_supplicant -B -i wlan0 -c /etc/wpa_supplicant/wpa_supplicant-wlan0.conf" > /etc/cron.d/wifi
+
 systemctl enable systemd-networkd
 systemctl enable systemd-resolved
 ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
@@ -26,6 +31,11 @@ pub enum Wifi {
         password: String,
     },
 }
+
+#[derive(Serialize, Deserialize, Debug, Clone, Template)]
+#[template(path = "systemd/wpa.conf", escape = "none")]
+#[serde(rename_all = "camelCase")]
+pub struct Wpa;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Template)]
 #[template(path = "systemd/dhcp.network", escape = "none")]
