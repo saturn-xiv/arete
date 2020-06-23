@@ -1,9 +1,26 @@
+use std::fs::{remove_file, File};
+use std::io::prelude::*;
 use std::net::Ipv4Addr;
+use std::path::{Component, Path, PathBuf};
 
 use askama::Template;
 use ipnetwork::Ipv4Network;
 
 use super::super::super::errors::Result;
+
+lazy_static! {
+    pub static ref SYSTEM: PathBuf = Path::new(&Component::RootDir)
+        .join("etc")
+        .join("systemd")
+        .join("system");
+    pub static ref NETWORK: PathBuf = Path::new(&Component::RootDir)
+        .join("etc")
+        .join("systemd")
+        .join("network");
+    pub static ref WPA_SUPPLICANT: PathBuf = Path::new(&Component::RootDir)
+        .join("etc")
+        .join("wpa_supplicant");
+}
 
 /*
 
@@ -39,10 +56,43 @@ pub enum Wifi {
     },
 }
 
+impl Wifi {
+    pub fn save(&self, name: &str) -> Result<()> {
+        let fd = Self::file(name);
+        debug!("generate {}", fd.display());
+        let buf = self.render()?;
+        let mut fd = File::create(fd)?;
+        write!(fd, "{}", buf)?;
+        Ok(())
+    }
+
+    pub fn remove(&self, name: &str) -> Result<()> {
+        let fd = Self::file(name);
+        debug!("remove {}", fd.display());
+        remove_file(fd)?;
+        Ok(())
+    }
+
+    fn file(name: &str) -> PathBuf {
+        WPA_SUPPLICANT.join(format!("wpa_supplicant-{}.conf", name))
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone, Template)]
 #[template(path = "systemd/wpa.service", escape = "none")]
 #[serde(rename_all = "camelCase")]
 pub struct Wpa;
+
+impl Wpa {
+    pub fn save(&self, name: &str) -> Result<()> {
+        let fd = SYSTEM.join(format!("wpa_supplicant@{}.service", name));
+        debug!("generate {}", fd.display());
+        let buf = self.render()?;
+        let mut fd = File::create(fd)?;
+        write!(fd, "{}", buf)?;
+        Ok(())
+    }
+}
 
 #[derive(Serialize, Deserialize, Debug, Clone, Template)]
 #[template(path = "systemd/dhcp.network", escape = "none")]
@@ -51,6 +101,17 @@ pub struct Dhcp {
     pub name: String,
     pub metric: u8,
     pub options: Vec<u8>,
+}
+
+impl Dhcp {
+    pub fn save(&self, vendor: &str) -> Result<()> {
+        let fd = NETWORK.join(&format!("00-{}-{}.network", vendor, self.name));
+        debug!("generate {}", fd.display());
+        let buf = self.render()?;
+        let mut fd = File::create(&fd)?;
+        write!(fd, "{}", buf)?;
+        Ok(())
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Template)]
@@ -66,6 +127,14 @@ pub struct Static {
 }
 
 impl Static {
+    pub fn save(&self, vendor: &str) -> Result<()> {
+        let fd = NETWORK.join(&format!("00-{}-{}.network", vendor, self.name));
+        debug!("generate {}", fd.display());
+        let buf = self.render()?;
+        let mut fd = File::create(&fd)?;
+        write!(fd, "{}", buf)?;
+        Ok(())
+    }
     pub fn new(
         name: &str,
         metric: u8,
