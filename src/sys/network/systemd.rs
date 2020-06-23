@@ -66,10 +66,12 @@ impl Wifi {
         Ok(())
     }
 
-    pub fn remove(&self, name: &str) -> Result<()> {
+    pub fn remove(name: &str) -> Result<()> {
         let fd = Self::file(name);
-        debug!("remove {}", fd.display());
-        remove_file(fd)?;
+        if fd.exists() {
+            debug!("remove {}", fd.display());
+            remove_file(fd)?;
+        }
         Ok(())
     }
 
