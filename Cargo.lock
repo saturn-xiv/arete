@@ -445,7 +445,7 @@ dependencies = [
  "handlebars",
  "hex",
  "humantime 2.0.1",
- "ipnet",
+ "ipnetwork",
  "jsonwebtoken",
  "juniper",
  "lapin",
@@ -2028,10 +2028,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "ipnet"
-version = "2.3.0"
+name = "ipnetwork"
+version = "0.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "47be2f14c678be2fdcab04ab1171db51b2762ce6f0a8ee87c8dd4a04ed216135"
+checksum = "b8eca9f51da27bc908ef3dd85c21e1bbba794edaf94d7841e37356275b82d31e"
 dependencies = [
  "serde",
 ]

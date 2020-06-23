@@ -1,9 +1,15 @@
+use std::net::Ipv4Addr;
+
 use askama::Template;
-use ipnet::Ipv4Net;
+use ipnetwork::Ipv4Network;
+
+use super::super::super::errors::Result;
 
 /*
 
 https://wiki.debian.org/SystemdNetworkd
+https://www.freedesktop.org/software/systemd/man/systemd.network.html
+https://tools.ietf.org/html/rfc4632
 
 wpa_passphrase MyNetwork SuperSecretPassphrase > /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
 
@@ -53,8 +59,33 @@ pub struct Dhcp {
 pub struct Static {
     pub name: String,
     pub metric: u8,
-    pub address: Ipv4Net,
-    pub gateway: String,
-    pub dns1: String,
-    pub dns2: Option<String>,
+    pub address: Ipv4Network,
+    pub gateway: Ipv4Addr,
+    pub dns1: Ipv4Addr,
+    pub dns2: Option<Ipv4Addr>,
+}
+
+impl Static {
+    pub fn new(
+        name: &str,
+        metric: u8,
+        address: &str,
+        netmask: &str,
+        gateway: &str,
+        dns1: &str,
+        dns2: Option<&str>,
+    ) -> Result<Self> {
+        let it = Self {
+            name: name.to_string(),
+            metric,
+            address: Ipv4Network::with_netmask(address.parse()?, netmask.parse()?)?,
+            gateway: gateway.parse()?,
+            dns1: dns1.parse()?,
+            dns2: match dns2 {
+                Some(v) => Some(v.parse()?),
+                None => None,
+            },
+        };
+        Ok(it)
+    }
 }

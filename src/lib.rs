@@ -35,7 +35,7 @@ extern crate futures_util;
 extern crate git2;
 extern crate hex;
 extern crate humantime;
-extern crate ipnet;
+extern crate ipnetwork;
 extern crate jsonwebtoken;
 extern crate juniper;
 extern crate lettre;
