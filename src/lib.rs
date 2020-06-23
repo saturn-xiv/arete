@@ -35,6 +35,7 @@ extern crate futures_util;
 extern crate git2;
 extern crate hex;
 extern crate humantime;
+extern crate ipnet;
 extern crate jsonwebtoken;
 extern crate juniper;
 extern crate lettre;
@@ -91,6 +92,7 @@ pub mod rfc;
 pub mod settings;
 pub mod storage;
 pub mod sys;
+pub mod theme;
 
 use chrono::{NaiveDateTime, Utc};
 

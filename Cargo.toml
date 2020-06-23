@@ -109,6 +109,10 @@ features = ["from_url"]
 version = "1"
 features = ["chrono", "serde_json", "uuid", "numeric", "r2d2", "postgres", "mysql", "sqlite"]
 
+[dependencies.ipnet]
+version = "2"
+features = ["serde"]
+
 [dependencies.handlebars]
 version = "3"
 features = ["dir_source", "script_helper"]

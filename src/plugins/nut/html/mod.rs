@@ -1,28 +1,44 @@
 pub mod seo;
 
+use std::ops::Deref;
 use std::path::Path;
 
 use actix_files::NamedFile;
-use actix_web::{get, web, HttpResponse, Responder};
-use chrono::Utc;
+use actix_web::{get, web, Responder};
 use handlebars::Handlebars;
-use mime::TEXT_HTML_UTF_8;
 
-use super::super::super::{errors::Result, VIEWS_ROOT};
+use super::super::super::{
+    cache::Pool as Cache, crypto::Crypto, errors::Result, orm::Pool as Db, request::Locale, theme,
+    VIEWS_ROOT,
+};
+
+#[derive(Serialize, Debug)]
+pub struct Home {}
 
 #[get("/")]
-async fn home(hbs: web::Data<Handlebars<'_>>) -> Result<impl Responder> {
-    // TODO get theme and tpl name from db
-    let body = hbs.render(
-        "bootstrap/views/home/blog",
-        &json!({
-            "now": Utc::now().naive_local()
-        }),
-    )?;
+async fn home(
+    db: web::Data<Db>,
+    ch: web::Data<Cache>,
+    hbs: web::Data<Handlebars<'_>>,
+    cyp: web::Data<Crypto>,
+    locale: Locale,
+) -> Result<impl Responder> {
+    let db = db.get()?;
+    let db = db.deref();
+    let mut ch = ch.get()?;
+    let cyp = cyp.deref();
+    let cyp = cyp.deref();
 
-    Ok(HttpResponse::Ok()
-        .content_type(TEXT_HTML_UTF_8.to_string())
-        .body(body))
+    theme::render(
+        "home",
+        &locale.0,
+        db,
+        cyp,
+        &mut ch,
+        &hbs,
+        "home/blog",
+        &Home {},
+    )
 }
 
 #[get("/assets/{theme}/{file:.*}")]

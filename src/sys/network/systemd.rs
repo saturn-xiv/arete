@@ -1,4 +1,5 @@
 use askama::Template;
+use ipnet::Ipv4Net;
 
 /*
 
@@ -52,8 +53,7 @@ pub struct Dhcp {
 pub struct Static {
     pub name: String,
     pub metric: u8,
-    pub address: String,
-    pub netmask: String,
+    pub address: Ipv4Net,
     pub gateway: String,
     pub dns1: String,
     pub dns2: Option<String>,

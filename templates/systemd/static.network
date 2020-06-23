@@ -3,7 +3,7 @@ Name={{ name }}
 
 [Network]
 LinkLocalAddressing=ipv6
-Address={{ address }}/{{ netmask }}
+Address={{ address }}
 Gateway={{ gateway }}
 DNS={{ dns1 }}
 {% match dns2 %}

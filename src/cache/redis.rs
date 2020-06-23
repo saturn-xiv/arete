@@ -44,6 +44,18 @@ impl fmt::Display for Config {
 }
 
 impl super::Provider for Connection {
+    #[cfg(debug_assertions)]
+    fn get<K, V, F>(&mut self, _key: &K, _ttl: Duration, fun: F) -> Result<V>
+    where
+        F: FnOnce() -> Result<V>,
+        K: Serialize,
+        V: DeserializeOwned + Serialize,
+    {
+        let val = fun()?;
+        Ok(val)
+    }
+
+    #[cfg(not(debug_assertions))]
     fn get<K, V, F>(&mut self, key: &K, ttl: Duration, fun: F) -> Result<V>
     where
         F: FnOnce() -> Result<V>,
