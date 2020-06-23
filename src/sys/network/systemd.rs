@@ -106,6 +106,8 @@ pub struct Dhcp {
 }
 
 impl Dhcp {
+    pub const WWW: u8 = 72;
+
     pub fn save(&self, vendor: &str) -> Result<()> {
         let fd = NETWORK.join(&format!("00-{}-{}.network", vendor, self.name));
         debug!("generate {}", fd.display());
