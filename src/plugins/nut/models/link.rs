@@ -37,9 +37,37 @@ pub trait Dao {
     ) -> Result<()>;
     fn all(&self) -> Result<Vec<Item>>;
     fn delete(&self, id: ID) -> Result<()>;
+    fn loc_by_lang(&self, lang: &str) -> Result<Vec<String>>;
+    fn by_lang_loc_x(&self, lang: &str, loc: &str, x: i16) -> Result<Vec<Item>>;
+    fn by_lang_loc_y(&self, lang: &str, loc: &str, y: i16) -> Result<Vec<Item>>;
 }
 
 impl Dao for Connection {
+    fn by_lang_loc_x(&self, lang: &str, loc: &str, x: i16) -> Result<Vec<Item>> {
+        let items = links::dsl::links
+            .filter(links::dsl::lang.eq(lang))
+            .filter(links::dsl::loc.eq(loc))
+            .filter(links::dsl::x.eq(x))
+            .order(links::dsl::y.asc())
+            .load::<Item>(self)?;
+        Ok(items)
+    }
+    fn by_lang_loc_y(&self, lang: &str, loc: &str, y: i16) -> Result<Vec<Item>> {
+        let items = links::dsl::links
+            .filter(links::dsl::lang.eq(lang))
+            .filter(links::dsl::loc.eq(loc))
+            .filter(links::dsl::y.eq(y))
+            .order(links::dsl::y.asc())
+            .load::<Item>(self)?;
+        Ok(items)
+    }
+    fn loc_by_lang(&self, lang: &str) -> Result<Vec<String>> {
+        Ok(links::dsl::links
+            .select(links::dsl::loc)
+            .filter(links::dsl::lang.eq(lang))
+            .distinct()
+            .load::<String>(self)?)
+    }
     fn by_id(&self, id: ID) -> Result<Item> {
         let it = links::dsl::links
             .filter(links::dsl::id.eq(id))

@@ -16,6 +16,7 @@ use super::{
     i18n::locale::Dao as LocaleDao,
     orm::Connection as Db,
     parser::from_toml,
+    plugins::nut::models::link::Dao as LinkDao,
     settings::Dao as SettingDao,
 };
 
@@ -69,8 +70,9 @@ pub struct Site {
     pub keywords: String,
     pub description: String,
     pub lang: String,
+    pub languages: Vec<String>,
     pub locales: HashMap<String, String>,
-    // pub nav: HashMap<String, Link>,
+    pub nav: HashMap<String, Nav>,
     pub created_at: NaiveDateTime,
 }
 
@@ -92,6 +94,31 @@ impl Site {
             items
         };
 
+        let nav = {
+            let mut items = HashMap::new();
+            for loc in LinkDao::loc_by_lang(db, lang)?.iter() {
+                if let Ok(root) = LinkDao::by_lang_loc_y(db, lang, loc, 0) {
+                    for it in root {
+                        let mut nav = Nav {
+                            title: it.label.clone(),
+                            href: it.href.clone(),
+                            children: Vec::new(),
+                        };
+                        if let Ok(children) = LinkDao::by_lang_loc_x(db, lang, loc, it.x) {
+                            for it in children {
+                                nav.children.push(Link {
+                                    title: it.label.clone(),
+                                    href: it.href.clone(),
+                                });
+                            }
+                        }
+                        items.insert(loc.to_string(), nav);
+                    }
+                }
+            }
+            items
+        };
+
         let it = Self {
             title: LocaleDao::by_lang_and_code(db, lang, "site.title")?.message,
             subhead: LocaleDao::by_lang_and_code(db, lang, "site.title")?.message,
@@ -99,16 +126,24 @@ impl Site {
             author: LocaleDao::by_lang_and_code(db, lang, "site.title")?.message,
             description: LocaleDao::by_lang_and_code(db, lang, "site.title")?.message,
             lang: lang.to_string(),
+            languages: LocaleDao::languages(db)?,
             locales,
+            nav,
             created_at: Utc::now().naive_local(),
         };
         Ok(it)
     }
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Nav {
+    pub title: String,
+    pub href: String,
+    pub children: Vec<Link>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Link {
     pub title: String,
     pub href: String,
-    pub children: Vec<Self>,
 }
