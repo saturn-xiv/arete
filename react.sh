@@ -18,4 +18,5 @@ yarn add urijs @types/urijs \
     redux react-redux @types/react-redux \
     react-router-dom @types/react-router-dom \
     @loadable/component @types/loadable__component \
-    @material-ui/core @material-ui/icons fontsource-roboto
+    validate.js \
+    @fluentui/react @uifabric/react-cards
