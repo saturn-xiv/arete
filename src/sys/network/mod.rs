@@ -1,3 +1,4 @@
+pub mod dhclient;
 pub mod dhcp;
 pub mod systemd;
 pub mod ubuntu;
