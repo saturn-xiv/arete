@@ -3,12 +3,12 @@
 
 __metadata:
   version: 4
-  cacheKey: 4
+  cacheKey: 5
 
-"@fortawesome/fontawesome-free@npm:^5.13.0":
-  version: 5.13.0
-  resolution: "@fortawesome/fontawesome-free@npm:5.13.0"
-  checksum: 53f4c992a1feac188ae198a9c6fd18ac696022d30d5ebb044ae9013053d0e60e1b7bfe2f831c9a0114adf4accaa457a47023966a9dacf508ddbcbb20a027f719
+"@fortawesome/fontawesome-free@npm:^5.14.0":
+  version: 5.14.0
+  resolution: "@fortawesome/fontawesome-free@npm:5.14.0"
+  checksum: a095ca936418526b6f9b08fe9065b09a34c306ad565fd11188a6d0753e326fd6a8a2cc68aadca4e3be36a6fb2b9385a33698fd29b08f6c53bb9f8a6b3eb0d100
   languageName: node
   linkType: hard
 
@@ -16,13 +16,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "arete@workspace:."
   dependencies:
-    "@fortawesome/fontawesome-free": ^5.13.0
+    "@fortawesome/fontawesome-free": ^5.14.0
     bootstrap: ^4.5.0
     jquery: ^3.5.1
-    marked: ^1.1.0
+    marked: ^1.1.1
     material-design-icons-iconfont: ^5.0.1
     materialize-css: ^1.0.0
-    moment: ^2.26.0
+    moment: ^2.27.0
     moment-timezone: ^0.5.31
     popper.js: ^1.16.1
     quill: ^1.3.7
@@ -189,12 +189,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"marked@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "marked@npm:1.1.0"
+"marked@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "marked@npm:1.1.1"
   bin:
     marked: bin/marked
-  checksum: 8cd86fd8c66e6e2ee6450c9520b48c19c147b75ec1f10c1da546811164d36b6f90098ba005f192823d76e0eda6477f6c84b9eb723e4b617aef57d15dfb7cf1b2
+  checksum: 4fb077a99ca6a6a4f389bbe2f27620509a332da6fac019560fc25e0e9636226cc86420ddbcfc6e8956920cbca68d64cd11d03954d22123a95ffc63c2e6c4e0ae
   languageName: node
   linkType: hard
 
@@ -221,10 +221,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"moment@npm:>= 2.9.0, moment@npm:^2.26.0":
+"moment@npm:>= 2.9.0":
   version: 2.26.0
   resolution: "moment@npm:2.26.0"
   checksum: 67bf24cd08c7aa392981f37ce1802214bc39f0f269cb77d9c7b50d9548e936fd23eacab55615882aea13736dfdb89880f2ac998400962253991e9cb0e54e8d71
+  languageName: node
+  linkType: hard
+
+"moment@npm:^2.27.0":
+  version: 2.27.0
+  resolution: "moment@npm:2.27.0"
+  checksum: 72d9a7d8dba59e3d538440cdc0b59fa895b123361e370be231896478aaf157a484355ce32bd8daf6f731d6d1636d3a67ecb67531e536e093ca18b43e0cbae194
   languageName: node
   linkType: hard
 

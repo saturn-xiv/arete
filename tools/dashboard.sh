@@ -1,7 +1,7 @@
 #!/bin/sh
 
+# https://yarnpkg.com/getting-started/install
 # https://create-react-app.dev/docs/adding-typescript/
-# yarn create react-app dashboard --template typescript
 
 # third
 yarn add urijs @types/urijs \
@@ -18,5 +18,6 @@ yarn add urijs @types/urijs \
     redux react-redux @types/react-redux \
     react-router-dom @types/react-router-dom \
     @loadable/component @types/loadable__component \
-    validate.js \
+    validate.js react-dropzone \
+    react-syntax-highlighter @types/react-syntax-highlighter \
     @fluentui/react @uifabric/react-cards
