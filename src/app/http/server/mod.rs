@@ -1,3 +1,5 @@
+pub mod helpers;
+
 use std::ffi::OsStr;
 use std::fs::read_dir;
 use std::net::SocketAddr;
@@ -22,12 +24,6 @@ use super::super::super::{
     VIEWS_ROOT,
 };
 
-// handlebars_helper!(lower: |s: str| s.to_lowercase());
-// handlebars_helper!(upper: |s: str| s.to_uppercase());
-// handlebars_helper!(hex: |v: i64| format!("0x{:x}", v));
-// handlebars_helper!(money: |v: i64, {cur: str="$"}| format!("{}{}.00", cur, v));
-// handlebars_helper!(datetime: |v: NaiveDateTime, {format: str="%c"}| v.format(format));
-
 #[actix_rt::main]
 pub async fn launch(cfg: Config) -> Result<()> {
     let db = cfg.database.open()?;
@@ -37,11 +33,10 @@ pub async fn launch(cfg: Config) -> Result<()> {
     {
         handlebars.set_strict_mode(true);
         {
-            // handlebars.register_helper("lower", Box::new(lower));
-            // handlebars.register_helper("upper", Box::new(upper));
-            // handlebars.register_helper("hex", Box::new(hex));
-            // handlebars.register_helper("money", Box::new(money));
-            // handlebars.register_helper("datetime", Box::new(datetime));
+            handlebars.register_helper("lower", Box::new(helpers::lower));
+            handlebars.register_helper("upper", Box::new(helpers::upper));
+            handlebars.register_helper("hex", Box::new(helpers::hex));
+            handlebars.register_helper("money", Box::new(helpers::money));
         }
         for entry in read_dir("helpers")? {
             let entry = entry?;

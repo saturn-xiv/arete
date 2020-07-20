@@ -111,7 +111,8 @@ version = "1"
 features = ["chrono", "serde_json", "uuid", "numeric", "r2d2", "postgres", "mysql", "sqlite"]
 
 [dependencies.handlebars]
-version = "3"
+version = "3.2.0"
+# git = "https://github.com/sunng87/handlebars-rust.git"
 features = ["dir_source", "script_helper"]
 
 [dependencies.openssl-sys]
