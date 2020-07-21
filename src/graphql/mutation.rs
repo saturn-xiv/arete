@@ -1,8 +1,16 @@
-use super::context::Context;
+use juniper::FieldResult;
 
-pub struct Root;
+use super::super::plugins::nut::graphql as nut;
+use super::{context::Context, OK};
+
+pub struct Mutation;
 
 #[juniper::object(
     Context = Context,
 )]
-impl Root {}
+impl Mutation {
+    fn usersSignIn(context: &Context, form: nut::users::SignIn) -> FieldResult<OK> {
+        form.execute(context)?;
+        Ok(OK::default())
+    }
+}

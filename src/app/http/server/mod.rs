@@ -91,8 +91,8 @@ pub async fn launch(cfg: Config) -> Result<()> {
     let mq = cfg.rabbitmq.open();
     let che = cfg.cache.open()?;
     let schema = web::Data::new(graphql::Schema::new(
-        graphql::query::Root {},
-        graphql::mutation::Root {},
+        graphql::query::Query {},
+        graphql::mutation::Mutation {},
     ));
     let env = cfg.env.clone();
 

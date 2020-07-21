@@ -1,13 +1,16 @@
-use super::super::env::VERSION;
+use juniper::FieldResult;
+
+use super::super::plugins::nut::graphql as nut;
 use super::context::Context;
 
-pub struct Root;
+pub struct Query;
 
 #[juniper::object(
     Context = Context,
 )]
-impl Root {
-    fn apiVersion(context: &Context) -> &str {
-        VERSION
+impl Query {
+    fn about(context: &Context) -> FieldResult<nut::About> {
+        let it = nut::About::new(context)?;
+        Ok(it)
     }
 }
