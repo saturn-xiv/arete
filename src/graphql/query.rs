@@ -13,4 +13,12 @@ impl Query {
         let it = nut::About::new(context)?;
         Ok(it)
     }
+    fn usersLogs(context: &Context) -> FieldResult<nut::About> {
+        let it = nut::About::new(context)?;
+        Ok(it)
+    }
+    fn usersSelf(context: &Context) -> FieldResult<nut::About> {
+        let it = nut::About::new(context)?;
+        Ok(it)
+    }
 }

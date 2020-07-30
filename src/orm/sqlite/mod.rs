@@ -51,6 +51,8 @@ pub fn schema_migrations_exists(name: &str) -> String {
     )
 }
 
+pub const VERSION: &str = "SELECT SQLITE_VERSION() AS value";
+
 // https://stackoverflow.com/questions/57123453/how-to-use-diesel-with-sqlite-connections-and-avoid-database-is-locked-type-of
 pub trait Pragma {
     fn busy_timeout(&self, d: Duration) -> Result<()>;

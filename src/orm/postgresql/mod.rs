@@ -55,3 +55,5 @@ pub fn schema_migrations_exists(name: &str) -> String {
         name
     )
 }
+
+pub const VERSION: &str = "SELECT VERSION() AS value";

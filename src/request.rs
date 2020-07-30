@@ -1,5 +1,6 @@
 use std::fmt;
 use std::fmt::Debug;
+use std::net::IpAddr;
 use std::pin::Pin;
 
 use actix_web::{
@@ -171,6 +172,25 @@ impl ClientIp {
                 let it = it.trim();
                 if !it.is_empty() {
                     return Some(it.to_string());
+                }
+            }
+        }
+        if let Some(it) = headers.get("Host") {
+            let local = "127.0.0.1".to_string();
+            if let Ok(it) = it.to_str() {
+                let items: Vec<&str> = it.split(':').collect();
+                if let Some(it) = items.first() {
+                    let it = it.trim();
+                    if !it.is_empty() {
+                        if it == "localhost" {
+                            return Some(local);
+                        }
+                        if let Ok(it) = it.parse::<IpAddr>() {
+                            if it.is_loopback() {
+                                return Some(local);
+                            }
+                        }
+                    }
                 }
             }
         }

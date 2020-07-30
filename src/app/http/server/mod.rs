@@ -20,7 +20,7 @@ use super::super::super::{
     errors::Result,
     graphql,
     jwt::Jwt,
-    plugins::nut,
+    plugins::{forum, nut},
     VIEWS_ROOT,
 };
 
@@ -141,6 +141,7 @@ pub async fn launch(cfg: Config) -> Result<()> {
             .service(nut::html::seo::rss)
             .service(nut::html::seo::robots_txt)
             .service(nut::html::seo::sitemap_xml_gz)
+            .service(web::scope("/forum").service(forum::controllers::posts::index))
             .service(web::resource(graphql::SOURCE).route(web::post().to(graphql::post)))
             .service(web::resource("/graphiql").route(web::get().to(graphql::get)))
             .service(actix_files::Files::new("/3rd", "node_modules").use_last_modified(true))

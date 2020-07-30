@@ -16,7 +16,7 @@ pub fn feed() -> Result<()> {
         .append(true)
         .open(wd)?;
     thread::spawn(move || loop {
-        trace!("feed watchdog");
+        log::trace!("feed watchdog");
         if let Err(e) = write!(&mut fd, "1") {
             error!("{:?}", e);
         }

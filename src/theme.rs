@@ -30,7 +30,7 @@ pub fn render<M: Serialize + Debug, E: Secret>(
     tpl: &str,
     model: &M,
 ) -> Result<impl Responder> {
-    let theme = match SettingDao::get(db, sec, &"site.keywords".to_string()) {
+    let theme = match SettingDao::get(db, sec, &"site.theme".to_string()) {
         Ok(it) => it,
         Err(_) => "bootstrap".to_string(),
     };
@@ -63,12 +63,19 @@ pub struct Layout<T: Serialize + Debug> {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct Author {
+    pub name: String,
+    pub email: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Site {
     pub title: String,
     pub subhead: String,
-    pub author: String,
-    pub keywords: String,
+    pub author: Author,
+    pub keywords: Vec<String>,
     pub description: String,
+    pub copyright: String,
     pub lang: String,
     pub languages: Vec<String>,
     pub locales: HashMap<String, String>,
@@ -121,10 +128,11 @@ impl Site {
 
         let it = Self {
             title: LocaleDao::by_lang_and_code(db, lang, "site.title")?.message,
-            subhead: LocaleDao::by_lang_and_code(db, lang, "site.title")?.message,
+            subhead: LocaleDao::by_lang_and_code(db, lang, "site.subhead")?.message,
             keywords: SettingDao::get(db, sec, &"site.keywords".to_string())?,
-            author: LocaleDao::by_lang_and_code(db, lang, "site.title")?.message,
-            description: LocaleDao::by_lang_and_code(db, lang, "site.title")?.message,
+            author: SettingDao::get(db, sec, &"site.author".to_string())?,
+            description: LocaleDao::by_lang_and_code(db, lang, "site.description")?.message,
+            copyright: SettingDao::get(db, sec, &"site.copyright".to_string())?,
             lang: lang.to_string(),
             languages: LocaleDao::languages(db)?,
             locales,

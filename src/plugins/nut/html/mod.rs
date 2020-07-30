@@ -29,6 +29,8 @@ async fn home(
     let cyp = cyp.deref();
     let cyp = cyp.deref();
 
+    // TODO check homepage
+
     theme::render(
         "home",
         &locale.0,

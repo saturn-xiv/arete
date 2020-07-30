@@ -16,9 +16,10 @@ extern crate diesel;
 extern crate failure;
 #[macro_use]
 extern crate serde_json;
+#[macro_use]
+extern crate actix_web;
 
 extern crate actix_files;
-extern crate actix_web;
 extern crate amq_protocol_uri;
 extern crate askama;
 extern crate base64;
