@@ -33,7 +33,7 @@ impl juniper::Context for Context {}
 
 impl Context {
     pub fn current_user(&self) -> Result<&User> {
-        self.current_user.as_ref().ok_or(self.forbidden())
+        self.current_user.as_ref().ok_or_else(|| self.forbidden())
     }
 
     pub fn administrator(&self) -> Result<&User> {

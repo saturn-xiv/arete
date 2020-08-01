@@ -45,7 +45,7 @@ pub type Consumer = Printer;
 #[cfg(not(debug_assertions))]
 pub type Consumer = SendEmail;
 
-pub const NAME: &'static str = "send-email";
+pub const NAME: &str = "send-email";
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

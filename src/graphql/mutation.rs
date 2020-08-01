@@ -2,7 +2,7 @@ use futures::executor;
 use juniper::FieldResult;
 
 use super::super::plugins::nut;
-use super::{context::Context, OK};
+use super::{context::Context, ID, OK};
 
 pub struct Mutation;
 
@@ -18,22 +18,22 @@ impl Mutation {
     }
 
     #[graphql(description = "Sign in by email/nick-name & password.")]
-    fn usersSignIn(context: &Context, form: nut::graphql::users::SignIn) -> FieldResult<String> {
+    fn signInUser(context: &Context, form: nut::graphql::users::SignIn) -> FieldResult<String> {
         let token = form.execute(context)?;
         Ok(token)
     }
     #[graphql(description = "Sign up an email account.")]
-    fn usersSignUp(context: &Context, form: nut::graphql::users::SignUp) -> FieldResult<OK> {
+    fn signUpUser(context: &Context, form: nut::graphql::users::SignUp) -> FieldResult<OK> {
         executor::block_on(form.execute(context))?;
         Ok(OK::default())
     }
     #[graphql(description = "Resend active email.")]
-    fn usersConfirm(context: &Context, form: nut::graphql::users::EmailForm) -> FieldResult<OK> {
+    fn confirmUser(context: &Context, form: nut::graphql::users::EmailForm) -> FieldResult<OK> {
         executor::block_on(form.confirm(context))?;
         Ok(OK::default())
     }
     #[graphql(description = "Active your account.")]
-    fn usersConfirmToken(
+    fn confirmUserToken(
         context: &Context,
         form: nut::graphql::users::TokenForm,
     ) -> FieldResult<OK> {
@@ -41,12 +41,12 @@ impl Mutation {
         Ok(OK::default())
     }
     #[graphql(description = "Resend unlock email.")]
-    fn usersUnlock(context: &Context, form: nut::graphql::users::EmailForm) -> FieldResult<OK> {
+    fn unlockUser(context: &Context, form: nut::graphql::users::EmailForm) -> FieldResult<OK> {
         executor::block_on(form.unlock(context))?;
         Ok(OK::default())
     }
     #[graphql(description = "Unlock your account.")]
-    fn usersUnlockToken(
+    fn unnlockUserToken(
         context: &Context,
         form: nut::graphql::users::TokenForm,
     ) -> FieldResult<OK> {
@@ -54,7 +54,7 @@ impl Mutation {
         Ok(OK::default())
     }
     #[graphql(description = "Forgot your password")]
-    fn usersForgotPassword(
+    fn forgotUserPassword(
         context: &Context,
         form: nut::graphql::users::EmailForm,
     ) -> FieldResult<OK> {
@@ -62,7 +62,7 @@ impl Mutation {
         Ok(OK::default())
     }
     #[graphql(description = "Reset your password.")]
-    fn usersResetPassword(
+    fn resetUserPassword(
         context: &Context,
         form: nut::graphql::users::ResetPassword,
     ) -> FieldResult<OK> {
@@ -78,7 +78,7 @@ impl Mutation {
         Ok(OK::default())
     }
     #[graphql(description = "Change your password.")]
-    fn usersChangePassword(
+    fn changeUserPassword(
         context: &Context,
         form: nut::graphql::users::ChangePassword,
     ) -> FieldResult<OK> {
@@ -86,13 +86,31 @@ impl Mutation {
         Ok(OK::default())
     }
     #[graphql(description = "Sign out.")]
-    fn usersSignOut(context: &Context) -> FieldResult<OK> {
+    fn signOutUser(context: &Context) -> FieldResult<OK> {
         nut::graphql::users::SignOut::execute(context)?;
         Ok(OK::default())
     }
     #[graphql(description = "Lock a account.")]
-    fn usersUnlock(context: &Context, form: nut::graphql::users::Lock) -> FieldResult<OK> {
-        form.execute(context)?;
+    fn lockUser(context: &Context, id: ID) -> FieldResult<OK> {
+        nut::graphql::users::Lock::execute(context, id)?;
+        Ok(OK::default())
+    }
+    #[graphql(description = "Apply policy to user.")]
+    fn applyUserPolicy(
+        context: &Context,
+        id: ID,
+        form: nut::graphql::users::Apply,
+    ) -> FieldResult<OK> {
+        form.execute(context, id)?;
+        Ok(OK::default())
+    }
+    #[graphql(description = "Deny policy from user.")]
+    fn denyUserPolicy(
+        context: &Context,
+        id: ID,
+        form: nut::graphql::users::Deny,
+    ) -> FieldResult<OK> {
+        form.execute(context, id)?;
         Ok(OK::default())
     }
 
@@ -101,15 +119,20 @@ impl Mutation {
         form.execute(context)?;
         Ok(OK::default())
     }
+    #[graphql(description = "Update site author")]
+    fn updateSiteAuthor(context: &Context, form: nut::graphql::site::Author) -> FieldResult<OK> {
+        form.execute(context)?;
+        Ok(OK::default())
+    }
 
-    #[graphql(description = "Setup locale")]
+    #[graphql(description = "Set locale")]
     fn updateLocale(context: &Context, form: nut::graphql::locales::Update) -> FieldResult<OK> {
         form.execute(context)?;
         Ok(OK::default())
     }
-    #[graphql(description = "Setup locale")]
-    fn deleteLocale(context: &Context, form: nut::graphql::locales::Update) -> FieldResult<OK> {
-        form.execute(context)?;
+    #[graphql(description = "Remove locale")]
+    fn destoryLocale(context: &Context, id: ID) -> FieldResult<OK> {
+        nut::graphql::locales::Destory::execute(context, id)?;
         Ok(OK::default())
     }
 }

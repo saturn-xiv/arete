@@ -1,30 +1,41 @@
 use std::ops::Deref;
 
+use chrono::NaiveDateTime;
 use juniper::{GraphQLInputObject, GraphQLObject};
 use validator::Validate;
 
 use super::super::super::super::{
-    errors::Result, graphql::context::Context, i18n::locale::Dao as LocaleDao,
+    errors::Result,
+    graphql::{context::Context, ID as RID},
+    i18n::locale::{Dao as LocaleDao, Item as LocaleItem},
     orm::Connection as Db,
 };
 
 #[derive(GraphQLObject)]
-pub struct Show {
-    pub id: String,
+pub struct Locale {
+    pub id: RID,
     pub code: String,
     pub message: String,
+    pub updated_at: NaiveDateTime,
 }
 
-impl Show {
-    pub fn load(ctx: &Context) -> Result<Vec<Self>> {
+impl From<LocaleItem> for Locale {
+    fn from(it: LocaleItem) -> Self {
+        Self {
+            id: it.id.into(),
+            message: it.message,
+            code: it.code,
+            updated_at: it.updated_at,
+        }
+    }
+}
+
+impl Locale {
+    pub fn index(ctx: &Context) -> Result<Vec<Self>> {
         let db = ctx.db.deref();
         Ok(LocaleDao::by_lang(db, &ctx.locale)?
             .into_iter()
-            .map(|it| Self {
-                id: it.id.to_string(),
-                code: it.code,
-                message: it.message,
-            })
+            .map(|it| it.into())
             .collect::<_>())
     }
 }
@@ -54,5 +65,15 @@ impl Update {
             }
         };
         Ok(())
+    }
+}
+
+pub struct Destory;
+
+impl Destory {
+    pub fn execute(ctx: &Context, id: RID) -> Result<()> {
+        ctx.administrator()?;
+        let db = ctx.db.deref();
+        LocaleDao::delete(db, id.0)
     }
 }

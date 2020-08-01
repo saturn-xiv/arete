@@ -129,17 +129,20 @@ pub async fn get() -> HttpResponse {
         .body(html)
 }
 
+type Services = (
+    web::Data<Db>,
+    web::Data<Cache>,
+    web::Data<RabbitMQ>,
+    web::Data<Crypto>,
+    web::Data<Jwt>,
+);
+type Params = (Locale, ClientIp, Option<Token>, Option<CurrentUser>);
+
 pub async fn post(
     st: web::Data<Schema>,
     data: web::Json<GraphQLRequest>,
-    services: (
-        web::Data<Db>,
-        web::Data<Cache>,
-        web::Data<RabbitMQ>,
-        web::Data<Crypto>,
-        web::Data<Jwt>,
-    ),
-    params: (Locale, ClientIp, Option<Token>, Option<CurrentUser>),
+    services: Services,
+    params: Params,
 ) -> Result<HttpResponse> {
     let db = (services.0).get()?;
     let ch = (services.1).get()?;

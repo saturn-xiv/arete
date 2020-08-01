@@ -9,17 +9,17 @@ use validator::Validate;
 use super::super::super::super::{
     crypto::Crypto,
     errors::Result,
-    graphql::{context::Context, Pager, Pagination, ID as RID},
+    graphql::{context::Context, Pager, Pagination, ID},
     i18n::I18n,
     jwt::Jwt,
-    orm::{Connection as Db, ID},
+    orm::Connection as Db,
     queue::{rabbitmq::RabbitMQ, Task},
 };
 use super::super::{
     models::{
         log::{Dao as LogDao, Item as LogItem},
         policy::{Dao as PolicyDao, Item as PolicyItem, Role},
-        user::{Dao as UserDao, Item as User},
+        user::{Dao as UserDao, Item as UserItem},
     },
     request::{Action, Token},
     tasks::send_email,
@@ -37,7 +37,7 @@ impl SignIn {
     pub fn execute(&self, ctx: &Context) -> Result<String> {
         self.validate()?;
         let db = ctx.db.deref();
-        let user: Result<User> = self.select(db).ok_or(__i18n_e!(
+        let user: Result<UserItem> = self.select(db).ok_or(__i18n_e!(
             db,
             &ctx.locale,
             "nut.errors.user.is-not-exist",
@@ -84,7 +84,7 @@ impl SignIn {
         Ok(token)
     }
 
-    fn select(&self, db: &Db) -> Option<User> {
+    fn select(&self, db: &Db) -> Option<UserItem> {
         if let Ok(it) = UserDao::by_nick_name(db, &self.id) {
             return Some(it);
         }
@@ -126,10 +126,10 @@ impl SignUp {
         .await?;
         Ok(())
     }
-    pub fn save(&self, ctx: &Context) -> Result<User> {
+    pub fn save(&self, ctx: &Context) -> Result<UserItem> {
         self.validate()?;
         let db = ctx.db.deref();
-        if let Ok(_) = UserDao::by_email(db, &self.email) {
+        if UserDao::by_email(db, &self.email).is_ok() {
             return Err(__i18n_e!(
                 db,
                 &ctx.locale,
@@ -137,7 +137,7 @@ impl SignUp {
                 &json!({"id": self.email})
             ));
         }
-        if let Ok(_) = UserDao::by_nick_name(db, &self.nick_name) {
+        if UserDao::by_nick_name(db, &self.nick_name).is_ok() {
             return Err(__i18n_e!(
                 db,
                 &ctx.locale,
@@ -181,7 +181,7 @@ impl EmailForm {
         self.validate()?;
         let db = ctx.db.deref();
         let it = UserDao::by_email(db, &self.email)?;
-        if let Some(_) = it.confirmed_at {
+        if it.confirmed_at.is_some() {
             return Err(__i18n_e!(
                 db,
                 &ctx.locale,
@@ -243,7 +243,7 @@ impl EmailForm {
         lang: &str,
         jwt: &Jwt,
         queue: &RabbitMQ,
-        user: &User,
+        user: &UserItem,
         act: &Action,
         home: &str,
     ) -> Result<()> {
@@ -255,8 +255,8 @@ impl EmailForm {
                 uid: user.uid.clone(),
                 sub: user.real_name.clone(),
                 act: act.clone(),
-                nbf: nbf,
-                exp: exp,
+                nbf,
+                exp,
             },
         )?;
 
@@ -271,8 +271,8 @@ impl EmailForm {
                 Task::new(&send_email::Task {
                     email: user.email.clone(),
                     name: user.real_name.clone(),
-                    subject: subject,
-                    body: body,
+                    subject,
+                    body,
                 })?,
             )
             .await?;
@@ -297,7 +297,7 @@ impl TokenForm {
         }
 
         let it = UserDao::by_uid(db, &token.uid)?;
-        if let Some(_) = it.confirmed_at {
+        if it.confirmed_at.is_some() {
             return Err(__i18n_e!(
                 db,
                 &ctx.locale,
@@ -465,6 +465,17 @@ impl From<PolicyItem> for Policy {
     }
 }
 
+impl Policy {
+    pub fn index(ctx: &Context, id: ID) -> Result<Vec<Self>> {
+        ctx.administrator()?;
+        let db = ctx.db.deref();
+        Ok(PolicyDao::all(db, id.0)?
+            .into_iter()
+            .map(|it| it.into())
+            .collect::<_>())
+    }
+}
+
 #[derive(GraphQLObject)]
 pub struct CurrentUser {
     pub nick_name: String,
@@ -491,7 +502,7 @@ impl CurrentUser {
 
 #[derive(GraphQLObject)]
 pub struct Log {
-    pub id: RID,
+    pub id: ID,
     pub ip: String,
     pub message: String,
     pub created_at: NaiveDateTime,
@@ -529,25 +540,121 @@ impl Logs {
     }
 }
 
-#[derive(GraphQLInputObject)]
-#[graphql(name = "LockUser", description = "Lock account by uid")]
-pub struct Lock {
-    pub user: String,
-}
+pub struct Lock;
 
 impl Lock {
-    pub fn execute(&self, ctx: &Context) -> Result<()> {
+    pub fn execute(ctx: &Context, id: ID) -> Result<()> {
         ctx.administrator()?;
         let db = ctx.db.deref();
 
-        let user: ID = self.user.parse()?;
-
+        let user = id.0;
         if PolicyDao::is(db, user, &Role::Root) {
             return Err(__i18n_e!(db, &ctx.locale, "nut.errors.forbidden"));
         }
         db.transaction::<_, Error, _>(move || {
             UserDao::lock(db, user, true)?;
             __i18n_l!(db, user, &ctx.client_ip, &ctx.locale, "nut.logs.user.lock")?;
+            Ok(())
+        })?;
+        Ok(())
+    }
+}
+
+#[derive(GraphQLObject)]
+pub struct User {
+    pub id: ID,
+    pub real_name: String,
+    pub nick_name: String,
+    pub email: String,
+    pub logo: String,
+    pub updated_at: NaiveDateTime,
+}
+
+impl From<UserItem> for User {
+    fn from(it: UserItem) -> Self {
+        Self {
+            id: it.id.into(),
+            real_name: it.real_name,
+            nick_name: it.nick_name,
+            email: it.email,
+            logo: it.logo,
+            updated_at: it.updated_at,
+        }
+    }
+}
+
+impl User {
+    pub fn index(ctx: &Context) -> Result<Vec<Self>> {
+        ctx.administrator()?;
+        let db = ctx.db.deref();
+        Ok(UserDao::all(db)?
+            .into_iter()
+            .map(|it| it.into())
+            .collect::<_>())
+    }
+}
+#[derive(GraphQLInputObject, Validate)]
+pub struct Apply {
+    #[validate(length(min = 1))]
+    pub role: String,
+    pub resource: Option<String>,
+    pub nbf: NaiveDate,
+    pub exp: NaiveDate,
+}
+
+impl Apply {
+    pub fn execute(&self, ctx: &Context, id: ID) -> Result<()> {
+        self.validate()?;
+        let db = ctx.db.deref();
+        ctx.administrator()?;
+
+        let user = UserDao::by_id(db, id.0)?;
+        db.transaction::<_, Error, _>(move || {
+            PolicyDao::apply(
+                db,
+                user.id,
+                &self.role.parse()?,
+                &self.resource,
+                &self.nbf,
+                &self.exp,
+            )?;
+            __i18n_l!(
+                db,
+                user.id,
+                &ctx.client_ip,
+                &ctx.locale,
+                "nut.logs.user.role.apply",
+                json!({"role": self.role})
+            )?;
+
+            Ok(())
+        })
+    }
+}
+#[derive(GraphQLInputObject, Validate)]
+pub struct Deny {
+    #[validate(length(min = 1))]
+    pub role: String,
+    pub resource: Option<String>,
+}
+
+impl Deny {
+    pub fn execute(&self, ctx: &Context, id: ID) -> Result<()> {
+        self.validate()?;
+        let db = ctx.db.deref();
+        ctx.administrator()?;
+
+        let user = UserDao::by_id(db, id.0)?;
+        db.transaction::<_, Error, _>(move || {
+            PolicyDao::deny(db, user.id, &self.role.parse()?, &self.resource)?;
+            __i18n_l!(
+                db,
+                user.id,
+                &ctx.client_ip,
+                &ctx.locale,
+                "nut.logs.user.role.deny",
+                json!({"role": self.role})
+            )?;
             Ok(())
         })?;
         Ok(())

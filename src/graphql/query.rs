@@ -1,7 +1,7 @@
 use juniper::FieldResult;
 
 use super::super::plugins::nut;
-use super::{context::Context, Pager};
+use super::{context::Context, Pager, ID};
 
 pub struct Query;
 
@@ -25,10 +25,23 @@ impl Query {
         let it = nut::graphql::users::CurrentUser::new(context)?;
         Ok(it)
     }
+    #[graphql(description = "List all user")]
+    fn indexUser(context: &Context) -> FieldResult<Vec<nut::graphql::users::User>> {
+        let items = nut::graphql::users::User::index(context)?;
+        Ok(items)
+    }
+    #[graphql(description = "List all user's policies")]
+    fn indexUserPolicies(
+        context: &Context,
+        id: ID,
+    ) -> FieldResult<Vec<nut::graphql::users::Policy>> {
+        let items = nut::graphql::users::Policy::index(context, id)?;
+        Ok(items)
+    }
 
     #[graphql(description = "All locale items")]
-    fn listLocale(context: &Context) -> FieldResult<Vec<nut::graphql::locales::Show>> {
-        let items = nut::graphql::locales::Show::load(context)?;
+    fn indexLocale(context: &Context) -> FieldResult<Vec<nut::graphql::locales::Locale>> {
+        let items = nut::graphql::locales::Locale::index(context)?;
         Ok(items)
     }
 }
