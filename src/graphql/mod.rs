@@ -2,11 +2,15 @@ pub mod context;
 pub mod mutation;
 pub mod query;
 
+use std::num::ParseIntError;
+use std::result::Result as StdResult;
+use std::str::FromStr;
+
 use actix_web::{web, HttpResponse};
 use chrono::{NaiveDateTime, Utc};
 use juniper::{
     http::{graphiql::graphiql_source, GraphQLRequest},
-    GraphQLInputObject, GraphQLObject, RootNode,
+    GraphQLInputObject, GraphQLObject, ParseScalarResult, ParseScalarValue, RootNode, Value,
 };
 use mime::{APPLICATION_JSON, TEXT_HTML_UTF_8};
 
@@ -15,7 +19,7 @@ use super::{
     crypto::Crypto,
     errors::Result,
     jwt::Jwt,
-    orm::Pool as Db,
+    orm::{Pool as Db, ID as TID},
     plugins::nut::request::CurrentUser,
     queue::rabbitmq::RabbitMQ,
     request::{ClientIp, Locale, Token},
@@ -24,6 +28,39 @@ use super::{
 pub type Schema = RootNode<'static, query::Query, mutation::Mutation>;
 
 pub const SOURCE: &str = "/graphql";
+
+pub struct ID(pub TID);
+
+impl From<TID> for ID {
+    fn from(item: TID) -> Self {
+        Self(item)
+    }
+}
+
+impl FromStr for ID {
+    type Err = ParseIntError;
+
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
+        Ok(Self(s.parse()?))
+    }
+}
+
+juniper::graphql_scalar!(ID where Scalar = <S> {
+    description: "ROW ID"
+
+    resolve(&self) -> Value {
+        Value::scalar(self.0.to_string())
+    }
+
+    from_input_value(v: &InputValue) -> Option<ID> {
+        v.as_scalar_value::<String>()
+         .and_then(|s| s.parse().ok())
+    }
+
+    from_str<'a>(value: ScalarToken<'a>) -> ParseScalarResult<'a, S> {
+        <String as ParseScalarValue<S>>::from_str(value)
+    }
+});
 
 #[derive(GraphQLObject)]
 pub struct Pagination {

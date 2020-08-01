@@ -2,6 +2,7 @@ nut:
   errors:
     bad-action: Bad action.
     forbidden: Forbidden.
+    db-not-empty: Database isn't empty.
     user:
       is-not-exist: User {{id}} is not exists.
       already-exist: User {{id}} is exists.
@@ -18,6 +19,9 @@ nut:
       lock: Locked.
       unlock: Unlocked.
       reset-password: Reset password.
+      role:
+        apply: Apply {{role}}
+        deny: Deny {{role}}
   mailer:
     users:
       confirm:

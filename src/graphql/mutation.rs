@@ -11,6 +11,12 @@ pub struct Mutation;
     description = "Writable operations!"
 )]
 impl Mutation {
+    #[graphql(description = "Initial database.")]
+    fn install(context: &Context, form: nut::graphql::Install) -> FieldResult<OK> {
+        form.execute(context)?;
+        Ok(OK::default())
+    }
+
     #[graphql(description = "Sign in by email/nick-name & password.")]
     fn usersSignIn(context: &Context, form: nut::graphql::users::SignIn) -> FieldResult<String> {
         let token = form.execute(context)?;
@@ -82,6 +88,28 @@ impl Mutation {
     #[graphql(description = "Sign out.")]
     fn usersSignOut(context: &Context) -> FieldResult<OK> {
         nut::graphql::users::SignOut::execute(context)?;
+        Ok(OK::default())
+    }
+    #[graphql(description = "Lock a account.")]
+    fn usersUnlock(context: &Context, form: nut::graphql::users::Lock) -> FieldResult<OK> {
+        form.execute(context)?;
+        Ok(OK::default())
+    }
+
+    #[graphql(description = "Update site info")]
+    fn updateSiteInfo(context: &Context, form: nut::graphql::site::Info) -> FieldResult<OK> {
+        form.execute(context)?;
+        Ok(OK::default())
+    }
+
+    #[graphql(description = "Setup locale")]
+    fn updateLocale(context: &Context, form: nut::graphql::locales::Update) -> FieldResult<OK> {
+        form.execute(context)?;
+        Ok(OK::default())
+    }
+    #[graphql(description = "Setup locale")]
+    fn deleteLocale(context: &Context, form: nut::graphql::locales::Update) -> FieldResult<OK> {
+        form.execute(context)?;
         Ok(OK::default())
     }
 }

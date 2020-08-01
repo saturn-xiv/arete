@@ -1,24 +1,87 @@
-pub mod admin;
+pub mod locales;
+pub mod site;
 pub mod users;
 
-use juniper::GraphQLObject;
-use nix::sys::utsname::uname;
+use std::ops::Deref;
 
-use super::super::super::{env::VERSION, errors::Result, graphql::context::Context, orm::Dao};
+use diesel::Connection;
+use failure::Error;
+use juniper::{GraphQLInputObject, GraphQLObject};
+use nix::sys::utsname::uname;
+use validator::Validate;
+
+use super::super::super::{
+    env::VERSION,
+    errors::Result,
+    graphql::context::Context,
+    i18n::{locale::Dao as LocaleDao, I18n},
+    orm::Dao,
+};
+use super::models::{
+    log::Dao as LogDao,
+    policy::{Dao as PolicyDao, Item as PolicyItem, Role},
+    user::Dao as UserDao,
+};
+
+#[derive(GraphQLInputObject, Validate)]
+pub struct Install {
+    pub title: String,
+    pub site: site::Info,
+    pub administrator: users::SignUp,
+}
+
+impl Install {
+    pub fn execute(&self, ctx: &Context) -> Result<()> {
+        self.validate()?;
+        let db = ctx.db.deref();
+        if UserDao::count(db)? > 0 {
+            return Err(__i18n_e!(db, &ctx.locale, "nut.errors.db-not-empty"));
+        }
+        let user = self.administrator.save(ctx)?;
+
+        let (nbf, exp) = PolicyItem::weeks(1 << 12);
+        db.transaction::<_, Error, _>(move || {
+            UserDao::confirm(db, user.id)?;
+            __i18n_l!(
+                db,
+                user.id,
+                &ctx.client_ip,
+                &ctx.locale,
+                "nut.logs.user.confirm"
+            )?;
+            for it in vec![Role::Admin, Role::Root] {
+                PolicyDao::apply(db, user.id, &it, &None::<String>, &nbf, &exp)?;
+                __i18n_l!(
+                    db,
+                    user.id,
+                    &ctx.client_ip,
+                    &ctx.locale,
+                    "nut.logs.user.role.apply",
+                    json!({ "name": it })
+                )?;
+            }
+            Ok(())
+        })?;
+        self.site.save(db, &ctx.locale)?;
+        Ok(())
+    }
+}
 
 #[derive(GraphQLObject)]
 pub struct About {
     version: String,
     db: String,
     os: String,
+    languages: Vec<String>,
 }
 
 impl About {
     pub fn new(ctx: &Context) -> Result<Self> {
         let uts = uname();
+        let db = ctx.db.deref();
         Ok(Self {
             version: VERSION.to_string(),
-            db: ctx.db.version()?,
+            db: db.version()?,
             os: format!(
                 "{} {} {} {} {}",
                 uts.sysname(),
@@ -27,6 +90,7 @@ impl About {
                 uts.version(),
                 uts.machine()
             ),
+            languages: LocaleDao::languages(db)?,
         })
     }
 }

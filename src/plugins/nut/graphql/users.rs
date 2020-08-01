@@ -1,6 +1,6 @@
 use std::ops::Deref;
 
-use chrono::Duration;
+use chrono::{Duration, NaiveDate, NaiveDateTime};
 use diesel::Connection;
 use failure::Error;
 use juniper::{GraphQLInputObject, GraphQLObject};
@@ -9,16 +9,16 @@ use validator::Validate;
 use super::super::super::super::{
     crypto::Crypto,
     errors::Result,
-    graphql::{context::Context, Pager, Pagination},
+    graphql::{context::Context, Pager, Pagination, ID as RID},
     i18n::I18n,
     jwt::Jwt,
-    orm::Connection as Db,
+    orm::{Connection as Db, ID},
     queue::{rabbitmq::RabbitMQ, Task},
 };
 use super::super::{
     models::{
-        log::{Dao as LogDao, Log},
-        policy::{Dao as PolicyDao, Policy},
+        log::{Dao as LogDao, Item as LogItem},
+        policy::{Dao as PolicyDao, Item as PolicyItem, Role},
         user::{Dao as UserDao, Item as User},
     },
     request::{Action, Token},
@@ -111,6 +111,22 @@ pub struct SignUp {
 
 impl SignUp {
     pub async fn execute(&self, ctx: &Context) -> Result<()> {
+        let user = self.save(ctx)?;
+
+        let db = ctx.db.deref();
+        EmailForm::send_email(
+            db,
+            &ctx.locale,
+            &ctx.jwt,
+            &ctx.queue,
+            &user,
+            &Action::Confirm,
+            &self.home,
+        )
+        .await?;
+        Ok(())
+    }
+    pub fn save(&self, ctx: &Context) -> Result<User> {
         self.validate()?;
         let db = ctx.db.deref();
         if let Ok(_) = UserDao::by_email(db, &self.email) {
@@ -148,17 +164,7 @@ impl SignUp {
             )?;
             Ok(it)
         })?;
-        EmailForm::send_email(
-            db,
-            &ctx.locale,
-            &ctx.jwt,
-            &ctx.queue,
-            &user,
-            &Action::Confirm,
-            &self.home,
-        )
-        .await?;
-        Ok(())
+        Ok(user)
     }
 }
 
@@ -439,6 +445,27 @@ impl Profile {
 }
 
 #[derive(GraphQLObject)]
+pub struct Policy {
+    pub role: String,
+    pub resource: Option<String>,
+    pub nbf: NaiveDate,
+    pub exp: NaiveDate,
+    pub updated_at: NaiveDateTime,
+}
+
+impl From<PolicyItem> for Policy {
+    fn from(it: PolicyItem) -> Self {
+        Self {
+            role: it.role,
+            resource: it.resource,
+            nbf: it.nbf,
+            exp: it.exp,
+            updated_at: it.updated_at,
+        }
+    }
+}
+
+#[derive(GraphQLObject)]
 pub struct CurrentUser {
     pub nick_name: String,
     pub real_name: String,
@@ -463,6 +490,25 @@ impl CurrentUser {
 }
 
 #[derive(GraphQLObject)]
+pub struct Log {
+    pub id: RID,
+    pub ip: String,
+    pub message: String,
+    pub created_at: NaiveDateTime,
+}
+
+impl From<LogItem> for Log {
+    fn from(it: LogItem) -> Self {
+        Self {
+            id: it.id.into(),
+            ip: it.ip,
+            message: it.message,
+            created_at: it.created_at,
+        }
+    }
+}
+
+#[derive(GraphQLObject)]
 pub struct Logs {
     pagination: Pagination,
     items: Vec<Log>,
@@ -480,5 +526,30 @@ impl Logs {
                 .map(|it| it.into())
                 .collect::<_>(),
         })
+    }
+}
+
+#[derive(GraphQLInputObject)]
+#[graphql(name = "LockUser", description = "Lock account by uid")]
+pub struct Lock {
+    pub user: String,
+}
+
+impl Lock {
+    pub fn execute(&self, ctx: &Context) -> Result<()> {
+        ctx.administrator()?;
+        let db = ctx.db.deref();
+
+        let user: ID = self.user.parse()?;
+
+        if PolicyDao::is(db, user, &Role::Root) {
+            return Err(__i18n_e!(db, &ctx.locale, "nut.errors.forbidden"));
+        }
+        db.transaction::<_, Error, _>(move || {
+            UserDao::lock(db, user, true)?;
+            __i18n_l!(db, user, &ctx.client_ip, &ctx.locale, "nut.logs.user.lock")?;
+            Ok(())
+        })?;
+        Ok(())
     }
 }

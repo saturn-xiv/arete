@@ -1,4 +1,3 @@
-use std::convert::From;
 use std::fmt;
 use std::ops::Add;
 use std::str::FromStr;
@@ -6,34 +5,12 @@ use std::str::FromStr;
 use chrono::{Duration, NaiveDate, NaiveDateTime, Utc};
 use diesel::{delete, insert_into, prelude::*, update};
 use failure::Error;
-use juniper::GraphQLObject;
 
 use super::super::super::super::{
     errors::Result,
     orm::{Connection, ID},
 };
 use super::super::schema::policies;
-
-#[derive(GraphQLObject)]
-pub struct Policy {
-    pub role: String,
-    pub resource: Option<String>,
-    pub nbf: NaiveDate,
-    pub exp: NaiveDate,
-    pub updated_at: NaiveDateTime,
-}
-
-impl From<Item> for Policy {
-    fn from(item: Item) -> Self {
-        Self {
-            role: item.role,
-            resource: item.resource,
-            nbf: item.nbf,
-            exp: item.exp,
-            updated_at: item.updated_at,
-        }
-    }
-}
 
 #[derive(Queryable, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -83,8 +60,8 @@ pub trait Dao {
         user: ID,
         role: &Role,
         resource: &Option<String>,
-        nbf: NaiveDate,
-        exp: NaiveDate,
+        nbf: &NaiveDate,
+        exp: &NaiveDate,
     ) -> Result<()>;
 }
 
@@ -147,8 +124,8 @@ impl Dao for Connection {
         user: ID,
         role: &Role,
         resource: &Option<String>,
-        nbf: NaiveDate,
-        exp: NaiveDate,
+        nbf: &NaiveDate,
+        exp: &NaiveDate,
     ) -> Result<()> {
         let now = Utc::now().naive_utc();
 

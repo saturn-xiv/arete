@@ -1,31 +1,11 @@
 use chrono::NaiveDateTime;
 use diesel::{insert_into, prelude::*};
-use juniper::GraphQLObject;
 
 use super::super::super::super::{
     errors::Result,
     orm::{Connection, ID},
 };
 use super::super::schema::logs;
-
-#[derive(GraphQLObject)]
-pub struct Log {
-    pub id: juniper::ID,
-    pub ip: String,
-    pub message: String,
-    pub created_at: NaiveDateTime,
-}
-
-impl From<Item> for Log {
-    fn from(item: Item) -> Self {
-        Self {
-            id: juniper::ID::new(item.id.to_string()),
-            ip: item.ip,
-            message: item.message,
-            created_at: item.created_at,
-        }
-    }
-}
 
 #[derive(Queryable, Serialize)]
 #[serde(rename_all = "camelCase")]
