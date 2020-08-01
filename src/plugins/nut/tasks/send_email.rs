@@ -3,6 +3,7 @@ use std::ops::Deref;
 use std::sync::Arc;
 use std::time::Duration;
 
+use juniper::GraphQLObject;
 use lettre::{smtp::authentication::Credentials, SmtpClient, Transport};
 use lettre_email::{Email, EmailBuilder};
 use validator::Validate;
@@ -15,7 +16,7 @@ use super::super::super::super::{
     settings::Dao as SettingsDao,
 };
 
-#[derive(Validate, Serialize, Deserialize)]
+#[derive(GraphQLObject, Validate, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Config {
     #[validate(length(min = 1))]

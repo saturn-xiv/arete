@@ -2,13 +2,14 @@ use std::ops::Deref;
 
 use diesel::Connection;
 use failure::Error;
-use juniper::GraphQLInputObject;
+use juniper::{GraphQLInputObject, GraphQLObject};
 use validator::Validate;
 
 use super::super::super::super::{
-    crypto::Crypto, errors::Result, graphql::context::Context, orm::Connection as Db,
-    settings::Dao as SettingDao,
+    cache::Provider, crypto::Crypto, errors::Result, graphql::context::Context,
+    orm::Connection as Db, queue::Task, settings::Dao as SettingDao,
 };
+use super::super::tasks::send_email;
 use super::locales::Update as UpdateLocale;
 
 #[derive(GraphQLInputObject, Validate)]
@@ -45,7 +46,7 @@ impl Info {
     }
 }
 
-#[derive(GraphQLInputObject, Serialize, Deserialize, Validate)]
+#[derive(GraphQLObject, Serialize, Deserialize, Validate)]
 pub struct Author {
     #[validate(length(min = 1), email)]
     pub email: String,
@@ -61,18 +62,124 @@ impl Default for Author {
         }
     }
 }
+
 impl Author {
     pub const KEY: &'static str = "site.author";
-    pub fn execute(&self, ctx: &Context) -> Result<()> {
+    pub fn get(ctx: &Context) -> Result<Self> {
+        let db = ctx.db.deref();
+        let enc = ctx.crypto.deref();
+        let it: Self = match SettingDao::get(db, enc, &Author::KEY.to_string()) {
+            Ok(v) => v,
+            Err(_) => Self::default(),
+        };
+        Ok(it)
+    }
+    pub fn set(ctx: &Context, email: &str, name: &str) -> Result<()> {
         ctx.administrator()?;
         let db = ctx.db.deref();
-        SettingDao::set::<String, Author, Crypto>(
+        let enc = ctx.crypto.deref();
+        SettingDao::set::<String, Self, Crypto>(
             db,
-            &ctx.crypto,
+            enc,
             &Self::KEY.to_string(),
-            self,
+            &Self {
+                email: email.to_string(),
+                name: name.to_string(),
+            },
             false,
         )?;
+        Ok(())
+    }
+}
+
+#[derive(GraphQLObject, Default, Validate, Serialize, Deserialize)]
+pub struct Seo {
+    pub google: Option<Google>,
+    pub baidu: Option<Baidu>,
+    pub keywords: Vec<String>,
+}
+
+#[derive(GraphQLObject, Validate, Serialize, Deserialize)]
+pub struct Google {
+    #[validate(length(min = 1))]
+    pub verify_id: String,
+}
+
+#[derive(GraphQLObject, Validate, Serialize, Deserialize)]
+pub struct Baidu {
+    #[validate(length(min = 1))]
+    pub verify_id: String,
+}
+
+impl Seo {
+    pub const KEY: &'static str = "site.seo";
+
+    pub fn get(ctx: &Context) -> Result<Self> {
+        ctx.administrator()?;
+        let db = ctx.db.deref();
+        let enc = ctx.crypto.deref();
+        let it: Self = match SettingDao::get(db, enc, &Self::KEY.to_string()) {
+            Ok(v) => v,
+            Err(_) => Self::default(),
+        };
+        Ok(it)
+    }
+
+    pub fn set(&self, ctx: &Context) -> Result<()> {
+        ctx.administrator()?;
+        let db = ctx.db.deref();
+        let enc = ctx.crypto.deref();
+        SettingDao::set::<String, Self, Crypto>(db, enc, &Self::KEY.to_string(), self, false)?;
+        Ok(())
+    }
+}
+
+impl send_email::Config {
+    pub fn get(ctx: &Context) -> Result<Self> {
+        ctx.administrator()?;
+        let db = ctx.db.deref();
+        let enc = ctx.crypto.deref();
+        let it: Self = match SettingDao::get(db, enc, &Self::KEY.to_string()) {
+            Ok(v) => v,
+            Err(_) => Self::default(),
+        };
+        Ok(it)
+    }
+
+    pub fn set(&self, ctx: &Context) -> Result<()> {
+        ctx.administrator()?;
+        let db = ctx.db.deref();
+        let enc = ctx.crypto.deref();
+        SettingDao::set::<String, Self, Crypto>(db, enc, &Self::KEY.to_string(), self, true)?;
+        Ok(())
+    }
+
+    pub async fn test(ctx: &Context) -> Result<()> {
+        ctx.administrator()?;
+        let user = ctx.administrator()?;
+        let queue = ctx.queue.deref();
+        queue
+            .publish(
+                send_email::NAME,
+                Task::new(&send_email::Task {
+                    email: user.email.clone(),
+                    name: user.real_name.clone(),
+                    subject: format!("Hi, {}", user.real_name),
+                    body: "This is a test email.".to_string(),
+                })?,
+            )
+            .await?;
+        Ok(())
+    }
+}
+
+pub struct ClearCache;
+impl ClearCache {
+    pub fn execute(ctx: &Context) -> Result<()> {
+        ctx.administrator()?;
+        if let Ok(mut ch) = ctx.cache.lock() {
+            ch.clear()?;
+        }
         Ok(())
     }
 }

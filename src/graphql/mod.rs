@@ -5,6 +5,7 @@ pub mod query;
 use std::num::ParseIntError;
 use std::result::Result as StdResult;
 use std::str::FromStr;
+use std::sync::Mutex;
 
 use actix_web::{web, HttpResponse};
 use chrono::{NaiveDateTime, Utc};
@@ -151,7 +152,7 @@ pub async fn post(
             &st,
             &context::Context {
                 db,
-                cache: ch,
+                cache: Mutex::new(ch),
                 queue: (services.2).into_inner(),
                 crypto: (services.3).into_inner(),
                 jwt: (services.4).into_inner(),

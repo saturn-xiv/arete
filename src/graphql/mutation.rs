@@ -115,13 +115,53 @@ impl Mutation {
     }
 
     #[graphql(description = "Update site info")]
-    fn updateSiteInfo(context: &Context, form: nut::graphql::site::Info) -> FieldResult<OK> {
+    fn setSiteInfo(context: &Context, form: nut::graphql::site::Info) -> FieldResult<OK> {
         form.execute(context)?;
         Ok(OK::default())
     }
     #[graphql(description = "Update site author")]
-    fn updateSiteAuthor(context: &Context, form: nut::graphql::site::Author) -> FieldResult<OK> {
-        form.execute(context)?;
+    fn setSiteAuthor(context: &Context, email: String, name: String) -> FieldResult<OK> {
+        nut::graphql::site::Author::set(context, &email, &name)?;
+        Ok(OK::default())
+    }
+    #[graphql(description = "Update site seo configuration")]
+    fn setSiteSeo(
+        context: &Context,
+        keywords: Vec<String>,
+        google_verify_code: Option<String>,
+        baidu_verify_code: Option<String>,
+    ) -> FieldResult<OK> {
+        let form = nut::graphql::site::Seo {
+            keywords,
+            google: google_verify_code.map(|it| nut::graphql::site::Google { verify_id: it }),
+            baidu: baidu_verify_code.map(|it| nut::graphql::site::Baidu { verify_id: it }),
+        };
+        form.set(context)?;
+        Ok(OK::default())
+    }
+    #[graphql(description = "Update site SMTP configuration")]
+    fn setSiteSmtp(
+        context: &Context,
+        host: String,
+        email: String,
+        password: String,
+    ) -> FieldResult<OK> {
+        let form = nut::tasks::send_email::Config {
+            host,
+            email,
+            password,
+        };
+        form.set(context)?;
+        Ok(OK::default())
+    }
+    #[graphql(description = "Test site SMTP configuration")]
+    fn testSiteSmtp(context: &Context) -> FieldResult<OK> {
+        executor::block_on(nut::tasks::send_email::Config::test(context))?;
+        Ok(OK::default())
+    }
+    #[graphql(description = "Clear site cache")]
+    fn clearSiteCache(context: &Context) -> FieldResult<OK> {
+        nut::graphql::site::ClearCache::execute(context)?;
         Ok(OK::default())
     }
 

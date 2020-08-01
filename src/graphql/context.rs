@@ -1,5 +1,5 @@
 use std::ops::Deref;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 use failure::Error;
 
@@ -21,7 +21,7 @@ pub struct Context {
     pub locale: String,
     pub db: Db,
     pub jwt: Arc<Jwt>,
-    pub cache: Cache,
+    pub cache: Mutex<Cache>,
     pub crypto: Arc<Crypto>,
     pub queue: Arc<RabbitMQ>,
     pub token: Option<String>,

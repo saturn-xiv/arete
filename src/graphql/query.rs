@@ -39,6 +39,22 @@ impl Query {
         Ok(items)
     }
 
+    #[graphql(description = "Get site author")]
+    fn getSiteAuthor(context: &Context) -> FieldResult<nut::graphql::site::Author> {
+        let it = nut::graphql::site::Author::get(context)?;
+        Ok(it)
+    }
+    #[graphql(description = "Get site seo configuration")]
+    fn getSiteSeo(context: &Context) -> FieldResult<nut::graphql::site::Seo> {
+        let it = nut::graphql::site::Seo::get(context)?;
+        Ok(it)
+    }
+    #[graphql(description = "Get site SMTP configuration")]
+    fn getSiteSmtp(context: &Context) -> FieldResult<nut::tasks::send_email::Config> {
+        let it = nut::tasks::send_email::Config::get(context)?;
+        Ok(it)
+    }
+
     #[graphql(description = "All locale items")]
     fn indexLocale(context: &Context) -> FieldResult<Vec<nut::graphql::locales::Locale>> {
         let items = nut::graphql::locales::Locale::index(context)?;
