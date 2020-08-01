@@ -1,13 +1,23 @@
 nut:
   errors:
+    bad-action: Bad action.
+    forbidden: Forbidden.
     user:
-      is-not-exist: User {{login}} is not exists.
+      is-not-exist: User {{id}} is not exists.
+      already-exist: User {{id}} is exists.
+      already-confirm: User is already confirmed.
+      is-not-lock: User is not locked.
   logs:
     user:
       sign-out: Sign out.
-      sign:
+      sign-in:
         failed: Sign in failed.
         success: Sign in success.
+      sign-up: Create account.
+      confirm: Confirmed.
+      lock: Locked.
+      unlock: Unlocked.
+      reset-password: Reset password.
   mailer:
     users:
       confirm:

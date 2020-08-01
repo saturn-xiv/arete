@@ -60,7 +60,7 @@ pub struct RabbitMQ {
 }
 
 impl RabbitMQ {
-    pub async fn open(&self, queue: &str) -> Result<Channel> {
+    async fn open(&self, queue: &str) -> Result<Channel> {
         let con = Connection::connect_uri(self.uri.clone(), self.conn.clone()).await?;
         let ch = con.create_channel().await?;
         ch.queue_declare(queue, QueueDeclareOptions::default(), FieldTable::default())

@@ -6,7 +6,7 @@ use actix_web::{web, HttpResponse};
 use chrono::{NaiveDateTime, Utc};
 use juniper::{
     http::{graphiql::graphiql_source, GraphQLRequest},
-    RootNode,
+    GraphQLInputObject, GraphQLObject, RootNode,
 };
 use mime::{APPLICATION_JSON, TEXT_HTML_UTF_8};
 
@@ -25,7 +25,54 @@ pub type Schema = RootNode<'static, query::Query, mutation::Mutation>;
 
 pub const SOURCE: &str = "/graphql";
 
-#[derive(juniper::GraphQLObject)]
+#[derive(GraphQLObject)]
+pub struct Pagination {
+    pub size: i32,
+    pub page: i32,
+    pub total: i32,
+}
+
+impl Pagination {
+    pub fn new(total: i64, pager: &Pager) -> Self {
+        Self {
+            total: total as i32,
+            page: pager.page,
+            size: pager.size,
+        }
+    }
+}
+
+#[derive(GraphQLInputObject, Debug)]
+pub struct Pager {
+    pub size: i32,
+    pub page: i32,
+}
+
+impl Pager {
+    pub const MIN_SIZE: i64 = 5;
+    pub const MAX_SIZE: i64 = 120;
+    pub fn offset(&self, total: i64) -> i64 {
+        let v = ((self.page as i64) - 1) * (self.size as i64);
+        if v < 0 {
+            return 0;
+        }
+        if v >= total {
+            return total - (self.size as i64);
+        }
+        v
+    }
+
+    pub fn limit(&self) -> i64 {
+        let v = self.size as i64;
+        if v < Self::MIN_SIZE {
+            Self::MAX_SIZE
+        } else {
+            v
+        }
+    }
+}
+
+#[derive(GraphQLObject)]
 #[graphql(description = "OK!")]
 pub struct OK {
     pub created_at: NaiveDateTime,
@@ -71,7 +118,7 @@ pub async fn post(
                 locale: (params.0).0,
                 client_ip: (params.1).0,
                 token: (params.2).map(|it| it.0),
-                user: (params.3).map(|it| it.0),
+                current_user: (params.3).map(|it| it.0),
             },
         );
         Ok::<_, serde_json::error::Error>(serde_json::to_string(&res)?)
