@@ -29,4 +29,7 @@ pub enum Error {
     R2d2(#[fail(cause)] r2d2::Error),
     #[fail(display = "{}", _0)]
     Multipart(actix_multipart::MultipartError),
+
+    #[fail(display = "forbidden")]
+    Forbidden,
 }

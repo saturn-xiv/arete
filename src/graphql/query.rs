@@ -54,6 +54,11 @@ impl Query {
         let it = nut::tasks::send_email::Config::get(context)?;
         Ok(it)
     }
+    #[graphql(description = "Get site current status")]
+    fn getSiteStatus(context: &Context) -> FieldResult<nut::graphql::site::status::Status> {
+        let it = nut::graphql::site::status::Status::new(context)?;
+        Ok(it)
+    }
 
     #[graphql(description = "All locale items")]
     fn indexLocale(context: &Context) -> FieldResult<Vec<nut::graphql::locales::Locale>> {

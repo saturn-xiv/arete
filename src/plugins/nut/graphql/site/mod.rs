@@ -1,3 +1,5 @@
+pub mod status;
+
 use std::ops::Deref;
 
 use diesel::Connection;

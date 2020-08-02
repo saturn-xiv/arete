@@ -73,12 +73,14 @@ impl Interface {
 
     pub fn ip4(&self) -> Result<String> {
         if let Some((ref n, _)) = self.ether {
-            let ip = super::ip4(n)?;
-            return Ok(ip.to_string());
+            if let Some(ip) = super::ip4(n) {
+                return Ok(ip.to_string());
+            }
         }
         if let Some((ref n, _)) = self.wifi {
-            let ip = super::ip4(n)?;
-            return Ok(ip.to_string());
+            if let Some(ip) = super::ip4(n) {
+                return Ok(ip.to_string());
+            }
         }
         Err(format_err!("network isn't enable"))
     }

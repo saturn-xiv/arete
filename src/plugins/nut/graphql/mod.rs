@@ -7,7 +7,6 @@ use std::ops::Deref;
 use diesel::Connection;
 use failure::Error;
 use juniper::{GraphQLInputObject, GraphQLObject};
-use nix::sys::utsname::uname;
 use validator::Validate;
 
 use super::super::super::{
@@ -15,7 +14,6 @@ use super::super::super::{
     errors::Result,
     graphql::context::Context,
     i18n::{locale::Dao as LocaleDao, I18n},
-    orm::Dao,
 };
 use super::models::{
     log::Dao as LogDao,
@@ -70,26 +68,14 @@ impl Install {
 #[derive(GraphQLObject)]
 pub struct About {
     version: String,
-    db: String,
-    os: String,
     languages: Vec<String>,
 }
 
 impl About {
     pub fn new(ctx: &Context) -> Result<Self> {
-        let uts = uname();
         let db = ctx.db.deref();
         Ok(Self {
             version: VERSION.to_string(),
-            db: db.version()?,
-            os: format!(
-                "{} {} {} {} {}",
-                uts.sysname(),
-                uts.nodename(),
-                uts.release(),
-                uts.version(),
-                uts.machine()
-            ),
             languages: LocaleDao::languages(db)?,
         })
     }

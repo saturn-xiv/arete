@@ -60,36 +60,40 @@ pub fn interfaces() -> Result<Vec<String>> {
     Ok(items)
 }
 
-pub fn ip4(name: &str) -> Result<Ipv4Addr> {
-    for it in nix::ifaddrs::getifaddrs()? {
-        if it.interface_name == *name {
-            if let Some(addr) = it.address {
-                if let nix::sys::socket::SockAddr::Inet(addr) = addr {
-                    if let SocketAddr::V4(addr) = addr.to_std() {
-                        return Ok(*addr.ip());
+pub fn ip4(name: &str) -> Option<Ipv4Addr> {
+    if let Ok(items) = nix::ifaddrs::getifaddrs() {
+        for it in items {
+            if it.interface_name == *name {
+                if let Some(addr) = it.address {
+                    if let nix::sys::socket::SockAddr::Inet(addr) = addr {
+                        if let SocketAddr::V4(addr) = addr.to_std() {
+                            return Some(*addr.ip());
+                        }
                     }
                 }
             }
         }
     }
 
-    Err(format_err!("bad network device {}", name))
+    None
 }
 
-pub fn ip6(name: &str) -> Result<Ipv6Addr> {
-    for it in nix::ifaddrs::getifaddrs()? {
-        if it.interface_name == *name {
-            if let Some(addr) = it.address {
-                if let nix::sys::socket::SockAddr::Inet(addr) = addr {
-                    if let SocketAddr::V6(addr) = addr.to_std() {
-                        return Ok(*addr.ip());
+pub fn ip6(name: &str) -> Option<Ipv6Addr> {
+    if let Ok(items) = nix::ifaddrs::getifaddrs() {
+        for it in items {
+            if it.interface_name == *name {
+                if let Some(addr) = it.address {
+                    if let nix::sys::socket::SockAddr::Inet(addr) = addr {
+                        if let SocketAddr::V6(addr) = addr.to_std() {
+                            return Some(*addr.ip());
+                        }
                     }
                 }
             }
         }
     }
 
-    Err(format_err!("bad network device {}", name))
+    None
 }
 
 // pub fn mac(name: &str) -> Result<Option<MacAddress>> {
