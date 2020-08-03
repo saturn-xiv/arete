@@ -63,6 +63,72 @@ juniper::graphql_scalar!(ID where Scalar = <S> {
     }
 });
 
+pub struct I64(pub i64);
+
+impl From<i64> for I64 {
+    fn from(item: i64) -> Self {
+        Self(item)
+    }
+}
+
+impl FromStr for I64 {
+    type Err = ParseIntError;
+
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
+        Ok(Self(s.parse()?))
+    }
+}
+
+juniper::graphql_scalar!(I64 where Scalar = <S> {
+    description: "i64"
+
+    resolve(&self) -> Value {
+        Value::scalar(self.0.to_string())
+    }
+
+    from_input_value(v: &InputValue) -> Option<I64> {
+        v.as_scalar_value::<String>()
+         .and_then(|s| s.parse().ok())
+    }
+
+    from_str<'a>(value: ScalarToken<'a>) -> ParseScalarResult<'a, S> {
+        <String as ParseScalarValue<S>>::from_str(value)
+    }
+});
+
+pub struct I16(pub i16);
+
+impl From<i16> for I16 {
+    fn from(item: i16) -> Self {
+        Self(item)
+    }
+}
+
+impl FromStr for I16 {
+    type Err = ParseIntError;
+
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
+        Ok(Self(s.parse()?))
+    }
+}
+
+juniper::graphql_scalar!(I16 where Scalar = <S> {
+    description: "i16"
+
+    resolve(&self) -> Value {
+        Value::scalar(self.0.to_string())
+    }
+
+    from_input_value(v: &InputValue) -> Option<I16> {
+        v.as_scalar_value::<String>()
+         .and_then(|s| s.parse().ok())
+    }
+
+    from_str<'a>(value: ScalarToken<'a>) -> ParseScalarResult<'a, S> {
+        <String as ParseScalarValue<S>>::from_str(value)
+    }
+});
+
 #[derive(GraphQLObject)]
 pub struct Pagination {
     pub size: i32,

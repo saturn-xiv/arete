@@ -1,8 +1,5 @@
 nut:
   errors:
-    bad-action: Bad action.
-    forbidden: Forbidden.
-    db-not-empty: Database isn't empty.
     user:
       is-not-exist: User {{id}} is not exists.
       already-exist: User {{id}} is exists.

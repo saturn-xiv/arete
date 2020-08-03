@@ -1,13 +1,12 @@
 use std::ops::Deref;
 use std::sync::{Arc, Mutex};
 
-use failure::Error;
+use actix_web::http::StatusCode;
 
 use super::super::{
     cache::PooledConnection as Cache,
     crypto::Crypto,
-    errors::Result,
-    i18n::I18n,
+    errors::{Error, Result},
     jwt::Jwt,
     orm::PooledConnection as Db,
     plugins::nut::models::{
@@ -33,7 +32,9 @@ impl juniper::Context for Context {}
 
 impl Context {
     pub fn current_user(&self) -> Result<&User> {
-        self.current_user.as_ref().ok_or_else(|| self.forbidden())
+        self.current_user
+            .as_ref()
+            .ok_or_else(|| Error::Http(StatusCode::FORBIDDEN).into())
     }
 
     pub fn administrator(&self) -> Result<&User> {
@@ -46,10 +47,6 @@ impl Context {
                 return Ok(it);
             }
         }
-        Err(self.forbidden())
-    }
-    fn forbidden(&self) -> Error {
-        let db = self.db.deref();
-        __i18n_e!(db, &self.locale, "nut.errors.user.forbidden")
+        Err(Error::Http(StatusCode::FORBIDDEN).into())
     }
 }

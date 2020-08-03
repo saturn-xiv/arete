@@ -1,14 +1,15 @@
 use std::ops::Deref;
 
+use actix_web::http::StatusCode;
 use chrono::{Duration, NaiveDate, NaiveDateTime};
 use diesel::Connection;
-use failure::Error;
+use failure::Error as FailureError;
 use juniper::{GraphQLInputObject, GraphQLObject};
 use validator::Validate;
 
 use super::super::super::super::{
     crypto::Crypto,
-    errors::Result,
+    errors::{Error, Result},
     graphql::{context::Context, Pager, Pagination, ID},
     i18n::I18n,
     jwt::Jwt,
@@ -58,7 +59,7 @@ impl SignIn {
 
         let uid = user.uid.clone();
         let name = user.real_name.clone();
-        db.transaction::<_, Error, _>(move || {
+        db.transaction::<_, FailureError, _>(move || {
             UserDao::sign_in(db, user.id, &ctx.client_ip)?;
             __i18n_l!(
                 db,
@@ -146,7 +147,7 @@ impl SignUp {
             ));
         }
 
-        let user = db.transaction::<_, Error, _>(move || {
+        let user = db.transaction::<_, FailureError, _>(move || {
             UserDao::sign_up::<Crypto>(
                 db,
                 &self.real_name,
@@ -293,7 +294,7 @@ impl TokenForm {
 
         let token = ctx.jwt.parse::<Token>(&self.token)?.claims;
         if token.act != Action::Confirm {
-            return Err(__i18n_e!(db, &ctx.locale, "nut.errors.bad-action"));
+            return Err(Error::Http(StatusCode::NOT_ACCEPTABLE).into());
         }
 
         let it = UserDao::by_uid(db, &token.uid)?;
@@ -305,7 +306,7 @@ impl TokenForm {
             ));
         }
 
-        db.transaction::<_, Error, _>(move || {
+        db.transaction::<_, FailureError, _>(move || {
             UserDao::confirm(db, it.id)?;
             __i18n_l!(
                 db,
@@ -324,13 +325,13 @@ impl TokenForm {
         let db = ctx.db.deref();
         let token = ctx.jwt.parse::<Token>(&self.token)?.claims;
         if token.act != Action::Unlock {
-            return Err(__i18n_e!(db, &ctx.locale, "nut.errors.bad-action"));
+            return Err(Error::Http(StatusCode::NOT_ACCEPTABLE).into());
         }
         let it = UserDao::by_uid(db, &token.uid)?;
         if None == it.locked_at {
             return Err(__i18n_e!(db, &ctx.locale, "nut.errors.user.is-not-lock"));
         }
-        db.transaction::<_, Error, _>(move || {
+        db.transaction::<_, FailureError, _>(move || {
             UserDao::lock(db, it.id, false)?;
             __i18n_l!(
                 db,
@@ -360,7 +361,7 @@ impl ResetPassword {
 
         let token = ctx.jwt.parse::<Token>(&self.token)?.claims;
         if token.act != Action::ResetPassword {
-            return Err(__i18n_e!(db, &ctx.locale, "nut.errors.bad-action"));
+            return Err(Error::Http(StatusCode::NOT_ACCEPTABLE).into());
         }
 
         let it = UserDao::by_uid(db, &token.uid)?;
@@ -392,7 +393,7 @@ impl ChangePassword {
         let user = ctx.current_user()?;
 
         user.auth::<Crypto>(&self.current_password)?;
-        db.transaction::<_, Error, _>(move || {
+        db.transaction::<_, FailureError, _>(move || {
             UserDao::password::<Crypto>(db, user.id, &self.new_password)?;
             __i18n_l!(
                 db,
@@ -549,9 +550,9 @@ impl Lock {
 
         let user = id.0;
         if PolicyDao::is(db, user, &Role::Root) {
-            return Err(__i18n_e!(db, &ctx.locale, "nut.errors.forbidden"));
+            return Err(Error::Http(StatusCode::FORBIDDEN).into());
         }
-        db.transaction::<_, Error, _>(move || {
+        db.transaction::<_, FailureError, _>(move || {
             UserDao::lock(db, user, true)?;
             __i18n_l!(db, user, &ctx.client_ip, &ctx.locale, "nut.logs.user.lock")?;
             Ok(())
@@ -609,7 +610,7 @@ impl Apply {
         ctx.administrator()?;
 
         let user = UserDao::by_id(db, id.0)?;
-        db.transaction::<_, Error, _>(move || {
+        db.transaction::<_, FailureError, _>(move || {
             PolicyDao::apply(
                 db,
                 user.id,
@@ -645,7 +646,7 @@ impl Deny {
         ctx.administrator()?;
 
         let user = UserDao::by_id(db, id.0)?;
-        db.transaction::<_, Error, _>(move || {
+        db.transaction::<_, FailureError, _>(move || {
             PolicyDao::deny(db, user.id, &self.role.parse()?, &self.resource)?;
             __i18n_l!(
                 db,

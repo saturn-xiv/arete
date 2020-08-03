@@ -1,17 +1,22 @@
+pub mod attahments;
+pub mod cards;
+pub mod categories;
+pub mod friend_links;
 pub mod locales;
 pub mod site;
 pub mod users;
 
 use std::ops::Deref;
 
+use actix_web::http::StatusCode;
 use diesel::Connection;
-use failure::Error;
+use failure::Error as FailureError;
 use juniper::{GraphQLInputObject, GraphQLObject};
 use validator::Validate;
 
 use super::super::super::{
     env::VERSION,
-    errors::Result,
+    errors::{Error, Result},
     graphql::context::Context,
     i18n::{locale::Dao as LocaleDao, I18n},
 };
@@ -33,12 +38,12 @@ impl Install {
         self.validate()?;
         let db = ctx.db.deref();
         if UserDao::count(db)? > 0 {
-            return Err(__i18n_e!(db, &ctx.locale, "nut.errors.db-not-empty"));
+            return Err(Error::Http(StatusCode::FORBIDDEN).into());
         }
         let user = self.administrator.save(ctx)?;
 
         let (nbf, exp) = PolicyItem::weeks(1 << 12);
-        db.transaction::<_, Error, _>(move || {
+        db.transaction::<_, FailureError, _>(move || {
             UserDao::confirm(db, user.id)?;
             __i18n_l!(
                 db,

@@ -65,4 +65,34 @@ impl Query {
         let items = nut::graphql::locales::Locale::index(context)?;
         Ok(items)
     }
+
+    #[graphql(description = "List attachments")]
+    fn indexAttachment(
+        context: &Context,
+    ) -> FieldResult<Vec<nut::graphql::attahments::Attachment>> {
+        let items = nut::graphql::attahments::Attachment::index(context)?;
+        Ok(items)
+    }
+
+    #[graphql(description = "List cards")]
+    fn indexCard(context: &Context) -> FieldResult<Vec<nut::graphql::cards::Card>> {
+        let items = nut::graphql::cards::Card::index(context)?;
+        Ok(items)
+    }
+    #[graphql(description = "Show card")]
+    fn showCard(context: &Context, id: ID) -> FieldResult<nut::graphql::cards::Card> {
+        let it = nut::graphql::cards::Card::show(context, id)?;
+        Ok(it)
+    }
+
+    #[graphql(description = "List categories")]
+    fn indexCategory(context: &Context) -> FieldResult<Vec<nut::graphql::categories::Category>> {
+        let items = nut::graphql::categories::Category::index(context)?;
+        Ok(items)
+    }
+    #[graphql(description = "Show catagory")]
+    fn showCategory(context: &Context, id: ID) -> FieldResult<nut::graphql::categories::Category> {
+        let it = nut::graphql::categories::Category::show(context, id)?;
+        Ok(it)
+    }
 }

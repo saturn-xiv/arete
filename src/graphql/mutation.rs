@@ -175,4 +175,46 @@ impl Mutation {
         nut::graphql::locales::Destory::execute(context, id)?;
         Ok(OK::default())
     }
+
+    #[graphql(description = "Destory attachment")]
+    fn destoryAttachment(context: &Context, id: ID) -> FieldResult<OK> {
+        nut::graphql::attahments::Destory::execute(context, id)?;
+        Ok(OK::default())
+    }
+
+    #[graphql(description = "Create card")]
+    fn createCard(context: &Context, form: nut::graphql::cards::Form) -> FieldResult<OK> {
+        form.create(context)?;
+        Ok(OK::default())
+    }
+    #[graphql(description = "Update card")]
+    fn updateCard(context: &Context, id: ID, form: nut::graphql::cards::Form) -> FieldResult<OK> {
+        form.update(context, id)?;
+        Ok(OK::default())
+    }
+    #[graphql(description = "Destory card")]
+    fn destoryCard(context: &Context, id: ID) -> FieldResult<OK> {
+        nut::graphql::cards::Destory::execute(context, id)?;
+        Ok(OK::default())
+    }
+
+    #[graphql(description = "Create category")]
+    fn createCategory(context: &Context, form: nut::graphql::categories::Form) -> FieldResult<OK> {
+        form.create(context)?;
+        Ok(OK::default())
+    }
+    #[graphql(description = "Update category")]
+    fn updateCategory(
+        context: &Context,
+        id: ID,
+        form: nut::graphql::categories::Form,
+    ) -> FieldResult<OK> {
+        form.update(context, id)?;
+        Ok(OK::default())
+    }
+    #[graphql(description = "Destory category")]
+    fn destoryCategory(context: &Context, id: ID) -> FieldResult<OK> {
+        nut::graphql::categories::Destory::execute(context, id)?;
+        Ok(OK::default())
+    }
 }

@@ -5,13 +5,17 @@ use std::sync::Arc;
 
 use actix_web::{
     dev::Payload,
-    error::{Error, ErrorUnauthorized},
+    error::{Error as ActixError, ErrorUnauthorized},
+    http::StatusCode,
     web, FromRequest, HttpRequest,
 };
 use futures::future::Future;
 
 use super::super::super::{
-    errors::Result as Result_, jwt::Jwt, orm::Pool as DbPool, request::Token as Auth,
+    errors::{Error, Result as Result_},
+    jwt::Jwt,
+    orm::Pool as DbPool,
+    request::Token as Auth,
 };
 use super::models::user::{Dao as UserDao, Item as User};
 
@@ -58,7 +62,7 @@ impl CurrentUser {
     pub fn parse(token: Auth, db: web::Data<DbPool>, jwt: web::Data<Arc<Jwt>>) -> Result_<User> {
         let token = jwt.parse::<Token>(&token.0)?;
         if token.claims.act != Action::SignIn {
-            return Err(format_err!("bad action"));
+            return Err(Error::Http(StatusCode::BAD_REQUEST).into());
         }
         let db = db.get()?;
         let db = db.deref();
@@ -70,7 +74,7 @@ impl CurrentUser {
 
 impl FromRequest for CurrentUser {
     type Config = ();
-    type Error = Error;
+    type Error = ActixError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
     fn from_request(req: &HttpRequest, pl: &mut Payload) -> Self::Future {
@@ -85,10 +89,7 @@ impl FromRequest for CurrentUser {
 
             match Self::parse(auth, db, jwt) {
                 Ok(it) => Ok(Self(it)),
-                Err(e) => {
-                    error!("{:?}", e);
-                    Err(ErrorUnauthorized("bad token"))
-                }
+                Err(e) => Err(ErrorUnauthorized(e)),
             }
         })
     }

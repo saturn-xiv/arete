@@ -43,7 +43,6 @@ pub trait Dao {
     fn update(
         &self,
         id: ID,
-        lang: &str,
         title: &str,
         logo: &str,
         body: &str,
@@ -54,6 +53,7 @@ pub trait Dao {
         position: i16,
     ) -> Result<()>;
     fn all(&self) -> Result<Vec<Item>>;
+    fn by_lang(&self, lang: &str) -> Result<Vec<Item>>;
     fn delete(&self, id: ID) -> Result<()>;
 }
 
@@ -97,7 +97,6 @@ impl Dao for Connection {
     fn update(
         &self,
         id: ID,
-        lang: &str,
         title: &str,
         logo: &str,
         body: &str,
@@ -110,7 +109,6 @@ impl Dao for Connection {
         let now = Utc::now().naive_utc();
         update(cards::dsl::cards.filter(cards::dsl::id.eq(id)))
             .set((
-                cards::dsl::lang.eq(lang),
                 cards::dsl::title.eq(title),
                 cards::dsl::body.eq(body),
                 cards::dsl::media_type.eq(&media_type.to_string()),
@@ -127,6 +125,14 @@ impl Dao for Connection {
 
     fn all(&self) -> Result<Vec<Item>> {
         let items = cards::dsl::cards
+            .order(cards::dsl::updated_at.desc())
+            .load::<Item>(self)?;
+        Ok(items)
+    }
+
+    fn by_lang(&self, lang: &str) -> Result<Vec<Item>> {
+        let items = cards::dsl::cards
+            .filter(cards::dsl::lang.eq(lang))
             .order(cards::dsl::updated_at.desc())
             .load::<Item>(self)?;
         Ok(items)

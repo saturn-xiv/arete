@@ -1,6 +1,7 @@
 use std::fmt;
 use std::ops::{Deref, DerefMut};
 
+use actix_web::http::StatusCode;
 use chrono::NaiveDateTime;
 use diesel::{
     prelude::*,
@@ -38,7 +39,7 @@ impl Status {
                 let ch = ch.deref_mut();
                 Ok(cmd("info").query::<String>(ch)?)
             }
-            Err(_) => Err(Error::Forbidden.into()),
+            Err(_) => Err(Error::Http(StatusCode::FORBIDDEN).into()),
         };
         Ok(Status {
             os: Os::new()?,

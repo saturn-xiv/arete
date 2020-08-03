@@ -30,6 +30,6 @@ pub enum Error {
     #[fail(display = "{}", _0)]
     Multipart(actix_multipart::MultipartError),
 
-    #[fail(display = "forbidden")]
-    Forbidden,
+    #[fail(display = "{}", _0)]
+    Http(actix_web::http::StatusCode),
 }

@@ -6,14 +6,14 @@ use validator::Validate;
 
 use super::super::super::super::{
     errors::Result,
-    graphql::{context::Context, ID as RID},
+    graphql::{context::Context, ID},
     i18n::locale::{Dao as LocaleDao, Item as LocaleItem},
     orm::Connection as Db,
 };
 
 #[derive(GraphQLObject)]
 pub struct Locale {
-    pub id: RID,
+    pub id: ID,
     pub code: String,
     pub message: String,
     pub updated_at: NaiveDateTime,
@@ -71,7 +71,7 @@ impl Update {
 pub struct Destory;
 
 impl Destory {
-    pub fn execute(ctx: &Context, id: RID) -> Result<()> {
+    pub fn execute(ctx: &Context, id: ID) -> Result<()> {
         ctx.administrator()?;
         let db = ctx.db.deref();
         LocaleDao::delete(db, id.0)
