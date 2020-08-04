@@ -14,8 +14,8 @@ impl FileSystem {
     }
 }
 
-impl super::Storage for FileSystem {
-    fn save(&self, name: &str, body: &[u8]) -> Result<String> {
+impl FileSystem {
+    pub fn save(&self, name: &str, body: &[u8]) -> Result<String> {
         let now = Utc::now();
         let mut it =
             Path::new(&now.format("%F").to_string()).join(&now.format("%H-%M-%S-%f").to_string());

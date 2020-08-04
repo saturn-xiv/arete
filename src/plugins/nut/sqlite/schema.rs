@@ -4,7 +4,7 @@ table! {
         user_id -> Integer,
         title -> Text,
         size -> BigInt,
-        mime_type -> Text,
+        content_type -> Text,
         url -> Text,
         version -> Integer,
         created_at -> Timestamp,

@@ -1,15 +1,9 @@
 use std::default::Default;
 use std::fmt;
-use std::fs::{create_dir_all, File};
-use std::io::Write;
-use std::path::Path;
-
-use chrono::Utc;
-use uuid::Uuid;
 
 use super::{
-    cache::Config as CacheConfig, crypto::Key, errors::Result, orm::Config as DatabaseConfig,
-    queue::rabbitmq::Config as RabbitMQConfig,
+    cache::Config as CacheConfig, crypto::Key, orm::Config as DatabaseConfig,
+    queue::rabbitmq::Config as RabbitMQConfig, storage::s3::Config as S3,
 };
 
 include!(concat!(env!("OUT_DIR"), "/env.rs"));
@@ -80,11 +74,7 @@ pub enum Upload {
         local_root: String,
         endpoint: String,
     },
-    S3 {
-        provider: String,
-        aws_access_key_id: String,
-        aws_secret_access_key: String,
-    },
+    Aws(S3),
 }
 
 impl Default for Upload {
@@ -96,27 +86,27 @@ impl Default for Upload {
     }
 }
 
-impl Upload {
-    pub fn save(&self, name: &str, body: &[u8]) -> Result<String> {
-        let now = Utc::now().format("%F").to_string();
-        let mut file = Path::new(&now).join(Uuid::new_v4().to_string());
-        if let Some(ext) = Path::new(&name).extension() {
-            file.set_extension(ext);
-        }
-        match self {
-            Upload::Filesystem {
-                local_root,
-                endpoint,
-            } => {
-                let dst = Path::new(local_root).join(&file);
-                if let Some(d) = dst.parent() {
-                    create_dir_all(d)?;
-                }
-                let mut dst = File::create(dst)?;
-                dst.write_all(body)?;
-                Ok(format!("{}/{}", endpoint, file.display()))
-            }
-            _ => Err(format_err!("not support storage")),
-        }
-    }
-}
+// impl Upload {
+//     pub fn save(&self, name: &str, body: &[u8]) -> Result<String> {
+//         let now = Utc::now().format("%F").to_string();
+//         let mut file = Path::new(&now).join(Uuid::new_v4().to_string());
+//         if let Some(ext) = Path::new(&name).extension() {
+//             file.set_extension(ext);
+//         }
+//         match self {
+//             Upload::Filesystem {
+//                 local_root,
+//                 endpoint,
+//             } => {
+//                 let dst = Path::new(local_root).join(&file);
+//                 if let Some(d) = dst.parent() {
+//                     create_dir_all(d)?;
+//                 }
+//                 let mut dst = File::create(dst)?;
+//                 dst.write_all(body)?;
+//                 Ok(format!("{}/{}", endpoint, file.display()))
+//             }
+//             _ => Err(format_err!("not support storage")),
+//         }
+//     }
+// }

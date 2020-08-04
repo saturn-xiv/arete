@@ -59,7 +59,7 @@ CREATE TABLE attachments(
     user_id INTEGER NOT NULL,
     title VARCHAR(255) NOT NULL,
     size BIGINT NOT NULL,
-    mime_type VARCHAR(255) NOT NULL,
+    content_type VARCHAR(255) NOT NULL,
     url VARCHAR(255) NOT NULL,
     version INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

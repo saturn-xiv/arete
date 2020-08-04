@@ -4,7 +4,7 @@ table! {
         user_id -> Int8,
         title -> Varchar,
         size -> Int8,
-        mime_type -> Varchar,
+        content_type -> Varchar,
         url -> Varchar,
         version -> Int8,
         created_at -> Timestamp,

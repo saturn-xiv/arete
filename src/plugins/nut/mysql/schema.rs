@@ -4,7 +4,7 @@ table! {
         user_id -> Bigint,
         title -> Varchar,
         size -> Bigint,
-        mime_type -> Varchar,
+        content_type -> Varchar,
         url -> Varchar,
         version -> Bigint,
         created_at -> Datetime,
