@@ -32,4 +32,6 @@ pub enum Error {
 
     #[fail(display = "{}", _0)]
     Http(actix_web::http::StatusCode),
+    #[fail(display = "{}", _0)]
+    Rss(String),
 }
