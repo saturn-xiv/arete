@@ -2,7 +2,7 @@
   "name": "arete",
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.14.0",
-    "bootstrap": "^4.5.0",
+    "bootstrap": "^4.5.2",
     "jquery": "^3.5.1",
     "marked": "^1.1.1",
     "material-design-icons-iconfont": "^5.0.1",
