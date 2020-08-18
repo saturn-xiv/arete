@@ -26,6 +26,15 @@ $ convert -background transparent -resize 192x192 from.svg to.png
 $ # favicon.ico: 16x16 32x32 64x64
 ```
 
+## Deployment
+
+```bash
+$ docker pull alpine:latest
+$ docker build -t arete .
+$ docker run --rm -it --network host -v `pwd`:/workspace arete
+$ tools/musl.sh
+```
+
 ### Mock test
 
 - [MinIO is a high performance object storage server compatible with Amazon S3 APIs](https://github.com/minio/minio)
