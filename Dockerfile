@@ -3,7 +3,7 @@ MAINTAINER Jeremy Zheng
 
 RUN apk update
 RUN apk add git curl vim zsh pwgen build-base \
-    node npm yarn \
+    nodejs-current npm yarn \
     openssl-dev
 
 # https://github.com/ohmyzsh/ohmyzsh
