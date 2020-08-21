@@ -15,9 +15,9 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
 # https://github.com/nvm-sh/nvm
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | sh
-RUN sh -c "sh $HOME/.profile \
+RUN sh -c ". $HOME/.profile \
     && nvm install node"
-RUN sh -c "sh $HOME/.nvm/nvm.sh \
+RUN sh -c ". $HOME/.nvm/nvm.sh \
     && npm install -g yarn"
 
 VOLUME /workspace
