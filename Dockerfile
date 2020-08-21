@@ -2,10 +2,16 @@ FROM alpine:latest
 MAINTAINER Jeremy Zheng
 
 RUN apk update
-RUN apk add git curl vim zsh pwgen build-base \
+RUN apk add git curl vim zsh pwgen sudo build-base \
     # nodejs-current npm yarn \
     # cargo rust \
     openssl-dev
+
+# deploy user
+RUN useradd -m deploy -s /bin/bash
+RUN passwd -l deploy
+RUN echo 'deploy ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/101-deploy
+USER deploy
 
 # https://github.com/ohmyzsh/ohmyzsh
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"

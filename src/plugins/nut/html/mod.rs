@@ -12,6 +12,9 @@ use super::super::super::{
     VIEWS_ROOT,
 };
 
+
+// FIXME url_for
+
 #[derive(Serialize, Debug)]
 pub struct Home {}
 
