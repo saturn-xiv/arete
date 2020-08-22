@@ -8,8 +8,7 @@ RUN apk add git curl vim zsh pwgen sudo build-base \
     openssl-dev
 
 # deploy user
-RUN useradd -m deploy -s /bin/bash
-RUN passwd -l deploy
+RUN adduser -s /bin/bash -D deploy
 RUN echo 'deploy ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/101-deploy
 USER deploy
 
@@ -25,6 +24,8 @@ RUN sh -c ". $HOME/.profile \
     && nvm install node"
 RUN sh -c ". $HOME/.nvm/nvm.sh \
     && npm install -g yarn"
+
+RUN echo 'source $HOME/.profile' >> $HOME/.zshrc
 
 VOLUME /workspace
 WORKDIR /workspace
