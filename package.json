@@ -5,7 +5,7 @@
     "bootstrap": "^4.5.2",
     "jquery": "^3.5.1",
     "marked": "^1.1.1",
-    "material-design-icons-iconfont": "^5.0.1",
+    "material-design-icons-iconfont": "^6.0.1",
     "materialize-css": "^1.0.0",
     "moment": "^2.27.0",
     "moment-timezone": "^0.5.31",

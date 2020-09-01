@@ -5,6 +5,8 @@ set -e
 export RUSTFLAGS="-C target-feature=+crt-static"
 cargo build --release
 
+yarn set version latest
+
 if [ ! -d node_modules ]
 then
     yarn install

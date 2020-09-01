@@ -7,8 +7,4 @@ tmp/
 /config.toml
 
 # https://yarnpkg.com/advanced/qa#which-files-should-be-gitignored
-.yarn/*
-!.yarn/plugins
-!.yarn/sdks
-!.yarn/versions
-.pnp.*
+/.yarn/
