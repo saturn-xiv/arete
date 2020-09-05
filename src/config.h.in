@@ -1,0 +1,11 @@
+#ifndef ARETE_CONFIG_H_
+#define ARETE_CONFIG_H_
+
+// clang-format off
+#define ARETE_VERSION_MAJOR @arete_VERSION_MAJOR@
+#define ARETE_VERSION_MINOR @arete_VERSION_MINOR@
+#define ARETE_VERSION_PATCH @arete_VERSION_PATCH@
+#define ARETE_VERSION "v@arete_VERSION_MAJOR@.@arete_VERSION_MINOR@.@arete_VERSION_PATCH@"
+// clang-format on
+
+#endif
