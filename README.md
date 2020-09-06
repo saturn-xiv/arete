@@ -34,3 +34,8 @@ $ make -j
 - [CMake](https://cmake.org/cmake/help/latest/guide/tutorial/index.html)
 - [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html)
 - [Boost](https://www.boost.org/doc/libs/release/more/getting_started/)
+- [mysql++](https://tangentsoft.com/mysqlpp/doc/html/userman/index.html)
+- [libpqxx](http://pqxx.org/development/libpqxx/)
+- [sqlite3](https://www.sqlite.org/cintro.html)
+- [hiredis](https://github.com/redis/hiredis)
+- [libsodium](https://doc.libsodium.org/)
