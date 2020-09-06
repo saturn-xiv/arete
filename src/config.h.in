@@ -6,6 +6,7 @@
 #define ARETE_VERSION_MINOR @arete_VERSION_MINOR@
 #define ARETE_VERSION_PATCH @arete_VERSION_PATCH@
 #define ARETE_VERSION "v@arete_VERSION_MAJOR@.@arete_VERSION_MINOR@.@arete_VERSION_PATCH@"
+#define ARETE_GIT_VERSION "@GIT_REV@"
 // clang-format on
 
 #endif

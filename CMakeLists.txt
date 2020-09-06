@@ -10,6 +10,12 @@ find_package(Threads REQUIRED)
 
 aux_source_directory(src DIR_SRCS)
 
+execute_process(COMMAND git describe --tags --always --dirty
+    OUTPUT_VARIABLE GIT_REV
+    ERROR_QUIET
+)
+string(STRIP "${GIT_REV}" GIT_REV)
+
 configure_file(src/config.h.in config.h)
 
 add_executable(arete ${DIR_SRCS})
