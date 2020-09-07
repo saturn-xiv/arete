@@ -34,11 +34,12 @@ impl Config {
 
     pub async fn put(&self, bucket: &str, name: &str, body: Vec<u8>) -> Result<()> {
         let client = self.open()?;
-        if let Err(_) = client
+        if client
             .head_bucket(HeadBucketRequest {
                 bucket: bucket.to_string(),
             })
             .await
+            .is_err()
         {
             client
                 .create_bucket(CreateBucketRequest {

@@ -32,7 +32,7 @@ pub async fn create(
     let db = db.deref();
     let s3 = s3.deref();
     while let Some(item) = payload.next().await {
-        let mut field = item.or_else(|it| Err(Error::Multipart(it)))?;
+        let mut field = item.map_err(Error::Multipart)?;
         let ct = field.content_type().clone();
         if let Some(cd) = field.content_disposition() {
             if let Some(ref name) = cd.get_name() {
@@ -41,7 +41,7 @@ pub async fn create(
                         if let Some(name) = cd.get_filename() {
                             let mut body = Vec::new();
                             while let Some(chunk) = field.next().await {
-                                let buf = chunk.or_else(|it| Err(Error::Multipart(it)))?;
+                                let buf = chunk.map_err(Error::Multipart)?;
                                 body.append(&mut buf.to_vec());
                             }
                             let bucket = user.0.nick_name.clone();
